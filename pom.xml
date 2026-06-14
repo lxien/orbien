@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.6</version>
+        <version>4.0.5</version>
         <relativePath/>
     </parent>
     <groupId>io.github.xiaoniucode</groupId>
@@ -59,36 +59,55 @@
         </repository>
     </distributionManagement>
     <properties>
+        <!-- ==================== 项目基础配置 ==================== -->
         <java.version>25</java.version>
         <revision>0.10.0</revision>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- ==================== 编译配置 ==================== -->
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <!--核心依赖-->
-        <!--        <netty.version>4.1.80.Final</netty.version>-->
+
+        <!-- ==================== 核心网络框架 ==================== -->
         <netty.version>4.1.131.Final</netty.version>
-        <protobuf.version>4.32.1</protobuf.version>
-        <maven.compiler>3.8.1</maven.compiler>
-        <toml4j.version>0.7.2</toml4j.version>
-        <maven-assembly-plugin>3.3.0</maven-assembly-plugin>
+        <protobuf.version>4.33.4</protobuf.version>
+
+        <!-- ==================== 日志框架 ==================== -->
         <logback-classic.version>1.3.16</logback-classic.version>
-        <gson.version>2.8.9</gson.version>
+
+        <!-- ==================== 高性能组件 ==================== -->
         <disruptor.version>3.4.2</disruptor.version>
         <snappy-java.version>1.1.10.4</snappy-java.version>
         <lz4-java.version>1.8.0</lz4-java.version>
-        <protobuf.version>4.33.4</protobuf.version>
-        <lombok.version>1.18.42</lombok.version>
-        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
-        <maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
-        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
-        <org.mapstruct.version>1.6.3</org.mapstruct.version>
-        <bucket4j_jdk17-core>8.16.1</bucket4j_jdk17-core>
+
+        <!-- ==================== 业务框架/状态机 ==================== -->
         <cola-statemachine.version>4.3.2</cola-statemachine.version>
         <javers-core.version>7.11.0</javers-core.version>
+        <bucket4j_jdk17-core>8.16.1</bucket4j_jdk17-core>
+
+        <!-- ==================== 序列化/配置文件解析 ==================== -->
+        <toml4j.version>0.7.2</toml4j.version>
+        <gson.version>2.8.9</gson.version>
+
+        <!-- ==================== 代码生成/注解处理 ==================== -->
+        <lombok.version>1.18.42</lombok.version>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
+
+        <!-- ==================== 通用工具库 ==================== -->
+        <guava.version>32.0.1-jre</guava.version>
+        <commons-collections.version>3.2.2</commons-collections.version>
+        <commons-lang.version>2.6</commons-lang.version>
+
+        <!-- ==================== Maven 插件版本 ==================== -->
+        <maven.compiler>3.8.1</maven.compiler>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
+        <maven-assembly-plugin>3.3.0</maven-assembly-plugin>
+        <maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
+        <maven-javadoc-plugin.version>3.8.0</maven-javadoc-plugin.version>
+        <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
+        <flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
         <central-publishing-maven-plugin.version>0.9.0</central-publishing-maven-plugin.version>
     </properties>
     <modules>
@@ -225,6 +244,26 @@
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>8.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${gson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons-collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>${commons-lang.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

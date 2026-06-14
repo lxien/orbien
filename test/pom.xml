@@ -12,8 +12,8 @@
     <name>etp-test</name>
     <description>etp-test</description>
     <properties>
-        <etp.version>0.10.0</etp.version>
-        <java.version>21</java.version>
+        <etp-server.version>0.10.0</etp-server.version>
+        <java.version>25</java.version>
         <maven.test.skip>false</maven.test.skip>
         <skipTests>false</skipTests>
         <mysql-connector-j.version>8.0.33</mysql-connector-j.version>
@@ -26,7 +26,7 @@
         <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-server</artifactId>
-            <version>0.10.0</version>
+            <version>${etp-server.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

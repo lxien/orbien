@@ -11,8 +11,9 @@
     <name>etps</name>
     <properties>
         <java.version>25</java.version>
-        <shade.mainClass>com.xiaoniucode.etp.server.web.TunnelServerStartup</shade.mainClass>
         <etp.version>0.10.0</etp.version>
+        <native-maven-plugin.version>0.11.4</native-maven-plugin.version>
+        <spring-boot-maven-plugin.version>4.0.5</spring-boot-maven-plugin.version>
     </properties>
     <dependencies>
         <dependency>
@@ -27,11 +28,10 @@
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
                 <artifactId>native-maven-plugin</artifactId>
-                <version>0.11.4</version>
+                <version>${native-maven-plugin.version}</version>
                 <configuration>
                     <buildArgs>
                         <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
-
                         <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>
                     <mainClass>com.xiaoniucode.etp.server.web.TunnelServerStartup</mainClass>
@@ -57,8 +57,16 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>4.0.6</version>
+                <version>${spring-boot-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
+                    <mainClass>com.xiaoniucode.etp.server.web.TunnelServerStartup</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
