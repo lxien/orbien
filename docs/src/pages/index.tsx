@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -14,194 +14,13 @@ const features: Array<{
 }> = [
     {id: 'panel', title: '管理面板', description: '提供现代化Web UI管理面板，实时监控连接状态、在线设备节点、流量统计与运行指标'},
     {id: 'speed', title: '高性能传输', description: '自研高效多路复用流传输协议、全链路零拷贝设计，采用状态机及事件驱动架构，保证系统稳定传输'},
-    {id: 'shield', title: '协议与加密', description: '支持TCP、HTTP及TCP上层协议代理，提供mTLS双向认证、端到端加密传输和会话级临时隧道机制'},
+    {id: 'shield', title: '协议与安全', description: '支持TCP、HTTP及TCP上层协议代理，提供mTLS双向认证、端到端加密传输和会话级临时隧道机制'},
     {id: 'sparkle', title: '简单易用', description: '支持客户端自治运行和集中式远程配置管理同步，无需复杂网络知识即可快速完成服务发布与运维管理'},
     {id: 'globe', title: '跨平台', description: '兼容Windows/Linux/macOS/Docker/k8s环境，同时支持嵌入Spring Boot应用，实现灵活集成部署'},
     {id: 'stack', title: '能力矩阵', description: '内置压缩传输、负载均衡、访问控制、身份认证、带宽限流、鉴权认证、自定义域名、流量分析等能力'},
 ];
 
-type InstallRole = 'server' | 'client';
 
-type InstallTabConfig = {
-    id: string;
-    label: string;
-    hint: string;
-    code: string;
-    doc: string;
-};
-
-const INSTALL_SERVER: InstallTabConfig[] = [
-    {
-        id: 'docker',
-        label: 'Docker',
-        hint: '默认登录用户名和密码为 admin / 123456',
-        code: `$ docker run -d \\
-  --name etps \\
-  -p 8020:8020 \\
-  -p 9527:9527 \\
-  xiaoniucode/etps:latest`,
-        doc: '/docs/install/docker',
-    },
-    {
-        id: 'jar',
-        label: 'JAR',
-        hint: '要求JDK 25+',
-        code: '$ java -jar etps.jar -c etps.toml',
-        doc: '/docs/install/linux',
-    }
-];
-
-const INSTALL_CLIENT: InstallTabConfig[] = [
-    {
-        id: 'binary',
-        label: '二进制',
-        hint: '与 etpc.toml 同目录运行；跨平台下载对应架构可执行文件，Windows 使用 etpc.exe。',
-        code: `$ chmod +x etpc
-$ ./etpc -c etpc.toml`,
-        doc: '/docs/install/linux',
-    },
-    {
-        id: 'jar',
-        label: 'JAR',
-        hint: '适合已有 JVM、希望与脚本或 systemd 集成的部署方式。',
-        code: '$ java -jar etpc.jar -c etpc.toml',
-        doc: '/docs/install/linux',
-    },
-    {
-        id: 'spring',
-        label: 'Spring Boot',
-        hint: '将 etpc 能力嵌入 Spring Boot，无需单独维护客户端进程',
-        code: `<dependency>
-  <groupId>io.github.xiaoniucode</groupId>
-  <artifactId>etp-spring-boot-starter</artifactId>
-  <version>0.3.0</version>
-</dependency>`,
-        doc: '/docs/spring',
-    },
-];
-
-function QuickInstall() {
-    const [role, setRole] = useState<InstallRole>('server');
-    const [methodIndex, setMethodIndex] = useState(0);
-    const [copied, setCopied] = useState(false);
-
-    const tabs = role === 'server' ? INSTALL_SERVER : INSTALL_CLIENT;
-
-    useEffect(() => {
-        setMethodIndex(0);
-    }, [role]);
-
-    useEffect(() => {
-        if (copied) {
-            const timer = setTimeout(() => setCopied(false), 2000);
-            return () => clearTimeout(timer);
-        }
-    }, [copied]);
-
-    const safeIndex = Math.min(methodIndex, tabs.length - 1);
-    const active = tabs[safeIndex] ?? tabs[0];
-
-    const windowTitle = `${role === 'server' ? 'etps' : 'etpc'} · ${active.label}`;
-
-    const handleCopy = async () => {
-        try {
-            await navigator.clipboard.writeText(active.code);
-            setCopied(true);
-        } catch (err) {
-            console.error('Failed to copy:', err);
-        }
-    };
-
-    return (
-        <section className={styles.qiSection} aria-labelledby="home-qi-title">
-            <div className={styles.qiInner}>
-                <div className={styles.qiCard}>
-                    <div className={styles.qiToolbar}>
-                        <div className={styles.qiRoleRow} role="tablist" aria-label="安装角色">
-                            <button
-                                type="button"
-                                role="tab"
-                                aria-selected={role === 'server'}
-                                className={clsx(styles.qiRoleBtn, role === 'server' && styles.qiRoleBtnActive)}
-                                onClick={() => setRole('server')}>
-                                服务端
-                            </button>
-                            <button
-                                type="button"
-                                role="tab"
-                                aria-selected={role === 'client'}
-                                className={clsx(styles.qiRoleBtn, role === 'client' && styles.qiRoleBtnActive)}
-                                onClick={() => setRole('client')}>
-                                客户端
-                            </button>
-                        </div>
-                        <div className={styles.qiTabs} role="tablist" aria-label="安装方式">
-                            {tabs.map((t, i) => (
-                                <button
-                                    key={t.id}
-                                    type="button"
-                                    role="tab"
-                                    aria-selected={i === safeIndex}
-                                    className={clsx(styles.qiTab, i === safeIndex && styles.qiTabActive)}
-                                    onClick={() => setMethodIndex(i)}>
-                                    {t.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={styles.qiWindow}>
-                        <div className={styles.qiWindowBar}>
-                            <span className={styles.qiWindowDots} aria-hidden>
-                                <span className={styles.qiDotR}/>
-                                <span className={styles.qiDotY}/>
-                                <span className={styles.qiDotG}/>
-                            </span>
-                            <span className={styles.qiWindowTitle}>{windowTitle}</span>
-                            <button
-                                type="button"
-                                className={clsx(styles.qiCopyBtn, copied && styles.qiCopyBtnSuccess)}
-                                onClick={handleCopy}
-                                aria-label={copied ? '已复制' : '复制代码'}
-                                title={copied ? '已复制' : '复制代码'}>
-                                {copied ? (
-                                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
-                                        <path d="M4 10l4 4 8-8" strokeLinecap="round" strokeLinejoin="round"/>
-                                    </svg>
-                                ) : (
-                                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8">
-                                        <rect x="7" y="7" width="9" height="9" rx="1.5"/>
-                                        <path
-                                            d="M13 7V5a1.5 1.5 0 0 0-1.5-1.5h-6A1.5 1.5 0 0 0 3 5v6c0 .8.7 1.5 1.5 1.5H5"
-                                            strokeLinecap="round"/>
-                                    </svg>
-                                )}
-                            </button>
-                        </div>
-                        <div className={styles.qiWindowMeta}>
-                            <p className={styles.qiHint}>{active.hint}</p>
-                        </div>
-                        <pre className={styles.qiPre}>
-                            <code>{active.code}</code>
-                        </pre>
-                    </div>
-
-                    <footer className={styles.qiFooter}>
-                        <Link className={styles.qiDocLink} to={active.doc}>
-                            查看完整安装文档 →
-                        </Link>
-                        <span className={styles.qiFooterSep} aria-hidden>
-                            |
-                        </span>
-                        <Link className={styles.qiAltLink} to="/docs/download">
-                            发行包下载
-                        </Link>
-                    </footer>
-                </div>
-            </div>
-        </section>
-    );
-}
 
 function HeroVisual() {
     const dashboardUrl = useBaseUrl('img/dashboard.png');
@@ -337,8 +156,6 @@ export default function Home() {
                         </ul>
                     </div>
                 </section>
-
-                {/*<QuickInstall/>*/}
             </div>
         </Layout>
     );

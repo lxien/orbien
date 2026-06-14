@@ -38,6 +38,7 @@ public class GoawayAction extends AgentBaseAction {
     private ProxyStore proxyStore;
     @Autowired
     private AgentStore agentStore;
+
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("开始清理客户端资源，事件：{}", event);
@@ -54,22 +55,12 @@ public class GoawayAction extends AgentBaseAction {
             embeddedAgentRegistry.removeAgent(agentId);
             proxyStore.deleteByAgent(agentId);
             agentStore.delete(agentId);
-            // cleanupStreams(agentId);
-            logger.debug("清理客户端 {} 所有连接", agentId);
             // 清理隧道资源
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
+            //清理连接上下文
             agentManager.removeAgentContext(agentId);
-
             proxyManager.onAgentOffline(agentId);
-            // 清理代理资源
-            //cleanupAgent(agentId);
-
-            // 清理关联的 Channel
-            //cleanupChannels(context);
-
-            // 清理Context 中的临时数据
-            //cleanupContextData(context);
             if (event == AgentEvent.LOCAL_GOAWAY) {
                 Channel control = context.getControl();
                 control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
@@ -79,11 +70,9 @@ public class GoawayAction extends AgentBaseAction {
                     ChannelUtils.closeOnFlush(control);
                 });
             }
-
             logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {
             logger.error("{} 资源清理过程中发生异常", agentId, e);
         }
-
     }
 }
