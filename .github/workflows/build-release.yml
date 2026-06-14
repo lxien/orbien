@@ -5,18 +5,74 @@ on:
   push:
     tags:
       - 'v*'
+
 env:
   JAVA_VERSION: '25'
+  NODE_VERSION: '24'
 
 jobs:
-  # 构建跨平台Native镜像
+  # =============================================
+  # 阶段1：构建 Vue 前端
+  # =============================================
+  build-frontend:
+    name: 构建前端资源
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 环境
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 获取 pnpm store 目录
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+        id: pnpm-cache
+
+      - name: 缓存 pnpm 依赖
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 安装依赖
+        working-directory: ./console-ui
+        run: pnpm install --frozen-lockfile
+
+      - name: 构建前端
+        working-directory: ./console-ui
+        env:
+          VITE_APP_API_BASE_URL: /api
+        run: pnpm build
+
+      - name: 上传前端构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: console-ui/dist
+          retention-days: 1
+
+  # =============================================
+  # 阶段2：构建跨平台 Native 镜像
+  # =============================================
   build-native:
     name: 构建原生镜像 - ${{ matrix.display_name }}
+    needs: [build-frontend]
     strategy:
       fail-fast: false
       matrix:
         include:
-          #Linux 平台
+          # Linux 平台
           - os: ubuntu-latest
             platform: linux
             arch: amd64
@@ -33,7 +89,6 @@ jobs:
             arch: amd64
             artifact_suffix: windows_amd64
             display_name: "Windows AMD64"
-
           - os: windows-latest
             platform: windows
             arch: arm64
@@ -59,6 +114,28 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
+      - name: 下载前端构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: ./console-ui/dist
+
+      - name: 复制前端资源到 Spring Boot (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir -p main/etps/src/main/resources/static
+          cp -r console-ui/dist/* main/etps/src/main/resources/static/
+          echo "✅ 前端资源已复制到 static 目录"
+          ls -la main/etps/src/main/resources/static/
+
+      - name: 复制前端资源到 Spring Boot (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path main\etps\src\main\resources\static
+          Copy-Item -Recurse -Force console-ui\dist\* main\etps\src\main\resources\static\
+          Write-Host "✅ 前端资源已复制到 static 目录"
+
       - name: 设置 GraalVM 环境
         uses: graalvm/setup-graalvm@v1
         with:
@@ -73,10 +150,12 @@ jobs:
           key: ${{ matrix.platform }}-${{ matrix.arch }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
-      - name: 构建 模块原生镜像
+
+      - name: 构建模块原生镜像
         run: cd main && mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress
+
       # Linux/macOS 打包
-      - name: 打包Unix发布文件
+      - name: 打包 Unix 发布文件
         if: matrix.os != 'windows-latest'
         shell: bash
         run: |
@@ -84,16 +163,19 @@ jobs:
           RELEASE_NAME="etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
           mkdir -p "$RELEASE_NAME"
-          cp "main/etps/target/server" "$RELEASE_NAME/etps"
-          cp "main/etpc/target/client" "$RELEASE_NAME/etpc"
+          cp "main/etps/target/etps" "$RELEASE_NAME/etps" 2>/dev/null || cp "main/etps/target/server" "$RELEASE_NAME/etps"
+          cp "main/etpc/target/etpc" "$RELEASE_NAME/etpc" 2>/dev/null || cp "main/etpc/target/client" "$RELEASE_NAME/etpc"
 
-          cp main/etps/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
-          cp main/etpc/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
+          cp main/etps/src/main/resources/etps-full.toml "$RELEASE_NAME/etps.toml" 2>/dev/null || true
+          cp main/etps/target/classes/etps-full.toml "$RELEASE_NAME/etps.toml" 2>/dev/null || true
+          cp main/etpc/src/main/resources/etpc-full.toml "$RELEASE_NAME/etpc.toml" 2>/dev/null || true
+          cp main/etpc/target/classes/etpc-full.toml "$RELEASE_NAME/etpc.toml" 2>/dev/null || true
 
           tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
           echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
+
       # Windows 打包
-      - name: 打包Windows发布文件
+      - name: 打包 Windows 发布文件
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
@@ -101,71 +183,125 @@ jobs:
           $RELEASE_NAME = "etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
           New-Item -ItemType Directory -Force -Path $RELEASE_NAME
-          Copy-Item "main\etps\target\server.exe" "$RELEASE_NAME\etps.exe"
-          Copy-Item "main\etpc\target\client.exe" "$RELEASE_NAME\etpc.exe"
 
-          Copy-Item "main/etps/target/classes/etps.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
-          Copy-Item "main/etpc/target/classes/etpc.toml" $RELEASE_NAME -ErrorAction SilentlyContinue
+          # 复制可执行文件（尝试多种可能的名称）
+          if (Test-Path "main\etps\target\etps.exe") {
+            Copy-Item "main\etps\target\etps.exe" "$RELEASE_NAME\etps.exe"
+          } elseif (Test-Path "main\etps\target\server.exe") {
+            Copy-Item "main\etps\target\server.exe" "$RELEASE_NAME\etps.exe"
+          }
+
+          if (Test-Path "main\etpc\target\etpc.exe") {
+            Copy-Item "main\etpc\target\etpc.exe" "$RELEASE_NAME\etpc.exe"
+          } elseif (Test-Path "main\etpc\target\client.exe") {
+            Copy-Item "main\etpc\target\client.exe" "$RELEASE_NAME\etpc.exe"
+          }
+
+          # 复制配置文件
+          if (Test-Path "main\etps\src\main\resources\etps-full.toml") {
+            Copy-Item "main\etps\src\main\resources\etps-full.toml" "$RELEASE_NAME\etps.toml"
+          } elseif (Test-Path "main\etps\target\classes\etps-full.toml") {
+            Copy-Item "main\etps\target\classes\etps-full.toml" "$RELEASE_NAME\etps.toml"
+          }
+
+          if (Test-Path "main\etpc\src\main\resources\etpc-full.toml") {
+            Copy-Item "main\etpc\src\main\resources\etpc-full.toml" "$RELEASE_NAME\etpc.toml"
+          } elseif (Test-Path "main\etpc\target\classes\etpc-full.toml") {
+            Copy-Item "main\etpc\target\classes\etpc-full.toml" "$RELEASE_NAME\etpc.toml"
+          }
 
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
           Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
+
       - name: 上传构件
         uses: actions/upload-artifact@v4
         with:
           name: etp-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
           path: etp_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
-  #  # 构建 JAR 包
-  #  build-jar:
-  #    name: 构建 JAR 包
-  #    runs-on: ubuntu-latest
-  #    permissions:
-  #      contents: write
-  #    steps:
-  #      - uses: actions/checkout@v4
-  #
-  #      - name: 设置 Java 环境
-  #        uses: actions/setup-java@v4
-  #        with:
-  #          java-version: ${{ env.JAVA_VERSION }}
-  #          distribution: 'temurin'
-  #          cache: maven
-  #
-  #      - name: 构建模块 JAR
-  #        run: |
-  #          mv pom.xml pom.xml.bak
-  #          mv build.xml pom.xml
-  #          mvn clean install package -DskipTests -Dnative.skip=true --no-transfer-progress
-  #          mv pom.xml build.xml
-  #          mv pom.xml.bak pom.xml
-  #      - name: 打包 JAR 发布文件
-  #        shell: bash
-  #        run: |
-  #          VERSION="${{ github.ref_name }}"
-  #          RELEASE_NAME="etp_${VERSION}_jdk${{ env.JAVA_VERSION }}_jar"
-  #
-  #          mkdir -p "$RELEASE_NAME"
-  #          SERVER_JAR=$(find server/target -name "server-*.jar" | head -1)
-  #          CLIENT_JAR=$(find client/target -name "client-*.jar" | head -1)
-  #
-  #          cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
-  #          cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
-  #
-  #          cp server/target/classes/etps.toml "$RELEASE_NAME/" 2>/dev/null || true
-  #          cp client/target/classes/etpc.toml "$RELEASE_NAME/" 2>/dev/null || true
-  #
-  #          zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
-  #          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
-  #      - name: 上传 JAR 构件
-  #        uses: actions/upload-artifact@v4
-  #        with:
-  #          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
-  #          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
+  # =============================================
+  # 阶段3：构建 JAR 包（包含前端资源）
+  # =============================================
+  build-jar:
+    name: 构建 JAR 包
+    needs: [build-frontend]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
 
-  # 统一发布阶段
+      - name: 下载前端构建产物
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: ./console-ui/dist
+
+      - name: 复制前端资源到 Spring Boot
+        run: |
+          mkdir -p main/etps/src/main/resources/static
+          cp -r console-ui/dist/* main/etps/src/main/resources/static/
+          echo "✅ 前端资源已复制到 static 目录"
+          ls -la main/etps/src/main/resources/static/
+
+      - name: 设置 Java 环境
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+          cache: maven
+
+      - name: 构建模块 JAR
+        run: cd main && mvn clean package -am -DskipTests --no-transfer-progress
+
+      - name: 打包 JAR 发布文件
+        shell: bash
+        run: |
+          VERSION="${{ github.ref_name }}"
+          RELEASE_NAME="etp_${VERSION}_jdk${{ env.JAVA_VERSION }}_jar"
+
+          mkdir -p "$RELEASE_NAME"
+
+          # 查找并复制服务端 JAR（包含前端资源）
+          SERVER_JAR=$(find main/etps/target -name "etps-*.jar" -not -name "original-*" | head -1)
+          if [ -z "$SERVER_JAR" ]; then
+            SERVER_JAR=$(find main/etps/target -name "*.jar" -not -name "original-*" | head -1)
+          fi
+          cp "$SERVER_JAR" "$RELEASE_NAME/etps.jar"
+
+          # 查找并复制客户端 JAR
+          CLIENT_JAR=$(find main/etpc/target -name "etpc-*.jar" -not -name "original-*" | head -1)
+          if [ -z "$CLIENT_JAR" ]; then
+            CLIENT_JAR=$(find main/etpc/target -name "*.jar" -not -name "original-*" | head -1)
+          fi
+          cp "$CLIENT_JAR" "$RELEASE_NAME/etpc.jar"
+
+          # 复制配置文件
+          cp main/etps/src/main/resources/etps-full.toml "$RELEASE_NAME/etps.toml" 2>/dev/null || true
+          cp main/etps/target/classes/etps-full.toml "$RELEASE_NAME/etps.toml" 2>/dev/null || true
+          cp main/etpc/src/main/resources/etpc-full.toml "$RELEASE_NAME/etpc.toml" 2>/dev/null || true
+          cp main/etpc/target/classes/etpc-full.toml "$RELEASE_NAME/etpc.toml" 2>/dev/null || true
+
+          zip -r "$RELEASE_NAME.zip" "$RELEASE_NAME"
+          echo "✅ JAR包打包完成: $RELEASE_NAME.zip"
+
+          # 显示 JAR 内容确认前端资源已包含
+          echo "📦 服务端 JAR 内容检查:"
+          unzip -l "$RELEASE_NAME/etps.jar" | grep "static/" | head -10 || echo "未找到 static 目录"
+
+      - name: 上传 JAR 构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: etp-jar-${{ github.ref_name }}-jdk${{ env.JAVA_VERSION }}
+          path: etp_${{ github.ref_name }}_jdk${{ env.JAVA_VERSION }}_jar.zip
+
+  # =============================================
+  # 阶段4：统一发布阶段
+  # =============================================
   create-release:
     name: 创建统一 Release
-    needs: [ build-native ]
+    needs: [build-native, build-jar]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
@@ -179,8 +315,41 @@ jobs:
           pattern: '*'
           merge-multiple: true
 
+      - name: 列出所有构件
+        run: ls -la artifacts/
+
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/**/*
           generate_release_notes: true
+          body: |
+            ## 📦 发布内容
+            
+            ### Native 镜像
+            - Linux AMD64/ARM64
+            - Windows AMD64/ARM64
+            - macOS AMD64/ARM64 (M1/M2)
+            
+            ### JAR 包
+            - etps.jar (服务端，包含前端资源)
+            - etpc.jar (客户端)
+            
+            ### 配置文件
+            - etps.toml (服务端配置)
+            - etpc.toml (客户端配置)
+            
+            ## 🚀 使用方式
+            
+            ### Native 镜像
+            ```bash
+            # 解压后直接运行
+            ./etps -c etps.toml
+            ./etpc -c etpc.toml
+            ```
+            
+            ### JAR 包
+            ```bash
+            java -jar etps.jar -c etps.toml
+            java -jar etpc.jar -c etpc.toml
+            ```
