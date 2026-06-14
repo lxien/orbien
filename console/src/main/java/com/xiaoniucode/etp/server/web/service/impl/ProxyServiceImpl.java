@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.baidu.fsg.uid.UidGenerator;
+import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;

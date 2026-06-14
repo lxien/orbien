@@ -16,7 +16,7 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent.action.config;
 
-import com.baidu.fsg.uid.UidGenerator;
+import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;

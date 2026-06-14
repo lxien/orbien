@@ -15,10 +15,10 @@
  */
 package com.xiaoniucode.etp.server.web.support.id;
 
-import com.baidu.fsg.uid.utils.DockerUtils;
-import com.baidu.fsg.uid.utils.NetUtils;
-import com.baidu.fsg.uid.worker.WorkerIdAssigner;
-import com.baidu.fsg.uid.worker.WorkerNodeType;
+import com.xiaoniucode.etp.server.uid.utils.DockerUtils;
+import com.xiaoniucode.etp.server.uid.utils.NetUtils;
+import com.xiaoniucode.etp.server.uid.worker.WorkerIdAssigner;
+import com.xiaoniucode.etp.server.uid.worker.WorkerNodeType;
 import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

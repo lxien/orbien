@@ -15,7 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.support.id;
 
-import com.baidu.fsg.uid.worker.WorkerNodeType;
+import com.xiaoniucode.etp.server.uid.worker.WorkerNodeType;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;

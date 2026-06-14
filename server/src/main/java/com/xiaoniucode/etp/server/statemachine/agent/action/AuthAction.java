@@ -1,6 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.baidu.fsg.uid.UidGenerator;
+import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;

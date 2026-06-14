@@ -1,8 +1,8 @@
 package com.xiaoniucode.etp.server.configuration;
 
 
-import com.baidu.fsg.uid.UidGenerator;
-import com.baidu.fsg.uid.impl.CachedUidGenerator;
+import com.xiaoniucode.etp.server.uid.UidGenerator;
+import com.xiaoniucode.etp.server.uid.impl.CachedUidGenerator;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
