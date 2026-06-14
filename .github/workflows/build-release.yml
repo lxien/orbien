@@ -151,6 +151,12 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
 
+      - name: 构建根目录模块到本地仓库
+        run: |
+          # 先构建根目录的所有模块
+          # 这样 etp-console 等依赖就能被解析
+          mvn install -pl '!main' -am -DskipTests --no-transfer-progress
+
       - name: 构建模块原生镜像
         run: cd main && mvn clean install native:compile -Pnative -am -DskipTests --no-transfer-progress
 
@@ -251,6 +257,11 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'temurin'
           cache: maven
+
+      - name: 构建根目录模块到本地仓库
+        run: |
+          # 先构建根目录的所有模块
+          mvn install -pl '!main' -am -DskipTests --no-transfer-progress
 
       - name: 构建模块 JAR
         run: cd main && mvn clean package -am -DskipTests --no-transfer-progress
