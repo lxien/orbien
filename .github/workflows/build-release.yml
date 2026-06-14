@@ -27,7 +27,6 @@ jobs:
             arch: arm64
             artifact_suffix: linux_arm64
             display_name: "Linux ARM64"
-
           # Windows 平台
           - os: windows-latest
             platform: windows
