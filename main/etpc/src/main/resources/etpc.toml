@@ -1,0 +1,4 @@
+serverAddr = "127.0.0.1"
+serverPort = 9527
+[auth]
+token = "token"

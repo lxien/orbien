@@ -1,0 +1,37 @@
+#server_addr = "0.0.0.0"
+server_addr = "localhost"
+server_port = 9527
+http_proxy_port = 80
+https_proxy_port = 8443
+base_domain = "domain1.com"
+
+[transport]
+# TLS
+[transport.tls]
+enabled = true
+cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.crt"
+key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.key"
+#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+#key_pass=""
+
+[auth]
+[[auth.tokens]]
+name = "macos"
+token = "414083A8563774142CAC91DDB5C9A2ED"
+expire_days=30
+[[auth.tokens]]
+name = "win"
+token = "2DE922B12A810486CF0ADA3B8FA03D93"
+
+#管理界面
+[dashboard]
+enabled = true
+addr = "localhost"
+port = 8030
+username = "admin"
+password = "123456"
+
+#公网端口分配范围
+[port_policy]
+start = 8000
+end = 8009

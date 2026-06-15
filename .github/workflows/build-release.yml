@@ -247,41 +247,11 @@ jobs:
           pattern: '*'
           merge-multiple: true
 
-      - name: 列出所有构件
-        run: ls -la artifacts/
+      - name: 删除空文件
+        run: find artifacts/ -type f -size 0 -delete
 
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/**/*
           generate_release_notes: true
-          body: |
-            ## 📦 发布内容
-            
-            ### Native 镜像
-            - Linux AMD64/ARM64
-            - Windows AMD64/ARM64
-            - macOS AMD64/ARM64 (M1/M2)
-            
-            ### JAR 包
-            - etps.jar (服务端，包含前端资源)
-            - etpc.jar (客户端)
-            
-            ### 配置文件
-            - etps.toml (服务端配置)
-            - etpc.toml (客户端配置)
-            
-            ## 🚀 使用方式
-            
-            ### Native 镜像
-            ```bash
-            # 解压后直接运行
-            ./etps -c etps.toml
-            ./etpc -c etpc.toml
-            ```
-            
-            ### JAR 包
-            ```bash
-            java -jar etps.jar -c etps.toml
-            java -jar etpc.jar -c etpc.toml
-            ```
