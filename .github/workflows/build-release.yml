@@ -152,7 +152,7 @@ jobs:
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
 
       - name: 安装根目录模块到本地仓库
-        run: mvn install -pl '!main' -am -DskipTests -Dgpg.skip=true --no-transfer-progress
+        run: mvn install -pl '!main' -am -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       - name: 构建服务端 JAR 包
         run: cd main && mvn clean package -pl etps -DskipTests --no-transfer-progress
@@ -171,7 +171,8 @@ jobs:
           mkdir -p "$RELEASE_NAME/server/config"
           mkdir -p "$RELEASE_NAME/client"
 
-          cp "main/etps/target/etps-${VERSION#v}.jar" "$RELEASE_NAME/server/etps.jar"
+          ETPS_JAR=$(ls main/etps/target/etps-[0-9]*.jar 2>/dev/null | head -1)
+          cp "$ETPS_JAR" "$RELEASE_NAME/server/etps.jar"
           cp "main/etps/src/main/resources/application.yml" "$RELEASE_NAME/server/config/application.yml"
           cp "main/etps/src/main/resources/application-mysql.yml" "$RELEASE_NAME/server/config/application-mysql.yml"
           cp "main/etps/src/main/resources/etps.toml" "$RELEASE_NAME/server/config/etps.toml"
@@ -187,13 +188,14 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          $VERSION = "${{ github.ref_name }}".Substring(1)
+          $VERSION = "${{ github.ref_name }}"
           $RELEASE_NAME = "etp_v${VERSION}_${{ matrix.artifact_suffix }}"
 
           New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\server\config"
           New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\client"
 
-          Copy-Item "main\etps\target\etps-$VERSION.jar" "$RELEASE_NAME\server\etps.jar"
+          $ETPS_JAR = Get-ChildItem "main\etps\target\etps-[0-9]*.jar" | Select-Object -First 1
+          Copy-Item $ETPS_JAR.FullName "$RELEASE_NAME\server\etps.jar"
           Copy-Item "main\etps\src\main\resources\application.yml" "$RELEASE_NAME\server\config\application.yml"
           Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$RELEASE_NAME\server\config\application-mysql.yml"
           Copy-Item "main\etps\src\main\resources\etps.toml" "$RELEASE_NAME\server\config\etps.toml"
