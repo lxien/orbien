@@ -151,6 +151,9 @@ jobs:
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
 
+      - name: 安装根目录模块到本地仓库
+        run: mvn install -pl '!main' -am -DskipTests -Dgpg.skip=true --no-transfer-progress
+
       - name: 构建服务端 JAR 包
         run: cd main && mvn clean package -pl etps -DskipTests --no-transfer-progress
 
