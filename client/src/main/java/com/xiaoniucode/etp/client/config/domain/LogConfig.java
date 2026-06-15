@@ -12,5 +12,5 @@ public class LogConfig {
     private String logPattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n";
     private int maxHistory = 30;
     private String totalSizeCap = "3GB";
-    private String level = "debug";
+    private String level = "info";
 }

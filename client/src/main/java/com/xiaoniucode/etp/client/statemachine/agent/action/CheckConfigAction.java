@@ -19,7 +19,7 @@ public class CheckConfigAction extends AgentBaseAction {
         AuthConfig auth = config.getAuthConfig();
         if (!StringUtils.hasText(auth.getToken())) {
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.LOCAL_GOAWAY, ctx);
-            logger.error("请配置登陆密钥");
+            logger.error("请配置身份认证密钥");
         } else {
             ctx.getStateMachine().fireEvent(ctx.getState(), AgentEvent.CONFIG_CHECKED, ctx);
         }

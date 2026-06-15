@@ -326,9 +326,8 @@ public class TomlConfigLoader implements ConfigSource {
             if (StringUtils.hasText(totalSizeCap)) {
                 logConfig.setTotalSizeCap(totalSizeCap.trim());
             }
-
-            builder.logConfig(logConfig);
         }
+        builder.logConfig(logConfig);
 
         return builder.build();
     }

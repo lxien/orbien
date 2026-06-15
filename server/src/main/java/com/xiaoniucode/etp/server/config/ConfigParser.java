@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.config;
 
-import com.xiaoniucode.etp.common.CommandLineArgs;
 import com.xiaoniucode.etp.common.PortChecker;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -8,14 +7,12 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-public class ConfigParser{
+public class ConfigParser {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(ConfigParser.class);
 
     public static AppConfig parse(String[] args) {
         try {
-            System.setProperty("io.netty.leakDetection.level", "DISABLED");
             AppConfig appConfig = buildConfig(args);
-//            initLogback(appConfig);
             int bindPort = appConfig.getServerPort();
             if (PortChecker.isPortOccupied(bindPort)) {
                 logger.error("{} 端口已经被占用", bindPort);
@@ -25,7 +22,6 @@ public class ConfigParser{
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
             System.err.println("错误: " + e.getMessage());
-            printHelp();
             System.exit(1);
         } catch (Exception e) {
             logger.error("启动失败", e);
@@ -35,58 +31,47 @@ public class ConfigParser{
         return null;
     }
 
-
     private static AppConfig buildConfig(String[] args) {
-        CommandLineArgs cmdArgs = new CommandLineArgs();
-        cmdArgs.registerOption("config", "c", "配置文件路径", false, true);
-        cmdArgs.registerOption("help", "h", "显示帮助信息", false, false);
-        try {
-            cmdArgs.parse(args);
-            if (cmdArgs.has("help")) {
-                printHelp();
-                System.exit(0);
-            }
-            if (cmdArgs.has("config")) {
-                return loadConfigFromFile(cmdArgs.get("config"));
-            }
-            return AppConfig.builder().build();
-
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("配置加载失败: " + e.getMessage(), e);
+        String configPath = parseConfigPath(args);
+        if (configPath != null) {
+            return loadConfigFromFile(configPath);
         }
+        return loadConfigFromDefaultLocations();
     }
 
-    private static void printHelp() {
-        System.out.println("用法: etps [选项]");
-        System.out.println();
-        System.out.println("选项:");
-        System.out.println("  -c, --config <path>         配置文件路径");
-        System.out.println("  --help                      显示帮助信息");
-        System.out.println();
-        System.out.println("示例:");
-        System.out.println("  etps -c etps.toml");
-        System.out.println("  etps");
+    private static String parseConfigPath(String[] args) {
+        String configPath = null;
+        int i = 0;
+        while (i < args.length) {
+            String arg = args[i];
+            if ("-c".equals(arg)) {
+                if (configPath != null) {
+                    throw new IllegalArgumentException("-c 选项只能指定一次");
+                }
+                if (i + 1 >= args.length) {
+                    throw new IllegalArgumentException("-c 选项需要指定配置文件路径");
+                }
+                configPath = args[++i];
+            } else {
+                throw new IllegalArgumentException("未知选项: " + arg);
+            }
+            i++;
+        }
+        return configPath;
     }
-//
-//    private static void initLogback(AppConfig config) {
-//        LogConfig log = config.getLogConfig();
-//        if (log == null) {
-//            return;
-//        }
-//        new LogbackConfigurator.Builder()
-//                .setPath(log.getPath())
-//                .setLogPattern(log.getLogPattern())
-//                .setArchivePattern(log.getArchivePattern())
-//                .setLogLevel(log.getLevel())
-//                .setLogName(log.getName())
-//                .setMaxHistory(log.getMaxHistory())
-//                .setTotalSizeCap(log.getTotalSizeCap())
-//                .addLogger("io.netty.channel.ChannelHandlerMask", Level.INFO)
-//                .build()
-//                .configure();
-//    }
+
+    private static AppConfig loadConfigFromDefaultLocations() {
+        String configFileName = "etps.toml";
+        String[] searchPaths = {"config/" + configFileName, configFileName};
+        for (String path : searchPaths) {
+            if (Files.exists(Paths.get(path))) {
+                logger.info("找到配置文件: {}", path);
+                return loadConfigFromFile(path);
+            }
+        }
+        throw new IllegalArgumentException("未找到配置文件，请使用 -c 选项指定配置文件路径。\n" +
+            "搜索路径: config/etps.toml, etps.toml");
+    }
 
     private static AppConfig loadConfigFromFile(String configPath) {
         if (!Files.exists(Paths.get(configPath))) {

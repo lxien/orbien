@@ -17,7 +17,7 @@ public class AuthResponseAction extends AgentBaseAction {
         Message.AuthResponse authResponse = context.getAndRemoveAs("authResponse", Message.AuthResponse.class);
         int code = authResponse.getCode();
         if (code == 0) {
-            logger.info("已连接到内网穿透安全网关");
+            logger.info("已连接到服务端");
             String agentId = authResponse.getAgentId();
             context.setConnectionId(authResponse.getConnectionId());
             context.setAuthenticated(true);

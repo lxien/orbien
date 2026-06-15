@@ -18,7 +18,6 @@ public interface AppConfig extends Config {
 
     ConnectionConfig getConnectionConfig();
 
-
     List<ProxyConfig> getProxies();
 
     LogConfig getLogConfig();

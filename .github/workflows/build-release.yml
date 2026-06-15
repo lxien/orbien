@@ -196,6 +196,7 @@ jobs:
           cp "main/etps/src/main/resources/application.yml" "$RELEASE_NAME/server/config/application.yml"
           cp "main/etps/src/main/resources/application-mysql.yml" "$RELEASE_NAME/server/config/application-mysql.yml"
           cp "main/etps/src/main/resources/etps.toml" "$RELEASE_NAME/server/config/etps.toml"
+          cp "main/etps/src/main/resources/logback-spring.xml" "$RELEASE_NAME/server/config/logback-spring.xml"
 
           cp "main/etpc/target/etpc" "$RELEASE_NAME/client/etpc"
           cp "main/etpc/src/main/resources/etpc.toml" "$RELEASE_NAME/client/etpc.toml"
@@ -239,6 +240,7 @@ jobs:
           Copy-Item "main\etps\src\main\resources\application.yml" "$RELEASE_NAME\server\config\application.yml"
           Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$RELEASE_NAME\server\config\application-mysql.yml"
           Copy-Item "main\etps\src\main\resources\etps.toml" "$RELEASE_NAME\server\config\etps.toml"
+          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$RELEASE_NAME\server\config\logback-spring.xml"
 
           Copy-Item "main\etpc\target\etpc.exe" "$RELEASE_NAME\client\etpc.exe"
           Copy-Item "main\etpc\src\main\resources\etpc.toml" "$RELEASE_NAME\client\etpc.toml"
@@ -271,8 +273,14 @@ jobs:
           pattern: 'etp-*'
           merge-multiple: true
 
+      - name: 读取发布信息模板
+        id: release-notes
+        run: echo "content=$(cat .github/RELEASE_NOTES_TEMPLATE.md)" >> $GITHUB_OUTPUT
+
       - name: 创建 GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: artifacts/**/*
-          generate_release_notes: true 
+          generate_release_notes: true
+          body: ${{ steps.release-notes.outputs.content }}
+           

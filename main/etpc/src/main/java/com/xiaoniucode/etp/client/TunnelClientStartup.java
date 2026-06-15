@@ -10,6 +10,8 @@ import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.*;
 import com.xiaoniucode.etp.client.log.LogbackConfigurator;
 import com.xiaoniucode.etp.core.enums.AgentType;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,59 +19,44 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class TunnelClientStartup {
-    private static final Logger logger = LoggerFactory.getLogger(TunnelClientStartup.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelClientStartup.class);
     private static TunnelClient tunnelClient;
     public static void main(String[] args) {
         try {
-            System.setProperty("io.netty.handler.ssl.noOpenSsl", "true");
             AppConfig config = buildConfig(args);
-          //  initLogback(config);
-            if (config.getLogConfig().getLevel().equalsIgnoreCase("debug")){
-                Debugger.enableDebug();
-                System.setProperty("io.netty.leakDetection.level", "PARANOID");
-            }
+            initLogback(config);
             registerShutdownHook();
             tunnelClient = new TunnelClient(config);
             tunnelClient.start();
         } catch (IllegalArgumentException e) {
             logger.error("参数错误: {}", e.getMessage());
-            System.err.println("错误: " + e.getMessage());
-            printHelp();
             System.exit(1);
         } catch (Exception e) {
             logger.error("启动失败", e);
-            System.err.println("启动失败: " + e.getMessage());
             System.exit(1);
         }
     }
 
     private static AppConfig buildConfig(String[] args) {
-        CommandLineArgs cmdArgs = new CommandLineArgs();
+        String configPath = null;
 
-        cmdArgs.registerOption("config", "c", "配置文件路径", false, true);
-        cmdArgs.registerOption("host", "h", "服务器地址", false, true);
-        cmdArgs.registerOption("port", "p", "隧道端口", false, true);
-        cmdArgs.registerOption("token", "t", "认证密钥", false, true);
-        cmdArgs.registerOption("help", "help", "显示帮助信息", false, false);
-
-        try {
-            cmdArgs.parse(args);
-
-            if (cmdArgs.has("help")) {
-                printHelp();
-                System.exit(0);
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if ("-c".equals(arg)) {
+                if (i + 1 >= args.length) {
+                    throw new IllegalArgumentException("-c 选项需要指定配置文件路径");
+                }
+                configPath = args[++i];
+            } else {
+                throw new IllegalArgumentException("未知选项: " + arg);
             }
-
-            if (cmdArgs.has("config")) {
-                return loadConfigFromFile(cmdArgs.get("config"));
-            }
-            return buildConfigFromCommandLine(cmdArgs);
-
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new IllegalArgumentException("配置加载失败: " + e.getMessage(), e);
         }
+
+        if (configPath != null) {
+            return loadConfigFromFile(configPath);
+        }
+        
+        return loadConfigFromDefaultLocations();
     }
 
     private static AppConfig loadConfigFromFile(String configPath) {
@@ -80,26 +67,19 @@ public class TunnelClientStartup {
         return configSource.load();
     }
 
-    private static AppConfig buildConfigFromCommandLine(CommandLineArgs cmdArgs) {
-        DefaultAppConfig.Builder builder = DefaultAppConfig.builder();
-
-        if (cmdArgs.has("host")) {
-            builder.serverAddr(cmdArgs.get("host"));
-        }
-        if (cmdArgs.has("port")) {
-            int port = cmdArgs.getInt("port", 9527);
-            if (port < 1 || port > 65535) {
-                throw new IllegalArgumentException("端口号必须在1-65535范围内: " + port);
+    private static AppConfig loadConfigFromDefaultLocations() {
+        String configFileName = "etpc.toml";
+        String[] searchPaths = {"config/" + configFileName, configFileName};
+        for (String path : searchPaths) {
+            if (Files.exists(Paths.get(path))) {
+                logger.info("找到配置文件: {}", path);
+                TomlConfigLoader configSource = new TomlConfigLoader(path);
+                return configSource.load();
             }
-            builder.serverPort(port);
         }
-        if (cmdArgs.has("token")) {
-            AuthConfig authConfig = new AuthConfig();
-            authConfig.setToken(cmdArgs.get("token"));
-            builder.authConfig(authConfig);
-        }
-        builder.agentType(AgentType.STANDALONE);
-        return builder.build();
+
+        throw new IllegalArgumentException("未找到配置文件，请使用 -c 选项指定配置文件路径。\n" +
+            "搜索路径: config/etpc.toml, etpc.toml");
     }
 
     private static void initLogback(AppConfig config) {
@@ -132,22 +112,5 @@ public class TunnelClientStartup {
                 }
             }
         }));
-    }
-
-    private static void printHelp() {
-        System.out.println("用法: etpc [选项]");
-        System.out.println();
-        System.out.println("选项:");
-        System.out.println("  -c, --config <path>           配置文件路径");
-        System.out.println("  -h, --host <serverAddr>       服务器地址");
-        System.out.println("  -p, --port <serverPort>       服务器端口");
-        System.out.println("  -t, --token <Token>           登陆令牌");
-        System.out.println("  --help                        显示帮助信息");
-        System.out.println();
-        System.out.println("示例:");
-        System.out.println("  ./etpc -c etpc.toml");
-        System.out.println("  ./etpc -t your-token");
-        System.out.println("  ./etpc -h localhost -p 9527 -t token");
-        System.out.println();
     }
 }

@@ -28,10 +28,73 @@
       ]
     },
     {
+      "type": "ch.qos.logback.classic.pattern.DateConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LevelConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LineSeparatorConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LoggerConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.MessageConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.ThreadConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
       "type": "ch.qos.logback.classic.spi.LogbackServiceProvider"
     },
     {
       "type": "ch.qos.logback.classic.util.DefaultJoranConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.rolling.helper.DateTokenConverter",
       "methods": [
         {
           "name": "<init>",
@@ -188,6 +251,9 @@
       ]
     },
     {
+      "type": "com.xiaoniucode.etp.client.TunnelClient$1"
+    },
+    {
       "type": "com.xiaoniucode.etp.client.TunnelClient$2"
     },
     {
@@ -200,13 +266,13 @@
       "type": "com.xiaoniucode.etp.client.transport.HeartbeatHandler"
     },
     {
+      "type": "com.xiaoniucode.etp.client.transport.RealServerHandler"
+    },
+    {
       "type": "com.xiaoniucode.etp.client.transport.TunnelConnectionFactory$1"
     },
     {
-      "type": "com.xiaoniucode.etp.core.codec.compress.SnappyDecoder"
-    },
-    {
-      "type": "com.xiaoniucode.etp.core.codec.compress.SnappyEncoder"
+      "type": "com.xiaoniucode.etp.client.transport.bridge.DirectTunnelBridge$1"
     },
     {
       "type": "com.xiaoniucode.etp.core.transport.IdleCheckHandler"
@@ -355,7 +421,10 @@
       "jniAccessible": true
     },
     {
-      "type": "io.netty.handler.logging.LoggingHandler"
+      "type": "io.netty.handler.codec.compression.SnappyFrameDecoder"
+    },
+    {
+      "type": "io.netty.handler.codec.compression.SnappyFrameEncoder"
     },
     {
       "type": "io.netty.handler.ssl.SslHandler"
@@ -370,6 +439,9 @@
     },
     {
       "type": "io.netty.util.DefaultAttributeMap"
+    },
+    {
+      "type": "io.netty.util.DefaultAttributeMap$DefaultAttribute"
     },
     {
       "type": "io.netty.util.Recycler$DefaultHandle"
@@ -976,6 +1048,9 @@
     },
     {
       "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
     },
     {
       "type": "sun.util.resources.cldr.TimeZoneNames"

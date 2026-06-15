@@ -19,7 +19,4 @@ cache:
     initial-capacity: 10000
     maximum-size: 150000
     expire-after-access: 30m
-logging:
-  level:
-    com.xiaoniucode.etp: debug
 dev: true
