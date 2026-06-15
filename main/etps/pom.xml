@@ -60,6 +60,7 @@
                 <version>${spring-boot-maven-plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>repackage</id>
                         <goals>
                             <goal>repackage</goal>
                         </goals>

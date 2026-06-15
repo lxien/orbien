@@ -36,9 +36,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaRepositories(basePackages = "com.xiaoniucode.etp.server.web.repository")
 public class TunnelServerStartup {
     public static void main(String[] args) {
-        System.setProperty("io.netty.leakDetection.targetRecords", "50");
-        System.setProperty("io.netty.leakDetection.samplingRate", "1");
-
         AppConfig config = ConfigParser.parse(args);
         DashboardConfig dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);
