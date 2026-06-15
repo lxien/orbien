@@ -171,8 +171,7 @@ jobs:
           mkdir -p "$RELEASE_NAME/server/config"
           mkdir -p "$RELEASE_NAME/client"
 
-          ETPS_JAR=$(ls main/etps/target/etps-[0-9]*.jar 2>/dev/null | head -1)
-          cp "$ETPS_JAR" "$RELEASE_NAME/server/etps.jar"
+          cp main/etps/target/etps-[0-9]*.jar "$RELEASE_NAME/server/etps.jar"
           cp "main/etps/src/main/resources/application.yml" "$RELEASE_NAME/server/config/application.yml"
           cp "main/etps/src/main/resources/application-mysql.yml" "$RELEASE_NAME/server/config/application-mysql.yml"
           cp "main/etps/src/main/resources/etps.toml" "$RELEASE_NAME/server/config/etps.toml"
@@ -189,13 +188,12 @@ jobs:
         shell: pwsh
         run: |
           $VERSION = "${{ github.ref_name }}"
-          $RELEASE_NAME = "etp_v${VERSION}_${{ matrix.artifact_suffix }}"
+          $RELEASE_NAME = "etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
           New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\server\config"
           New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\client"
 
-          $ETPS_JAR = Get-ChildItem "main\etps\target\etps-[0-9]*.jar" | Select-Object -First 1
-          Copy-Item $ETPS_JAR.FullName "$RELEASE_NAME\server\etps.jar"
+          Copy-Item "main\etps\target\etps-[0-9]*.jar" "$RELEASE_NAME\server\etps.jar"
           Copy-Item "main\etps\src\main\resources\application.yml" "$RELEASE_NAME\server\config\application.yml"
           Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$RELEASE_NAME\server\config\application-mysql.yml"
           Copy-Item "main\etps\src\main\resources\etps.toml" "$RELEASE_NAME\server\config\etps.toml"
