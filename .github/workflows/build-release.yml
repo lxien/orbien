@@ -168,16 +168,36 @@ jobs:
           VERSION="${{ github.ref_name }}"
           RELEASE_NAME="etp_${VERSION}_${{ matrix.artifact_suffix }}"
 
+          echo "=== 调试信息 ==="
+          echo "当前目录: $(pwd)"
+          echo "VERSION: $VERSION"
+          echo "RELEASE_NAME: $RELEASE_NAME"
+          echo ""
+          echo "=== 项目根目录文件 ==="
+          ls -la
+          echo ""
+          echo "=== main/etps/target ==="
+          ls -la main/etps/target
+          echo ""
+          echo "=== main/etps/src/main/resources ==="
+          ls -la main/etps/src/main/resources
+          echo ""
+          echo "=== main/etpc/target ==="
+          ls -la main/etpc/target
+          echo ""
+          echo "=== main/etpc/src/main/resources ==="
+          ls -la main/etpc/src/main/resources
+          echo ""
+          echo "=== 开始打包 ==="
+
           mkdir -p "$RELEASE_NAME/server/config"
           mkdir -p "$RELEASE_NAME/client"
 
           cp main/etps/target/etps-[0-9]*.jar "$RELEASE_NAME/server/etps.jar"
           cp "main/etps/src/main/resources/application.yml" "$RELEASE_NAME/server/config/application.yml"
           cp "main/etps/src/main/resources/application-mysql.yml" "$RELEASE_NAME/server/config/application-mysql.yml"
-          cp "main/etps/src/main/resources/etps.toml" "$RELEASE_NAME/server/config/etps.toml"
 
           cp "main/etpc/target/etpc" "$RELEASE_NAME/client/etpc"
-          cp "main/etpc/src/main/resources/etpc.toml" "$RELEASE_NAME/client/etpc.toml"
 
           tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
           echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
@@ -196,10 +216,8 @@ jobs:
           Copy-Item "main\etps\target\etps-[0-9]*.jar" "$RELEASE_NAME\server\etps.jar"
           Copy-Item "main\etps\src\main\resources\application.yml" "$RELEASE_NAME\server\config\application.yml"
           Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$RELEASE_NAME\server\config\application-mysql.yml"
-          Copy-Item "main\etps\src\main\resources\etps.toml" "$RELEASE_NAME\server\config\etps.toml"
 
           Copy-Item "main\etpc\target\etpc.exe" "$RELEASE_NAME\client\etpc.exe"
-          Copy-Item "main\etpc\src\main\resources\etpc.toml" "$RELEASE_NAME\client\etpc.toml"
 
           Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
           Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
