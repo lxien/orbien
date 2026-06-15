@@ -166,43 +166,26 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
-          RELEASE_NAME="etp_${VERSION}_${{ matrix.artifact_suffix }}"
+          ETPS_RELEASE_NAME="etps_${VERSION}_${{ matrix.artifact_suffix }}"
+          ETPC_RELEASE_NAME="etpc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          echo "=== 当前工作目录 ==="
-          pwd
+          mkdir -p "$ETPS_RELEASE_NAME"
+          mkdir -p "$ETPC_RELEASE_NAME"
 
-          echo "=== etpc/src/main/resources ==="
-          ls -la main/etpc/src/main/resources
+          # 打包服务端
+          cp main/etps/target/etps-[0-9]*.jar "$ETPS_RELEASE_NAME/etps.jar"
+          cp "main/etps/src/main/resources/application.yml" "$ETPS_RELEASE_NAME/application.yml"
+          cp "main/etps/src/main/resources/application-mysql.yml" "$ETPS_RELEASE_NAME/application-mysql.yml"
+          cp "main/etps/src/main/resources/etps.toml" "$ETPS_RELEASE_NAME/etps.toml"
+          cp "main/etps/src/main/resources/logback-spring.xml" "$ETPS_RELEASE_NAME/logback-spring.xml"
 
-          echo "=== etpc/target ==="
-          ls -la main/etpc/target
+          # 打包客户端
+          cp "main/etpc/target/etpc" "$ETPC_RELEASE_NAME/etpc"
+          cp "main/etpc/src/main/resources/etpc.toml" "$ETPC_RELEASE_NAME/etpc.toml"
 
-          echo "=== etpc/target/classes ==="
-          ls -la main/etpc/target/classes
-
-          echo "=== etps/src/main/resources ==="
-          ls -la main/etps/src/main/resources
-
-          echo "=== etps/target ==="
-          ls -la main/etps/target
-
-          echo "=== etps/target/classes ==="
-          ls -la main/etps/target/classes
-
-          mkdir -p "$RELEASE_NAME/server/config"
-          mkdir -p "$RELEASE_NAME/client"
-
-          cp main/etps/target/etps-[0-9]*.jar "$RELEASE_NAME/server/etps.jar"
-          cp "main/etps/src/main/resources/application.yml" "$RELEASE_NAME/server/config/application.yml"
-          cp "main/etps/src/main/resources/application-mysql.yml" "$RELEASE_NAME/server/config/application-mysql.yml"
-          cp "main/etps/src/main/resources/etps.toml" "$RELEASE_NAME/server/config/etps.toml"
-          cp "main/etps/src/main/resources/logback-spring.xml" "$RELEASE_NAME/server/config/logback-spring.xml"
-
-          cp "main/etpc/target/etpc" "$RELEASE_NAME/client/etpc"
-          cp "main/etpc/src/main/resources/etpc.toml" "$RELEASE_NAME/client/etpc.toml"
-
-          tar -czf "$RELEASE_NAME.tar.gz" "$RELEASE_NAME"
-          echo "✅ Unix打包完成: $RELEASE_NAME.tar.gz"
+          tar -czf "$ETPS_RELEASE_NAME.tar.gz" "$ETPS_RELEASE_NAME"
+          tar -czf "$ETPC_RELEASE_NAME.tar.gz" "$ETPC_RELEASE_NAME"
+          echo "✅ Unix打包完成: $ETPS_RELEASE_NAME.tar.gz, $ETPC_RELEASE_NAME.tar.gz"
 
       # Windows 打包
       - name: 打包 Windows 发布文件
@@ -210,49 +193,38 @@ jobs:
         shell: pwsh
         run: |
           $VERSION = "${{ github.ref_name }}"
-          $RELEASE_NAME = "etp_${VERSION}_${{ matrix.artifact_suffix }}"
+          $ETPS_RELEASE_NAME = "etps_${VERSION}_${{ matrix.artifact_suffix }}"
+          $ETPC_RELEASE_NAME = "etpc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          Write-Host "=== 当前工作目录 ==="
-          Get-Location
+          New-Item -ItemType Directory -Force -Path $ETPS_RELEASE_NAME
+          New-Item -ItemType Directory -Force -Path $ETPC_RELEASE_NAME
 
-          Write-Host "=== etpc/src/main/resources ==="
-          Get-ChildItem -Path "main\etpc\src\main\resources"
+          # 打包服务端
+          Copy-Item "main\etps\target\etps-[0-9]*.jar" "$ETPS_RELEASE_NAME\etps.jar"
+          Copy-Item "main\etps\src\main\resources\application.yml" "$ETPS_RELEASE_NAME\application.yml"
+          Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$ETPS_RELEASE_NAME\application-mysql.yml"
+          Copy-Item "main\etps\src\main\resources\etps.toml" "$ETPS_RELEASE_NAME\etps.toml"
+          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$ETPS_RELEASE_NAME\logback-spring.xml"
 
-          Write-Host "=== etpc/target ==="
-          Get-ChildItem -Path "main\etpc\target"
+          # 打包客户端
+          Copy-Item "main\etpc\target\etpc.exe" "$ETPC_RELEASE_NAME\etpc.exe"
+          Copy-Item "main\etpc\src\main\resources\etpc.toml" "$ETPC_RELEASE_NAME\etpc.toml"
 
-          Write-Host "=== etpc/target/classes ==="
-          Get-ChildItem -Path "main\etpc\target\classes"
-
-          Write-Host "=== etps/src/main/resources ==="
-          Get-ChildItem -Path "main\etps\src\main\resources"
-
-          Write-Host "=== etps/target ==="
-          Get-ChildItem -Path "main\etps\target"
-
-          Write-Host "=== etps/target/classes ==="
-          Get-ChildItem -Path "main\etps\target\classes"
-
-          New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\server\config"
-          New-Item -ItemType Directory -Force -Path "$RELEASE_NAME\client"
-
-          Copy-Item "main\etps\target\etps-[0-9]*.jar" "$RELEASE_NAME\server\etps.jar"
-          Copy-Item "main\etps\src\main\resources\application.yml" "$RELEASE_NAME\server\config\application.yml"
-          Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$RELEASE_NAME\server\config\application-mysql.yml"
-          Copy-Item "main\etps\src\main\resources\etps.toml" "$RELEASE_NAME\server\config\etps.toml"
-          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$RELEASE_NAME\server\config\logback-spring.xml"
-
-          Copy-Item "main\etpc\target\etpc.exe" "$RELEASE_NAME\client\etpc.exe"
-          Copy-Item "main\etpc\src\main\resources\etpc.toml" "$RELEASE_NAME\client\etpc.toml"
-
-          Compress-Archive -Path "$RELEASE_NAME\*" -DestinationPath "$RELEASE_NAME.zip"
-          Write-Host "✅ Windows打包完成: $RELEASE_NAME.zip"
+          Compress-Archive -Path "$ETPS_RELEASE_NAME\*" -DestinationPath "$ETPS_RELEASE_NAME.zip"
+          Compress-Archive -Path "$ETPC_RELEASE_NAME\*" -DestinationPath "$ETPC_RELEASE_NAME.zip"
+          Write-Host "✅ Windows打包完成: $ETPS_RELEASE_NAME.zip, $ETPC_RELEASE_NAME.zip"
 
       - name: 上传构件
         uses: actions/upload-artifact@v4
         with:
-          name: etp-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
-          path: etp_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+          name: etps-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: etps_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+
+      - name: 上传构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: etpc-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: etpc_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # =============================================
   # 阶段4：统一发布阶段
@@ -270,7 +242,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-          pattern: 'etp-*'
+          pattern: 'etp?-*'
           merge-multiple: true
 
       - name: 读取发布信息模板
