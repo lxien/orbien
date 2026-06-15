@@ -11,8 +11,7 @@ buildNumber.properties
 .project
 .classpath
 /bak/
-etps.toml
-etpc.toml
+
 server/dependency-reduced-pom.xml
 client/dependency-reduced-pom.xml
 /etp-test/dependency-reduced-pom.xml
