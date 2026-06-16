@@ -67,7 +67,7 @@ public class DashboardAdminSynchronizer implements EventListener<TunnelServerBin
     public void onEvent(TunnelServerBindEvent event) {
         try {
             DashboardConfig dashboard = appConfig.getDashboard();
-            if (dashboard == null) {
+            if (dashboard == null||!dashboard.getEnabled()) {
                 return;
             }
             String username = dashboard.getUsername();

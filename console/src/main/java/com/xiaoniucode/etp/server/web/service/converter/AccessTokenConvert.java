@@ -15,24 +15,30 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
+import com.xiaoniucode.etp.server.web.common.utils.DesensitizedUtil;
 import com.xiaoniucode.etp.server.web.dto.accesstoken.AccessTokenDTO;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenCreateParam;
 import com.xiaoniucode.etp.server.web.param.accesstoken.AccessTokenUpdateParam;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", imports = DesensitizedUtil.class)
 public interface AccessTokenConvert {
+    @Named("desensitized")
+    @Mapping(target = "token", expression = "java(DesensitizedUtil.token(entity.getToken()))")
     AccessTokenDTO toDTO(AccessTokenDO entity);
 
+    @Named("fullToken")
+    AccessTokenDTO toDTOWithFullToken(AccessTokenDO entity);
+
+    @IterableMapping(qualifiedByName = "desensitized")
     List<AccessTokenDTO> toDTOList(List<AccessTokenDO> accessTokenDOS);
 
     AccessTokenDO toDO(AccessTokenCreateParam param);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "token", ignore = true)
     void updateDO(@MappingTarget AccessTokenDO accessTokenDO, AccessTokenUpdateParam request);
 }

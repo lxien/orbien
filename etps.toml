@@ -11,7 +11,7 @@ base_domain = "domain1.com"
 enabled = true
 cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.crt"
 key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.key"
-#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #key_pass=""
 
 [auth]

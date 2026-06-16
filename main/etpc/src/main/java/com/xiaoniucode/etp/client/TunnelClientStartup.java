@@ -1,19 +1,13 @@
 package com.xiaoniucode.etp.client;
 
 import ch.qos.logback.classic.Level;
-import com.alibaba.cola.statemachine.impl.Debugger;
 import com.xiaoniucode.etp.client.config.AppConfig;
-import com.xiaoniucode.etp.client.config.DefaultAppConfig;
 import com.xiaoniucode.etp.client.config.TomlConfigLoader;
-import com.xiaoniucode.etp.client.config.domain.AuthConfig;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
 import com.xiaoniucode.etp.common.*;
 import com.xiaoniucode.etp.client.log.LogbackConfigurator;
-import com.xiaoniucode.etp.core.enums.AgentType;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -38,24 +32,14 @@ public class TunnelClientStartup {
     }
 
     private static AppConfig buildConfig(String[] args) {
-        String configPath = null;
-
         for (int i = 0; i < args.length; i++) {
-            String arg = args[i];
-            if ("-c".equals(arg)) {
+            if ("-c".equals(args[i])) {
                 if (i + 1 >= args.length) {
                     throw new IllegalArgumentException("-c 选项需要指定配置文件路径");
                 }
-                configPath = args[++i];
-            } else {
-                throw new IllegalArgumentException("未知选项: " + arg);
+                return loadConfigFromFile(args[i + 1]);
             }
         }
-
-        if (configPath != null) {
-            return loadConfigFromFile(configPath);
-        }
-        
         return loadConfigFromDefaultLocations();
     }
 
@@ -72,7 +56,7 @@ public class TunnelClientStartup {
         String[] searchPaths = {"config/" + configFileName, configFileName};
         for (String path : searchPaths) {
             if (Files.exists(Paths.get(path))) {
-                logger.info("找到配置文件: {}", path);
+                logger.info("使用配置文件: {}", path);
                 TomlConfigLoader configSource = new TomlConfigLoader(path);
                 return configSource.load();
             }

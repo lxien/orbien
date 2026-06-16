@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.*;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -29,6 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * @author xiaoniucode
  */
+@Getter
 public class TomlConfigSource implements ConfigSource {
     private final String path;
     private static final String DEFAULT_HOST = "0.0.0.0";
@@ -46,7 +48,6 @@ public class TomlConfigSource implements ConfigSource {
         AppConfig.Builder builder = AppConfig.builder();
 
         parseRoot(builder, root);
-//        parseLogConfig(builder, root);
         parseDashboard(builder, root);
         parseTransport(builder, root);
         parsePortPolicy(builder, root);
@@ -79,13 +80,6 @@ public class TomlConfigSource implements ConfigSource {
         builder.httpsProxyPort(httpsPort);
     }
 
-//    private void parseLogConfig(AppConfig.Builder builder, Toml root) {
-//        LogConfig logConfig = LogUtils.parseLogConfig(root.getTable("log"), true);
-//        if (logConfig != null) {
-//            builder.logConfig(logConfig);
-//        }
-//    }
-
     private void parseDashboard(AppConfig.Builder builder, Toml root) {
         Toml dash = root.getTable("dashboard");
         if (dash != null) {
@@ -101,7 +95,7 @@ public class TomlConfigSource implements ConfigSource {
                 if (!StringUtils.hasText(password)) {
                     throw new IllegalArgumentException("请配置 Dashboard 密码");
                 }
-                DashboardConfig dashboard = new DashboardConfig(true, username, password, addr, port.intValue());
+                DashboardConfig dashboard = new DashboardConfig(enabled, username, password, addr, port.intValue());
                 builder.dashboard(dashboard);
             }
         }
@@ -177,10 +171,6 @@ public class TomlConfigSource implements ConfigSource {
     @Override
     public ConfigSourceType getSourceType() {
         return ConfigSourceType.TOML;
-    }
-
-    public String getPath() {
-        return path;
     }
 
     private void validatePort(int port) {

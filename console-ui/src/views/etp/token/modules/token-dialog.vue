@@ -15,6 +15,16 @@
       <ElFormItem label="令牌名称" prop="name">
         <ElInput v-model="formData.name" placeholder="请输入令牌名称" />
       </ElFormItem>
+      <ElFormItem v-if="dialogType === 'edit'" label="描述">
+        <ElInput
+          v-model="formData.remark"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入描述"
+          maxlength="500"
+          show-word-limit
+        />
+      </ElFormItem>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -40,6 +50,7 @@
   interface Emits {
     (e: 'update:visible', value: boolean): void
     (e: 'submit'): void
+    (e: 'create-success', token: string): void
   }
 
   const props = defineProps<Props>()
@@ -58,7 +69,8 @@
   const formData = reactive({
     id: undefined as number | undefined,
     token: '',
-    name: ''
+    name: '',
+    remark: ''
   })
 
   const rules: FormRules = {
@@ -70,7 +82,8 @@
       Object.assign(formData, {
         id: undefined,
         token: '',
-        name: ''
+        name: '',
+        remark: ''
       })
     } else if (props.type === 'edit' && props.tokenId) {
       loading.value = true
@@ -79,7 +92,8 @@
         Object.assign(formData, {
           id: data.id,
           token: data.token || '',
-          name: data.name || ''
+          name: data.name || '',
+          remark: data.remark || ''
         })
       } catch (error) {
         console.error('获取令牌详情失败:', error)
@@ -110,20 +124,22 @@
       if (valid) {
         try {
           if (dialogType.value === 'add') {
-            await fetchCreateToken({
+            const result = await fetchCreateToken({
               name: formData.name
             })
-            ElMessage.success('创建成功')
+            dialogVisible.value = false
+            emit('create-success', result.token)
           } else {
             if (formData.id) {
               await fetchUpdateToken({
                 id: formData.id,
-                name: formData.name
+                name: formData.name,
+                remark: formData.remark
               })
               ElMessage.success('更新成功')
+              dialogVisible.value = false
             }
           }
-          dialogVisible.value = false
           emit('submit')
         } catch (error) {
           console.error('操作失败:', error)

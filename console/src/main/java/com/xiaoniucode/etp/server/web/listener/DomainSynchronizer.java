@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> {
@@ -47,10 +48,15 @@ public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
         String baseDomain = appConfig.getBaseDomain();
+        if (!StringUtils.hasText(baseDomain)) {
+            return;
+        }
         boolean exists = domainRepository.existsByDomain(baseDomain);
         if (!exists) {
             domainRepository.save(new DomainDO(baseDomain));
             logger.info("同步域名到数据库, domain={}", baseDomain);
+        } else {
+            logger.debug("域名 {} 已经存在，跳过持久化", baseDomain);
         }
     }
 }

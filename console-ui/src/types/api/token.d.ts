@@ -3,6 +3,7 @@ declare namespace Api.AccessToken {
     id: number
     name: string
     token: string
+    remark?: string
     createdAt: string
     updatedAt: string
   }
@@ -14,5 +15,6 @@ declare namespace Api.AccessToken {
   interface AccessTokenUpdateParam {
     id: number
     name: string
+    remark?: string
   }
 }

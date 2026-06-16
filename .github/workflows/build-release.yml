@@ -169,15 +169,15 @@ jobs:
           ETPS_RELEASE_NAME="etps_${VERSION}_${{ matrix.artifact_suffix }}"
           ETPC_RELEASE_NAME="etpc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          mkdir -p "$ETPS_RELEASE_NAME"
+          mkdir -p "$ETPS_RELEASE_NAME/config"
           mkdir -p "$ETPC_RELEASE_NAME"
 
           # 打包服务端
           cp main/etps/target/etps-[0-9]*.jar "$ETPS_RELEASE_NAME/etps.jar"
-          cp "main/etps/src/main/resources/application.yml" "$ETPS_RELEASE_NAME/application.yml"
-          cp "main/etps/src/main/resources/application-mysql.yml" "$ETPS_RELEASE_NAME/application-mysql.yml"
           cp "main/etps/src/main/resources/etps.toml" "$ETPS_RELEASE_NAME/etps.toml"
-          cp "main/etps/src/main/resources/logback-spring.xml" "$ETPS_RELEASE_NAME/logback-spring.xml"
+          cp "main/etps/src/main/resources/application.yml" "$ETPS_RELEASE_NAME/config/application.yml"
+          cp "main/etps/src/main/resources/application-mysql.yml" "$ETPS_RELEASE_NAME/config/application-mysql.yml"
+          cp "main/etps/src/main/resources/logback-spring.xml" "$ETPS_RELEASE_NAME/config/logback-spring.xml"
 
           # 打包客户端
           cp "main/etpc/target/etpc" "$ETPC_RELEASE_NAME/etpc"
@@ -196,15 +196,15 @@ jobs:
           $ETPS_RELEASE_NAME = "etps_${VERSION}_${{ matrix.artifact_suffix }}"
           $ETPC_RELEASE_NAME = "etpc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          New-Item -ItemType Directory -Force -Path $ETPS_RELEASE_NAME
+          New-Item -ItemType Directory -Force -Path "$ETPS_RELEASE_NAME\config"
           New-Item -ItemType Directory -Force -Path $ETPC_RELEASE_NAME
 
           # 打包服务端
           Copy-Item "main\etps\target\etps-[0-9]*.jar" "$ETPS_RELEASE_NAME\etps.jar"
-          Copy-Item "main\etps\src\main\resources\application.yml" "$ETPS_RELEASE_NAME\application.yml"
-          Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$ETPS_RELEASE_NAME\application-mysql.yml"
           Copy-Item "main\etps\src\main\resources\etps.toml" "$ETPS_RELEASE_NAME\etps.toml"
-          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$ETPS_RELEASE_NAME\logback-spring.xml"
+          Copy-Item "main\etps\src\main\resources\application.yml" "$ETPS_RELEASE_NAME\config\application.yml"
+          Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$ETPS_RELEASE_NAME\config\application-mysql.yml"
+          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$ETPS_RELEASE_NAME\config\logback-spring.xml"
 
           # 打包客户端
           Copy-Item "main\etpc\target\etpc.exe" "$ETPC_RELEASE_NAME\etpc.exe"

@@ -61,7 +61,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
         accessToken.setToken(token);
         AccessTokenDO save = accessTokenRepository.save(accessToken);
 
-        return accessTokenConvert.toDTO(save);
+        return accessTokenConvert.toDTOWithFullToken(save);
     }
 
     @Override

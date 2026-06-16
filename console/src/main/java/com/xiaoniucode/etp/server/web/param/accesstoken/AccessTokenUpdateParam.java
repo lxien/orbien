@@ -30,4 +30,8 @@ public class AccessTokenUpdateParam {
      * 令牌名称
      */
     private String name;
+    /**
+     * 描述
+     */
+    private String remark;
 }

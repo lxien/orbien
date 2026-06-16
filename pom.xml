@@ -100,6 +100,9 @@
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-lang.version>2.6</commons-lang.version>
 
+        <!-- ==================== 加密库 ==================== -->
+        <bouncycastle.version>1.78.1</bouncycastle.version>
+
         <!-- ==================== Maven 插件版本 ==================== -->
         <maven.compiler>3.8.1</maven.compiler>
         <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
@@ -121,6 +124,16 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.javers</groupId>
                 <artifactId>javers-core</artifactId>

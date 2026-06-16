@@ -19,13 +19,11 @@ client/dependency-reduced-pom.xml
 /core/dependency-reduced-pom.xml
 etps.log
 etpc.log
-/scripts/cert
+/scripts/
 .idea
 /cert/
 etp.db
-ports.txt
 etp.iml
 etp.mv.db
 etp.trace.db
-/cli-cli-1.0.4/
 /skills

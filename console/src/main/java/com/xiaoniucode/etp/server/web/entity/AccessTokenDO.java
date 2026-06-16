@@ -51,6 +51,11 @@ public class AccessTokenDO {
     @Column(name = "token", nullable = false, unique = true)
     private String token;
     /**
+     * 描述
+     */
+    @Column(name = "remark")
+    private String remark;
+    /**
      * 创建时间
      */
     @CreationTimestamp

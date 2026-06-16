@@ -28,12 +28,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * 服务启动入口
  *
- * @author liuxin
+ * @author xiaoniucode
  */
 @EnableScheduling
 @SpringBootApplication
 @ComponentScan("com.xiaoniucode.etp")
-@EnableJpaRepositories(basePackages = "com.xiaoniucode.etp.server.web.repository")
 public class TunnelServerStartup {
     public static void main(String[] args) {
         AppConfig config = ConfigParser.parse(args);

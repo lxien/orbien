@@ -20,12 +20,10 @@ public class ConfigParser {
             }
             return appConfig;
         } catch (IllegalArgumentException e) {
-            logger.error(e.getMessage(), e);
-            System.err.println("错误: " + e.getMessage());
+            logger.error("错误: {}", e.getMessage());
             System.exit(1);
         } catch (Exception e) {
-            logger.error("启动失败", e);
-            System.err.println("启动失败: " + e.getMessage());
+            logger.error("启动失败: {}", e.getMessage(), e);
             System.exit(1);
         }
         return null;
@@ -40,24 +38,15 @@ public class ConfigParser {
     }
 
     private static String parseConfigPath(String[] args) {
-        String configPath = null;
-        int i = 0;
-        while (i < args.length) {
-            String arg = args[i];
-            if ("-c".equals(arg)) {
-                if (configPath != null) {
-                    throw new IllegalArgumentException("-c 选项只能指定一次");
-                }
+        for (int i = 0; i < args.length; i++) {
+            if ("-c".equals(args[i])) {
                 if (i + 1 >= args.length) {
                     throw new IllegalArgumentException("-c 选项需要指定配置文件路径");
                 }
-                configPath = args[++i];
-            } else {
-                throw new IllegalArgumentException("未知选项: " + arg);
+                return args[i + 1];
             }
-            i++;
         }
-        return configPath;
+        return null;
     }
 
     private static AppConfig loadConfigFromDefaultLocations() {

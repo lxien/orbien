@@ -33,6 +33,10 @@ public class AccessTokenDTO {
      */
     private String token;
     /**
+     * 描述
+     */
+    private String remark;
+    /**
      * 创建时间
      */
     private LocalDateTime createdAt;

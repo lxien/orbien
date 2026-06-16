@@ -31,6 +31,14 @@
         :type="dialogType"
         :token-id="currentTokenId"
         @submit="handleDialogSubmit"
+        @create-success="handleCreateSuccess"
+      />
+      
+      <!-- Token创建成功弹窗 -->
+      <TokenSuccess
+        v-model:visible="tokenSuccessVisible"
+        :token="createdToken"
+        @close="handleTokenSuccessClose"
       />
     </ElCard>
   </div>
@@ -42,7 +50,8 @@
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetTokenList, fetchDeleteToken, fetchDeleteBatchTokens } from '@/api/token'
   import TokenDialog from './modules/token-dialog.vue'
-  import { ElMessageBox, ElMessage } from 'element-plus'
+import TokenSuccess from './modules/token-success.vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
   import { DialogType } from '@/types'
 
   defineOptions({ name: 'TokenManagement' })
@@ -54,6 +63,10 @@
   const dialogType = ref<DialogType>('add')
   const dialogVisible = ref(false)
   const currentTokenId = ref<number | undefined>()
+  
+  // Token成功弹窗
+  const tokenSuccessVisible = ref(false)
+  const createdToken = ref('')
 
   const {
     columns,
@@ -87,6 +100,11 @@
           prop: 'token',
           label: '令牌',
           minWidth: 200
+        },
+        {
+          prop: 'remark',
+          label: '描述',
+          minWidth: 150
         },
         {
           prop: 'operation',
@@ -165,11 +183,25 @@
   }
 
   /**
-   * 处理对话框提交
+   * 处理对话框提交（编辑/更新）
    */
-  const handleDialogSubmit = async () => {
-    dialogVisible.value = false
-    currentTokenId.value = undefined
+  const handleDialogSubmit = () => {
+    refreshData()
+  }
+
+  /**
+   * 处理创建成功
+   */
+  const handleCreateSuccess = (token: string) => {
+    createdToken.value = token
+    tokenSuccessVisible.value = true
+  }
+
+  /**
+   * 处理成功弹窗关闭
+   */
+  const handleTokenSuccessClose = () => {
+    createdToken.value = ''
     refreshData()
   }
 </script>
