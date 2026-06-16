@@ -1,7 +1,9 @@
 serverAddr = "0.0.0.0"
 serverPort = 9527
 
-[access_tokens]
-desc = "macos"
-token = "5E793FAD27AA713D"
-maxClients = 2
+[dashboard]
+enabled = true
+addr = "0.0.0.0"
+port = 8020
+username = "admin"
+password = "123456"

@@ -39,6 +39,10 @@ public final class AgentIdentity {
         return StringUtils.hasText(currentIdentity);
     }
 
+    public String getStoragePath() {
+        return storagePath;
+    }
+
     public void updateIdentity(String identity) {
         updateIdentity(identity, storagePath != null);
     }

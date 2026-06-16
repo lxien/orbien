@@ -101,8 +101,8 @@ public class AuthAction extends AgentBaseAction {
             if (agentInfoOpt.isEmpty()) {
                 logger.warn("设备ID {} 不存在", agentId);
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setCode(1)
-                        .setMessage("AgentId " + agentId + " 不存在，请删除 agent.id 文件").build();
+                        .setCode(100)//todo 暂时写死
+                        .setMessage("AgentId " + agentId + " 不存在").build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;

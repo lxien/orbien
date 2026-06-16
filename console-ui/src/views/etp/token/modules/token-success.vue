@@ -13,7 +13,7 @@
         >您的新身份验证令牌已创建！这是最后一次显示该令牌。请将其安全保存到您的计算机中。</p
       >
       <div class="token-display">
-        <ElInput :model-value="token" readonly class="token-input" placeholder="Token">
+        <ElInput :model-value="token" size="large" readonly class="token-input" placeholder="Token">
           <template #suffix>
             <button class="copy-btn" @click="handleCopyOnly">
               <svg

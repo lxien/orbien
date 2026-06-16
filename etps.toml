@@ -1,5 +1,4 @@
-#server_addr = "0.0.0.0"
-server_addr = "localhost"
+server_addr = "0.0.0.0"
 server_port = 9527
 http_proxy_port = 80
 https_proxy_port = 8443
@@ -17,11 +16,7 @@ ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 [auth]
 [[auth.tokens]]
 name = "macos"
-token = "414083A8563774142CAC91DDB5C9A2ED"
-expire_days=30
-[[auth.tokens]]
-name = "win"
-token = "2DE922B12A810486CF0ADA3B8FA03D93"
+token = "6233E4F34566EAD26C6774C688E0ADFF"
 
 #管理界面
 [dashboard]

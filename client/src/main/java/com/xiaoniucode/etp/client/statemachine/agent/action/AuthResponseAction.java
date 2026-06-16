@@ -24,6 +24,10 @@ public class AuthResponseAction extends AgentBaseAction {
             AgentType agentType = context.getAgentType();
             context.getAgentIdentity().updateIdentity(agentId, agentType.isStandalone());
             context.fireEvent(AgentEvent.AUTH_SUCCESS);
+        } else if (code == 100) {
+            String storagePath = context.getAgentIdentity().getStoragePath();
+            logger.error("认证失败: {}，请删除本地身份文件后重试: {}", authResponse.getMessage(), storagePath);
+            context.fireEvent(AgentEvent.LOCAL_GOAWAY);
         } else {
             logger.error("{}", authResponse.getMessage());
             context.fireEvent(AgentEvent.LOCAL_GOAWAY);

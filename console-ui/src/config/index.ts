@@ -122,7 +122,7 @@ const appConfig: SystemConfig = {
     '#B48DF3',
     '#1D84FF',
     '#60C041',
-    '#38C0FC',
+    '#1A1A1A',
     '#F9901F',
     '#FF80C8'
   ] as const,
