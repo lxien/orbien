@@ -10,13 +10,13 @@ base_domain = "domain1.com"
 enabled = true
 cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.crt"
 key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.key"
-ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
 #key_pass=""
 
 [auth]
 [[auth.tokens]]
 name = "macos"
-token = "6233E4F34566EAD26C6774C688E0ADFF"
+token = "414083A8563774142CAC91DDB5C9A2ED"
 
 #管理界面
 [dashboard]

@@ -7,7 +7,7 @@ token = "token"
 [[proxies]]
 name = "MySQL"
 protocol = "tcp"
-remotePort = 3307
+remote_port = 3307
 targets = [
     { host = "127.0.0.1", port = 3306, weight = 1, name = "mysql" }
 ]

@@ -119,7 +119,6 @@
         <module>server</module>
         <module>console</module>
         <module>client</module>
-        <module>main</module>
     </modules>
 
     <dependencyManagement>
