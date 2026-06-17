@@ -12,14 +12,37 @@ const features: Array<{
     title: string;
     description: string;
 }> = [
-    {id: 'panel', title: '管理面板', description: '提供现代化Web UI管理面板，实时监控连接状态、在线设备节点、流量统计与运行指标'},
-    {id: 'speed', title: '高性能传输', description: '自研高效多路复用流传输协议、全链路零拷贝设计，采用状态机及事件驱动架构，保证系统稳定传输'},
-    {id: 'shield', title: '协议与安全', description: '支持TCP、HTTP及TCP上层协议代理，提供mTLS双向认证、端到端加密传输和会话级临时隧道机制'},
-    {id: 'sparkle', title: '简单易用', description: '支持客户端自治运行和集中式远程配置管理同步，无需复杂网络知识即可快速完成服务发布与运维管理'},
-    {id: 'globe', title: '跨平台', description: '兼容Windows/Linux/macOS/Docker/k8s环境，同时支持嵌入Spring Boot应用，实现灵活集成部署'},
-    {id: 'stack', title: '能力矩阵', description: '内置压缩传输、负载均衡、访问控制、身份认证、带宽限流、鉴权认证、自定义域名、流量分析等能力'},
+    {
+        id: 'panel',
+        title: '管理面板',
+        description: '提供现代化Web UI管理面板，实时监控连接状态、在线设备节点、流量统计与运行指标'
+    },
+    {
+        id: 'speed',
+        title: '高性能传输',
+        description: '自研高效多路复用流传输协议、全链路零拷贝设计，采用状态机及事件驱动架构，保证系统稳定传输'
+    },
+    {
+        id: 'shield',
+        title: '协议与安全',
+        description: '支持TCP、HTTP及TCP上层协议代理，提供mTLS双向认证、端到端加密传输和会话级临时隧道机制'
+    },
+    {
+        id: 'sparkle',
+        title: '简单易用',
+        description: '支持客户端自治运行和集中式远程配置管理同步，无需复杂网络知识即可快速完成服务发布与运维管理'
+    },
+    {
+        id: 'globe',
+        title: '跨平台',
+        description: '兼容Windows/Linux/macOS/Docker/k8s环境，同时支持嵌入Spring Boot应用，实现灵活集成部署'
+    },
+    {
+        id: 'stack',
+        title: '能力矩阵',
+        description: '内置压缩传输、负载均衡、访问控制、身份认证、带宽限流、鉴权认证、自定义域名、流量分析等能力'
+    },
 ];
-
 
 
 function HeroVisual() {
@@ -106,7 +129,6 @@ export default function Home() {
         <Layout title={siteConfig.title} description={siteConfig.tagline}>
             <div className={styles.page}>
                 <section className={styles.hero}>
-                    <div className={styles.heroMesh}/>
                     <div className={styles.heroInner}>
                         <div className={styles.heroCopy}>
                             <p className={styles.heroEyebrow}>Easy Tunnel Proxy · etp</p>
@@ -115,9 +137,8 @@ export default function Home() {
                                 面向开发和运维的一站式解决方案。TCP/HTTP多协议代理支持，反向代理、TLS传输加密、压缩、负载均衡、精细限流、访问控制、安全认证、
                                 SpringBoot集成、管理面板，具备丰富的场景自定义能力
                             </p>
-                            <div className={styles.heroLogoRow}>
-                                <img src={logoUrl} alt="" className={styles.heroLogoMark} width={52} height={52}/>
-                                <span className={styles.heroLogoCaption}>由 Netty 驱动 · Java 生态友好</span>
+                            <div className={styles.heroBadge}>
+                                <span className={styles.heroBadgeText}>由 Netty 驱动 · 安全可靠 · 操作简单</span>
                             </div>
                             <div className={styles.heroActions}>
                                 <Link className={clsx(styles.btn, styles.btnPrimary)} to="/docs/overview">
@@ -143,10 +164,8 @@ export default function Home() {
                     <div className={styles.featureSectionInner}>
                         <ul className={styles.featureGrid}>
                             {features.map((f, i) => (
-                                <li key={f.title}
-                                    className={clsx(styles.featureCard, styles[`featureTone${(i % 3) + 1}`])}>
-                                    <div className={styles.featureCardTop}/>
-                                    <div className={styles.featureIconWrap}>
+                                <li key={f.title} className={clsx(styles.featureCard, styles[`featureCard${i + 1}`])}>
+                                    <div className={clsx(styles.featureIconWrap, styles[`featureIcon${i + 1}`])}>
                                         <FeatureIcon id={f.id}/>
                                     </div>
                                     <h3 className={styles.featureCardTitle}>{f.title}</h3>
