@@ -10,13 +10,14 @@ sidebar_position: 2
 
 前往 [GitHub Releases](https://github.com/xiaoniucode/etp/releases) 页面，根据您的操作系统下载对应的二进制文件：
 
-| 平台               | 文件名称                                                                                                                            |
-|:-----------------|:--------------------------------------------------------------------------------------------------------------------------------|
-| Linux (x86_64)   | [etp_v0.10.0_linux_amd64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etp_v0.10.0_linux_amd64.tar.gz)   |
-| Linux (arm64)    | [etp_v0.10.0_linux_arm64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etp_v0.10.0_linux_arm64.tar.gz)   |
-| macOS (x86_64)   | [etp_v0.10.0_darwin_amd64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etp_v0.10.0_darwin_amd64.tar.gz) |
-| macOS (arm64)    | [etp_v0.10.0_darwin_arm64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etp_v0.10.0_darwin_arm64.tar.gz) |
-| Windows (x86_64) | [etp_v0.10.0_windows_amd64.zip](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etp_v0.10.0_windows_amd64.zip)     |
+| 平台               | 文件名称                                                                                                                              |
+|:-----------------|:----------------------------------------------------------------------------------------------------------------------------------|
+| Linux (x86_64)   | [etpc_v0.10.0_linux_amd64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_linux_amd64.tar.gz)   |
+| Linux (arm64)    | [etpc_v0.10.0_linux_arm64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_linux_arm64.tar.gz)   |
+| macOS (x86_64)   | [etpc_v0.10.0_darwin_amd64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_darwin_amd64.tar.gz) |
+| macOS (arm64)    | [etpc_v0.10.0_darwin_arm64.tar.gz](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_darwin_arm64.tar.gz) |
+| Windows (x86_64) | [etpc_v0.10.0_windows_amd64.zip](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_windows_amd64.zip)     |
+| Windows (arm64)  | [etpc_v0.10.0_windows_arm64.zip](https://github.com/xiaoniucode/etp/releases/download/v0.10.0/etpc_v0.10.0_windows_arm64.zip)     |
 
 #### 1. 编辑配置文件
 

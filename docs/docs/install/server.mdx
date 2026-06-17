@@ -4,9 +4,9 @@ sidebar_position: 1
 
 # 服务端
 
-## Docker
+## 一、Docker（推荐）
 通过`Docker`可以快速部署`etps`服务端，无需手动安装`Java` 运行环境。
-### 一、一键运行
+### 1.1、一键运行
 
 如果已经拥有可用的`MySQL`数据库，可使用以下命令快速启动`etps`：
 ```shell
@@ -24,9 +24,12 @@ docker run -d \
   xiaoniucode/etps:latest
 ```
 
-### 二、自定义部署
+:::tip 提示
+  -p 8600-8609:8600-8609：是TCP隧道可以使用的公网端口，实际根据自己需求调整。
+:::
+### 1.2、自定义部署
 
-#### 创建目录
+#### 1.2.1、创建目录
 
 推荐使用统一目录管理配置、日志和数据库数据：
 
@@ -81,7 +84,7 @@ docker run -d \
 docker logs -f etps-mysql
 ```
 
-#### 启动 etps
+#### 1.2.4、启动 etps
 ```shell
 docker run -d \
   --name etps \
@@ -114,7 +117,7 @@ docker logs -f etps
 docker stop etps
 ```
 
-### 三、Docker Compose
+### 1.3、Docker Compose
 
 ```shell
 mkdir -p /opt/etps/{config,certs,logs,mysql/data}
@@ -144,7 +147,7 @@ services:
     ports:
       - "8020:8020"          # Web 管理面板
       - "9527:9527"          # 控制协议端口
-      - "8600-8609:8600-8609" # 数据端口范围
+      - "8600-8609:8600-8609" # TCP隧道公网端口范围
     environment:
       JAVA_OPTS: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=1024m -XX:+UseG1GC"
     volumes:
@@ -171,3 +174,6 @@ docker logs -f etps
 # 停止服务：
 docker compose down
 ```
+
+
+
