@@ -33,19 +33,19 @@
 
 ## Introduction
 **etp (Easy Tunnel Proxy)** is a high-performance **intranet penetration platform**.
-- 🚀 Support for TCP and HTTP protocol proxying
-- ⚡ Data compression transmission, reducing bandwidth consumption
-- 🔄 TCP multiplexing stream transmission, multiple requests over single physical connection
-- 🔒 mTLS mutual authentication for secure data transmission
-- 🛡️ IP CIDR access control (whitelist/blacklist)
-- 🔑 HTTP BasicAuth authentication, Token-based identity verification
-- 📉 Fine-grained bandwidth rate limiting and traffic management
-- ⚖️ Load balancing and cluster proxy support, enhancing system availability
-- 🌐 Custom domain and subdomain routing support
-- 📊 Built-in modern Web UI dashboard for visual management and operational monitoring
-- 🔌 Spring Boot integration, reducing development and testing costs
-- 💻 Compatible with Windows, Linux, and macOS for cross-platform deployment
-- 📚 Client-autonomous + server-centralized management configuration rules for simplified administration
+- Support for TCP and HTTP protocol proxying
+- Data compression transmission, reducing bandwidth consumption
+- TCP multiplexing stream transmission, multiple requests over single physical connection
+- mTLS mutual authentication for secure data transmission
+- IP CIDR access control (whitelist/blacklist)
+- HTTP BasicAuth authentication, Token-based identity verification
+- Fine-grained bandwidth rate limiting and traffic management
+- Load balancing and cluster proxy support, enhancing system availability
+- Custom domain and subdomain routing support
+- Built-in modern Web UI dashboard for visual management and operational monitoring
+- Spring Boot integration, reducing development and testing costs
+- Compatible with Windows, Linux, and macOS for cross-platform deployment
+- Client-autonomous + server-centralized management configuration rules for simplified administration
 
 ## Quick Start
 
