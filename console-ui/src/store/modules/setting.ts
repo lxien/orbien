@@ -36,7 +36,6 @@ import { MenuThemeType } from '@/types/store'
 import AppConfig from '@/config'
 import { SystemThemeEnum, MenuThemeEnum, MenuTypeEnum, ContainerWidthEnum } from '@/enums/appEnum'
 import { setElementThemeColor } from '@/utils/ui'
-import { useCeremony } from '@/hooks/core/useCeremony'
 import { StorageConfig } from '@/utils'
 import { SETTING_DEFAULT_CONFIG } from '@/config/setting'
 
@@ -149,14 +148,6 @@ export const useSettingStore = defineStore(
      */
     const getCustomRadius = computed((): string => {
       return customRadius.value + 'rem' || SETTING_DEFAULT_CONFIG.customRadius + 'rem'
-    })
-
-    /**
-     * 是否显示烟花
-     * 根据当前日期和节日日期判断是否显示烟花效果
-     */
-    const isShowFireworks = computed((): boolean => {
-      return festivalDate.value === useCeremony().currentFestivalData.value?.date ? false : true
     })
 
     /**
@@ -409,7 +400,6 @@ export const useSettingStore = defineStore(
       isDark,
       getMenuOpenWidth,
       getCustomRadius,
-      isShowFireworks,
       switchMenuLayouts,
       setMenuOpenWidth,
       setGlopTheme,

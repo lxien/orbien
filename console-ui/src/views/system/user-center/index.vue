@@ -15,11 +15,11 @@
           <div class="w-75 mx-auto mt-7.5 text-left">
             <div class="mt-2.5">
               <ArtSvgIcon icon="ri:mail-line" class="text-g-700" />
-              <span class="ml-2 text-sm">yuanyicode@mall.com</span>
+              <span class="ml-2 text-sm">未设置邮箱</span>
             </div>
             <div class="mt-2.5">
               <ArtSvgIcon icon="ri:user-3-line" class="text-g-700" />
-              <span class="ml-2 text-sm">软件开发者</span>
+              <span class="ml-2 text-sm">软件开发工程师</span>
             </div>
           </div>
         </div>

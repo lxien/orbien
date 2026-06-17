@@ -6,7 +6,6 @@
 <script setup lang="ts">
   import { useChartOps, useChartComponent } from '@/hooks/core/useChart'
   import type { EChartsOption } from '@/plugins/echarts'
-  import { computed } from 'vue'
 
   defineOptions({ name: 'ArtGaugeChart' })
 
@@ -45,10 +44,7 @@
   })
 
   // 使用新的图表组件抽象
-  const {
-    chartRef,
-    getTooltipStyle
-  } = useChartComponent({
+  const { chartRef, getTooltipStyle } = useChartComponent({
     props,
     checkEmpty: () => {
       return props.value === undefined || props.value === null
@@ -56,9 +52,11 @@
     watchSources: [() => props.value, () => props.name, () => props.min, () => props.max],
     generateOptions: (): EChartsOption => {
       const options: EChartsOption = {
-        tooltip: props.showTooltip ? getTooltipStyle('item', {
-          formatter: '{a} <br/>{b} : {c}%'
-        }) : undefined,
+        tooltip: props.showTooltip
+          ? getTooltipStyle('item', {
+              formatter: '{a} <br/>{b} : {c}%'
+            })
+          : undefined,
         series: [
           {
             name: props.name,
