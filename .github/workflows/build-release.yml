@@ -241,21 +241,17 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 下载 Docker 镜像构建所需的 etps jar
+      - name: 下载 Docker 镜像构建所需的 etps tar.gz
         uses: actions/download-artifact@v4
         with:
-          name: etps-${{ github.ref_name }}-linux_amd64
-          path: ./main/etps/target
+          name: etps-linux_amd64-${{ github.ref_name }}
+          path: ./
 
-      - name: 提取 jar 包文件名
-        id: jar
+      - name: 创建工作目录并解压 tar.gz
         run: |
-          JAR_FILE=$(ls main/etps/target/etps-*.jar | head -1)
-          echo "jar_file=$JAR_FILE" >> $GITHUB_OUTPUT
-          echo "jar_name=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
-
-      - name: 重命名 jar 包
-        run: mv "${{ steps.jar.outputs.jar_file }}" "main/etps/target/etps.jar"
+          mkdir -p main/etps/target
+          tar -xzf etps_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
+          cp /tmp/etps_${{ github.ref_name }}_linux_amd64/etps.jar main/etps/target/etps.jar
 
       - name: 提取版本号
         id: version
@@ -272,8 +268,8 @@ jobs:
       - name: 推送 Docker 镜像
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          docker push xiaoniucode/etps:latest
           docker push xiaoniucode/etps:$VERSION
+          docker push xiaoniucode/etps:latest
 
   # =============================================
   # 阶段4：统一发布阶段
