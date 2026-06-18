@@ -27,7 +27,7 @@ services:
     container_name: etps
     restart: unless-stopped
     ports:
-      - "80:80" # HTTP 隧道代理服务
+      - "8080:8080" # HTTP 隧道代理服务
       - "8020:8020" # 管理面板
       - "9527:9527" # 控制隧道
       - "9050-9099:9050-9099" # TCP 隧道代理服务
@@ -35,10 +35,12 @@ services:
       JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
       MYSQL_PASSWORD: etps.123456
       MYSQL_HOST: etps-mysql
+      TZ: Asia/Shanghai
     volumes:
       - /opt/etps/config:/app/config
       - /opt/etps/certs:/app/certs
       - /opt/etps/logs:/app/logs
+      - /opt/etps/etps.toml:/app/etps.toml
     networks:
       - etps-net
     depends_on:

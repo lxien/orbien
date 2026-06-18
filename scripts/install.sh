@@ -27,7 +27,7 @@ docker run -d \
   --name etps \
   --network etps-net \
   --restart unless-stopped \
-  -p 80:80 \
+  -p 8080:8080 \
   -p 8020:8020 \
   -p 9527:9527 \
   -p 9050-9099:9050-9099 \
@@ -35,9 +35,12 @@ docker run -d \
   -e MYSQL_DATABASE=etps \
   -e MYSQL_PASSWORD=etps.123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
+  -e TZ=Asia/Shanghai \
+  -v "$ETPS_HOME/etps.toml:/app/etps.toml" \
   -v "$ETPS_HOME/config:/app/config" \
   -v "$ETPS_HOME/certs:/app/certs" \
   -v "$ETPS_HOME/logs:/app/logs" \
+  -v /etc/localtime:/etc/localtime:ro \
   xiaoniucode/etps:latest
 
 echo ""
@@ -49,7 +52,7 @@ echo "【访问信息】"
 echo "  管理地址     : http://<服务器IP>:8020"
 echo "  Web 管理端口 : 8020"
 echo "  控制端口     : 9527"
-echo "  HTTP隧道代理服务端口 : 80"
+echo "  HTTP隧道代理服务端口 : 8080"
 echo "  映射端口范围 : 9050-9099"
 echo ""
 echo "【数据库信息】"

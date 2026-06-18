@@ -48,7 +48,8 @@
 
 <script setup lang="ts">
   import { ref } from 'vue'
-  import { ElMessage } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
+  import { ClipboardUtils } from '@/utils/ui'
 
   interface Props {
     visible: boolean
@@ -65,26 +66,64 @@
 
   const copyAndCloseLoading = ref(false)
 
-  const doCopy = async () => {
-    if (!props.token) return
-    try {
-      await navigator.clipboard.writeText(props.token)
+  const doCopy = async (closeAfterCopy = false): Promise<boolean> => {
+    if (!props.token) {
+      ElMessage.warning('复制内容为空')
+      return false
+    }
+
+    const success = await ClipboardUtils.copy(props.token)
+    
+    if (success) {
       ElMessage.success('复制成功')
-    } catch {
-      ElMessage.error('复制失败，请手动复制')
+      if (closeAfterCopy) {
+        emit('update:visible', false)
+        emit('close')
+      }
+      return true
+    } else {
+      await showManualCopyDialog()
+      if (closeAfterCopy) {
+        emit('update:visible', false)
+        emit('close')
+      }
+      return true
     }
   }
 
+  const showManualCopyDialog = async (): Promise<void> => {
+    return new Promise((resolve) => {
+      ElMessageBox({
+        title: '请手动复制',
+        message: `<input type="text" value="${ClipboardUtils.escapeHtml(props.token)}" id="clipboard_manual_input" style="width:100%;padding:8px;font-size:14px;font-family:monospace;" onclick="this.select()">`,
+        showCancelButton: false,
+        confirmButtonText: '已复制',
+        dangerouslyUseHTMLString: true,
+        beforeClose: () => {
+          resolve()
+        }
+      }).then(() => {
+        ElMessage.success('复制成功')
+      })
+
+      setTimeout(() => {
+        const input = document.getElementById('clipboard_manual_input') as HTMLInputElement
+        if (input) {
+          input.select()
+          input.focus()
+        }
+      }, 100)
+    })
+  }
+
   const handleCopyOnly = async () => {
-    await doCopy()
+    await doCopy(false)
   }
 
   const handleCopyAndClose = async () => {
     copyAndCloseLoading.value = true
     try {
-      await doCopy()
-      emit('update:visible', false)
-      emit('close')
+      await doCopy(true)
     } finally {
       copyAndCloseLoading.value = false
     }
