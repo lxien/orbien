@@ -50,7 +50,6 @@
   // 使用设置面板逻辑
   const settingsPanel = useSettingsPanel()
   const { showDrawer } = settingsPanel
-
   // 获取各种处理器
   const { handleOpen, handleClose, closeDrawer } = settingsPanel.useDrawerControl()
   const { initializeSettings, cleanupSettings } = settingsPanel.useSettingsInitializer()
