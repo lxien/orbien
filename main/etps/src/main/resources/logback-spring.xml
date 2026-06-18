@@ -27,7 +27,7 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <logger name="com.xiaoniucode.etp" level="DEBUG"/>
+    <logger name="com.xiaoniucode.etp" level="INFO"/>
     <logger name="io.netty.handler.ssl" level="INFO"/>
     <logger name="io.netty.handler.ssl.util.BouncyCastleUtil" level="INFO"/>
     <logger name="io.netty.channel.ChannelHandlerMask" level="INFO"/>
