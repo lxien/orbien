@@ -12,17 +12,29 @@ services:
       - etps-net
     volumes:
       - /opt/etps/mysql/data:/var/lib/mysql
-
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysql -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1' >/dev/null 2>&1"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
   etps:
     image: xiaoniucode/etps:latest
     container_name: etps
     restart: unless-stopped
     ports:
-      - "8020:8020"
-      - "9527:9527"
-      - "8600-8609:8600-8609"
+      - "80:80" # HTTP 隧道代理服务
+      - "8020:8020" # 管理面板
+      - "9527:9527" # 控制隧道
+      - "9050-9099:9050-9099" # TCP 隧道代理服务
     environment:
       JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
+      MYSQL_PASSWORD: etps.123456
+      MYSQL_HOST: etps-mysql
     volumes:
       - /opt/etps/config:/app/config
       - /opt/etps/certs:/app/certs
@@ -30,7 +42,8 @@ services:
     networks:
       - etps-net
     depends_on:
-      - etps-mysql
+      etps-mysql:
+        condition: service_healthy
 
 networks:
   etps-net:

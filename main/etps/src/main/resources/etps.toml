@@ -7,3 +7,8 @@ addr = "0.0.0.0"
 port = 8020
 username = "admin"
 password = "123456"
+
+#公网TCP隧道端口分配范围
+[port_policy]
+start = 9050
+end = 9099

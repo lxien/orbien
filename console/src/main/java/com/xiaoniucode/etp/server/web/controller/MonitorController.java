@@ -29,9 +29,6 @@ public class MonitorController {
     @Autowired
     private StatsService statsService;
 
-    /**
-     * 获取服务器信息
-     */
     @GetMapping("server-info")
     public Ajax getServerInfo() {
         return Ajax.success(ServerMonitor.getServerInfo());

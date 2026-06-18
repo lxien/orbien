@@ -123,7 +123,7 @@ public class StreamOpenAction extends StreamBaseAction {
             return tunnelEntry;
         }
 
-        logger.warn("没有可用连接，开始创建新隧道");
+        logger.debug("没有可用连接，开始创建新隧道");
 
         CreateConnCommand createConnCommand;
         if (context.isMultiplex()) {

@@ -56,7 +56,6 @@ public class AgentManager {
         connectionToContextMap.put(connectionId, agentContext);
         return agentContext;
     }
-
     public void addAgentContextIndex(String agentId, AgentContext context) {
         agentToContextMap.put(agentId, context);
     }
@@ -77,7 +76,6 @@ public class AgentManager {
             writeLock.unlock();
         }
     }
-
     public boolean isOnline(String agentId) {
         AgentContext agentContext = agentToContextMap.get(agentId);
         if (agentContext == null) {

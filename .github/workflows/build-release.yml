@@ -227,11 +227,60 @@ jobs:
           path: etpc_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # =============================================
+  # 阶段3：构建并推送 Docker 镜像
+  # =============================================
+  docker-build:
+    name: 构建并推送 Docker 镜像
+    needs: [build-native]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 下载 Docker 镜像构建所需的 etps jar
+        uses: actions/download-artifact@v4
+        with:
+          name: etps-${{ github.ref_name }}-linux_amd64
+          path: ./main/etps/target
+
+      - name: 提取 jar 包文件名
+        id: jar
+        run: |
+          JAR_FILE=$(ls main/etps/target/etps-*.jar | head -1)
+          echo "jar_file=$JAR_FILE" >> $GITHUB_OUTPUT
+          echo "jar_name=$(basename $JAR_FILE)" >> $GITHUB_OUTPUT
+
+      - name: 重命名 jar 包
+        run: mv "${{ steps.jar.outputs.jar_file }}" "main/etps/target/etps.jar"
+
+      - name: 提取版本号
+        id: version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: 构建 Docker 镜像
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          docker build -t xiaoniucode/etps:latest -t xiaoniucode/etps:$VERSION .
+
+      - name: 登录到 Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: 推送 Docker 镜像
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          docker push xiaoniucode/etps:latest
+          docker push xiaoniucode/etps:$VERSION
+
+  # =============================================
   # 阶段4：统一发布阶段
   # =============================================
   create-release:
     name: 创建统一 Release
-    needs: [build-native]
+    needs: [build-native, docker-build]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:

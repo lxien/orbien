@@ -28,5 +28,5 @@ password = "123456"
 
 #公网端口分配范围
 [port_policy]
-start = 8000
-end = 8009
+start = 9050
+end = 9099

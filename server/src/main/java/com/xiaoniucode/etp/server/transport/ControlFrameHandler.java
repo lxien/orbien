@@ -209,12 +209,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         if (channelType == ChannelType.CONTROL) {
             agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
                 logger.debug("与客户端 {} 断开连接", agentContext.getAgentId());
-                //todo agentContext.fireEvent(AgentEvent.DISCONNECT);
-                agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
+                agentContext.fireEvent(AgentEvent.DISCONNECT);
             });
         } else if (channelType == ChannelType.TUNNEL) {
             logger.error("数据连接断开");
-            //todo 需要处理数据连接断开
+            //todo 需要处理数据连接断开 清理连接池连接
+            //
         }
     }
 
