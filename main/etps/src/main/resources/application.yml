@@ -19,4 +19,4 @@ cache:
     initial-capacity: 10000
     maximum-size: 150000
     expire-after-access: 30m
-dev: true
+dev: false
