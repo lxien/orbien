@@ -72,7 +72,7 @@ docker run -d \
   --name etps-mysql \
   --network etps-net \
   --restart unless-stopped \
-  -e MYSQL_ROOT_PASSWORD=etps.123456 \
+  -e MYSQL_ROOT_PASSWORD=123456 \
   -e MYSQL_DATABASE=etps \
   -v /opt/etps/mysql/data:/var/lib/mysql \
   mysql:8.4
@@ -96,7 +96,7 @@ docker run -d \
   -p 9050-9099:9050-9099 \
   -e MYSQL_HOST=etps-mysql \
   -e MYSQL_DATABASE=etps \
-  -e MYSQL_PASSWORD=etps.123456 \
+  -e MYSQL_PASSWORD=123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
   -e TZ=Asia/Shanghai \
   -v /opt/etps/config:/app/config \
@@ -133,7 +133,7 @@ services:
     container_name: etps-mysql
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: etps.123456
+      MYSQL_ROOT_PASSWORD: 123456
       MYSQL_DATABASE: etps
     networks:
       - etps-net
@@ -160,7 +160,7 @@ services:
       - "9050-9099:9050-9099" # TCP 隧道代理服务
     environment:
       JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
-      MYSQL_PASSWORD: etps.123456
+      MYSQL_PASSWORD: 123456
       MYSQL_HOST: etps-mysql
       TZ: Asia/Shanghai
     volumes:

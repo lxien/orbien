@@ -19,7 +19,7 @@ docker run -d \
   --name etps-mysql \
   --network etps-net \
   --restart unless-stopped \
-  -e MYSQL_ROOT_PASSWORD=etps.123456 \
+  -e MYSQL_ROOT_PASSWORD=123456 \
   -e MYSQL_DATABASE=etps \
   -v "$ETPS_HOME/mysql/data:/var/lib/mysql" \
   mysql:8.4
@@ -34,7 +34,7 @@ docker run -d \
   -p 9050-9099:9050-9099 \
   -e MYSQL_HOST=etps-mysql \
   -e MYSQL_DATABASE=etps \
-  -e MYSQL_PASSWORD=etps.123456 \
+  -e MYSQL_PASSWORD=123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
   -e TZ=Asia/Shanghai \
   -v "$ETPS_HOME/config:/app/config" \
@@ -60,7 +60,7 @@ echo "  地址         : etps-mysql"
 echo "  端口         : 3306"
 echo "  数据库名     : etps"
 echo "  用户名       : root"
-echo "  密码         : etps.123456"
+echo "  密码         : 123456"
 echo ""
 echo "【数据目录】"
 echo "  MySQL 数据   : $ETPS_HOME/mysql/data"
