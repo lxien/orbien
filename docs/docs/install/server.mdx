@@ -99,7 +99,6 @@ docker run -d \
   -e MYSQL_PASSWORD=etps.123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
   -e TZ=Asia/Shanghai \
-  -v /opt/etps/etps.toml:/app/etps.toml \
   -v /opt/etps/config:/app/config \
   -v /opt/etps/certs:/app/certs \
   -v /opt/etps/logs:/app/logs \
