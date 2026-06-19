@@ -22,7 +22,7 @@ docker run -d \
   -e MYSQL_USERNAME=root \
   -e MYSQL_PASSWORD=123456 \
   -e TZ=Asia/Shanghai \
-  xiaoniucode/etps:latest
+  xiaoniucode/etps:0.10.0
 ```
 
 :::tip 提示
@@ -103,7 +103,7 @@ docker run -d \
   -v /opt/etps/config:/app/config \
   -v /opt/etps/certs:/app/certs \
   -v /opt/etps/logs:/app/logs \
-  xiaoniucode/etps:latest
+  xiaoniucode/etps:0.10.0
 ```
 
 查看`etps`运行日志：
@@ -151,7 +151,7 @@ services:
       retries: 20
       start_period: 60s
   etps:
-    image: xiaoniucode/etps:latest
+    image: xiaoniucode/etps:0.10.0
     container_name: etps
     restart: unless-stopped
     ports:
@@ -168,7 +168,6 @@ services:
       - /opt/etps/config:/app/config
       - /opt/etps/certs:/app/certs
       - /opt/etps/logs:/app/logs
-      - /opt/etps/etps.toml:/app/etps.toml
     networks:
       - etps-net
     depends_on:

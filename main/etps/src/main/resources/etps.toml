@@ -1,5 +1,6 @@
-serverAddr = "0.0.0.0"
-serverPort = 9527
+server_addr = "0.0.0.0"
+server_port = 9527
+http_proxy_port = 8080
 
 [dashboard]
 enabled = true

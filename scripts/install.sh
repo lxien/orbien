@@ -2,8 +2,9 @@
 
 set -e
 
-# Linux 使用 /opt/etps
-# macOS 使用 ~/.etps
+ETPS_IMAGE="xiaoniucode/etps:0.10.0"
+ETPS_VERSION="0.10.0"
+
 if [ "$(uname -s)" = "Darwin" ]; then
     ETPS_HOME="$HOME/.etps"
 else
@@ -36,16 +37,14 @@ docker run -d \
   -e MYSQL_PASSWORD=etps.123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
   -e TZ=Asia/Shanghai \
-  -v "$ETPS_HOME/etps.toml:/app/etps.toml" \
   -v "$ETPS_HOME/config:/app/config" \
   -v "$ETPS_HOME/certs:/app/certs" \
   -v "$ETPS_HOME/logs:/app/logs" \
-  -v /etc/localtime:/etc/localtime:ro \
-  xiaoniucode/etps:latest
+  "$ETPS_IMAGE"
 
 echo ""
 echo "=================================================="
-echo "               ETPS 部署完成"
+echo "               ETPS ${ETPS_VERSION} 部署完成"
 echo "=================================================="
 echo ""
 echo "【访问信息】"

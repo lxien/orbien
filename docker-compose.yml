@@ -23,7 +23,7 @@ services:
       retries: 20
       start_period: 60s
   etps:
-    image: xiaoniucode/etps:latest
+    image: xiaoniucode/etps:0.10.0
     container_name: etps
     restart: unless-stopped
     ports:
@@ -40,13 +40,11 @@ services:
       - /opt/etps/config:/app/config
       - /opt/etps/certs:/app/certs
       - /opt/etps/logs:/app/logs
-      - /opt/etps/etps.toml:/app/etps.toml
     networks:
       - etps-net
     depends_on:
       etps-mysql:
         condition: service_healthy
-
 networks:
   etps-net:
     driver: bridge
