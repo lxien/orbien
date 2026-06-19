@@ -37,8 +37,6 @@ services:
       MYSQL_HOST: etps-mysql
       TZ: Asia/Shanghai
     volumes:
-      - /opt/etps/config:/app/config
-      - /opt/etps/certs:/app/certs
       - /opt/etps/logs:/app/logs
     networks:
       - etps-net
