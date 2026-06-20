@@ -6,5 +6,6 @@
 
 export enum ProtocolType {
   TCP = 1,
-  HTTP = 2
+  HTTP = 2,
+  HTTPS = 3
 }

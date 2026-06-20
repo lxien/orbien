@@ -3,12 +3,11 @@ package com.xiaoniucode.etp.server.configuration;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.TunnelServer;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.transport.http.HttpProxyServer;
+import com.xiaoniucode.etp.server.transport.https.ssl.SslCertificateManager;
+import com.xiaoniucode.etp.server.transport.http.*;
+import com.xiaoniucode.etp.server.transport.https.HttpsProxyServer;
 import com.xiaoniucode.etp.server.transport.tcp.TcpProxyServer;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
-import com.xiaoniucode.etp.server.transport.http.BasicAuthHandler;
-import com.xiaoniucode.etp.server.transport.http.HttpIpCheckHandler;
-import com.xiaoniucode.etp.server.transport.http.HttpVisitorHandler;
 import com.xiaoniucode.etp.server.transport.tcp.TcpIpCheckHandler;
 import com.xiaoniucode.etp.server.transport.tcp.TcpVisitorHandler;
 import jakarta.annotation.Resource;
@@ -42,5 +41,17 @@ public class TransportConfiguration {
                 httpIpCheckHandler,
                 basicAuthHandler,
                 eventBus);
+    }
+    @Bean
+    public HttpsProxyServer httpsProxyServer(HttpVisitorHandler httpVisitorHandler,
+                                             HttpIpCheckHandler httpIpCheckHandler,
+                                             BasicAuthHandler basicAuthHandler,
+                                             EventBus eventBus, SslCertificateManager sslCertificateManager) {
+        return new HttpsProxyServer(config,
+                httpVisitorHandler,
+                httpIpCheckHandler,
+                basicAuthHandler,
+                eventBus,
+                sslCertificateManager);
     }
 }

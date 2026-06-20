@@ -8,9 +8,9 @@ base_domain = "domain1.com"
 # TLS
 [transport.tls]
 enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/server.key"
-#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/system/transport/server.crt"
+key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/system/transport/server.key"
+#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/system/transport/ca.crt"
 #key_pass=""
 
 [auth]

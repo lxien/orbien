@@ -30,7 +30,7 @@ export const SETTING_DEFAULT_CONFIG = {
   /** 菜单类型 */
   menuType: MenuTypeEnum.DUAL_MENU,
   /** 菜单展开宽度 */
-  menuOpenWidth: 230,
+  menuOpenWidth: 180,
   /** 菜单是否展开 */
   menuOpen: true,
   /** 双菜单是否显示文本 */
@@ -56,7 +56,7 @@ export const SETTING_DEFAULT_CONFIG = {
   /** 是否显示语言切换 */
   showLanguage: true,
   /** 是否显示进度条 */
-  showNprogress: false,
+  showNprogress: true,
   /** 是否显示设置引导 */
   showSettingGuide: true,
   /** 是否显示节日文本 */

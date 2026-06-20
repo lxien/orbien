@@ -13,6 +13,8 @@ etp:
         limit-in: 1Mbps
         limit-out: 1Mbps
         limit-total: 2Mbps
+      transport:
+        encrypt: true
 #      basic-auth:
 #        enabled: true
 #        users:

@@ -60,6 +60,12 @@ declare namespace Api.Proxy {
     httpProxyPort: number
   }
 
+  /** HTTPS 代理列表 */
+  interface HttpsProxyListDTO extends ProxyListDTO {
+    domains: string[]
+    httpsProxyPort: number
+  }
+
   /** TCP 代理列表 */
   interface TcpProxyListDTO extends ProxyListDTO {
     listenPort: number
@@ -84,6 +90,12 @@ declare namespace Api.Proxy {
 
   /** HTTP 代理详情 */
   interface HttpProxyDetailDTO extends ProxyDetailDTO {
+    domains: string[]
+    domainType: number
+  }
+
+  /** HTTPS 代理详情 */
+  interface HttpsProxyDetailDTO extends ProxyDetailDTO {
     domains: string[]
     domainType: number
   }
@@ -136,6 +148,34 @@ declare namespace Api.Proxy {
 
   /** HTTP 代理更新参数 */
   interface HttpProxyUpdateParam {
+    id: string
+    name: string
+    status: number
+    domainType: number
+    domains: string[] | null
+    deploymentMode: number
+    targets: ProxyTargetAddParam[]
+    bandwidth: BandwidthSaveParam | null
+    loadBalance: LoadBalanceParam | null
+    transport: TransportSaveParam
+  }
+
+  /** HTTPS 代理创建参数 */
+  interface HttpsProxyCreateParam {
+    agentId: string
+    name: string
+    status: number
+    domainType: number
+    domains: string[] | null
+    deploymentMode: number
+    targets: ProxyTargetAddParam[]
+    transport: TransportSaveParam
+    bandwidth: BandwidthSaveParam | null
+    loadBalance: LoadBalanceParam | null
+  }
+
+  /** HTTPS 代理更新参数 */
+  interface HttpsProxyUpdateParam {
     id: string
     name: string
     status: number

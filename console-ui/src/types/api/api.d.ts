@@ -84,4 +84,5 @@ declare namespace Api {
       avatar?: string
     }
   }
-}
+
+  }

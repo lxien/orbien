@@ -2,7 +2,7 @@ server_addr = "localhost"
 server_port = 9527
 
 [auth]
-token = "414083A8563774142CAC91DDB5C9A2ED1"
+token = "52B73D3080A41C349895125180488403"
 
 ##############################################################################################################
 [connection]
@@ -28,9 +28,9 @@ enabled = true
 
 [transport.tls]
 enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/client.key"
-ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/openssl/ca.crt"
+cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
+key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
+ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
 #
 ##################################################代理配置############################################################
 #[[proxies]]

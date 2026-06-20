@@ -246,11 +246,13 @@
       "title": "ホーム"
     },
     "etp": {
-      "embedded": "埋め込みトンネル",
+      "embedded": "一時隧道",
       "http": "HTTP",
+      "https": "HTTPS",
       "tcp": "TCP",
       "agent": "クライアント",
       "domain": "ドメイン管理",
+      "ssl": "SSL証明書",
       "token": "アクセストークン",
       "stats": "トラフィック統計"
     },

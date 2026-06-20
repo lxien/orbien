@@ -59,9 +59,7 @@
 Docker一键启动`etps`服务端:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh
-chmod +x install.sh
-sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
 管理面板访问地址：`http://服务器IP:8020` (admin: 123456)

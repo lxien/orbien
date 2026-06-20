@@ -59,9 +59,7 @@ Requirements:
 One-command Docker startup for `etps` server:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh
-chmod +x install.sh
-sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
 Management dashboard access: `http://server_ip:8020` (admin: 123456)

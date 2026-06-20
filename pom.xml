@@ -135,6 +135,11 @@
                 <version>${bouncycastle.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bctls-jdk18on</artifactId>
+                <version>${bouncycastle.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.javers</groupId>
                 <artifactId>javers-core</artifactId>
                 <version>${javers-core.version}</version>

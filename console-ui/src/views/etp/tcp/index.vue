@@ -161,7 +161,7 @@
               }),
               h(ArtButtonTable, {
                 type: 'text',
-                text: '流量统计',
+                text: '统计',
                 onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, { type: 'edit', onClick: () => showDialog('edit', row) }),

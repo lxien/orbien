@@ -52,7 +52,11 @@ public class ProxyController {
         proxyService.createHttpProxy(param);
         return Ajax.success();
     }
-
+    @PostMapping("https")
+    public Ajax createHttpsProxy(@RequestBody @Validated HttpProxyCreateParam param) {
+        proxyService.createHttpProxy(param);
+        return Ajax.success();
+    }
     @PutMapping("tcp")
     public Ajax updateTcpProxy(@RequestBody @Validated TcpProxyUpdateParam param) {
         proxyService.updateTcpProxy(param);
@@ -64,7 +68,11 @@ public class ProxyController {
         proxyService.updateHttpProxy(param);
         return Ajax.success();
     }
-
+    @PutMapping("https")
+    public Ajax updateHttpsProxy(@RequestBody @Validated HttpProxyUpdateParam param) {
+        proxyService.updateHttpProxy(param);
+        return Ajax.success();
+    }
     @GetMapping("tcp/{id}")
     public Ajax getTcpProxyDetailById(@PathVariable String id) {
         TcpProxyDetailDTO proxy = proxyService.getTcpProxyById(id);
@@ -76,7 +84,11 @@ public class ProxyController {
         HttpProxyDetailDTO proxy = proxyService.getHttpProxyById(id);
         return Ajax.success(proxy);
     }
-
+    @GetMapping("https/{id}")
+    public Ajax getHttpsProxyDetailById(@PathVariable String id) {
+        HttpProxyDetailDTO proxy = proxyService.getHttpProxyById(id);
+        return Ajax.success(proxy);
+    }
     @GetMapping("tcp")
     public Ajax findTcpProxies(@ModelAttribute PageQuery pageQuery) {
         PageResult<TcpProxyListDTO> proxies = proxyService.findTcpProxies(pageQuery);
@@ -88,7 +100,11 @@ public class ProxyController {
         PageResult<HttpProxyListDTO> proxies = proxyService.findHttpProxies(pageQuery);
         return Ajax.success(proxies);
     }
-
+    @GetMapping("https")
+    public Ajax getHttpsProxies(@ModelAttribute PageQuery pageQuery) {
+        PageResult<HttpProxyListDTO> proxies = proxyService.findHttpProxies(pageQuery);
+        return Ajax.success(proxies);
+    }
     @PutMapping("status/{id}")
     public Ajax setStatus(@PathVariable String id, @Valid @RequestBody ProxyStatusUpdateParam param) {
         proxyService.setProxyStatus(id, param.getStatus());

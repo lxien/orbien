@@ -246,11 +246,13 @@
       "title": "首页"
     },
     "etp": {
-      "embedded": "会话隧道",
+      "embedded": "临时隧道",
       "http": "HTTP",
+      "https": "HTTPS",
       "tcp": "TCP",
       "agent": "客户端",
       "domain": "域名管理",
+      "ssl": "SSL证书",
       "token": "访问令牌",
       "stats": "流量统计"
     },

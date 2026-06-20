@@ -1,5 +1,5 @@
 <template>
-  <div class="http-page art-full-height">
+  <div class="https-page art-full-height">
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
@@ -29,8 +29,8 @@
       >
       </ArtTable>
 
-      <!-- HTTP 代理弹窗 -->
-      <HttpDialog
+      <!-- HTTPS 代理弹窗 -->
+      <HttpsDialog
         v-model:visible="dialogVisible"
         :type="dialogType"
         :proxy-data="currentProxyData"
@@ -58,6 +58,13 @@
         :show-time-range="true"
         @close="handleMetricsClose"
       />
+
+      <!-- SSL 配置弹窗 -->
+      <SslDialog
+        v-model:visible="sslDialogVisible"
+        :proxy-id="currentSslProxyId"
+        @close="handleSslClose"
+      />
     </ElCard>
   </div>
 </template>
@@ -66,26 +73,27 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetHttpProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
-  import HttpDialog from './modules/http-dialog.vue'
+  import { fetchGetHttpsProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
+  import HttpsDialog from './modules/https-dialog.vue'
   import AccessControlDialog from '../modules/access-control-dialog.vue'
   import BasicAuthDialog from '../modules/basic-auth-dialog.vue'
   import MetricsDialog from '../modules/metrics-dialog.vue'
+  import SslDialog from './modules/ssl-dialog.vue'
   import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
   import { ProtocolType } from '@/enums/businessEnum'
 
-  defineOptions({ name: 'HttpPenetration' })
+  defineOptions({ name: 'HttpsPenetration' })
 
-  type HttpProxyItem = Api.Proxy.HttpProxyListDTO
+  type HttpsProxyItem = Api.Proxy.HttpsProxyListDTO
 
   // 选中行
-  const selectedRows = ref<HttpProxyItem[]>([])
+  const selectedRows = ref<HttpsProxyItem[]>([])
 
   // 弹窗相关
   const dialogType = ref<DialogType>('add')
   const dialogVisible = ref(false)
-  const currentProxyData = ref<Partial<HttpProxyItem>>({})
+  const currentProxyData = ref<Partial<HttpsProxyItem>>({})
 
   // 访问控制弹窗相关
   const accessControlDialogVisible = ref(false)
@@ -98,6 +106,10 @@
   // 流量统计弹窗相关
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
+
+  // SSL 弹窗相关
+  const sslDialogVisible = ref(false)
+  const currentSslProxyId = ref('')
 
   const getProxyStatusConfig = (status: number) => {
     return status === 1
@@ -116,7 +128,7 @@
     refreshData
   } = useTable({
     core: {
-      apiFn: fetchGetHttpProxyList,
+      apiFn: fetchGetHttpsProxyList,
       apiParams: {
         current: 1,
         size: 10
@@ -133,22 +145,22 @@
           prop: 'domains',
           label: '远程地址',
           minWidth: 150,
-          formatter: (row: HttpProxyItem) => {
+          formatter: (row: HttpsProxyItem) => {
             if (!row.domains || row.domains.length === 0) {
               return ''
             }
             return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
               row.domains.map((domain) => {
                 const fullDomain =
-                  row.httpProxyPort && row.httpProxyPort !== 80
-                    ? `${domain}:${row.httpProxyPort}`
+                  row.httpsProxyPort && row.httpsProxyPort !== 443
+                    ? `${domain}:${row.httpsProxyPort}`
                     : domain
                 return h(
                   ElTag,
                   {
                     type: 'warning',
                     style: 'cursor: pointer;',
-                    onClick: () => window.open(`http://${fullDomain}`, '_blank')
+                    onClick: () => window.open(`https://${fullDomain}`, '_blank')
                   },
                   () => domain
                 )
@@ -160,7 +172,7 @@
           prop: 'targets',
           label: '目标服务',
           minWidth: 150,
-          formatter: (row: HttpProxyItem) => {
+          formatter: (row: HttpsProxyItem) => {
             if (!row.targets || row.targets.length === 0) {
               return ''
             }
@@ -176,7 +188,7 @@
           prop: 'status',
           label: '状态',
           width: 80,
-          formatter: (row: HttpProxyItem) => {
+          formatter: (row: HttpsProxyItem) => {
             const statusConfig = getProxyStatusConfig(row.status)
             return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
           }
@@ -184,9 +196,9 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 390,
+          width: 450,
           fixed: 'right',
-          formatter: (row: HttpProxyItem) =>
+          formatter: (row: HttpsProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'text',
@@ -199,10 +211,15 @@
                 onClick: () => handleBasicAuth(row)
               }),
               h(ArtButtonTable, {
-          type: 'text',
-          text: '统计',
-          onClick: () => handleMetrics(row)
-        }),
+                type: 'text',
+                text: '统计',
+                onClick: () => handleMetrics(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'text',
+                text: 'SSL',
+                onClick: () => handleSsl(row)
+              }),
               h(ArtButtonTable, {
                 type: 'edit',
                 onClick: () => showDialog('edit', row)
@@ -217,12 +234,12 @@
     }
   })
 
-  const handleSelectionChange = (selection: HttpProxyItem[]): void => {
+  const handleSelectionChange = (selection: HttpsProxyItem[]): void => {
     selectedRows.value = selection
     console.log('选中行数据:', selectedRows.value)
   }
 
-  const showDialog = (type: DialogType, row?: HttpProxyItem): void => {
+  const showDialog = (type: DialogType, row?: HttpsProxyItem): void => {
     console.log('打开弹窗:', { type, row })
     dialogType.value = type
     currentProxyData.value = row || {}
@@ -242,7 +259,7 @@
     }
   }
 
-  const handleIpControl = (proxy: HttpProxyItem) => {
+  const handleIpControl = (proxy: HttpsProxyItem) => {
     currentAccessControlProxyId.value = proxy.id
     accessControlDialogVisible.value = true
   }
@@ -251,7 +268,7 @@
     currentAccessControlProxyId.value = ''
   }
 
-  const handleBasicAuth = (proxy: HttpProxyItem) => {
+  const handleBasicAuth = (proxy: HttpsProxyItem) => {
     currentBasicAuthProxyId.value = proxy.id
     basicAuthDialogVisible.value = true
   }
@@ -260,13 +277,22 @@
     currentBasicAuthProxyId.value = ''
   }
 
-  const handleMetrics = (proxy: HttpProxyItem) => {
+  const handleMetrics = (proxy: HttpsProxyItem) => {
     currentMetricsProxyId.value = proxy.id
     metricsDialogVisible.value = true
   }
 
   const handleMetricsClose = () => {
     currentMetricsProxyId.value = ''
+  }
+
+  const handleSsl = (proxy: HttpsProxyItem) => {
+    currentSslProxyId.value = proxy.id
+    sslDialogVisible.value = true
+  }
+
+  const handleSslClose = () => {
+    currentSslProxyId.value = ''
   }
 
   const handleBatchDelete = async () => {
@@ -283,7 +309,7 @@
       })
 
       const ids = selectedRows.value.map((item) => item.id)
-      await fetchBatchDeleteProxy({ ids, protocol: ProtocolType.HTTP })
+      await fetchBatchDeleteProxy({ ids, protocol: ProtocolType.HTTPS })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {
@@ -292,7 +318,7 @@
     }
   }
 
-  const handleSingleDelete = async (proxy: HttpProxyItem) => {
+  const handleSingleDelete = async (proxy: HttpsProxyItem) => {
     try {
       await ElMessageBox.confirm(`确定要删除代理「${proxy.name}」吗？`, '警告', {
         confirmButtonText: '确定',
@@ -300,7 +326,7 @@
         type: 'warning'
       })
 
-      await fetchBatchDeleteProxy({ ids: [proxy.id], protocol: ProtocolType.HTTP })
+      await fetchBatchDeleteProxy({ ids: [proxy.id], protocol: ProtocolType.HTTPS })
       refreshData()
     } catch (error) {
       if (error !== 'cancel') {

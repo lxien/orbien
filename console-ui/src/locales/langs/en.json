@@ -246,11 +246,13 @@
       "title": "Home"
     },
     "etp": {
-      "embedded": "Embedded",
+      "embedded": "Temporary",
       "http": "HTTP",
+      "https": "HTTPS",
       "tcp": "TCP",
       "agent": "Agent",
       "domain": "Domain",
+      "ssl": "SSL Certificate",
       "token": "Token",
       "stats": "Statistics"
     },

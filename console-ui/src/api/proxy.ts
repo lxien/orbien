@@ -36,6 +36,29 @@ export function fetchGetHttpProxyById(id: string) {
 }
 
 /**
+ * 获取 HTTPS 代理列表（分页）
+ * @param params 分页参数
+ * @returns HTTPS 代理分页列表
+ */
+export function fetchGetHttpsProxyList(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Proxy.HttpsProxyListDTO>>({
+    url: '/api/proxies/https',
+    params
+  })
+}
+
+/**
+ * 获取 HTTPS 代理详情
+ * @param id 代理 ID
+ * @returns HTTPS 代理详情
+ */
+export function fetchGetHttpsProxyById(id: string) {
+  return request.get<Api.Proxy.HttpsProxyDetailDTO>({
+    url: `/api/proxies/https/${id}`
+  })
+}
+
+/**
  * 获取 TCP 代理详情
  * @param id 代理 ID
  * @returns TCP 代理详情
@@ -54,6 +77,19 @@ export function fetchGetTcpProxyById(id: string) {
 export function fetchCreateHttpProxy(data: Api.Proxy.HttpProxyCreateParam) {
   return request.post({
     url: '/api/proxies/http',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 创建 HTTPS 代理
+ * @param data 创建参数
+ * @returns 响应结果
+ */
+export function fetchCreateHttpsProxy(data: Api.Proxy.HttpsProxyCreateParam) {
+  return request.post({
+    url: '/api/proxies/https',
     data,
     showSuccessMessage: true
   })
@@ -80,6 +116,19 @@ export function fetchCreateTcpProxy(data: Api.Proxy.TcpProxyCreateParam) {
 export function fetchUpdateHttpProxy(data: Api.Proxy.HttpProxyUpdateParam) {
   return request.put({
     url: '/api/proxies/http',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 更新 HTTPS 代理
+ * @param data 更新参数
+ * @returns 响应结果
+ */
+export function fetchUpdateHttpsProxy(data: Api.Proxy.HttpsProxyUpdateParam) {
+  return request.put({
+    url: '/api/proxies/https',
     data,
     showSuccessMessage: true
   })

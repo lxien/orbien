@@ -22,6 +22,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'HTTPS',
+    path: '/https',
+    component: '/etp/https',
+    meta: {
+      title: 'menus.etp.https',
+      icon: 'ri:shield-keyhole-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'TCP',
     path: '/tcp',
     component: '/etp/tcp',
@@ -48,6 +58,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     meta: {
       title: 'menus.etp.domain',
       icon: 'ri:link',
+      roles: ['R_SUPER']
+    }
+  },
+  {
+    name: 'SSL',
+    path: '/ssl',
+    component: '/etp/ssl',
+    meta: {
+      title: 'menus.etp.ssl',
+      icon: 'ri:shield-check-line',
       roles: ['R_SUPER']
     }
   },
