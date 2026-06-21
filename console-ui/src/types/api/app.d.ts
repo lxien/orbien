@@ -19,6 +19,7 @@ declare namespace Api.App {
     serverAddr: string
     serverPort: number
     httpProxyPort: number
+    httpsProxyPort: number
     baseDomain: string
     portStart: number
     portEnd: number

@@ -55,6 +55,7 @@ declare namespace Api.Monitor {
 
   interface ProxyProtocolCountDTO {
     httpCount: number
+    httpsCount: number
     tcpCount: number
   }
 }

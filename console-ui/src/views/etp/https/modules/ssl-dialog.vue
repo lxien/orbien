@@ -13,10 +13,20 @@
         <template #add-icon>
           <ElSwitch v-model="forceHttps" />
         </template>
-        <ElTabPane
-          name="current-cert"
-          :label="`当前证书-[${sslStatus === 1 ? '已部署SSL' : '未部署SSL'}]`"
-        >
+        <ElTabPane name="current-cert">
+          <template #label>
+            <span>
+              当前证书-[
+              <span
+                :style="{
+                  color: sslStatus === 1 ? 'var(--el-color-primary)' : 'var(--el-color-danger)'
+                }"
+              >
+                {{ sslStatus === 1 ? '已部署SSL' : '未部署SSL' }}
+              </span>
+              ]
+            </span>
+          </template>
           <div class="tab-content">
             <div class="ssl-info">
               <div class="info-column">
@@ -104,7 +114,7 @@
 
   const dialogVisible = ref(false)
   const activeName = ref('current-cert')
-  const sslStatus = ref(1)
+  const sslStatus = ref(0)
   const forceHttps = ref(false)
   const certData = reactive({
     keyContent: '',

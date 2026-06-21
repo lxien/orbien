@@ -3,7 +3,7 @@
     <div class="art-card-header">
       <div class="title">
         <h4>代理类型分布</h4>
-        <p>HTTP 与 TCP 代理数量对比</p>
+        <p>HTTP、HTTPS 与 TCP 代理数量占比</p>
       </div>
     </div>
     <div class="flex items-center justify-center h-[calc(100%-56px)]">
@@ -28,6 +28,10 @@
       value: 0
     },
     {
+      name: 'HTTPS 代理',
+      value: 0
+    },
+    {
       name: 'TCP 代理',
       value: 0
     }
@@ -43,6 +47,10 @@
         {
           name: 'HTTP 代理',
           value: data.httpCount
+        },
+        {
+          name: 'HTTPS 代理',
+          value: data.httpsCount
         },
         {
           name: 'TCP 代理',

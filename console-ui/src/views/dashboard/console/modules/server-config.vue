@@ -73,6 +73,12 @@
       iconBgClass: 'icon-bg-orange'
     },
     {
+      label: 'HTTPS 代理',
+      value: configInfo.value?.httpsProxyPort || '-',
+      icon: 'ri:router-line',
+      iconBgClass: 'icon-bg-orange'
+    },
+    {
       label: '基础域名',
       value: configInfo.value?.baseDomain || '-',
       icon: 'ri:earth-line',

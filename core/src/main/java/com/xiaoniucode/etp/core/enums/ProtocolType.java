@@ -14,7 +14,8 @@ import java.util.Map;
  */
 public enum ProtocolType {
     TCP(1, "tcp"),
-    HTTP(2, "http");
+    HTTP(2, "http"),
+    HTTPS(3, "https");
     private static final Map<Integer, ProtocolType> TYPE_MAP;
     private static final Map<String, ProtocolType> NAME_MAP;
 

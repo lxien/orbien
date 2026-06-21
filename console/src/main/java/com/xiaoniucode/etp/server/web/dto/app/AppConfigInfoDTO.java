@@ -28,7 +28,7 @@ public class AppConfigInfoDTO implements Serializable {
     private String serverAddr;
     private Integer serverPort;
     private Integer httpProxyPort;
-   // private Integer httpsProxyPort;
+   private Integer httpsProxyPort;
     private String baseDomain;
     private Integer portStart;
     private Integer portEnd;

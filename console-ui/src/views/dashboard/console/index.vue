@@ -1,29 +1,29 @@
 <!-- 工作台页面 -->
 <template>
   <div>
-    <ServerStatusCards></ServerStatusCards>
-    <CardList></CardList>
+    <ServerStatus />
+    <SystemOverview />
     <ElRow :gutter="20">
       <ElCol :sm="24" :md="24" :lg="24">
-        <SalesOverview />
+        <TrafficStats />
       </ElCol>
     </ElRow>
     <ElRow :gutter="20">
       <ElCol :sm="24" :md="12" :lg="12">
-        <ProxyTypeChart />
+        <ProxyStats />
       </ElCol>
       <ElCol :sm="24" :md="12" :lg="12">
-        <AppConfig />
+        <ServerConfig />
       </ElCol>
     </ElRow>
   </div>
 </template>
 
 <script setup lang="ts">
-  import ServerStatusCards from './modules/server-status-cards.vue'
-  import CardList from './modules/card-list.vue'
-  import ProxyTypeChart from './modules/proxy-type-chart.vue'
-  import SalesOverview from './modules/sales-overview.vue'
-  import AppConfig from './modules/app-config.vue'
+  import ServerStatus from './modules/server-status.vue'
+  import SystemOverview from './modules/system-overview.vue'
+  import ProxyStats from './modules/proxy-stats.vue'
+  import TrafficStats from './modules/traffic-stats.vue'
+  import ServerConfig from './modules/server-config.vue'
   defineOptions({ name: 'Console' })
 </script>

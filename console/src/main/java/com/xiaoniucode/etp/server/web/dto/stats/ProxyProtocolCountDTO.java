@@ -31,7 +31,10 @@ public class ProxyProtocolCountDTO implements Serializable {
      * HTTP 代理数量
      */
     private Long httpCount;
-
+    /**
+     * HTTPS 代理数量
+     */
+    private Long httpsCount;
     /**
      * TCP 代理数量
      */

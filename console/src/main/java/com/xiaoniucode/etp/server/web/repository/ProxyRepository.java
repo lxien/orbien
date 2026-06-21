@@ -93,12 +93,14 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     @Query("""
             SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO(
                 SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
+                             SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
                 SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END)
             )
             FROM ProxyDO p
             """)
     ProxyProtocolCountDTO countHttpAndTcp(
             @Param("http") ProtocolType http,
+            @Param("https") ProtocolType https,
             @Param("tcp") ProtocolType tcp
     );
 

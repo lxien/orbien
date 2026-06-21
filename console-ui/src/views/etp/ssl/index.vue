@@ -107,29 +107,38 @@
           label: '操作',
           width: 220,
           fixed: 'right',
-          formatter: (row: SslItem) =>
-            h('div', [
-              h(ArtButtonTable, {
-                type: 'text',
-                text: '部署',
-                onClick: () => handleDeploy(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'text',
-                text: '下载',
-                onClick: () => handleDownload(row)
-              }),
+          formatter: (row: SslItem) => {
+            const now = new Date()
+            const notAfter = new Date(row.notAfter)
+            const isExpired = now > notAfter
+            const children = []
+            if (!isExpired) {
+              children.push(
+                h(ArtButtonTable, {
+                  type: 'text',
+                  text: '部署',
+                  onClick: () => handleDeploy(row)
+                }),
+                h(ArtButtonTable, {
+                  type: 'text',
+                  text: '下载',
+                  onClick: () => handleDownload(row)
+                })
+              )
+            }
+            children.push(
               h(ArtButtonTable, {
                 type: 'delete',
                 text: '删除',
                 onClick: () => handleDelete(row)
               })
-            ])
+            )
+            return h('div', children)
+          }
         }
       ]
     }
   })
-
   const handleSelectionChange = (selection: SslItem[]): void => {
     selectedRows.value = selection
   }
@@ -193,7 +202,7 @@
 </script>
 
 <style lang="scss" scoped>
- :deep(.el-dialog__body) {
-    padding: 0  !important;
+  :deep(.el-dialog__body) {
+    padding: 0 !important;
   }
 </style>

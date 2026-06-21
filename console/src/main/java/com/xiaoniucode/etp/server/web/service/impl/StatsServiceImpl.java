@@ -52,6 +52,6 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public ProxyProtocolCountDTO getProxyProtocolStats() {
-        return proxyRepository.countHttpAndTcp(ProtocolType.HTTP, ProtocolType.TCP);
+        return proxyRepository.countHttpAndTcp(ProtocolType.HTTP,ProtocolType.HTTPS, ProtocolType.TCP);
     }
 }

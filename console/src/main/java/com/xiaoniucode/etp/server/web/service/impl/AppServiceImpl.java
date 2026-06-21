@@ -35,6 +35,7 @@ public class AppServiceImpl implements AppService {
         dto.setServerPort(appConfig.getServerPort());
         dto.setBaseDomain(appConfig.getBaseDomain());
         dto.setHttpProxyPort(appConfig.getHttpProxyPort());
+        dto.setHttpsProxyPort(appConfig.getHttpsProxyPort());
 
         PortPolicyConfig portPolicy = appConfig.getPortPolicy();
         if (portPolicy != null) {
