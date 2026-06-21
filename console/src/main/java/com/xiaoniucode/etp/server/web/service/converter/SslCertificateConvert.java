@@ -16,24 +16,19 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.dto.ssl;
+package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
+import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
+import com.xiaoniucode.etp.server.web.entity.SslCertificate;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.List;
 
-@Data
-public class SslCertDTO implements Serializable {
-    private Long id;
-    private String issuer;
-    private String issuer0;
-    private String subject;
-    private String sanDomains;
-    private Integer status;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private LocalDateTime notBefore;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
-    private LocalDateTime notAfter;
+@Mapper(componentModel = "spring")
+public interface SslCertificateConvert {
+    @Mapping(target = "status", expression = "java(sslCertificate.getStatus().getCode())")
+    SslCertDTO toDTO(SslCertificate sslCertificate);
+
+    List<SslCertDTO> toDTOList(List<SslCertificate> sslCertificateList);
 }

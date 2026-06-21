@@ -123,7 +123,6 @@
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'name',
           label: '代理名称',
@@ -184,7 +183,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 390,
+          width: 360,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [

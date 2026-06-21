@@ -42,7 +42,6 @@
         size: 20
       },
       columnsFactory: () => [
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'domain',
           label: '域名'

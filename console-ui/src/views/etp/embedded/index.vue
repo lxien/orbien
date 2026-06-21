@@ -95,7 +95,6 @@
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'tunnel.agentId',
           label: '会话标识',

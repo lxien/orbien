@@ -18,10 +18,14 @@
 
 package com.xiaoniucode.etp.server.web.service;
 
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 
 public interface SslCertificateService {
 
     SslCertDTO saveCert(SslCertSaveParam param);
+
+    PageResult<SslCertDTO> findByPage(PageQuery pageQuery);
 }

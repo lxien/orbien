@@ -135,7 +135,6 @@
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'name',
           label: '代理名称',
@@ -196,7 +195,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 450,
+          width: 410,
           fixed: 'right',
           formatter: (row: HttpsProxyItem) =>
             h('div', [
@@ -336,4 +335,8 @@
   }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  :deep(.el-dialog__body) {
+    padding: 0  !important;
+  }
+</style>

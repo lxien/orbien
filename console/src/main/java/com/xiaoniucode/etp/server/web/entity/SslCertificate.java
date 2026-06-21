@@ -18,11 +18,16 @@
 
 package com.xiaoniucode.etp.server.web.entity;
 
+import com.xiaoniucode.etp.server.web.entity.converter.SslStatusConverter;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
 import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "ssl_certificate")
 public class SslCertificate {
@@ -37,56 +42,76 @@ public class SslCertificate {
      * 证书分类
      * 例如：Let's Encrypt
      */
+    @Column(name = "issuer")
     private String issuer;
+
     /**
-     * 证书品牌，例如：YR2
+     * 证书品牌
+     * 例如：YR2
      */
+    @Column(name = "issuer0")
     private String issuer0;
 
     /**
      * 主域名
      */
+    @Column(name = "subject")
     private String subject;
 
     /**
      * SAN域名，可能多个
      */
+    @Column(name = "san_domains")
     private String sanDomains;
 
+    /**
+     * 证书状态
+     */
+    @Column(name = "status")
+    @Convert(converter = SslStatusConverter.class)
     private SslStatus status;
 
     /**
      * 生效时间
      */
+    @Column(name = "not_before")
     private LocalDateTime notBefore;
 
     /**
      * 过期时间
      */
+    @Column(name = "not_after")
     private LocalDateTime notAfter;
 
     /**
      * 指纹
      */
+    @Column(name = "fingerprint")
     private String fingerprint;
 
     /**
      * 私钥路径
      */
+    @Column(name = "key_path")
     private String keyPath;
 
     /**
      * 证书路径
      */
+    @Column(name = "full_chain_path")
     private String fullChainPath;
 
     /**
      * 创建时间
      */
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

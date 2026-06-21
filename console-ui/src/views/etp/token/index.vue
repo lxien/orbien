@@ -90,7 +90,6 @@ import { ElMessageBox, ElMessage } from 'element-plus'
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'name',
           label: '令牌名称',

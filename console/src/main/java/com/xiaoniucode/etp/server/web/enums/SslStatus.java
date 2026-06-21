@@ -18,6 +18,49 @@
 
 package com.xiaoniucode.etp.server.web.enums;
 
+import lombok.Getter;
+
+/**
+ * SSL证书状态
+ */
+@Getter
 public enum SslStatus {
-    // STAGING / ACTIVE / FAILED / EXPIRED / ARCHIVED
+    /** SSL证书已激活 */
+    ACTIVE(1, "已激活"),
+    /** SSL证书已过期 */
+    EXPIRED(2, "已过期");
+
+    private final Integer code;
+    private final String description;
+
+    SslStatus(Integer code, String description) {
+        this.code = code;
+        this.description = description;
+    }
+
+    public static SslStatus fromCode(Integer code) {
+        for (SslStatus status : values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("未知SSL状态: " + code);
+    }
+
+    public static SslStatus fromValue(String value) {
+        for (SslStatus status : values()) {
+            if (status.name().equalsIgnoreCase(value)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("无效的SSL状态: " + value);
+    }
+
+    public boolean isActive() {
+        return this == ACTIVE;
+    }
+
+    public boolean isExpired() {
+        return this == EXPIRED;
+    }
 }

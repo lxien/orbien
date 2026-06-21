@@ -67,7 +67,6 @@
         size: 20
       },
       columnsFactory: () => [
-        { type: 'index', width: 60, label: '序号' },
         {
           prop: 'id',
           label: '客户端标识',

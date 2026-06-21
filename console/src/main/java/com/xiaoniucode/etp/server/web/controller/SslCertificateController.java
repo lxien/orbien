@@ -19,26 +19,26 @@
 package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
-import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/ssl-certificate")
 public class SslCertificateController {
-
     @Autowired
     private SslCertificateService sslCertificateService;
 
     @PostMapping("save-cert")
-    public Ajax saveCert(@RequestBody SslCertSaveParam param){
-        SslCertDTO dto = sslCertificateService.saveCert(param);
-        return Ajax.success(dto);
+    public Ajax saveCert(@RequestBody SslCertSaveParam param) {
+        return Ajax.success(sslCertificateService.saveCert(param));
+    }
+
+    @GetMapping
+    public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
+        return Ajax.success(sslCertificateService.findByPage(pageQuery));
     }
 
 }

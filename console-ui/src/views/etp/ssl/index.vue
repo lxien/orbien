@@ -31,24 +31,37 @@
     </ElCard>
 
     <SslDialog v-model:visible="dialogVisible" @submit="handleUploadSubmit" />
+    <DeployDialog v-model:visible="deployDialogVisible" @submit="handleDeploySubmit" />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref } from 'vue'
+  import { ref, h } from 'vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { ElMessage, ElMessageBox } from 'element-plus'
+  import { ElMessage, ElMessageBox, ElButton } from 'element-plus'
   import SslDialog from './modules/ssl-dialog.vue'
+  import DeployDialog from './modules/deploy-dialog.vue'
+  import { fetchGetCertListByPage } from '@/api/ssl'
+  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
 
   defineOptions({ name: 'SslManagement' })
 
-  type SslItem = any
+  type SslItem = Api.Ssl.CertDTO
 
-  // 选中行
   const selectedRows = ref<SslItem[]>([])
-
-  // 对话框可见性
   const dialogVisible = ref(false)
+  const deployDialogVisible = ref(false)
+
+  const getExpireDays = (item: SslItem) => {
+    const now = new Date()
+    const notAfter = new Date(item.notAfter)
+    if (now > notAfter) {
+      return h('span', { style: { color: 'var(--el-color-danger)' } }, '已过期')
+    }
+    const diffTime = notAfter.getTime() - now.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return h('span', { style: { color: 'var(--el-color-primary)' } }, `剩余${diffDays}天`)
+  }
 
   const {
     columns,
@@ -56,45 +69,62 @@
     data,
     loading,
     pagination,
-    getData,
     handleSizeChange,
     handleCurrentChange,
     refreshData
   } = useTable({
     core: {
-      apiFn: async () => ({ data: [], total: 0 }),
+      apiFn: fetchGetCertListByPage,
       apiParams: {
         current: 1,
         size: 10
       },
       columnsFactory: () => [
         { type: 'selection' },
-        { type: 'index', width: 60, label: '序号' },
         {
-          prop: 'name',
-          label: '证书名称',
+          prop: 'sanDomains',
+          label: '认证域名',
+          minWidth: 180
+        },
+        {
+          prop: 'issuer',
+          label: '证书分类',
           minWidth: 120
         },
         {
-          prop: 'domain',
-          label: '域名',
-          minWidth: 150
+          prop: 'issuer0',
+          label: '证书品牌',
+          minWidth: 100
         },
         {
-          prop: 'expireTime',
-          label: '过期时间',
-          minWidth: 150
-        },
-        {
-          prop: 'status',
-          label: '状态',
-          width: 80
+          prop: 'notAfter',
+          label: '到期时间',
+          minWidth: 160,
+          formatter: (row: SslItem) => getExpireDays(row)
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 200,
-          fixed: 'right'
+          width: 220,
+          fixed: 'right',
+          formatter: (row: SslItem) =>
+            h('div', [
+              h(ArtButtonTable, {
+                type: 'text',
+                text: '部署',
+                onClick: () => handleDeploy(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'text',
+                text: '下载',
+                onClick: () => handleDownload(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'delete',
+                text: '删除',
+                onClick: () => handleDelete(row)
+              })
+            ])
         }
       ]
     }
@@ -109,6 +139,10 @@
   }
 
   const handleUploadSubmit = () => {
+    refreshData()
+  }
+
+  const handleDeploySubmit = () => {
     refreshData()
   }
 
@@ -132,6 +166,34 @@
       }
     }
   }
+
+  const handleDeploy = (row: SslItem) => {
+    deployDialogVisible.value = true
+  }
+
+  const handleDownload = (row: SslItem) => {
+    console.log('下载证书:', row)
+  }
+
+  const handleDelete = async (row: SslItem) => {
+    try {
+      await ElMessageBox.confirm('确定要删除该证书吗？', '证书删除确认', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      ElMessage.success('删除成功')
+      refreshData()
+    } catch (error) {
+      if (error !== 'cancel') {
+        console.error('删除失败:', error)
+      }
+    }
+  }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+ :deep(.el-dialog__body) {
+    padding: 0  !important;
+  }
+</style>
