@@ -18,12 +18,12 @@
 
 package com.xiaoniucode.etp.server.web.repository;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.entity.CertificateDeploymentDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Integer> {
+public interface CertificateDeploymentRepository extends JpaRepository<CertificateDeploymentDO, Long> {
 
 
 }

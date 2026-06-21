@@ -16,14 +16,14 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.xiaoniucode.etp.server.web.dto.ssl.CertificateDeploymentDTO;
+import com.xiaoniucode.etp.server.web.entity.CertificateDeployment;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Integer> {
-
+@Mapper(componentModel = "spring")
+public interface CertificateDeploymentConvert {
 
 }

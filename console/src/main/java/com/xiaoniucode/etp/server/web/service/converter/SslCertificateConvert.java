@@ -19,7 +19,7 @@
 package com.xiaoniucode.etp.server.web.service.converter;
 
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
-import com.xiaoniucode.etp.server.web.entity.SslCertificate;
+import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SslCertificateConvert {
     @Mapping(target = "status", expression = "java(sslCertificate.getStatus().getCode())")
-    SslCertDTO toDTO(SslCertificate sslCertificate);
+    SslCertDTO toDTO(SslCertificateDO sslCertificate);
 
-    List<SslCertDTO> toDTOList(List<SslCertificate> sslCertificateList);
+    List<SslCertDTO> toDTOList(List<SslCertificateDO> sslCertificateList);
 }

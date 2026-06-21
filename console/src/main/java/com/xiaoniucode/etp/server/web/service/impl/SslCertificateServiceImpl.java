@@ -21,7 +21,7 @@ package com.xiaoniucode.etp.server.web.service.impl;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
-import com.xiaoniucode.etp.server.web.entity.SslCertificate;
+import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.repository.SslCertificateRepository;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
@@ -51,7 +51,7 @@ public class SslCertificateServiceImpl implements SslCertificateService {
     public PageResult<SslCertDTO> findByPage(PageQuery pageQuery) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<SslCertificate> resultPage = sslCertificateRepository.findAll(pageable);
+        Page<SslCertificateDO> resultPage = sslCertificateRepository.findAll(pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }

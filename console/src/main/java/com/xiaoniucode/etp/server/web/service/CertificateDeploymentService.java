@@ -16,14 +16,9 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.service;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Integer> {
+public interface CertificateDeploymentService {
 
 
 }

@@ -30,7 +30,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "ssl_certificate")
-public class SslCertificate {
+public class SslCertificateDO {
     /**
      * 主键ID
      */

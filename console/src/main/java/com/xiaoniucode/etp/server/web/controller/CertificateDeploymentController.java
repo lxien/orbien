@@ -16,14 +16,19 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.controller;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.xiaoniucode.etp.server.web.service.CertificateDeploymentService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Integer> {
+@RestController
+@RequestMapping("/api/certificate-deployment")
+@RequiredArgsConstructor
+public class CertificateDeploymentController {
+
+    private final CertificateDeploymentService certificateDeploymentService;
 
 
 }
