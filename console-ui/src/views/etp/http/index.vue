@@ -110,7 +110,6 @@
     data,
     loading,
     pagination,
-    getData,
     handleSizeChange,
     handleCurrentChange,
     refreshData
@@ -198,10 +197,10 @@
                 onClick: () => handleBasicAuth(row)
               }),
               h(ArtButtonTable, {
-          type: 'text',
-          text: '统计',
-          onClick: () => handleMetrics(row)
-        }),
+                type: 'text',
+                text: '统计',
+                onClick: () => handleMetrics(row)
+              }),
               h(ArtButtonTable, {
                 type: 'edit',
                 onClick: () => showDialog('edit', row)

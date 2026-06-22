@@ -20,13 +20,10 @@ package com.xiaoniucode.etp.server.transport.https;
 
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.server.Lifecycle;
-import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.configuration.SpringContextHolder;
-import com.xiaoniucode.etp.server.transport.http.HeaderInjectDecoder;
-import com.xiaoniucode.etp.server.transport.https.ssl.SslCertificateManager;
 import com.xiaoniucode.etp.server.transport.UploadRateLimitHandler;
 import com.xiaoniucode.etp.server.transport.VisitorInfoDecoder;
 import com.xiaoniucode.etp.server.transport.http.BasicAuthHandler;
@@ -40,7 +37,6 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.ssl.SniHandler;
-import io.netty.handler.ssl.SslContext;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.PostConstruct;
@@ -89,12 +85,12 @@ public class HttpsProxyServer implements Lifecycle {
                         protected void initChannel(SocketChannel sc) {
                             ChannelPipeline pipeline = sc.pipeline();
                             pipeline.addLast(new SniHandler(sslCertificateManager::getSslContext));
-                            pipeline.addLast(new IdleCheckHandler());
+                            //pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
-                            pipeline.addLast(new HeaderInjectDecoder());
-                            pipeline.addLast(httpIpCheckHandler);
-                            pipeline.addLast(uploadRateLimitHandler);
-                            pipeline.addLast(basicAuthHandler);
+                           // pipeline.addLast(new HeaderInjectDecoder());
+                          //  pipeline.addLast(httpIpCheckHandler);
+                         //   pipeline.addLast(uploadRateLimitHandler);
+                           // pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

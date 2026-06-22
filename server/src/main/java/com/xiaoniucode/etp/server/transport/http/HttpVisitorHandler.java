@@ -1,10 +1,10 @@
 package com.xiaoniucode.etp.server.transport.http;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import com.xiaoniucode.etp.core.enums.TunnelType;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamEvent;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.net.ssl.SSLHandshakeException;
 import java.util.Optional;
 
 @Component
@@ -72,12 +73,34 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (isCertificateUnknownError(cause)) {
+            ChannelUtils.closeOnFlush(ctx.channel());
+            logger.debug("证书未知错误，可能是客户端未信任自签名证书", cause);
+            return;
+        }
         logger.error("[HTTP]发生异常", cause);
         streamManager.getStreamContext(ctx.channel()).ifPresent(streamContext -> {
             logger.error("[HTTP] 访问者连接发生异常，关闭流", cause);
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireExceptionCaught(cause);
+    }
+
+    /**
+     * 证书未知错误异常判断
+     *
+     * @param cause 异常
+     * @return 是否是未知SSL证书异常
+     */
+    private boolean isCertificateUnknownError(Throwable cause) {
+        while (cause != null) {
+            if (cause instanceof SSLHandshakeException && cause.getMessage() != null &&
+                    cause.getMessage().contains("certificate_unknown")) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     @Override

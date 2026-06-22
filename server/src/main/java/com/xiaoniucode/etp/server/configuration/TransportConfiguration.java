@@ -3,7 +3,7 @@ package com.xiaoniucode.etp.server.configuration;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.server.TunnelServer;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.transport.https.ssl.SslCertificateManager;
+import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
 import com.xiaoniucode.etp.server.transport.http.*;
 import com.xiaoniucode.etp.server.transport.https.HttpsProxyServer;
 import com.xiaoniucode.etp.server.transport.tcp.TcpProxyServer;

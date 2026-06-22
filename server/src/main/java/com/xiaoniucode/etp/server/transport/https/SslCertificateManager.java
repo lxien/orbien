@@ -16,8 +16,9 @@
  *
  */
 
-package com.xiaoniucode.etp.server.transport.https.ssl;
+package com.xiaoniucode.etp.server.transport.https;
 
+import com.xiaoniucode.etp.server.security.SelfSignedCertificateGenerator;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.util.internal.logging.InternalLogger;
@@ -48,13 +49,16 @@ public class SslCertificateManager {
     @PostConstruct
     public void init() {
         try {
-            File certFile = new File(DEFAULT_SSL_PATH, "fullchain.pem");
             File keyFile = new File(DEFAULT_SSL_PATH, "privkey.pem");
+            File certFile = new File(DEFAULT_SSL_PATH, "fullchain.pem");
             if (certFile.exists() && keyFile.exists()) {
                 this.defaultSslContext = SslContextBuilder.forServer(certFile, keyFile).build();
-                logger.info("默认SSL证书已加载: {}", certFile.getAbsolutePath());
+                logger.info("默认SSL证书已加载");
             } else {
-                //todo 如果没有证书则自动生成
+                SelfSignedCertificateGenerator.Result result = SelfSignedCertificateGenerator.generate();
+                this.defaultSslContext = SslContextBuilder.forServer(result.privateKey(), result.certificate()).build();
+                SelfSignedCertificateGenerator.writeToPemFiles(result,keyFile,certFile);
+                logger.info("生成HTTPS自签名SSL证书");
             }
         } catch (Exception e) {
             logger.error("证书加载错误", e);

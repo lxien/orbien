@@ -40,14 +40,12 @@ public class SslCertificateDO {
 
     /**
      * 证书分类
-     * 例如：Let's Encrypt
      */
     @Column(name = "issuer")
     private String issuer;
 
     /**
      * 证书品牌
-     * 例如：YR2
      */
     @Column(name = "issuer0")
     private String issuer0;

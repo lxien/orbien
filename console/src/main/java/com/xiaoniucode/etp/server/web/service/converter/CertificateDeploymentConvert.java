@@ -18,10 +18,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.web.dto.ssl.CertificateDeploymentDTO;
-import com.xiaoniucode.etp.server.web.entity.CertificateDeployment;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CertificateDeploymentConvert {

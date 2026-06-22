@@ -1,6 +1,5 @@
 server:
   port: 8084
-
 spring:
   application:
     name: 网关服务
