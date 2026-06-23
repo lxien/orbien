@@ -50,6 +50,9 @@
                 </div>
               </div>
             </div>
+            <div v-else class="ssl-info ssl-info--empty">
+              <span class="ssl-empty-text">暂未部署SSL证书</span>
+            </div>
             <div class="form-wrapper">
               <div class="form-item">
                 <div class="form-label">私钥(KEY)</div>
@@ -64,7 +67,7 @@
             <div class="form-actions">
               <ElSpace v-if="sslStatus !== 1">
                 <ElButton type="primary">保存并部署证书</ElButton>
-                <ElButton @click="handleDownloadCurrentCert">下载证书</ElButton>
+                <ElButton v-if="sslDeployInfo" @click="handleDownloadCurrentCert">下载证书</ElButton>
               </ElSpace>
               <ElSpace v-else>
                 <ElButton type="primary">保存</ElButton>
@@ -314,6 +317,18 @@ import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
     border-radius: 4px;
     display: flex;
     gap: 48px;
+    flex-shrink: 0;
+  }
+
+  .ssl-info--empty {
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+  }
+
+  .ssl-empty-text {
+    color: var(--el-text-color-secondary);
+    font-size: 14px;
   }
 
   .info-column {
