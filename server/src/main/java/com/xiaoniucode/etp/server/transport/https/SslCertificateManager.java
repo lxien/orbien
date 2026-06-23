@@ -21,6 +21,7 @@ package com.xiaoniucode.etp.server.transport.https;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.xiaoniucode.etp.server.config.SystemConstants;
 import com.xiaoniucode.etp.server.security.SelfSignedCertificateGenerator;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -31,10 +32,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * SSL 证书管理器
@@ -42,44 +44,33 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class SslCertificateManager {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(SslCertificateManager.class);
-    private final ConcurrentHashMap<String/*domain*/, SslContext> certMap = new ConcurrentHashMap<>();
     private final Cache<String, SslContext> l1Cache = Caffeine.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(1, TimeUnit.HOURS)
             .build();
-    /**
-     * 通配符域名列表
-     */
-    private final Set<String> wildcardDomains = ConcurrentHashMap.newKeySet();
-    /**
-     * 用于记录已经被部署的域名
-     */
     private final Set<String> deployedDomains = ConcurrentHashMap.newKeySet();
-    private SslContext defaultSslContext;
-
-    private static final String DEFAULT_SSL_PATH = Paths.get("cert", "system", "gateway").toString();
+    private volatile SslContext defaultSslContext;
+    private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     /**
-     * 系统首次启动时执行
-     * 1.加载默认证书，如果不存在则自动生成
-     * 2.加载部署可用域名证书
+     * 加载默认证书，如果不存在则自动生成
      */
     @PostConstruct
     public void init() {
         try {
-            File keyFile = new File(DEFAULT_SSL_PATH, "privkey.pem");
-            File certFile = new File(DEFAULT_SSL_PATH, "fullchain.pem");
+            File keyFile = new File(SystemConstants.DEFAULT_GATEWAY_SSL_PATH, "privkey.pem");
+            File certFile = new File(SystemConstants.DEFAULT_GATEWAY_SSL_PATH, "fullchain.pem");
             if (certFile.exists() && keyFile.exists()) {
                 this.defaultSslContext = SslContextBuilder.forServer(certFile, keyFile).build();
                 logger.info("默认SSL证书已加载");
             } else {
                 SelfSignedCertificateGenerator.Result result = SelfSignedCertificateGenerator.generate();
                 this.defaultSslContext = SslContextBuilder.forServer(result.privateKey(), result.certificate()).build();
-                SelfSignedCertificateGenerator.writeToPemFiles(result,keyFile,certFile);
+                SelfSignedCertificateGenerator.writeToPemFiles(result, keyFile, certFile);
                 logger.info("生成HTTPS自签名SSL证书");
             }
         } catch (Exception e) {
-            logger.error("证书加载错误", e);
+            logger.error("HTTPS默认证书加载错误", e);
         }
     }
 
@@ -87,60 +78,70 @@ public class SslCertificateManager {
      * 部署证书到指定域名
      */
     public void deploy(String domain, File certFile, File keyFile) throws Exception {
-        //todo  构建 SslContext  路径
-        SslContext sslCtx = SslContextBuilder.forServer(
-                new File(DEFAULT_SSL_PATH, "fullchain.pem"),
-                new File(DEFAULT_SSL_PATH, "privkey.pem")
-        ).build();
-
-        // 更新索引和缓存
-        deployedDomains.add(domain);
-        if (domain.startsWith("*.")) {
-            wildcardDomains.add(domain);
+        rwLock.writeLock().lock();
+        try {
+            SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
+            // 更新索引和缓存
+            deployedDomains.add(domain);
+            l1Cache.put(domain, sslCtx);
+            logger.info("证书已部署到域名: {}", domain);
+        } finally {
+            rwLock.writeLock().unlock();
         }
-        l1Cache.put(domain, sslCtx);
-
-        logger.info("证书已部署: {}", domain);
-        logger.info("证书已部署到域名: {}", domain);
     }
+
     public void cancelDeploy(String domain) {
-        l1Cache.invalidate(domain);
-        deployedDomains.remove(domain);
-        wildcardDomains.remove(domain);
+        rwLock.writeLock().lock();
+        try {
+            l1Cache.invalidate(domain);
+            deployedDomains.remove(domain);
+            logger.info("域名证书已取消部署: {}", domain);
+        } finally {
+            rwLock.writeLock().unlock();
+        }
     }
 
     /**
      * 根据 SNI 域名获取对应的 SslContext
      */
-    public SslContext getSslContext(String sniHost) {
-        if (!StringUtils.hasText(sniHost)) return defaultSslContext;
-        //从缓存读取
-        SslContext ctx = l1Cache.getIfPresent(sniHost);
-        if (ctx != null) return ctx;
-        //判断域名是否部署，没有部署直接返回默认证书
-        if (!deployedDomains.contains(sniHost) && !matchWildcard(sniHost)) {
-            return defaultSslContext;  // 从未部署，零文件IO
-        }
-        //todo 已经部署但缓存过期，从文件系统加载证书
-
-        return defaultSslContext;
-    }
-    /**
-     * todo 通配符匹配 可能需要优化时间复杂度
-     */
-    private boolean matchWildcard(String sniHost) {
-        for (String wildcard : wildcardDomains) {
-            String suffix = wildcard.substring(1);
-            if (sniHost.endsWith(suffix)) {
-                return true;
+    public SslContext getSslContext(String domain) {
+        rwLock.readLock().lock();
+        try {
+            if (!StringUtils.hasText(domain)) return defaultSslContext;
+            SslContext ctx = l1Cache.getIfPresent(domain);
+            if (ctx != null) return ctx;
+            if (!deployedDomains.contains(domain)) {
+                return defaultSslContext;
             }
+            ctx = loadFromFileSystem(domain);
+            if (ctx != null) {
+                l1Cache.put(domain, ctx);
+                return ctx;
+            }
+
+            return defaultSslContext;
+        } finally {
+            rwLock.readLock().unlock();
         }
-        return false;
     }
-    /**
-     * 移除证书
-     */
-    public void remove(String domain) {
-        certMap.remove(domain);
+
+    private SslContext loadFromFileSystem(String domain) {
+        try {
+            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, domain);
+            File certFile = new File(domainDir, "fullchain.pem");
+            File keyFile = new File(domainDir, "privkey.pem");
+
+            if (!certFile.exists() || !keyFile.exists()) {
+                logger.warn("域名 {} 的证书文件不完整，cert存在={}, key存在={}",
+                        domain, certFile.exists(), keyFile.exists());
+                return null;
+            }
+            SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
+            logger.debug("从文件系统加载证书成功: {}", domain);
+            return sslCtx;
+        } catch (Exception e) {
+            logger.debug("从文件系统加载证书失败: {}", domain, e);
+            return null;
+        }
     }
 }

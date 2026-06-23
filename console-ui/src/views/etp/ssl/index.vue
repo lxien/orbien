@@ -41,8 +41,9 @@
   import { ElMessage, ElMessageBox, ElButton } from 'element-plus'
   import SslDialog from './modules/ssl-dialog.vue'
   import DeployDialog from './modules/deploy-dialog.vue'
-  import { fetchGetCertListByPage } from '@/api/ssl'
+  import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert } from '@/api/ssl'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { downloadBlob } from '@/utils/download'
 
   defineOptions({ name: 'SslManagement' })
 
@@ -168,11 +169,13 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
+      const ids = selectedRows.value.map(row => row.id!)
+      await fetchDeleteCert(ids)
       ElMessage.success('删除成功')
       refreshData()
     } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
+      if (error === 'cancel') {
+        return
       }
     }
   }
@@ -181,8 +184,15 @@
     deployDialogVisible.value = true
   }
 
-  const handleDownload = (row: SslItem) => {
-    console.log('下载证书:', row)
+  const handleDownload = async (row: SslItem) => {
+    try {
+      const blob = await fetchDownloadCert(row.id!)
+      const fileName = `${row.sanDomains?.join('_') || 'cert'}.zip`
+      downloadBlob(blob, fileName)
+    } catch (error: any) {
+      console.error('下载失败:', error)
+      ElMessage.error(error?.message || '下载失败')
+    }
   }
 
   const handleDelete = async (row: SslItem) => {
@@ -192,11 +202,12 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
+      await fetchDeleteCert([row.id!])
       ElMessage.success('删除成功')
       refreshData()
     } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
+      if (error === 'cancel') {
+        return
       }
     }
   }

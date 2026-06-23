@@ -311,8 +311,8 @@
       await fetchBatchDeleteProxy({ ids, protocol: ProtocolType.HTTPS })
       refreshData()
     } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
+      if (error === 'cancel') {
+        return
       }
     }
   }
@@ -328,8 +328,8 @@
       await fetchBatchDeleteProxy({ ids: [proxy.id], protocol: ProtocolType.HTTPS })
       refreshData()
     } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
+      if (error === 'cancel') {
+        return
       }
     }
   }

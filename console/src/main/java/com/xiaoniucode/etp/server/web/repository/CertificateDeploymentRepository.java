@@ -22,8 +22,15 @@ import com.xiaoniucode.etp.server.web.entity.CertificateDeploymentDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface CertificateDeploymentRepository extends JpaRepository<CertificateDeploymentDO, Long> {
 
+    boolean existsByCertId(Long certId);
+
+    boolean existsByCertIdIn(List<Long> certIds);
+
+    CertificateDeploymentDO findByProxyId(String proxyId);
 
 }

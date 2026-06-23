@@ -16,15 +16,19 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.param.ssl;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
+@Data
+public class SslCertSaveAndDeployParam {
+    @NotBlank(message = "代理ID不能为空")
+    private String proxyId;
 
-    boolean existsByFingerprint(String fingerprint);
+    @NotBlank(message = "私钥不能为空")
+    private String key;
 
+    @NotBlank(message = "证书不能为空")
+    private String fullChain;
 }

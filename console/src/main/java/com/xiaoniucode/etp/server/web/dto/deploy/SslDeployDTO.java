@@ -16,15 +16,11 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.dto.deploy;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Data;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
-
-    boolean existsByFingerprint(String fingerprint);
-
+import java.io.Serializable;
+@Data
+public class SslDeployDTO implements Serializable {
 }

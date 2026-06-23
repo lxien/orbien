@@ -16,15 +16,25 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.*;
+import lombok.Data;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
+/**
+ * 代理证书部署关联的域名，一个代理隧道可能有多个域名
+ */
+@Data
+@Entity
+@Table(name = "certificate_deployment_domain")
+public class CertificateDeploymentDomainDO {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    boolean existsByFingerprint(String fingerprint);
+    @Column(name = "deploy_id", nullable = false)
+    private Long deployId;
 
+    @Column(name = "domain", nullable = false, unique = true)
+    private String domain;
 }

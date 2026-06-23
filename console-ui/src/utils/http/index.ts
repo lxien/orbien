@@ -83,6 +83,10 @@ axiosInstance.interceptors.request.use(
 /** 响应拦截器 */
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse<BaseResponse>) => {
+    const contentType = response.headers['content-type']
+    if (!contentType?.includes('application/json')) {
+      return response
+    }
     const { code, msg } = response.data
     if (code === ApiStatus.success) return response
     if (code === ApiStatus.unauthorized) handleUnauthorizedError(msg)
@@ -177,6 +181,11 @@ async function request<T = any>(config: ExtendedAxiosRequestConfig): Promise<T> 
   try {
     const res = await axiosInstance.request<BaseResponse<T>>(config)
 
+    const contentType = res.headers['content-type']
+    if (!contentType?.includes('application/json')) {
+      return res as unknown as T
+    }
+
     // 显示成功消息
     if (config.showSuccessMessage && res.data.msg) {
       showSuccess(res.data.msg)
@@ -210,5 +219,4 @@ const api = {
     return retryRequest<T>(config)
   }
 }
-
 export default api

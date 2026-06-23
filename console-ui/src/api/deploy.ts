@@ -16,15 +16,25 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+import request from '@/utils/http'
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+/**
+ * 获取SSL部署信息
+ * @param proxyId 代理ID
+ * @returns SSL部署信息
+ */
+export function fetchGetSslDeployInfo(proxyId: string) {
+  return request.get<Api.Deploy.SslDeployInfoDTO>({
+    url: `/api/certificate-deployment/get-ssl/${proxyId}`
+  })
+}
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
-
-    boolean existsByFingerprint(String fingerprint);
-
+/**
+ * 关闭SSL证书
+ * @param proxyId 代理ID
+ */
+export function fetchCloseSsl(proxyId: string) {
+  return request.put({
+    url: `/api/certificate-deployment/close-ssl/${proxyId}`
+  })
 }

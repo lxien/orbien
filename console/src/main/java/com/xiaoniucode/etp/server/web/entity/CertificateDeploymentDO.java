@@ -38,18 +38,13 @@ public class CertificateDeploymentDO {
     /**
      * 关联的证书ID
      */
-    @Column(name = "certificate_id", nullable = false)
-    private Long certificateId;
+    @Column(name = "cert_id", nullable = false)
+    private Long certId;
     /**
      * 关联的代理ID
      */
     @Column(name = "proxy_id", nullable = false)
-    private Long proxyId;
-    /**
-     * 绑定的域名
-     */
-    @Column(name = "domain")
-    private String domain;
+    private String proxyId;
     /**
      * 是否启用
      */

@@ -28,31 +28,31 @@
             </span>
           </template>
           <div class="tab-content">
-            <div class="ssl-info">
+            <div v-if="sslDeployInfo" class="ssl-info">
               <div class="info-column">
                 <div class="info-item">
                   <span class="info-label">证书分类</span>
-                  <span class="info-value">自签证书</span>
+                  <span class="info-value">{{ sslDeployInfo.org }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">认证域名</span>
-                  <span class="info-value"></span>
+                  <span class="info-value">{{ sslDeployInfo.sanDomains?.join(', ') || '' }}</span>
                 </div>
               </div>
               <div class="info-column">
                 <div class="info-item">
                   <span class="info-label">证书品牌</span>
-                  <span class="info-value">localhost</span>
+                  <span class="info-value">{{ sslDeployInfo.issuer }}</span>
                 </div>
                 <div class="info-item">
                   <span class="info-label">到期时间</span>
-                  <span class="info-value">2027-06-20</span>
+                  <span class="info-value">{{ formatDate(sslDeployInfo.notAfter) }}</span>
                 </div>
               </div>
             </div>
             <div class="form-wrapper">
               <div class="form-item">
-                <div class="form-label">密钥(KEY)</div>
+                <div class="form-label">私钥(KEY)</div>
                 <ElInput v-model="certData.keyContent" type="textarea" resize="none" />
               </div>
 
@@ -63,13 +63,13 @@
             </div>
             <div class="form-actions">
               <ElSpace v-if="sslStatus !== 1">
-                <ElButton type="primary">保存并启用证书</ElButton>
-                <ElButton>下载证书</ElButton>
+                <ElButton type="primary">保存并部署证书</ElButton>
+                <ElButton @click="handleDownloadCurrentCert">下载证书</ElButton>
               </ElSpace>
               <ElSpace v-else>
                 <ElButton type="primary">保存</ElButton>
-                <ElButton>下载证书</ElButton>
-                <ElButton>关闭SSL</ElButton>
+                <ElButton @click="handleDownloadCurrentCert">下载证书</ElButton>
+                <ElButton @click="handleCloseSsl">关闭SSL</ElButton>
               </ElSpace>
             </div>
           </div>
@@ -101,7 +101,9 @@
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import DeployDialog from './deploy-dialog.vue'
-  import { fetchGetCertListByPage } from '@/api/ssl'
+  import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert } from '@/api/ssl'
+  import { downloadBlob } from '@/utils/download'
+import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
 
   defineOptions({ name: 'SslDialog' })
 
@@ -121,6 +123,7 @@
     certContent: ''
   })
   const deployDialogVisible = ref(false)
+  const sslDeployInfo = ref<Api.Deploy.SslDeployInfoDTO | null>(null)
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -170,7 +173,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 150,
+          width: 180,
           formatter: (row: Api.Ssl.CertDTO) =>
             h('div', [
               h(ArtButtonTable, {
@@ -191,11 +194,36 @@
 
   watch(
     () => props.visible,
-    (newVal) => {
+    async (newVal) => {
       dialogVisible.value = newVal
+      if (newVal && props.proxyId) {
+        await loadSslDeployInfo()
+      }
     },
     { immediate: true }
   )
+
+  const loadSslDeployInfo = async () => {
+    try {
+      const data = await fetchGetSslDeployInfo(props.proxyId)
+      if (data) {
+        sslDeployInfo.value = data
+        sslStatus.value = data.enabled ? 1 : 0
+        certData.keyContent = data.keyPem || ''
+        certData.certContent = data.fullChainPem || ''
+      } else {
+        sslDeployInfo.value = null
+        sslStatus.value = 0
+        certData.keyContent = ''
+        certData.certContent = ''
+      }
+    } catch (error) {
+      sslDeployInfo.value = null
+      sslStatus.value = 0
+      certData.keyContent = ''
+      certData.certContent = ''
+    }
+  }
   watch(dialogVisible, (newVal) => {
     emit('update:visible', newVal)
   })
@@ -209,6 +237,7 @@
     deployDialogVisible.value = true
   }
 
+
   const handleCertDelete = async (row: Api.Ssl.CertDTO) => {
     try {
       await ElMessageBox.confirm('确定要删除该证书吗？', '警告', {
@@ -216,11 +245,46 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
+      await fetchDeleteCert([row.id!])
       ElMessage.success('删除成功')
     } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
+      if (error === 'cancel') {
+        return
       }
+    }
+  }
+
+  const handleCloseSsl = async () => {
+    try {
+      await ElMessageBox.confirm('确定要关闭SSL证书吗？', '警告', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      await fetchCloseSsl(props.proxyId)
+      ElMessage.success('SSL已关闭')
+      sslStatus.value = 0
+    } catch (error) {
+      if (error === 'cancel') {
+        return
+      }
+    }
+  }
+
+  const handleDownloadCurrentCert = async () => {
+    const certId = sslDeployInfo.value?.certId
+    if (!certId) {
+      ElMessage.warning('当前没有可下载的证书')
+      return
+    }
+
+    try {
+      const blob = await fetchDownloadCert(certId)
+      const fileName = `${sslDeployInfo.value?.sanDomains?.join('_') || 'cert'}.zip`
+      downloadBlob(blob, fileName)
+    } catch (error: any) {
+      console.error('下载失败:', error)
+      ElMessage.error(error?.message || '下载失败')
     }
   }
 </script>

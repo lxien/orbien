@@ -22,8 +22,11 @@ import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/ssl-certificate")
@@ -41,4 +44,14 @@ public class SslCertificateController {
         return Ajax.success(sslCertificateService.findByPage(pageQuery));
     }
 
+    @DeleteMapping
+    public Ajax deleteByIds(@RequestBody List<Long> ids) {
+        sslCertificateService.deleteByIds(ids);
+        return Ajax.success();
+    }
+
+    @GetMapping("download-cert/{certId}")
+    public void downloadCert(@PathVariable Long certId, HttpServletResponse response) {
+        sslCertificateService.downloadCert(certId, response);
+    }
 }

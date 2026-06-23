@@ -21,11 +21,27 @@ package com.xiaoniucode.etp.server.web.service;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
+import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.List;
 
 public interface SslCertificateService {
 
     SslCertDTO saveCert(SslCertSaveParam param);
 
     PageResult<SslCertDTO> findByPage(PageQuery pageQuery);
+
+    SslCertDownloadDTO getSslDownloadInfo(Long certId);
+
+    void deleteByIds(List<Long> ids);
+
+    /**
+     * 下载证书文件
+     *
+     * @param certId   证书ID
+     * @param response HTTP响应
+     */
+    void downloadCert(Long certId, HttpServletResponse response);
 }

@@ -2,7 +2,7 @@
   <ElDialog v-model="dialogVisible" title="上传证书" width="60%" align-center>
     <div class="cert-form">
       <div class="form-item">
-        <div class="form-label">密钥(KEY)</div>
+        <div class="form-label">私钥(KEY)</div>
         <ElInput v-model="formData.keyContent" type="textarea" resize="none" />
       </div>
 
@@ -58,7 +58,7 @@
 
   const handleSubmit = async () => {
     if (!formData.keyContent.trim()) {
-      ElMessage.warning('请输入密钥内容')
+      ElMessage.warning('请输入私钥内容')
       return
     }
     if (!formData.certContent.trim()) {
@@ -66,18 +66,16 @@
       return
     }
 
-    try {
-      await fetchSaveCert({
-        key: formData.keyContent.trim(),
-        fullChain: formData.certContent.trim()
-      })
+    const result = await fetchSaveCert({
+      key: formData.keyContent.trim(),
+      fullChain: formData.certContent.trim()
+    })
+    if (result) {
       ElMessage.success('证书上传成功')
       dialogVisible.value = false
       formData.keyContent = ''
       formData.certContent = ''
       emit('submit')
-    } catch {
-    
     }
   }
 </script>

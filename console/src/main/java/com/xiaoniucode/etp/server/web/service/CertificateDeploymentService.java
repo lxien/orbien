@@ -18,7 +18,17 @@
 
 package com.xiaoniucode.etp.server.web.service;
 
-public interface CertificateDeploymentService {
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
 
+public interface CertificateDeploymentService {
+    void closeSsl(String proxyId);
+
+    void deleteDeploy(Long deployId);
+
+    SslDeployInfoDTO getSslDeployInfo(String proxyId);
+
+    SslDeployDTO deploy(SslCertDeployParam param);
 
 }

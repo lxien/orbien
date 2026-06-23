@@ -16,15 +16,14 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.config;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.io.File;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
-
-    boolean existsByFingerprint(String fingerprint);
-
+/**
+ * 系统常量
+ */
+public interface SystemConstants {
+    String DEFAULT_DOMAIN_SSL_PATH = "cert" + File.separator + "domains";
+    String DEFAULT_GATEWAY_SSL_PATH = "cert" + File.separator + "gateway";
 }

@@ -15,16 +15,17 @@
  *  *    limitations under the License.
  *
  */
+package com.xiaoniucode.etp.server.web.param.ssl;
 
-package com.xiaoniucode.etp.server.web.repository;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
-
-    boolean existsByFingerprint(String fingerprint);
-
+@Data
+public class SslCertDeployParam {
+    @NotNull(message = "证书ID不能为空")
+    private Long certId;
+    @NotNull(message = "代理ID不能为空")
+    private List<String> proxyIds;
 }

@@ -18,10 +18,13 @@
 
 package com.xiaoniucode.etp.server.web.controller;
 
+import com.xiaoniucode.etp.server.web.common.message.Ajax;
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
 import com.xiaoniucode.etp.server.web.service.CertificateDeploymentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/certificate-deployment")
@@ -30,5 +33,27 @@ public class CertificateDeploymentController {
 
     private final CertificateDeploymentService certificateDeploymentService;
 
+    @PostMapping("deploy")
+    public Ajax deploy(@RequestBody SslCertDeployParam param) {
+        SslDeployDTO sslDeployDTO = certificateDeploymentService.deploy(param);
+        return Ajax.success(sslDeployDTO);
+    }
 
+    @DeleteMapping("delete-deploy/{deployId}")
+    public Ajax deleteDeploy(@PathVariable Long deployId) {
+        certificateDeploymentService.deleteDeploy(deployId);
+        return Ajax.success();
+    }
+
+    @PutMapping("close-ssl/{proxyId}")
+    public Ajax closeSsl(@PathVariable String proxyId) {
+        certificateDeploymentService.closeSsl(proxyId);
+        return Ajax.success();
+    }
+
+    @GetMapping("get-ssl/{proxyId}")
+    public Ajax getSslInfo(@PathVariable String proxyId) {
+        SslDeployInfoDTO sslDeployInfoDTO = certificateDeploymentService.getSslDeployInfo(proxyId);
+        return Ajax.success(sslDeployInfoDTO);
+    }
 }
