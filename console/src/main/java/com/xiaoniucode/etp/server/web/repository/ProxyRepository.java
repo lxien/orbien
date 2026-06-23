@@ -16,7 +16,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 代理 Repository
@@ -104,21 +103,7 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             @Param("tcp") ProtocolType tcp
     );
 
-    @Query("SELECT p.id FROM ProxyDO p WHERE p.agentId = :agentId")
-    List<String> findProxyIdsByAgentId(@Param("agentId") String agentId);
-
-    Optional<ProxyDO> findByRemotePort(Integer remotePort);
-
-    Optional<ProxyDO> findByAgentIdAndName(String agentId, String proxyName);
-
     void deleteByIdIn(List<String> ids);
-
-    @Query("""
-            SELECT p.listenPort FROM AgentDO a
-             inner join ProxyDO p ON a.id=p.agentId
-              where p.agentId = :agentId and a.id=:agentId and p.status=:status
-            """)
-    List<Integer> findPortByAgentIdAndProxyStatus(@Param("agentId") String agentId, @Param("status") ProxyStatus status);
 
     @Query("SELECT p.listenPort FROM ProxyDO p WHERE p.listenPort IS NOT NULL")
     List<Integer> findAllListenPorts();

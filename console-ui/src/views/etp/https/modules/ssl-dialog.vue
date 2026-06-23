@@ -148,7 +148,8 @@
         {
           prop: 'sanDomains',
           label: '认证域名',
-          minWidth: 150
+          minWidth: 150,
+          formatter: (row: Api.Ssl.CertDTO) => row.sanDomains?.join(', ') || ''
         },
         {
           prop: 'issuer',

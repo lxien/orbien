@@ -1,10 +1,7 @@
 package com.xiaoniucode.etp.server.web.repository;
+
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -13,16 +10,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Integer> {
     /**
-     * 根据关键词搜索访问令牌
-     */
-    @Query("SELECT a FROM AccessTokenDO a WHERE a.name LIKE %:keyword% OR a.token LIKE %:keyword%")
-    Page<AccessTokenDO> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
-    
-    /**
      * 检查是否存在指定名称的访问令牌
      */
     boolean existsByName(String name);
-    
+
     /**
      * 检查是否存在指定名称但排除指定 ID 的访问令牌
      */
@@ -30,16 +21,12 @@ public interface AccessTokenRepository extends JpaRepository<AccessTokenDO, Inte
 
     /**
      * 查询访问令牌是否已经存在
-     * @param name 名称
+     *
+     * @param name  名称
      * @param token 令牌值
      * @return 只要name 或token有一个就算存在
      */
     boolean existsByNameOrToken(String name, String token);
-    /**
-     * 根据 token 查询访问令牌
-     */
-  AccessTokenDO findByToken(String token);
-    
     /**
      * 检查是否存在指定 token 的访问令牌
      */

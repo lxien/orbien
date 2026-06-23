@@ -24,7 +24,7 @@ import lombok.Data;
 import java.io.Serializable;
 @Data
 public class SslCertSaveParam implements Serializable {
-    @NotBlank(message = "密钥不能为空")
+    @NotBlank(message = "私钥不能为空")
     private String key;
 
     @NotBlank(message = "证书不能为空")

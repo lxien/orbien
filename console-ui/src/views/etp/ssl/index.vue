@@ -84,15 +84,16 @@
         {
           prop: 'sanDomains',
           label: '认证域名',
-          minWidth: 180
+          minWidth: 180,
+          formatter: (row: SslItem) => row.sanDomains?.join(', ') || ''
         },
         {
-          prop: 'issuer',
+          prop: 'org',
           label: '证书分类',
           minWidth: 120
         },
         {
-          prop: 'issuer0',
+          prop: 'issuer',
           label: '证书品牌',
           minWidth: 100
         },

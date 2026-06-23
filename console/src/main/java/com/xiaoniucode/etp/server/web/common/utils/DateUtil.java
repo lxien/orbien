@@ -16,24 +16,30 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.dto.ssl;
+package com.xiaoniucode.etp.server.web.common.utils;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.ZoneId;
+import java.util.Date;
 
-@Data
-public class SslCertDTO implements Serializable {
-    private Long id;
-    private String org;
-    private String issuer;
-    private List<String> sanDomains;
-    private Integer status;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate notBefore;
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate notAfter;
+/**
+ * 日期工具类
+ *
+ * @author xiaoniucode
+ */
+public class DateUtil {
+
+    /**
+     * 将 java.util.Date 转换为 java.time.LocalDate
+     * 使用系统默认时区
+     *
+     * @param date Date 对象，可为 null
+     * @return LocalDate 对象，若输入为 null 则返回 null
+     */
+    public static LocalDate toLocalDate(Date date) {
+        if (date == null) {
+            return null;
+        }
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    }
 }

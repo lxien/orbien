@@ -18,6 +18,9 @@
 
 package com.xiaoniucode.etp.server.transport.https;
 
+
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xiaoniucode.etp.server.security.SelfSignedCertificateGenerator;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
@@ -29,7 +32,9 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * SSL 证书管理器
@@ -38,7 +43,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SslCertificateManager {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(SslCertificateManager.class);
     private final ConcurrentHashMap<String/*domain*/, SslContext> certMap = new ConcurrentHashMap<>();
+    private final Cache<String, SslContext> l1Cache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(1, TimeUnit.HOURS)
+            .build();
+    /**
+     * 通配符域名列表
+     */
+    private final Set<String> wildcardDomains = ConcurrentHashMap.newKeySet();
+    /**
+     * 用于记录已经被部署的域名
+     */
+    private final Set<String> deployedDomains = ConcurrentHashMap.newKeySet();
     private SslContext defaultSslContext;
+
     private static final String DEFAULT_SSL_PATH = Paths.get("cert", "system", "gateway").toString();
 
     /**
@@ -69,9 +87,26 @@ public class SslCertificateManager {
      * 部署证书到指定域名
      */
     public void deploy(String domain, File certFile, File keyFile) throws Exception {
-        SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
-        certMap.put(domain, sslCtx);
+        //todo  构建 SslContext  路径
+        SslContext sslCtx = SslContextBuilder.forServer(
+                new File(DEFAULT_SSL_PATH, "fullchain.pem"),
+                new File(DEFAULT_SSL_PATH, "privkey.pem")
+        ).build();
+
+        // 更新索引和缓存
+        deployedDomains.add(domain);
+        if (domain.startsWith("*.")) {
+            wildcardDomains.add(domain);
+        }
+        l1Cache.put(domain, sslCtx);
+
+        logger.info("证书已部署: {}", domain);
         logger.info("证书已部署到域名: {}", domain);
+    }
+    public void cancelDeploy(String domain) {
+        l1Cache.invalidate(domain);
+        deployedDomains.remove(domain);
+        wildcardDomains.remove(domain);
     }
 
     /**
@@ -79,11 +114,29 @@ public class SslCertificateManager {
      */
     public SslContext getSslContext(String sniHost) {
         if (!StringUtils.hasText(sniHost)) return defaultSslContext;
-        SslContext ctx = certMap.get(sniHost);
+        //从缓存读取
+        SslContext ctx = l1Cache.getIfPresent(sniHost);
         if (ctx != null) return ctx;
+        //判断域名是否部署，没有部署直接返回默认证书
+        if (!deployedDomains.contains(sniHost) && !matchWildcard(sniHost)) {
+            return defaultSslContext;  // 从未部署，零文件IO
+        }
+        //todo 已经部署但缓存过期，从文件系统加载证书
+
         return defaultSslContext;
     }
-
+    /**
+     * todo 通配符匹配 可能需要优化时间复杂度
+     */
+    private boolean matchWildcard(String sniHost) {
+        for (String wildcard : wildcardDomains) {
+            String suffix = wildcard.substring(1);
+            if (sniHost.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * 移除证书
      */

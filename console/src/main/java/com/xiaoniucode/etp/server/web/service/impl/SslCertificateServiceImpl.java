@@ -18,10 +18,14 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
+import com.xiaoniucode.etp.server.web.common.utils.DateUtil;
+import com.xiaoniucode.etp.server.web.common.utils.SslParser;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.enums.SslStatus;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.repository.SslCertificateRepository;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
@@ -33,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -44,7 +49,31 @@ public class SslCertificateServiceImpl implements SslCertificateService {
 
     @Override
     public SslCertDTO saveCert(SslCertSaveParam param) {
-        return null;
+        SslParser.SslInfo sslInfo = SslParser.parsePem(param.getFullChain());
+        if (sslInfo.hasError()) {
+            throw new BizException("证书不可用");
+        }
+        String sha256Fingerprint = sslInfo.getSha256Fingerprint();
+        if (sslCertificateRepository.existsByFingerprint(sha256Fingerprint)) {
+            throw new BizException("该证书已经存在");
+        }
+        
+        SslCertificateDO sslCertificateDO = new SslCertificateDO();
+        sslCertificateDO.setIssuer(sslInfo.issuer);
+        sslCertificateDO.setOrg(sslInfo.organization);
+        sslCertificateDO.setSanDomains(String.join(",", sslInfo.dns));
+        sslCertificateDO.setFingerprint(sslInfo.sha256Fingerprint);
+        LocalDate notBefore = DateUtil.toLocalDate(sslInfo.issuedAt);
+        LocalDate notAfter = DateUtil.toLocalDate(sslInfo.expiresAt);
+        sslCertificateDO.setNotBefore(notBefore);
+        sslCertificateDO.setNotAfter(notAfter);
+
+        LocalDate today = LocalDate.now();
+        SslStatus status = (notAfter != null && today.isAfter(notAfter)) ? SslStatus.EXPIRED : SslStatus.ACTIVE;
+        sslCertificateDO.setStatus(status);
+        
+        sslCertificateRepository.saveAndFlush(sslCertificateDO);
+        return sslCertificateConvert.toDTO(sslCertificateDO);
     }
 
     @Override

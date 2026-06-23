@@ -25,5 +25,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Integer> {
 
+    boolean existsByFingerprint(String fingerprint);
 
 }

@@ -25,11 +25,14 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "ssl_certificate")
+@Table(name = "ssl_certificate", indexes = {
+        @Index(name = "idx_ssl_certificate_fingerprint", columnList = "fingerprint")
+    })
 public class SslCertificateDO {
     /**
      * 主键ID
@@ -39,22 +42,16 @@ public class SslCertificateDO {
     private Long id;
 
     /**
-     * 证书分类
+     * 证书颁发者
      */
     @Column(name = "issuer")
     private String issuer;
 
     /**
-     * 证书品牌
+     * 证书组织
      */
-    @Column(name = "issuer0")
-    private String issuer0;
-
-    /**
-     * 主域名
-     */
-    @Column(name = "subject")
-    private String subject;
+    @Column(name = "org")
+    private String org;
 
     /**
      * SAN域名，可能多个
@@ -73,13 +70,13 @@ public class SslCertificateDO {
      * 生效时间
      */
     @Column(name = "not_before")
-    private LocalDateTime notBefore;
+    private LocalDate notBefore;
 
     /**
      * 过期时间
      */
     @Column(name = "not_after")
-    private LocalDateTime notAfter;
+    private LocalDate notAfter;
 
     /**
      * 指纹
