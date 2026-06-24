@@ -16,21 +16,25 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.repository;
+package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.server.web.entity.CertificateDeploymentDO;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.*;
+import lombok.Data;
 
-import java.util.List;
+/**
+ * 代理证书部署关联的域名，一个代理隧道可能有多个域名
+ */
+@Data
+@Entity
+@Table(name = "cert_deploy_domain")
+public class CertDeployDomainDO {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-@Repository
-public interface CertificateDeploymentRepository extends JpaRepository<CertificateDeploymentDO, Long> {
+    @Column(name = "deploy_id", nullable = false)
+    private Long deployId;
 
-    boolean existsByCertId(Long certId);
-
-    boolean existsByCertIdIn(List<Long> certIds);
-
-    CertificateDeploymentDO findByProxyId(String proxyId);
-
+    @Column(name = "domain", nullable = false, unique = true)
+    private String domain;
 }

@@ -33,9 +33,9 @@ public interface SslCertificateService {
 
     PageResult<SslCertDTO> findByPage(PageQuery pageQuery);
 
-    SslCertDownloadDTO getSslDownloadInfo(Long certId);
+    SslCertDownloadDTO getSslDownloadInfo(String certId);
 
-    void deleteByIds(List<Long> ids);
+    void deleteByIds(List<String> ids);
 
     /**
      * 下载证书文件
@@ -43,5 +43,5 @@ public interface SslCertificateService {
      * @param certId   证书ID
      * @param response HTTP响应
      */
-    void downloadCert(Long certId, HttpServletResponse response);
+    void downloadCert(String certId, HttpServletResponse response);
 }

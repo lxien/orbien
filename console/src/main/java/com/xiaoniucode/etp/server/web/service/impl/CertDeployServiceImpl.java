@@ -22,13 +22,14 @@ import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
 import com.xiaoniucode.etp.server.web.common.exception.SystemException;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
-import com.xiaoniucode.etp.server.web.entity.CertificateDeploymentDO;
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.entity.CertDeployDO;
+import com.xiaoniucode.etp.server.web.entity.SslCertDO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
-import com.xiaoniucode.etp.server.web.repository.CertificateDeploymentRepository;
-import com.xiaoniucode.etp.server.web.repository.SslCertificateRepository;
-import com.xiaoniucode.etp.server.web.service.CertificateDeploymentService;
-import com.xiaoniucode.etp.server.web.service.converter.CertificateDeploymentConvert;
+import com.xiaoniucode.etp.server.web.repository.CertDeployDomainRepository;
+import com.xiaoniucode.etp.server.web.repository.CertDeployRepository;
+import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
+import com.xiaoniucode.etp.server.web.service.CertDeployService;
+import com.xiaoniucode.etp.server.web.service.converter.CertDeployConvert;
 import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,26 +43,30 @@ import java.nio.file.Files;
 
 @Service
 @RequiredArgsConstructor
-public class CertificateDeploymentServiceImpl implements CertificateDeploymentService {
-    private final CertificateDeploymentRepository certificateDeploymentRepository;
+public class CertDeployServiceImpl implements CertDeployService {
+    private final CertDeployRepository certDeployRepository;
     @Autowired
     private SslCertificateManager sslCertificateManager;
     @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
-    private SslCertificateRepository sslCertificateRepository;
+    private SslCertRepository sslCertRepository;
     @Autowired
-    private CertificateDeploymentConvert certificateDeploymentConvert;
+    private CertDeployConvert certDeployConvert;
+    @Autowired
+    private CertDeployDomainRepository certDeployDomainRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void closeSsl(String proxyId) {
-        CertificateDeploymentDO deploymentDO = certificateDeploymentRepository.findByProxyId(proxyId);
+        CertDeployDO deploymentDO = certDeployRepository.findByProxyId(proxyId);
         if (deploymentDO != null) {
             deploymentDO.setEnabled(false);
-            certificateDeploymentRepository.saveAndFlush(deploymentDO);
+            certDeployRepository.saveAndFlush(deploymentDO);
         }
-        //todo 需要清理证书管理器
+
+        //清理证书管理器
+
     }
 
     @Override
@@ -71,18 +76,18 @@ public class CertificateDeploymentServiceImpl implements CertificateDeploymentSe
 
     @Override
     public SslDeployInfoDTO getSslDeployInfo(String proxyId) {
-        CertificateDeploymentDO deploymentDO = certificateDeploymentRepository.findByProxyId(proxyId);
+        CertDeployDO deploymentDO = certDeployRepository.findByProxyId(proxyId);
         if (deploymentDO == null) {
             return null;
         }
 
-        Long certId = deploymentDO.getCertId();
-        SslCertificateDO certificateDO = sslCertificateRepository.findById(certId).orElse(null);
+        String certId = deploymentDO.getCertId();
+        SslCertDO certificateDO = sslCertRepository.findById(certId).orElse(null);
         if (certificateDO == null) {
             return null;
         }
 
-        SslDeployInfoDTO dto = certificateDeploymentConvert.toDeployInfoDTO(deploymentDO, certificateDO);
+        SslDeployInfoDTO dto = certDeployConvert.toDeployInfoDTO(deploymentDO, certificateDO);
 
         String keyPath = certificateDO.getKeyPath();
         String fullChainPath = certificateDO.getFullChainPath();

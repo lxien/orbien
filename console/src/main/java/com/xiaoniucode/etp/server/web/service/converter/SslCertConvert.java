@@ -18,9 +18,8 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
-import com.xiaoniucode.etp.server.web.entity.CertificateDeploymentDO;
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
+import com.xiaoniucode.etp.server.web.entity.SslCertDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -30,20 +29,12 @@ import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface CertificateDeploymentConvert {
+public interface SslCertConvert {
+    @Mapping(target = "status", expression = "java(sslCertificate.getStatus().getCode())")
+    @Mapping(target = "sanDomains", source = "sanDomains", qualifiedByName = "stringToList")
+    SslCertDTO toDTO(SslCertDO sslCertificate);
 
-    @Mapping(target = "deployId", source = "deploymentDO.id")
-    @Mapping(target = "certId", source = "deploymentDO.certId")
-    @Mapping(target = "proxyId", source = "deploymentDO.proxyId")
-    @Mapping(target = "enabled", source = "deploymentDO.enabled")
-    @Mapping(target = "issuer", source = "certificateDO.issuer")
-    @Mapping(target = "org", source = "certificateDO.org")
-    @Mapping(target = "sanDomains", source = "certificateDO.sanDomains", qualifiedByName = "stringToList")
-    @Mapping(target = "notBefore", source = "certificateDO.notBefore")
-    @Mapping(target = "notAfter", source = "certificateDO.notAfter")
-    @Mapping(target = "keyPem", ignore = true)
-    @Mapping(target = "fullChainPem", ignore = true)
-    SslDeployInfoDTO toDeployInfoDTO(CertificateDeploymentDO deploymentDO, SslCertificateDO certificateDO);
+    List<SslCertDTO> toDTOList(List<SslCertDO> sslCertificateList);
 
     @Named("stringToList")
     default List<String> stringToList(String value) {

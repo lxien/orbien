@@ -21,6 +21,9 @@ package com.xiaoniucode.etp.server.web.dto.deploy;
 import lombok.Data;
 
 import java.io.Serializable;
+/**
+ * SSL证书部署结果DTO
+ */
 @Data
 public class SslDeployDTO implements Serializable {
 }

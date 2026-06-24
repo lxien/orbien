@@ -30,16 +30,15 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "ssl_certificate", indexes = {
-        @Index(name = "idx_ssl_certificate_fingerprint", columnList = "fingerprint")
+@Table(name = "ssl_cert", indexes = {
+        @Index(name = "idx_ssl_cert_fingerprint", columnList = "fingerprint")
     })
-public class SslCertificateDO {
+public class SslCertDO {
     /**
      * 主键ID
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     /**
      * 证书颁发者

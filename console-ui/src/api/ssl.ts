@@ -7,7 +7,7 @@ import request from '@/utils/http'
  */
 export function fetchGetCertListByPage(params: Api.Common.CommonSearchParams) {
   return request.get<Api.Common.PaginatedResponse<Api.Ssl.CertDTO>>({
-    url: '/api/ssl-certificate',
+    url: '/api/ssl-cert',
     params
   })
 }
@@ -19,7 +19,7 @@ export function fetchGetCertListByPage(params: Api.Common.CommonSearchParams) {
  */
 export function fetchSaveCert(params: Api.Ssl.CertSaveParams) {
   return request.post<Api.Ssl.CertDTO>({
-    url: '/api/ssl-certificate/save-cert',
+    url: '/api/ssl-cert/save-cert',
     data: params
   })
 }
@@ -27,9 +27,9 @@ export function fetchSaveCert(params: Api.Ssl.CertSaveParams) {
  * 删除SSL证书（支持批量）
  * @param ids 证书ID列表
  */
-export function fetchDeleteCert(ids: number[]) {
+export function fetchDeleteCert(ids: string[]) {
   return request.del({
-    url: '/api/ssl-certificate',
+    url: '/api/ssl-cert',
     data: ids
   })
 }
@@ -39,9 +39,9 @@ export function fetchDeleteCert(ids: number[]) {
  * @param certId 证书ID
  * @returns 证书文件二进制流
  */
-export function fetchDownloadCert(certId: number): Promise<Blob> {
+export function fetchDownloadCert(certId: string): Promise<Blob> {
   return request.get({
-    url: `/api/ssl-certificate/download-cert/${certId}`,
+    url: `/api/ssl-cert/download-cert/${certId}`,
     responseType: 'blob',
     showErrorMessage: false
   }).then(res => (res as { data: Blob }).data)

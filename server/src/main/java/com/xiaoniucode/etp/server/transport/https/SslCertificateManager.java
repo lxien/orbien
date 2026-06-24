@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -44,11 +45,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class SslCertificateManager {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(SslCertificateManager.class);
-    private final Cache<String, SslContext> l1Cache = Caffeine.newBuilder()
+    private final Cache<String/*domain*/, SslContext> l1Cache = Caffeine.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(1, TimeUnit.HOURS)
             .build();
-    private final Set<String> deployedDomains = ConcurrentHashMap.newKeySet();
+    private final Set<String/*domain*/> deployedDomains = ConcurrentHashMap.newKeySet();
+    private final Map<String/*domain*/, Long/*certId*/> activeCert = new ConcurrentHashMap<>();
     private volatile SslContext defaultSslContext;
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
@@ -75,24 +77,36 @@ public class SslCertificateManager {
     }
 
     /**
-     * 部署证书到指定域名
+     * 部署证书到域名
+     *
+     * @param domain   具体域名
+     * @param certFile 证书
+     * @param keyFile  私钥
+     * @throws Exception
      */
-    public void deploy(String domain, File certFile, File keyFile) throws Exception {
+    public void deploy(Long certId, String domain, File certFile, File keyFile) throws Exception {
         rwLock.writeLock().lock();
         try {
             SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
             // 更新索引和缓存
             deployedDomains.add(domain);
             l1Cache.put(domain, sslCtx);
+            activeCert.put(domain, certId);
             logger.info("证书已部署到域名: {}", domain);
         } finally {
             rwLock.writeLock().unlock();
         }
     }
 
+    /**
+     * 取消证书部署
+     *
+     * @param domain 具体域名
+     */
     public void cancelDeploy(String domain) {
         rwLock.writeLock().lock();
         try {
+            activeCert.remove(domain);
             l1Cache.invalidate(domain);
             deployedDomains.remove(domain);
             logger.info("域名证书已取消部署: {}", domain);
@@ -102,7 +116,7 @@ public class SslCertificateManager {
     }
 
     /**
-     * 根据 SNI 域名获取对应的 SslContext
+     * 根据 SNI 具体域名获取对应的 SslContext
      */
     public SslContext getSslContext(String domain) {
         rwLock.readLock().lock();
@@ -127,7 +141,11 @@ public class SslCertificateManager {
 
     private SslContext loadFromFileSystem(String domain) {
         try {
-            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, domain);
+            Long certId = activeCert.get(domain);
+            if (certId == null) {
+                return null;
+            }
+            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, String.valueOf(certId));
             File certFile = new File(domainDir, "fullchain.pem");
             File keyFile = new File(domainDir, "privkey.pem");
 

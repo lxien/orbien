@@ -22,8 +22,19 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+/**
+ * SSL证书下载DTO
+ * 用于返回证书文件内容供下载
+ */
 @Data
 public class SslCertDownloadDTO implements Serializable {
+    /**
+     * 私钥内容（PEM格式）
+     */
     private String keyPem;
+
+    /**
+     * 完整证书链内容（PEM格式）
+     */
     private String fullChainPem;
 }

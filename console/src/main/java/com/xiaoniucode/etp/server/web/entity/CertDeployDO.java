@@ -30,8 +30,8 @@ import java.time.LocalDateTime;
  */
 @Data
 @Entity
-@Table(name = "certificate_deployment")
-public class CertificateDeploymentDO {
+@Table(name = "cert_deploy")
+public class CertDeployDO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,7 +39,7 @@ public class CertificateDeploymentDO {
      * 关联的证书ID
      */
     @Column(name = "cert_id", nullable = false)
-    private Long certId;
+    private String certId;
     /**
      * 关联的代理ID
      */

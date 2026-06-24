@@ -18,13 +18,17 @@
 
 package com.xiaoniucode.etp.server.web.repository;
 
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.entity.CertDeployDomainDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface SslCertificateRepository extends JpaRepository<SslCertificateDO, Long> {
+import java.util.List;
 
-    boolean existsByFingerprint(String fingerprint);
+@Repository
+public interface CertDeployDomainRepository extends JpaRepository<CertDeployDomainDO, Long> {
+
+    List<CertDeployDomainDO> findByDeployId(Long deployId);
+
+    void deleteByDomain(String domain);
 
 }

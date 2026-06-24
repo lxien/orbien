@@ -29,8 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ssl-certificate")
-public class SslCertificateController {
+@RequestMapping("/api/ssl-cert")
+public class SslCertController {
     @Autowired
     private SslCertificateService sslCertificateService;
 
@@ -45,13 +45,13 @@ public class SslCertificateController {
     }
 
     @DeleteMapping
-    public Ajax deleteByIds(@RequestBody List<Long> ids) {
+    public Ajax deleteByIds(@RequestBody List<String> ids) {
         sslCertificateService.deleteByIds(ids);
         return Ajax.success();
     }
 
     @GetMapping("download-cert/{certId}")
-    public void downloadCert(@PathVariable Long certId, HttpServletResponse response) {
+    public void downloadCert(@PathVariable String certId, HttpServletResponse response) {
         sslCertificateService.downloadCert(certId, response);
     }
 }

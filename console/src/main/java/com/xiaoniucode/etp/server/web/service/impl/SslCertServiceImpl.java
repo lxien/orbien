@@ -19,6 +19,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.SystemConstants;
+import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.exception.SystemException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
@@ -27,13 +28,13 @@ import com.xiaoniucode.etp.server.web.common.utils.DateUtil;
 import com.xiaoniucode.etp.server.web.common.utils.SslParser;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
-import com.xiaoniucode.etp.server.web.entity.SslCertificateDO;
+import com.xiaoniucode.etp.server.web.entity.SslCertDO;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
-import com.xiaoniucode.etp.server.web.repository.CertificateDeploymentRepository;
-import com.xiaoniucode.etp.server.web.repository.SslCertificateRepository;
+import com.xiaoniucode.etp.server.web.repository.CertDeployRepository;
+import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
-import com.xiaoniucode.etp.server.web.service.converter.SslCertificateConvert;
+import com.xiaoniucode.etp.server.web.service.converter.SslCertConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,14 +56,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
-public class SslCertificateServiceImpl implements SslCertificateService {
+public class SslCertServiceImpl implements SslCertificateService {
     @Autowired
-    private SslCertificateRepository sslCertificateRepository;
+    private SslCertRepository sslCertRepository;
     @Autowired
-    private CertificateDeploymentRepository certificateDeploymentRepository;
+    private CertDeployRepository certificateDeploymentRepository;
     @Autowired
-    private SslCertificateConvert sslCertificateConvert;
-
+    private SslCertConvert sslCertConvert;
+    @Autowired
+    private UidGenerator uidGenerator;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SslCertDTO saveCert(SslCertSaveParam param) {
@@ -71,23 +73,25 @@ public class SslCertificateServiceImpl implements SslCertificateService {
             throw new BizException("证书不可用");
         }
         String sha256Fingerprint = sslInfo.getSha256Fingerprint();
-        if (sslCertificateRepository.existsByFingerprint(sha256Fingerprint)) {
+        if (sslCertRepository.existsByFingerprint(sha256Fingerprint)) {
             throw new BizException("该证书已经存在");
         }
-        
-        SslCertificateDO sslCertificateDO = new SslCertificateDO();
-        sslCertificateDO.setIssuer(sslInfo.issuer);
-        sslCertificateDO.setOrg(sslInfo.organization);
-        sslCertificateDO.setSanDomains(String.join(",", sslInfo.dns));
-        sslCertificateDO.setFingerprint(sslInfo.sha256Fingerprint);
+        String certId = uidGenerator.getUIDAsString();
+
+        SslCertDO sslCertDO = new SslCertDO();
+        sslCertDO.setId(certId);
+        sslCertDO.setIssuer(sslInfo.issuer);
+        sslCertDO.setOrg(sslInfo.organization);
+        sslCertDO.setSanDomains(String.join(",", sslInfo.dns));
+        sslCertDO.setFingerprint(sslInfo.sha256Fingerprint);
         LocalDate notBefore = DateUtil.toLocalDate(sslInfo.issuedAt);
         LocalDate notAfter = DateUtil.toLocalDate(sslInfo.expiresAt);
-        sslCertificateDO.setNotBefore(notBefore);
-        sslCertificateDO.setNotAfter(notAfter);
+        sslCertDO.setNotBefore(notBefore);
+        sslCertDO.setNotAfter(notAfter);
 
         LocalDate today = LocalDate.now();
         SslStatus status = (notAfter != null && today.isAfter(notAfter)) ? SslStatus.EXPIRED : SslStatus.ACTIVE;
-        sslCertificateDO.setStatus(status);
+        sslCertDO.setStatus(status);
 
         String rootPath = SystemConstants.DEFAULT_DOMAIN_SSL_PATH;
         
@@ -96,60 +100,50 @@ public class SslCertificateServiceImpl implements SslCertificateService {
             throw new SystemException("无法创建证书目录");
         }
 
-        String firstKeyPath = null;
-        String firstFullChainPath = null;
-        
-        for (String domain : sslInfo.dns) {
-            String domainPath = rootPath + File.separator + domain;
-            File domainDir = new File(domainPath);
-            if (!domainDir.exists() && !domainDir.mkdirs()) {
-                throw new SystemException("无法创建域名目录: " + domain);
-            }
-
-            String keyPath = domainPath + File.separator + "privkey.pem";
-            String fullChainPath = domainPath + File.separator + "fullchain.pem";
-
-            try {
-                Files.writeString(new File(keyPath).toPath(), param.getKey(), StandardCharsets.UTF_8);
-                Files.writeString(new File(fullChainPath).toPath(), param.getFullChain(), StandardCharsets.UTF_8);
-                
-                if (firstKeyPath == null) {
-                    firstKeyPath = keyPath;
-                    firstFullChainPath = fullChainPath;
-                }
-            } catch (IOException e) {
-                throw new SystemException("写入证书文件失败: " + domain);
-            }
+        String certPath = rootPath + File.separator + certId;
+        File certDir = new File(certPath);
+        if (!certDir.exists() && !certDir.mkdirs()) {
+            throw new SystemException("无法创建证书目录: " + certId);
         }
 
-        sslCertificateDO.setKeyPath(firstKeyPath);
-        sslCertificateDO.setFullChainPath(firstFullChainPath);
+        File keyFile = new File(certPath + File.separator + "privkey.pem");
+        File fullChainFile = new File(certPath + File.separator + "fullchain.pem");
 
-        sslCertificateRepository.saveAndFlush(sslCertificateDO);
-        return sslCertificateConvert.toDTO(sslCertificateDO);
+        try {
+            Files.writeString(keyFile.toPath(), param.getKey(), StandardCharsets.UTF_8);
+            Files.writeString(fullChainFile.toPath(), param.getFullChain(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new SystemException("写入证书文件失败");
+        }
+
+        sslCertDO.setKeyPath(keyFile.getAbsolutePath());
+        sslCertDO.setFullChainPath(fullChainFile.getAbsolutePath());
+
+        sslCertRepository.saveAndFlush(sslCertDO);
+        return sslCertConvert.toDTO(sslCertDO);
     }
 
     @Override
     public PageResult<SslCertDTO> findByPage(PageQuery pageQuery) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<SslCertificateDO> resultPage = sslCertificateRepository.findAll(pageable);
+        Page<SslCertDO> resultPage = sslCertRepository.findAll(pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
-        List<SslCertDTO> dtoList = sslCertificateConvert.toDTOList(resultPage.getContent());
+        List<SslCertDTO> dtoList = sslCertConvert.toDTOList(resultPage.getContent());
         return PageResult.wrap(resultPage, dtoList);
     }
 
     @Override
-    public SslCertDownloadDTO getSslDownloadInfo(Long certId) {
-        Optional<SslCertificateDO> opt = sslCertificateRepository.findById(certId);
+    public SslCertDownloadDTO getSslDownloadInfo(String certId) {
+        Optional<SslCertDO> opt = sslCertRepository.findById(certId);
         if (opt.isEmpty()) {
             return null;
         }
-        SslCertificateDO sslCertificateDO = opt.get();
-        String keyPath = sslCertificateDO.getKeyPath();
-        String fullChainPath = sslCertificateDO.getFullChainPath();
+        SslCertDO sslCertDO = opt.get();
+        String keyPath = sslCertDO.getKeyPath();
+        String fullChainPath = sslCertDO.getFullChainPath();
 
         if (keyPath == null || fullChainPath == null) {
             throw new SystemException("证书文件路径未配置");
@@ -169,7 +163,7 @@ public class SslCertificateServiceImpl implements SslCertificateService {
     }
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteByIds(List<Long> ids) {
+    public void deleteByIds(List<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
         }
@@ -178,43 +172,37 @@ public class SslCertificateServiceImpl implements SslCertificateService {
             throw new BizException("证书已被部署使用，无法删除");
         }
 
-        List<SslCertificateDO> certificates = sslCertificateRepository.findAllById(ids);
+        List<SslCertDO> certificates = sslCertRepository.findAllById(ids);
 
-        for (SslCertificateDO sslCertificateDO : certificates) {
-            String sanDomains = sslCertificateDO.getSanDomains();
-            if (sanDomains != null && !sanDomains.isEmpty()) {
-                String[] domains = sanDomains.split(",");
-                String rootPath = SystemConstants.DEFAULT_DOMAIN_SSL_PATH;
-
-                for (String domain : domains) {
-                    String domainPath = rootPath + File.separator + domain.trim();
-                    File domainDir = new File(domainPath);
-                    if (domainDir.exists() && domainDir.isDirectory()) {
-                        try {
-                            File keyFile = new File(domainPath + File.separator + "privkey.pem");
-                            if (keyFile.exists()) {
-                                Files.delete(keyFile.toPath());
-                            }
-
-                            File fullChainFile = new File(domainPath + File.separator + "fullchain.pem");
-                            if (fullChainFile.exists()) {
-                                Files.delete(fullChainFile.toPath());
-                            }
-
-                            domainDir.delete();
-                        } catch (IOException e) {
-                            throw new SystemException("删除证书文件失败: " + domain);
-                        }
+        for (SslCertDO sslCertDO : certificates) {
+            String keyPath = sslCertDO.getKeyPath();
+            if (keyPath != null && !keyPath.isEmpty()) {
+                try {
+                    File keyFile = new File(keyPath);
+                    if (keyFile.exists()) {
+                        Files.delete(keyFile.toPath());
                     }
+
+                    File certDir = keyFile.getParentFile();
+                    if (certDir != null && certDir.exists() && certDir.isDirectory()) {
+                        String fullChainPath = certDir.getPath() + File.separator + "fullchain.pem";
+                        File fullChainFile = new File(fullChainPath);
+                        if (fullChainFile.exists()) {
+                            Files.delete(fullChainFile.toPath());
+                        }
+                        certDir.delete();
+                    }
+                } catch (IOException e) {
+                    throw new SystemException("删除证书文件失败");
                 }
             }
         }
 
-        sslCertificateRepository.deleteAllById(ids);
+        sslCertRepository.deleteAllById(ids);
     }
 
     @Override
-    public void downloadCert(Long certId, HttpServletResponse response) {
+    public void downloadCert(String certId, HttpServletResponse response) {
         SslCertDownloadDTO ssl = getSslDownloadInfo(certId);
         if (ssl == null) {
             throw new BizException("证书信息不存在");

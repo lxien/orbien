@@ -16,25 +16,19 @@
  *
  */
 
-import request from '@/utils/http'
+package com.xiaoniucode.etp.server.web.service;
 
-/**
- * 获取SSL部署信息
- * @param proxyId 代理ID
- * @returns SSL部署信息
- */
-export function fetchGetSslDeployInfo(proxyId: string) {
-  return request.get<Api.Deploy.SslDeployInfoDTO>({
-    url: `/api/cert-deploy/get-ssl/${proxyId}`
-  })
-}
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
+import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
 
-/**
- * 关闭SSL证书
- * @param proxyId 代理ID
- */
-export function fetchCloseSsl(proxyId: string) {
-  return request.put({
-    url: `/api/cert-deploy/close-ssl/${proxyId}`
-  })
+public interface CertDeployService {
+    void closeSsl(String proxyId);
+
+    void deleteDeploy(Long deployId);
+
+    SslDeployInfoDTO getSslDeployInfo(String proxyId);
+
+    SslDeployDTO deploy(SslCertDeployParam param);
+
 }

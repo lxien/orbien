@@ -51,7 +51,7 @@
               </div>
             </div>
             <div v-else class="ssl-info ssl-info--empty">
-              <span class="ssl-empty-text">暂未部署SSL证书</span>
+              <span class="ssl-empty-text">暂未配置SSL证书</span>
             </div>
             <div class="form-wrapper">
               <div class="form-item">

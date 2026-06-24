@@ -22,16 +22,16 @@ import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
-import com.xiaoniucode.etp.server.web.service.CertificateDeploymentService;
+import com.xiaoniucode.etp.server.web.service.CertDeployService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/certificate-deployment")
+@RequestMapping("/api/cert-deploy")
 @RequiredArgsConstructor
-public class CertificateDeploymentController {
+public class CertDeployController {
 
-    private final CertificateDeploymentService certificateDeploymentService;
+    private final CertDeployService certificateDeploymentService;
 
     @PostMapping("deploy")
     public Ajax deploy(@RequestBody SslCertDeployParam param) {
@@ -39,7 +39,7 @@ public class CertificateDeploymentController {
         return Ajax.success(sslDeployDTO);
     }
 
-    @DeleteMapping("delete-deploy/{deployId}")
+    @DeleteMapping("delete/{deployId}")
     public Ajax deleteDeploy(@PathVariable Long deployId) {
         certificateDeploymentService.deleteDeploy(deployId);
         return Ajax.success();

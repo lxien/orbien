@@ -16,19 +16,21 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.service;
+package com.xiaoniucode.etp.server.web.repository;
 
-import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
-import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
-import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
+import com.xiaoniucode.etp.server.web.entity.CertDeployDO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CertificateDeploymentService {
-    void closeSsl(String proxyId);
+import java.util.List;
 
-    void deleteDeploy(Long deployId);
+@Repository
+public interface CertDeployRepository extends JpaRepository<CertDeployDO, Long> {
 
-    SslDeployInfoDTO getSslDeployInfo(String proxyId);
+    boolean existsByCertId(String certId);
 
-    SslDeployDTO deploy(SslCertDeployParam param);
+    boolean existsByCertIdIn(List<String> certIds);
+
+    CertDeployDO findByProxyId(String proxyId);
 
 }

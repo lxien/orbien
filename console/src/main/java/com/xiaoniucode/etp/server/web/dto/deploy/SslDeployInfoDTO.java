@@ -24,11 +24,27 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * SSL部署信息DTO
+ * 用于返回代理的SSL证书部署详情
+ */
 @Data
 public class SslDeployInfoDTO implements Serializable {
+    /**
+     * 部署记录ID
+     */
     private Long deployId;
-    private Long certId;
+
+    /**
+     * 证书ID
+     */
+    private String certId;
+
+    /**
+     * 代理ID
+     */
     private String proxyId;
+
     /**
      * 证书颁发者
      */
@@ -40,21 +56,30 @@ public class SslDeployInfoDTO implements Serializable {
     private String org;
 
     /**
-     * SAN域名，可能多个
+     * SAN域名列表
      */
     private List<String> sanDomains;
+
     /**
-     * 生效时间
+     * 证书生效时间
      */
     private LocalDate notBefore;
 
     /**
-     * 过期时间
+     * 证书过期时间
      */
     private LocalDate notAfter;
 
+    /**
+     * 私钥内容（PEM格式）
+     */
     private String keyPem;
+
+    /**
+     * 完整证书链内容（PEM格式）
+     */
     private String fullChainPem;
+
     /**
      * 是否启用SSL证书
      */
