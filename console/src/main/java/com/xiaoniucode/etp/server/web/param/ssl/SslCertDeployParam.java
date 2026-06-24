@@ -25,7 +25,7 @@ import java.util.List;
 @Data
 public class SslCertDeployParam {
     @NotNull(message = "证书ID不能为空")
-    private Long certId;
+    private String certId;
     @NotNull(message = "代理ID不能为空")
     private List<String> proxyIds;
 }

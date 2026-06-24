@@ -31,4 +31,5 @@ public interface CertDeployDomainRepository extends JpaRepository<CertDeployDoma
 
     void deleteByDomain(String domain);
 
+    void deleteByDeployId(Long deployId);
 }

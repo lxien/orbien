@@ -20,6 +20,7 @@ package com.xiaoniucode.etp.server.web.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "cert_deploy")
+@NoArgsConstructor
 public class CertDeployDO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,12 +51,13 @@ public class CertDeployDO {
      * 是否启用
      */
     @Column(name = "enabled")
-    private Boolean enabled = true;
+    private Boolean enabled;
 
     /**
      * 最后部署时间
      */
     @Column(name = "last_deployed_at", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime lastDeployedAt;
 
     /**
@@ -70,4 +73,10 @@ public class CertDeployDO {
     @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+    public CertDeployDO(String certId, String proxyId, Boolean enabled) {
+        this.certId = certId;
+        this.proxyId = proxyId;
+        this.enabled = enabled;
+    }
 }

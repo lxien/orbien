@@ -19,15 +19,13 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.exception.SystemException;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
-import com.xiaoniucode.etp.server.web.entity.CertDeployDO;
-import com.xiaoniucode.etp.server.web.entity.SslCertDO;
+import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
-import com.xiaoniucode.etp.server.web.repository.CertDeployDomainRepository;
-import com.xiaoniucode.etp.server.web.repository.CertDeployRepository;
-import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
+import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.CertDeployService;
 import com.xiaoniucode.etp.server.web.service.converter.CertDeployConvert;
 import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
@@ -40,6 +38,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +58,10 @@ public class CertDeployServiceImpl implements CertDeployService {
     private CertDeployConvert certDeployConvert;
     @Autowired
     private CertDeployDomainRepository certDeployDomainRepository;
+    @Autowired
+    private ProxyRepository proxyRepository;
+    @Autowired
+    private ProxyDomainRepository proxyDomainRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -62,16 +69,21 @@ public class CertDeployServiceImpl implements CertDeployService {
         CertDeployDO deploymentDO = certDeployRepository.findByProxyId(proxyId);
         if (deploymentDO != null) {
             deploymentDO.setEnabled(false);
-            certDeployRepository.saveAndFlush(deploymentDO);
+            certDeployRepository.save(deploymentDO);
+
+            //清理证书管理器部署信息
+            certDeployDomainRepository.findByDeployId(deploymentDO.getId()).forEach(domain ->
+                    sslCertificateManager.cancelDeploy(domain.getDomain()));
         }
-
-        //清理证书管理器
-
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDeploy(Long deployId) {
-
+        certDeployRepository.deleteById(deployId);
+        certDeployDomainRepository.deleteByDeployId(deployId);
+        certDeployDomainRepository.findByDeployId(deployId).forEach(domain ->
+                sslCertificateManager.cancelDeploy(domain.getDomain()));
     }
 
     @Override
@@ -105,7 +117,59 @@ public class CertDeployServiceImpl implements CertDeployService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public SslDeployDTO deploy(SslCertDeployParam param) {
-        return null;
+        String certId = param.getCertId();
+        List<String> proxyIds = param.getProxyIds();
+
+        //根据certId查询证书信息
+        SslCertDO sslCertDO = sslCertRepository.findById(certId).orElseThrow(() -> new BizException("证书不存在"));
+        String keyPath = sslCertDO.getKeyPath();
+        String fullChainPath = sslCertDO.getFullChainPath();
+        //加载证书文件为File
+        File keyFile = new File(keyPath);
+        if (!keyFile.exists()) {
+            throw new SystemException("证书私钥文件不存在");
+        }
+        File certFile = new File(fullChainPath);
+        if (!certFile.exists()) {
+            throw new SystemException("证书链文件不存在");
+        }
+
+        //一次性查询出所有代理,并校验存在性
+        List<String> existingProxyIds = proxyRepository.findAllById(proxyIds).stream()
+                .map(ProxyDO::getId)
+                .toList();
+        if (existingProxyIds.size() != proxyIds.size()) {
+            proxyIds.removeAll(existingProxyIds);
+            throw new BizException("以下代理不存在: " + proxyIds);
+        }
+
+        //一次性查询出每个代理的所有域名
+        List<ProxyDomainDO> allDomains = proxyDomainRepository.findByProxyIdIn(proxyIds);
+        Map<String, List<ProxyDomainDO>> domainMap = allDomains.stream()
+                .collect(Collectors.groupingBy(ProxyDomainDO::getProxyId));
+
+        List<String> successDomains = new ArrayList<>();
+        //将每个代理下的所有域名都进行域名部署
+        for (String proxyId : proxyIds) {
+            List<ProxyDomainDO> domains = domainMap.getOrDefault(proxyId, Collections.emptyList());
+
+            CertDeployDO certDeployDO = certDeployRepository.save(new CertDeployDO(certId, proxyId, true));
+            for (ProxyDomainDO proxyDomainDO : domains) {
+                String domain = proxyDomainDO.getFullDomain();
+                certDeployDomainRepository.save(new CertDeployDomainDO(certDeployDO.getId(), domain));
+                try {
+                    sslCertificateManager.deploy(certId, domain, keyFile, certFile);
+                    successDomains.add(domain);
+                } catch (Exception e) {
+                    throw new SystemException("SSL 证书部署失败: " + domain, e);
+                }
+            }
+        }
+
+        SslDeployDTO result = new SslDeployDTO();
+        result.setDomains(successDomains);
+        return result;
     }
 }

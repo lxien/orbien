@@ -20,6 +20,7 @@ package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -38,7 +39,11 @@ public class SslCertController {
     public Ajax saveCert(@RequestBody SslCertSaveParam param) {
         return Ajax.success(sslCertificateService.saveCert(param));
     }
-
+    @PostMapping("save-and-deploy")
+    public Ajax saveAndDeploy(@RequestBody SslCertSaveAndDeployParam param) {
+        sslCertificateService.saveAndDeployCert(param);
+        return Ajax.success();
+    }
     @GetMapping
     public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
         return Ajax.success(sslCertificateService.findByPage(pageQuery));

@@ -20,6 +20,7 @@ package com.xiaoniucode.etp.server.web.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 代理证书部署关联的域名，一个代理隧道可能有多个域名
@@ -27,6 +28,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "cert_deploy_domain")
+@NoArgsConstructor
 public class CertDeployDomainDO {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,4 +39,9 @@ public class CertDeployDomainDO {
 
     @Column(name = "domain", nullable = false, unique = true)
     private String domain;
+
+    public CertDeployDomainDO(Long deployId, String domain) {
+        this.deployId = deployId;
+        this.domain = domain;
+    }
 }

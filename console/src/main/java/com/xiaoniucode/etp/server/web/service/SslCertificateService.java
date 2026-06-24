@@ -22,6 +22,7 @@ import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -44,4 +45,6 @@ public interface SslCertificateService {
      * @param response HTTP响应
      */
     void downloadCert(String certId, HttpServletResponse response);
+
+    void saveAndDeployCert(SslCertSaveAndDeployParam param);
 }

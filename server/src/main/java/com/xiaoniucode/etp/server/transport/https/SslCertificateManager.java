@@ -50,7 +50,7 @@ public class SslCertificateManager {
             .expireAfterAccess(1, TimeUnit.HOURS)
             .build();
     private final Set<String/*domain*/> deployedDomains = ConcurrentHashMap.newKeySet();
-    private final Map<String/*domain*/, Long/*certId*/> activeCert = new ConcurrentHashMap<>();
+    private final Map<String/*domain*/, String/*certId*/> activeCert = new ConcurrentHashMap<>();
     private volatile SslContext defaultSslContext;
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
@@ -80,11 +80,11 @@ public class SslCertificateManager {
      * 部署证书到域名
      *
      * @param domain   具体域名
-     * @param certFile 证书
      * @param keyFile  私钥
+     * @param certFile 证书
      * @throws Exception
      */
-    public void deploy(Long certId, String domain, File certFile, File keyFile) throws Exception {
+    public void deploy(String certId, String domain, File keyFile, File certFile) throws Exception {
         rwLock.writeLock().lock();
         try {
             SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
@@ -141,11 +141,11 @@ public class SslCertificateManager {
 
     private SslContext loadFromFileSystem(String domain) {
         try {
-            Long certId = activeCert.get(domain);
+            String certId = activeCert.get(domain);
             if (certId == null) {
                 return null;
             }
-            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, String.valueOf(certId));
+            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, certId);
             File certFile = new File(domainDir, "fullchain.pem");
             File keyFile = new File(domainDir, "privkey.pem");
 
