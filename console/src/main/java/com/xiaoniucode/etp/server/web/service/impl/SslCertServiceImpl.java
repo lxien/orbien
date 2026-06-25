@@ -28,11 +28,15 @@ import com.xiaoniucode.etp.server.web.common.utils.DateUtil;
 import com.xiaoniucode.etp.server.web.common.utils.SslParser;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
+import com.xiaoniucode.etp.server.web.entity.CertDeployDO;
 import com.xiaoniucode.etp.server.web.entity.SslCertDO;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.repository.CertDeployRepository;
 import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
+import com.xiaoniucode.etp.server.web.service.CertDeployService;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
 import com.xiaoniucode.etp.server.web.service.converter.SslCertConvert;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,11 +64,14 @@ public class SslCertServiceImpl implements SslCertificateService {
     @Autowired
     private SslCertRepository sslCertRepository;
     @Autowired
-    private CertDeployRepository certificateDeploymentRepository;
+    private CertDeployRepository certDeployRepository;
     @Autowired
     private SslCertConvert sslCertConvert;
     @Autowired
     private UidGenerator uidGenerator;
+    @Autowired
+    private CertDeployService certDeployService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SslCertDTO saveCert(SslCertSaveParam param) {
@@ -94,7 +101,7 @@ public class SslCertServiceImpl implements SslCertificateService {
         sslCertDO.setStatus(status);
 
         String rootPath = SystemConstants.DEFAULT_DOMAIN_SSL_PATH;
-        
+
         File rootDir = new File(rootPath);
         if (!rootDir.exists() && !rootDir.mkdirs()) {
             throw new SystemException("无法创建证书目录");
@@ -161,6 +168,7 @@ public class SslCertServiceImpl implements SslCertificateService {
             throw new SystemException("读取证书文件失败");
         }
     }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(List<String> ids) {
@@ -168,7 +176,7 @@ public class SslCertServiceImpl implements SslCertificateService {
             return;
         }
 
-        if (certificateDeploymentRepository.existsByCertIdIn(ids)) {
+        if (certDeployRepository.existsByCertIdIn(ids)) {
             throw new BizException("证书已被部署使用，无法删除");
         }
 
@@ -224,4 +232,31 @@ public class SslCertServiceImpl implements SslCertificateService {
         }
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveAndDeployCert(SslCertSaveAndDeployParam param) {
+        String proxyId = param.getProxyId();
+        // 解析证书
+        SslParser.SslInfo sslInfo = SslParser.parsePem(param.getFullChain());
+        if (sslInfo.hasError()) {
+            throw new BizException("证书不可用");
+        }
+        String sha256Fingerprint = sslInfo.getSha256Fingerprint();
+        //根据证书指纹查询证书
+        SslCertDO sslCertDO = sslCertRepository.findByFingerprint(sha256Fingerprint);
+        boolean existsCerts = sslCertDO != null;
+        String certId;
+        //如果证书不存在，则创建一个证书
+        if (!existsCerts) {
+            certId = this.saveCert(new SslCertSaveParam(param.getKey(), param.getFullChain())).getId();
+        } else {
+            certId = sslCertDO.getId();
+        }
+        CertDeployDO certDeployDO = certDeployRepository.findByProxyId(proxyId);
+
+        if (certDeployDO != null) {
+            certDeployService.deleteDeploy(certDeployDO.getId());
+        }
+        certDeployService.deploy(new SslCertDeployParam(certId, List.of(proxyId)));
+    }
 }

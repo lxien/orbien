@@ -30,6 +30,8 @@ import com.xiaoniucode.etp.server.web.service.CertDeployService;
 import com.xiaoniucode.etp.server.web.service.converter.CertDeployConvert;
 import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +49,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CertDeployServiceImpl implements CertDeployService {
+    private final Logger logger= LoggerFactory.getLogger(CertDeployServiceImpl.class);
     private final CertDeployRepository certDeployRepository;
     @Autowired
     private SslCertificateManager sslCertificateManager;

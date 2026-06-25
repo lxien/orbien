@@ -27,4 +27,5 @@ public interface SslCertRepository extends JpaRepository<SslCertDO, String> {
 
     boolean existsByFingerprint(String fingerprint);
 
+    SslCertDO findByFingerprint(String sha256Fingerprint);
 }

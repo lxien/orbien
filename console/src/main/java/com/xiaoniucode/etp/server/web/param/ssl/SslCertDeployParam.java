@@ -18,11 +18,15 @@
 package com.xiaoniucode.etp.server.web.param.ssl;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class SslCertDeployParam {
     @NotNull(message = "证书ID不能为空")
     private String certId;

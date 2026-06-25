@@ -40,9 +40,22 @@ export function fetchDeleteCert(ids: string[]) {
  * @returns 证书文件二进制流
  */
 export function fetchDownloadCert(certId: string): Promise<Blob> {
-  return request.get({
-    url: `/api/ssl-cert/download-cert/${certId}`,
-    responseType: 'blob',
-    showErrorMessage: false
-  }).then(res => (res as { data: Blob }).data)
+  return request
+    .get({
+      url: `/api/ssl-cert/download-cert/${certId}`,
+      responseType: 'blob',
+      showErrorMessage: false
+    })
+    .then((res) => (res as { data: Blob }).data)
+}
+
+/**
+ * 保存并部署SSL证书
+ * @param params 证书参数
+ */
+export function fetchSaveAndDeployCert(params: Api.Ssl.CertSaveAndDeployParams) {
+  return request.post({
+    url: '/api/ssl-cert/save-and-deploy',
+    data: params
+  })
 }

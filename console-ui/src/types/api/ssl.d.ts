@@ -13,4 +13,10 @@ declare namespace Api.Ssl {
     key: string
     fullChain: string
   }
+
+  interface CertSaveAndDeployParams {
+    proxyId: string
+    key: string
+    fullChain: string
+  }
 }

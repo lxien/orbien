@@ -66,11 +66,13 @@
             </div>
             <div class="form-actions">
               <ElSpace v-if="sslStatus !== 1">
-                <ElButton type="primary">保存并部署证书</ElButton>
-                <ElButton v-if="sslDeployInfo" @click="handleDownloadCurrentCert">下载证书</ElButton>
+                <ElButton type="primary" @click="handleSaveAndDeploy">保存并部署证书</ElButton>
+                <ElButton v-if="sslDeployInfo" @click="handleDownloadCurrentCert"
+                  >下载证书</ElButton
+                >
               </ElSpace>
               <ElSpace v-else>
-                <ElButton type="primary">保存</ElButton>
+                <ElButton type="primary" @click="handleSaveAndDeploy">保存</ElButton>
                 <ElButton @click="handleDownloadCurrentCert">下载证书</ElButton>
                 <ElButton @click="handleCloseSsl">关闭SSL</ElButton>
               </ElSpace>
@@ -104,9 +106,14 @@
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import DeployDialog from './deploy-dialog.vue'
-  import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert } from '@/api/ssl'
+  import {
+    fetchGetCertListByPage,
+    fetchDownloadCert,
+    fetchDeleteCert,
+    fetchSaveAndDeployCert
+  } from '@/api/ssl'
   import { downloadBlob } from '@/utils/download'
-import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
+  import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
 
   defineOptions({ name: 'SslDialog' })
 
@@ -240,6 +247,23 @@ import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
     deployDialogVisible.value = true
   }
 
+  const handleSaveAndDeploy = async () => {
+    if (!certData.keyContent.trim()) {
+      ElMessage.warning('请输入私钥(KEY)')
+      return
+    }
+    if (!certData.certContent.trim()) {
+      ElMessage.warning('请输入证书(PEM格式)')
+      return
+    }
+    await fetchSaveAndDeployCert({
+      proxyId: props.proxyId,
+      key: certData.keyContent.trim(),
+      fullChain: certData.certContent.trim()
+    })
+    ElMessage.success('证书已保存')
+    await loadSslDeployInfo()
+  }
 
   const handleCertDelete = async (row: Api.Ssl.CertDTO) => {
     try {
