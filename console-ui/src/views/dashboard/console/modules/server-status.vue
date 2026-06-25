@@ -23,7 +23,7 @@
             :data="item.ringData"
             :radius="['75%', '88%']"
             :centerText="item.percentage + '%'"
-            :colors="[item.color, '#E8E8E8']"
+            :colors="getRingColors(item.color)"
             :showTooltip="false"
             :showLabel="false"
             :borderRadius="0"
@@ -33,14 +33,14 @@
         </div>
 
         <div class="absolute left-5 bottom-5">
-          <div class="text-sm mb-1" style="color: #303133; font-weight: 900">{{ item.label }}</div>
-          <div class="font-bold mb-1" style="font-size: 17px">
-            <span :style="{ color: item.label === 'CPU' ? '#303133' : item.color }">{{
+          <div class="text-sm mb-1 status-label">{{ item.label }}</div>
+          <div class="font-bold mb-1 status-value">
+            <span :class="{ 'value-primary': item.label === 'CPU' }" :style="item.label === 'CPU' ? {} : { color: item.color }">{{
               item.usedValue || item.value
             }}</span>
-            <span v-if="item.totalValue" style="color: #303133"> / {{ item.totalValue }}</span>
+            <span v-if="item.totalValue" class="status-total"> / {{ item.totalValue }}</span>
           </div>
-          <div class="text-xs text-g-500">{{ item.desc }}</div>
+          <div class="text-xs status-desc">{{ item.desc }}</div>
         </div>
       </div>
     </ElCol>
@@ -52,9 +52,11 @@
   import { ElRow, ElCol } from 'element-plus'
   import ArtRingChart from '@/components/core/charts/art-ring-chart/index.vue'
   import { fetchGetServerInfo } from '@/api/monitor'
+  import { useSettingStore } from '@/store/modules/setting'
 
   defineOptions({ name: 'ServerStatusCards' })
 
+  const settingStore = useSettingStore()
   const serverInfo = ref<Api.Monitor.ServerInfo | null>(null)
 
   const statusData = computed(() => {
@@ -172,6 +174,11 @@
     ]
   })
 
+  const getRingColors = (activeColor: string) => {
+    const bgColor = settingStore.isDark ? '#2a2a35' : '#E8E8E8'
+    return [activeColor, bgColor]
+  }
+
   const getData = async () => {
     serverInfo.value = (await fetchGetServerInfo()) as Api.Monitor.ServerInfo
   }
@@ -191,5 +198,30 @@
     border-radius: 12px;
     background: var(--el-bg-color);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  html.dark .art-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .status-label {
+    color: var(--el-text-color-primary);
+    font-weight: 700;
+  }
+
+  .status-value {
+    font-size: 17px;
+  }
+
+  .value-primary {
+    color: var(--el-text-color-primary);
+  }
+
+  .status-total {
+    color: var(--el-text-color-primary);
+  }
+
+  .status-desc {
+    color: var(--el-text-color-secondary);
   }
 </style>

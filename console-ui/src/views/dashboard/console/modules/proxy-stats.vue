@@ -24,15 +24,15 @@
 
   const proxyData = ref([
     {
-      name: 'HTTP 代理',
+      name: 'HTTP',
       value: 0
     },
     {
-      name: 'HTTPS 代理',
+      name: 'HTTPS',
       value: 0
     },
     {
-      name: 'TCP 代理',
+      name: 'TCP',
       value: 0
     }
   ])
@@ -45,15 +45,15 @@
     if (data) {
       proxyData.value = [
         {
-          name: 'HTTP 代理',
+          name: 'HTTP',
           value: data.httpCount
         },
         {
-          name: 'HTTPS 代理',
+          name: 'HTTPS',
           value: data.httpsCount
         },
         {
-          name: 'TCP 代理',
+          name: 'TCP',
           value: data.tcpCount
         }
       ]

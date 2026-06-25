@@ -1,5 +1,5 @@
 <template>
-  <ElDialog v-model="dialogVisible" title="流量统计" width="1200px" height="800px" align-center>
+  <ElDialog v-model="dialogVisible" title="流量统计" width="1050px" align-center>
     <div v-if="loading" class="my-5">
       <ElSkeleton :rows="10" animated />
     </div>
@@ -13,7 +13,7 @@
           刷新
         </ElButton>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-5">
         <ArtStatsCard
           title="连接数"
           :count="ByteUtils.formatNumber(metricsData.activeChannels || 0)"
@@ -50,8 +50,8 @@
           iconStyle="bg-indigo-500"
         />
       </div>
-      <div class="pt-4">
-        <div class="art-card-sm p-4 mb-5">
+      <div class="pt-1">
+        <div class="art-card-sm p-4 mb-6">
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium m-0 text-g-900">流量趋势</h3>
             <div v-if="showTimeRange" class="flex items-center gap-2">
@@ -91,7 +91,7 @@
             :tooltipFormatter="tooltipFormatter"
           />
         </div>
-        <div class="flex gap-5 mb-5">
+        <div class="flex gap-5">
           <div class="art-card-sm p-4 flex-1">
             <h3 class="text-lg font-medium m-0 mb-4 text-g-900">流量对比</h3>
             <ArtRingChart
