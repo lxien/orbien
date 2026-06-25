@@ -12,4 +12,13 @@ export namespace Api.Deploy {
     fullChainPem: string
     enabled: boolean
   }
+
+  export interface SslDeployDTO {
+    domains: string[]
+  }
+
+  export interface SslDeployParams {
+    certId: string
+    proxyIds: string[]
+  }
 }

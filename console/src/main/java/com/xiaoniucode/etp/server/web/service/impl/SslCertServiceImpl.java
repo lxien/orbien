@@ -39,6 +39,8 @@ import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
 import com.xiaoniucode.etp.server.web.service.CertDeployService;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
 import com.xiaoniucode.etp.server.web.service.converter.SslCertConvert;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,7 +73,8 @@ public class SslCertServiceImpl implements SslCertificateService {
     private UidGenerator uidGenerator;
     @Autowired
     private CertDeployService certDeployService;
-
+    @PersistenceContext
+    private EntityManager entityManager;
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SslCertDTO saveCert(SslCertSaveParam param) {
@@ -256,7 +259,9 @@ public class SslCertServiceImpl implements SslCertificateService {
 
         if (certDeployDO != null) {
             certDeployService.deleteDeploy(certDeployDO.getId());
+            entityManager.flush();
+            entityManager.clear();
         }
-        certDeployService.deploy(new SslCertDeployParam(certId, List.of(proxyId)));
+        certDeployService.deployAndOverride(new SslCertDeployParam(certId, List.of(proxyId)));
     }
 }

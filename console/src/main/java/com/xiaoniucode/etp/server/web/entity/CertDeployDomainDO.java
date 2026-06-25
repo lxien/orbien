@@ -37,7 +37,7 @@ public class CertDeployDomainDO {
     @Column(name = "deploy_id", nullable = false)
     private Long deployId;
 
-    @Column(name = "domain", nullable = false, unique = true)
+    @Column(name = "domain", nullable = false)
     private String domain;
 
     public CertDeployDomainDO(Long deployId, String domain) {

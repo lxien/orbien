@@ -95,7 +95,6 @@
         </ElTabPane>
       </ElTabs>
     </div>
-    <DeployDialog v-model:visible="deployDialogVisible" />
   </ElDialog>
 </template>
 
@@ -105,7 +104,6 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
-  import DeployDialog from './deploy-dialog.vue'
   import {
     fetchGetCertListByPage,
     fetchDownloadCert,
@@ -113,7 +111,7 @@
     fetchSaveAndDeployCert
   } from '@/api/ssl'
   import { downloadBlob } from '@/utils/download'
-  import { fetchGetSslDeployInfo, fetchCloseSsl } from '@/api/deploy'
+  import { fetchGetSslDeployInfo, fetchCloseSsl, fetchDeployCert } from '@/api/deploy'
 
   defineOptions({ name: 'SslDialog' })
 
@@ -132,7 +130,6 @@
     keyContent: '',
     certContent: ''
   })
-  const deployDialogVisible = ref(false)
   const sslDeployInfo = ref<Api.Deploy.SslDeployInfoDTO | null>(null)
 
   const formatDate = (dateStr: string) => {
@@ -243,8 +240,26 @@
     emit('close')
   }
 
-  const handleCertDeploy = (row: Api.Ssl.CertDTO) => {
-    deployDialogVisible.value = true
+  const handleCertDeploy = async (row: Api.Ssl.CertDTO) => {
+    try {
+      const message = sslStatus.value === 1 ? '部署将覆盖原有证书，是否继续？' : '确定部署该证书？'
+      await ElMessageBox.confirm(message, '部署证书', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      await fetchDeployCert({
+        certId: String(row.id),
+        proxyIds: [props.proxyId]
+      })
+      ElMessage.success('证书部署成功')
+      await loadSslDeployInfo()
+      activeName.value = 'current-cert'
+    } catch (error) {
+      if (error === 'cancel') {
+        return
+      }
+    }
   }
 
   const handleSaveAndDeploy = async () => {
@@ -255,6 +270,13 @@
     if (!certData.certContent.trim()) {
       ElMessage.warning('请输入证书(PEM格式)')
       return
+    }
+    if (sslStatus.value === 1) {
+      await ElMessageBox.confirm('保存将覆盖原有证书，是否继续？', '保存证书', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
     }
     await fetchSaveAndDeployCert({
       proxyId: props.proxyId,
@@ -267,7 +289,7 @@
 
   const handleCertDelete = async (row: Api.Ssl.CertDTO) => {
     try {
-      await ElMessageBox.confirm('确定要删除该证书吗？', '警告', {
+      await ElMessageBox.confirm('确定要删除该证书？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -283,7 +305,7 @@
 
   const handleCloseSsl = async () => {
     try {
-      await ElMessageBox.confirm('确定要关闭SSL证书吗？', '警告', {
+      await ElMessageBox.confirm('确定要关闭SSL？', '警告', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

@@ -31,7 +31,11 @@
     </ElCard>
 
     <SslDialog v-model:visible="dialogVisible" @submit="handleUploadSubmit" />
-    <DeployDialog v-model:visible="deployDialogVisible" @submit="handleDeploySubmit" />
+    <DeployDialog
+      v-model:visible="deployDialogVisible"
+      :cert-id="currentCertId"
+      @submit="handleDeploySubmit"
+    />
   </div>
 </template>
 
@@ -52,6 +56,7 @@
   const selectedRows = ref<SslItem[]>([])
   const dialogVisible = ref(false)
   const deployDialogVisible = ref(false)
+  const currentCertId = ref<number | null>(null)
 
   const getExpireDays = (item: SslItem) => {
     const now = new Date()
@@ -169,7 +174,7 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      const ids = selectedRows.value.map(row => row.id!)
+      const ids = selectedRows.value.map((row) => row.id!)
       await fetchDeleteCert(ids)
       ElMessage.success('删除成功')
       refreshData()
@@ -181,6 +186,7 @@
   }
 
   const handleDeploy = (row: SslItem) => {
+    currentCertId.value = row.id || null
     deployDialogVisible.value = true
   }
 

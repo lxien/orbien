@@ -38,3 +38,15 @@ export function fetchCloseSsl(proxyId: string) {
     url: `/api/cert-deploy/close-ssl/${proxyId}`
   })
 }
+
+/**
+ * 部署SSL证书到代理
+ * @param params 部署参数（证书ID、代理ID列表）
+ * @returns 部署结果
+ */
+export function fetchDeployCert(params: Api.Deploy.SslDeployParams) {
+  return request.post<Api.Deploy.SslDeployDTO>({
+    url: '/api/cert-deploy/deploy',
+    data: params
+  })
+}

@@ -22,13 +22,22 @@ import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployDTO;
 import com.xiaoniucode.etp.server.web.dto.deploy.SslDeployInfoDTO;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
 
+import java.util.List;
+
 public interface CertDeployService {
     void closeSsl(String proxyId);
 
     void deleteDeploy(Long deployId);
+    void batchDeleteDeploy(List<Long> deployId);
 
     SslDeployInfoDTO getSslDeployInfo(String proxyId);
 
-    SslDeployDTO deploy(SslCertDeployParam param);
+    /**
+     * 部署并覆盖，如果已经部署过则覆盖当前部署
+     *
+     * @param param 部署信息
+     * @return 部署结果
+     */
+    SslDeployDTO deployAndOverride(SslCertDeployParam param);
 
 }

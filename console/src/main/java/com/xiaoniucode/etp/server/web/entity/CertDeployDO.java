@@ -45,7 +45,7 @@ public class CertDeployDO {
     /**
      * 关联的代理ID
      */
-    @Column(name = "proxy_id", nullable = false)
+    @Column(name = "proxy_id", nullable = false,unique = true)
     private String proxyId;
     /**
      * 是否启用

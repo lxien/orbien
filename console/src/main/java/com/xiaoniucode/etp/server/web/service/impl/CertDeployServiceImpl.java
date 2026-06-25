@@ -35,6 +35,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,7 +53,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CertDeployServiceImpl implements CertDeployService {
-    private final Logger logger= LoggerFactory.getLogger(CertDeployServiceImpl.class);
+    private final Logger logger = LoggerFactory.getLogger(CertDeployServiceImpl.class);
     private final CertDeployRepository certDeployRepository;
     @Autowired
     private SslCertificateManager sslCertificateManager;
@@ -65,6 +69,8 @@ public class CertDeployServiceImpl implements CertDeployService {
     private ProxyRepository proxyRepository;
     @Autowired
     private ProxyDomainRepository proxyDomainRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -83,10 +89,21 @@ public class CertDeployServiceImpl implements CertDeployService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteDeploy(Long deployId) {
-        certDeployRepository.deleteById(deployId);
-        certDeployDomainRepository.deleteByDeployId(deployId);
         certDeployDomainRepository.findByDeployId(deployId).forEach(domain ->
                 sslCertificateManager.cancelDeploy(domain.getDomain()));
+        certDeployRepository.deleteById(deployId);
+        certDeployDomainRepository.deleteByDeployId(deployId);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void batchDeleteDeploy(List<Long> deployIds) {
+        certDeployDomainRepository.findByDeployIdIn(deployIds).forEach(domain ->
+                sslCertificateManager.cancelDeploy(domain.getDomain()));
+
+        certDeployDomainRepository.deleteByDeployIdIn(deployIds);
+        certDeployRepository.deleteAllById(deployIds);
     }
 
     @Override
@@ -121,7 +138,7 @@ public class CertDeployServiceImpl implements CertDeployService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SslDeployDTO deploy(SslCertDeployParam param) {
+    public SslDeployDTO deployAndOverride(SslCertDeployParam param) {
         String certId = param.getCertId();
         List<String> proxyIds = param.getProxyIds();
 
@@ -152,6 +169,14 @@ public class CertDeployServiceImpl implements CertDeployService {
         List<ProxyDomainDO> allDomains = proxyDomainRepository.findByProxyIdIn(proxyIds);
         Map<String, List<ProxyDomainDO>> domainMap = allDomains.stream()
                 .collect(Collectors.groupingBy(ProxyDomainDO::getProxyId));
+
+        List<CertDeployDO> existingDeployments = certDeployRepository.findByProxyIdIn(proxyIds);
+        if (!CollectionUtils.isEmpty(existingDeployments)) {
+            List<Long> deployIds = existingDeployments.stream().map(CertDeployDO::getId).toList();
+            this.batchDeleteDeploy(deployIds);
+            entityManager.flush();
+            entityManager.clear();
+        }
 
         List<String> successDomains = new ArrayList<>();
         //将每个代理下的所有域名都进行域名部署

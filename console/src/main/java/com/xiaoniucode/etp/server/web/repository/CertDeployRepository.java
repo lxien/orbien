@@ -33,4 +33,5 @@ public interface CertDeployRepository extends JpaRepository<CertDeployDO, Long> 
 
     CertDeployDO findByProxyId(String proxyId);
 
+    List<CertDeployDO> findByProxyIdIn(List<String> proxyIds);
 }

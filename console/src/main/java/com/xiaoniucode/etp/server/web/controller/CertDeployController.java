@@ -35,7 +35,7 @@ public class CertDeployController {
 
     @PostMapping("deploy")
     public Ajax deploy(@RequestBody SslCertDeployParam param) {
-        SslDeployDTO sslDeployDTO = certificateDeploymentService.deploy(param);
+        SslDeployDTO sslDeployDTO = certificateDeploymentService.deployAndOverride(param);
         return Ajax.success(sslDeployDTO);
     }
 

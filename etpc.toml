@@ -172,7 +172,7 @@ strategy = "weight"
 
 [log]
 level = "info"
-path = "/Users/xiaoniucode/Desktop/workspace/etp/log/log"
+path = "/Users/xiaoniucode/Desktop/workspace/etp/logs"
 name = "etpc.log"
 archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
