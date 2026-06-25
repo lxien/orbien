@@ -18,9 +18,7 @@
     <template #footer>
       <div class="dialog-footer">
         <ElButton @click="handleCancel">取消</ElButton>
-        <ElButton type="primary" @click="handleSubmit" :disabled="!selectedRow">
-          部署
-        </ElButton>
+        <ElButton type="primary" @click="handleSubmit" :disabled="!selectedRow"> 部署 </ElButton>
       </div>
     </template>
   </ElDialog>
@@ -38,7 +36,7 @@
 
   interface Props {
     visible: boolean
-    certId: number | null
+    certId: string | null
   }
 
   interface Emits {
@@ -143,14 +141,14 @@
       return
     }
 
-    await ElMessageBox.confirm('确认部署该证书？', '部署确认', {
+    await ElMessageBox.confirm('确认部署证书到该隧道？', '部署确认', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning'
     })
 
-    const result = await fetchDeployCert({
-      certId: String(props.certId),
+    await fetchDeployCert({
+      certId: props.certId!,
       proxyIds: [selectedRow.value.id]
     })
 
@@ -160,5 +158,4 @@
   }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

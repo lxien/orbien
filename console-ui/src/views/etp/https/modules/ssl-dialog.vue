@@ -113,6 +113,8 @@
   import { downloadBlob } from '@/utils/download'
   import { fetchGetSslDeployInfo, fetchCloseSsl, fetchDeployCert } from '@/api/deploy'
 
+  type SslDeployInfoDTO = Awaited<ReturnType<typeof fetchGetSslDeployInfo>>
+
   defineOptions({ name: 'SslDialog' })
 
   const props = defineProps({
@@ -130,7 +132,7 @@
     keyContent: '',
     certContent: ''
   })
-  const sslDeployInfo = ref<Api.Deploy.SslDeployInfoDTO | null>(null)
+  const sslDeployInfo = ref<SslDeployInfoDTO | null>(null)
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -224,7 +226,7 @@
         certData.keyContent = ''
         certData.certContent = ''
       }
-    } catch (error) {
+    } catch {
       sslDeployInfo.value = null
       sslStatus.value = 0
       certData.keyContent = ''
@@ -249,7 +251,7 @@
         type: 'warning'
       })
       await fetchDeployCert({
-        certId: String(row.id),
+        certId: row.id,
         proxyIds: [props.proxyId]
       })
       ElMessage.success('证书部署成功')
@@ -294,7 +296,7 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await fetchDeleteCert([row.id!])
+      await fetchDeleteCert([row.id])
       ElMessage.success('删除成功')
     } catch (error) {
       if (error === 'cancel') {

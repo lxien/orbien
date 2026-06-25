@@ -1,6 +1,6 @@
 declare namespace Api.Ssl {
   interface CertDTO {
-    id: number
+    id: string
     issuer: string
     org: string
     sanDomains: string[]

@@ -1,7 +1,7 @@
 import request from '@/utils/http'
 
 /**
- * 获取SSL证书列表（分页）
+ * 获取SSL证书列表
  * @param params 分页参数
  * @returns 证书分页列表
  */
@@ -14,7 +14,7 @@ export function fetchGetCertListByPage(params: Api.Common.CommonSearchParams) {
 
 /**
  * 上传SSL证书
- * @param params 证书参数（密钥和完整证书链）
+ * @param params 证书参数
  * @returns 证书DTO
  */
 export function fetchSaveCert(params: Api.Ssl.CertSaveParams) {
@@ -24,7 +24,7 @@ export function fetchSaveCert(params: Api.Ssl.CertSaveParams) {
   })
 }
 /**
- * 删除SSL证书（支持批量）
+ * 删除SSL证书
  * @param ids 证书ID列表
  */
 export function fetchDeleteCert(ids: string[]) {

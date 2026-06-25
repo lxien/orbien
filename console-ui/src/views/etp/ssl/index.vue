@@ -56,7 +56,7 @@
   const selectedRows = ref<SslItem[]>([])
   const dialogVisible = ref(false)
   const deployDialogVisible = ref(false)
-  const currentCertId = ref<number | null>(null)
+  const currentCertId = ref<string | null>(null)
 
   const getExpireDays = (item: SslItem) => {
     const now = new Date()
@@ -174,7 +174,7 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      const ids = selectedRows.value.map((row) => row.id!)
+      const ids = selectedRows.value.map((row) => row.id)
       await fetchDeleteCert(ids)
       ElMessage.success('删除成功')
       refreshData()
@@ -192,7 +192,7 @@
 
   const handleDownload = async (row: SslItem) => {
     try {
-      const blob = await fetchDownloadCert(row.id!)
+      const blob = await fetchDownloadCert(row.id)
       const fileName = `${row.sanDomains?.join('_') || 'cert'}.zip`
       downloadBlob(blob, fileName)
     } catch (error: any) {
@@ -208,7 +208,7 @@
         cancelButtonText: '取消',
         type: 'warning'
       })
-      await fetchDeleteCert([row.id!])
+      await fetchDeleteCert([row.id])
       ElMessage.success('删除成功')
       refreshData()
     } catch (error) {

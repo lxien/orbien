@@ -1,7 +1,7 @@
-export namespace Api.Deploy {
-  export interface SslDeployInfoDTO {
+declare namespace Api.Deploy {
+  interface SslDeployInfoDTO {
     deployId: number
-    certId: number
+    certId: string
     proxyId: string
     issuer: string
     org: string
@@ -13,11 +13,11 @@ export namespace Api.Deploy {
     enabled: boolean
   }
 
-  export interface SslDeployDTO {
+  interface SslDeployDTO {
     domains: string[]
   }
 
-  export interface SslDeployParams {
+  interface SslDeployParams {
     certId: string
     proxyIds: string[]
   }
