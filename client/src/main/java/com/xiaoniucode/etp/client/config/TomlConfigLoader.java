@@ -14,6 +14,7 @@ import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.enums.ProxyStatus;
 import lombok.Getter;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -146,57 +147,65 @@ public class TomlConfigLoader implements ConfigSource {
 
                 String name = proxyTable.getString("name");
                 String protocol = proxyTable.getString("protocol");
-                String localIp = proxyTable.getString("localIp", "127.0.0.1");
-                Long localPortValue = proxyTable.getLong("localPort");
                 Long remotePortValue = proxyTable.getLong("remote_port");
-
                 Boolean enableV = proxyTable.getBoolean("enabled", true);
+                Boolean forceHttpsV = proxyTable.getBoolean("force_Https", false);
 
-                if (StringUtils.hasText(name)) {
-                    proxyConfig.setName(name.trim());
+                if (!StringUtils.hasText(name)) {
+                    throw new IllegalArgumentException("代理名称不能为空");
                 }
-                if (StringUtils.hasText(protocol)) {
-                    ProtocolType protocolType = ProtocolType.getByName(protocol.trim());
-                    if (protocolType == null) {
-                        throw new IllegalArgumentException("无效的协议类型: " + protocol);
-                    }
-                    proxyConfig.setProtocol(protocolType);
+                if (!StringUtils.hasText(protocol)) {
+                    throw new IllegalArgumentException("协议类型不能为空");
                 }
-                List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
-                        .map(item -> {
-                            Map map = (Map) item;
-                            String host = (String) map.getOrDefault("host", "127.0.0.1");
-                            Long port = (Long) map.getOrDefault("port", -1);
-                            Long weight = (Long) map.getOrDefault("weight", 1);
-                            Object nameV = map.get("name");
-                            return new Target(host, port.intValue(), weight.intValue(), nameV != null ? (String) nameV : null);
-                        }).collect(Collectors.toList());
-                if (localPortValue != null) {
-                    int localPort = localPortValue.intValue();
-                    validatePort(localPortValue.intValue());
-                    targets.add(new Target(localIp, localPort));
+                ProtocolType protocolType = ProtocolType.getByName(protocol.trim());
+                if (protocolType == null) {
+                    throw new IllegalArgumentException("无效的协议类型: " + protocol);
                 }
-                proxyConfig.addTargets(targets);
+
+                proxyConfig.setName(name.trim());
+                proxyConfig.setProtocol(protocolType);
+                proxyConfig.setForceHttps(forceHttpsV);
+                proxyConfig.setStatus(enableV ? ProxyStatus.OPEN : ProxyStatus.CLOSED);
                 if (remotePortValue != null) {
                     validatePort(remotePortValue.intValue());
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
-                if (proxyConfig.isHttp()) {
+
+                //解析目标服务
+                List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
+                        .map(item -> {
+                            Map<String, Object> map = (Map) item;
+                            String host = (String) map.getOrDefault("host", "127.0.0.1");
+                            Long port = (Long) map.get("port");
+                            Long weight = (Long) map.getOrDefault("weight", 1L);
+                            Object nameV = map.get("name");
+                            if (port == null) {
+                                throw new IllegalArgumentException("目标端口不能为空");
+                            }
+                            return new Target(host, port.intValue(), weight.intValue(), nameV != null ? String.valueOf(nameV) : null);
+                        }).collect(Collectors.toList());
+                if (targets.isEmpty()) {
+                    throw new IllegalArgumentException("至少配置一个目标内网服务");
+                }
+                proxyConfig.addTargets(targets);
+
+                //解析HTTP(S)协议域名配置
+                if (proxyConfig.isHttpOrHttps()) {
                     Boolean autoDomain = proxyTable.getBoolean("auto_domain", true);
                     List<String> customDomains = proxyTable.getList("custom_domains");
                     List<String> subDomains = proxyTable.getList("sub_domains");
+
                     RouteConfig routeConfig = new RouteConfig();
-                    if (autoDomain != null) {
-                        routeConfig.setAutoDomain(autoDomain);
-                    }
-                    if (customDomains != null && !customDomains.isEmpty()) {
+                    routeConfig.setAutoDomain(autoDomain);
+
+                    if (customDomains != null) {
                         for (String domain : customDomains) {
                             if (StringUtils.hasText(domain)) {
                                 routeConfig.getCustomDomains().add(domain.trim());
                             }
                         }
                     }
-                    if (subDomains != null && !subDomains.isEmpty()) {
+                    if (subDomains != null) {
                         for (String domain : subDomains) {
                             if (StringUtils.hasText(domain)) {
                                 routeConfig.getSubDomains().add(domain.trim());
@@ -206,9 +215,7 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setRouteConfig(routeConfig);
                 }
 
-                if (enableV != null) {
-                    proxyConfig.setStatus(enableV? ProxyStatus.OPEN : ProxyStatus.CLOSED);
-                }
+
                 //访问控制
                 Toml accessControl = proxyTable.getTable("access_control");
                 if (accessControl != null) {
@@ -227,8 +234,8 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 proxies.add(proxyConfig);
-                //HTTP BASIC AUTH 只有HTTP协议才解析
-                if (ProtocolType.isHttp(protocol)) {
+                //HTTP(S) BASIC AUTH
+                if (ProtocolType.isHttpOrHttps(protocol)) {
                     Toml basicAuth = proxyTable.getTable("basic_auth");
                     if (basicAuth != null) {
                         Boolean enabled = basicAuth.getBoolean("enabled", false);
@@ -247,6 +254,28 @@ public class TomlConfigLoader implements ConfigSource {
                         proxyConfig.setBasicAuth(basicAuthConfig);
                     }
                 }
+                //HTTPS SSL证书
+                if (protocolType.isHttps()) {
+                    Toml ssl = proxyTable.getTable("ssl");
+                    if (ssl != null) {
+                        String keyFile = ssl.getString("key_file");
+                        String certFile = ssl.getString("cert_file");
+                        if (!StringUtils.hasText(keyFile)) {
+                            throw new IllegalArgumentException("请配置私钥路径：" + keyFile);
+                        }
+                        if (!StringUtils.hasText(certFile)) {
+                            throw new IllegalArgumentException("请配置证书路径：" + certFile);
+                        }
+                        if (!new File(keyFile).exists()) {
+                            throw new IllegalArgumentException("私钥不存在，请检查私钥路径");
+                        }
+                        if (!new File(certFile).exists()) {
+                            throw new IllegalArgumentException("证书不存在，请检查证书路径");
+                        }
+                        proxyConfig.setSslConfig(new SslConfig(keyFile, certFile));
+                    }
+                }
+
                 //带宽限制
                 Toml bandwidth = proxyTable.getTable("bandwidth");
                 if (bandwidth != null) {
@@ -270,13 +299,11 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setLoadBalance(loadBalanceConfig);
                 }
 
-                //传输
+                //自定义传输配置
                 Toml transport = proxyTable.getTable("transport");
                 TransportCustomConfig transportCustomConfig = new TransportCustomConfig();
-
-                if (globalTransportConfig != null) {
-                    transportCustomConfig.setMultiplex(globalTransportConfig.getMultiplexConfig().isEnabled());
-                }
+                //默认使用全局配置
+                transportCustomConfig.setMultiplex(globalTransportConfig.getMultiplexConfig().isEnabled());
                 if (transport != null) {
                     Boolean multiplex = transport.getBoolean("multiplex");
                     Boolean compress = transport.getBoolean("compress", true);
@@ -293,7 +320,7 @@ public class TomlConfigLoader implements ConfigSource {
             builder.addProxies(proxies);
         }
 
-        // 读取日志配置
+        //解析日志配置
         Toml logTable = root.getTable("log");
         LogConfig logConfig = new LogConfig();
         if (logTable != null) {

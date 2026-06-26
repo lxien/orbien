@@ -31,6 +31,20 @@ enabled = true
 cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
 key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
 ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
+
+[[proxies]]
+name = "web1"
+protocol = "https"
+custom_domains = ["a.domain1.com", "b.domain1.com"]
+targets = [
+    {  port = 8084},
+    { host = "127.0.0.1", port = 8084, weight = 1, name = "web-instance-1" }
+]
+force_https = true
+[proxies.ssl]
+cert_file = "cert/domains/xiaoniucode.com/fullchain.pem"
+key_file = "cert/domains/xiaoniucode.com/privkey.pem"
+
 #
 ##################################################代理配置############################################################
 #[[proxies]]
@@ -157,24 +171,24 @@ ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
 #limit_in = "64Kbps"
 #limit_out = "64Kbps"
 
-[[proxies]]
-name = "redis"
-protocol = "tcp"
-
-targets = [
-    { host = "10.1.1.2", port = 6379, weight = 70, name = "redis-1" },
-    { host = "10.1.1.1", port = 6379, weight = 30, name = "redis-2" }
-]
-
-[proxies.loadbalance]
-strategy = "weight"
+#[[proxies]]
+#name = "redis"
+#protocol = "tcp"
+#
+#targets = [
+#    { host = "10.1.1.2", port = 6379, weight = 70, name = "redis-1" },
+#    { host = "10.1.1.1", port = 6379, weight = 30, name = "redis-2" }
+#]
+#
+#[proxies.loadbalance]
+#strategy = "weight"
 
 
 [log]
-level = "info"
+level = "debug"
 path = "/Users/xiaoniucode/Desktop/workspace/etp/logs"
 name = "etpc.log"
 archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-max_history = 30
-total_size_cap = "1GB"
+max_history = 1
+total_size_cap = "1MB"

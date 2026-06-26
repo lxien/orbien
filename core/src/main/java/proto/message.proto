@@ -4,6 +4,7 @@ package com.xiaoniucode.etp.core.message;
 enum ProtocolType {
   TCP = 0;
   HTTP = 1;
+  HTTPS = 2;
 }
 enum AgentType{
   BINARY = 0;
@@ -18,9 +19,6 @@ enum LoadBalanceStrategy {
   WEIGHT = 1;
   RANDOM = 2;
   LEAST_CONN = 3;
-}
-enum TransportProtocolType{
-  T_TCP = 0;
 }
 message AuthInfo {
   string token = 1;
@@ -78,7 +76,7 @@ message Bandwidth {
 }
 
 message Target {
-  string host = 1;
+  optional string host = 1;
   uint32 port = 2;
   optional string name = 4;
   optional int32 weight = 5;
@@ -91,6 +89,10 @@ message DomainInfo{
   optional bool auto_domain = 1;
   repeated string custom_domains = 2;
   repeated string sub_domains = 3;
+}
+message SslInfo{
+  string private_key_pem = 1;
+  string cert_chain_pem = 2;
 }
 message  Transport{
   optional bool mux = 1;
@@ -109,6 +111,8 @@ message NewProxy {
   optional Bandwidth bandwidth = 13;
   optional LoadBalance load_balance = 14;
   optional Transport transport = 15;
+  optional bool forceHttps = 16;
+  optional SslInfo sslInfo = 17;
 }
 message NewProxyResp {
   string proxyId = 1;

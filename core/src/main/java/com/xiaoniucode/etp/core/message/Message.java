@@ -39,6 +39,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>HTTP = 1;</code>
      */
     HTTP(1),
+    /**
+     * <code>HTTPS = 2;</code>
+     */
+    HTTPS(2),
     UNRECOGNIZED(-1),
     ;
 
@@ -59,6 +63,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>HTTP = 1;</code>
      */
     public static final int HTTP_VALUE = 1;
+    /**
+     * <code>HTTPS = 2;</code>
+     */
+    public static final int HTTPS_VALUE = 2;
 
 
     public final int getNumber() {
@@ -87,6 +95,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       switch (value) {
         case 0: return TCP;
         case 1: return HTTP;
+        case 2: return HTTPS;
         default: return null;
       }
     }
@@ -510,114 +519,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.LoadBalanceStrategy)
-  }
-
-  /**
-   * Protobuf enum {@code com.xiaoniucode.etp.core.message.TransportProtocolType}
-   */
-  public enum TransportProtocolType
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>T_TCP = 0;</code>
-     */
-    T_TCP(0),
-    UNRECOGNIZED(-1),
-    ;
-
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 33,
-        /* patch= */ 4,
-        /* suffix= */ "",
-        "TransportProtocolType");
-    }
-    /**
-     * <code>T_TCP = 0;</code>
-     */
-    public static final int T_TCP_VALUE = 0;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @param value The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static TransportProtocolType valueOf(int value) {
-      return forNumber(value);
-    }
-
-    /**
-     * @param value The numeric wire value of the corresponding enum entry.
-     * @return The enum associated with the given numeric wire value.
-     */
-    public static TransportProtocolType forNumber(int value) {
-      switch (value) {
-        case 0: return T_TCP;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<TransportProtocolType>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        TransportProtocolType> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<TransportProtocolType>() {
-            public TransportProtocolType findValueByNumber(int number) {
-              return TransportProtocolType.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalStateException(
-            "Can't get the descriptor of an unrecognized enum value.");
-      }
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.getDescriptor().getEnumTypes().get(4);
-    }
-
-    private static final TransportProtocolType[] VALUES = values();
-
-    public static TransportProtocolType valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private TransportProtocolType(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.TransportProtocolType)
   }
 
   public interface AuthInfoOrBuilder extends
@@ -8597,12 +8498,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string host = 1;</code>
+     * <code>optional string host = 1;</code>
+     * @return Whether the host field is set.
+     */
+    boolean hasHost();
+    /**
+     * <code>optional string host = 1;</code>
      * @return The host.
      */
     java.lang.String getHost();
     /**
-     * <code>string host = 1;</code>
+     * <code>optional string host = 1;</code>
      * @return The bytes for host.
      */
     com.google.protobuf.ByteString
@@ -8686,7 +8592,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @SuppressWarnings("serial")
     private volatile java.lang.Object host_ = "";
     /**
-     * <code>string host = 1;</code>
+     * <code>optional string host = 1;</code>
+     * @return Whether the host field is set.
+     */
+    @java.lang.Override
+    public boolean hasHost() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional string host = 1;</code>
      * @return The host.
      */
     @java.lang.Override
@@ -8703,7 +8617,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>string host = 1;</code>
+     * <code>optional string host = 1;</code>
      * @return The bytes for host.
      */
     @java.lang.Override
@@ -8741,7 +8655,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasName() {
-      return ((bitField0_ & 0x00000001) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>optional string name = 4;</code>
@@ -8787,7 +8701,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasWeight() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
      * <code>optional int32 weight = 5;</code>
@@ -8812,16 +8726,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(host_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 1, host_);
       }
       if (port_ != 0) {
         output.writeUInt32(2, port_);
       }
-      if (((bitField0_ & 0x00000001) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 4, name_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (((bitField0_ & 0x00000004) != 0)) {
         output.writeInt32(5, weight_);
       }
       getUnknownFields().writeTo(output);
@@ -8833,17 +8747,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(host_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(1, host_);
       }
       if (port_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(2, port_);
       }
-      if (((bitField0_ & 0x00000001) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(4, name_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (((bitField0_ & 0x00000004) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(5, weight_);
       }
@@ -8862,8 +8776,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       com.xiaoniucode.etp.core.message.Message.Target other = (com.xiaoniucode.etp.core.message.Message.Target) obj;
 
-      if (!getHost()
-          .equals(other.getHost())) return false;
+      if (hasHost() != other.hasHost()) return false;
+      if (hasHost()) {
+        if (!getHost()
+            .equals(other.getHost())) return false;
+      }
       if (getPort()
           != other.getPort()) return false;
       if (hasName() != other.hasName()) return false;
@@ -8887,8 +8804,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + HOST_FIELD_NUMBER;
-      hash = (53 * hash) + getHost().hashCode();
+      if (hasHost()) {
+        hash = (37 * hash) + HOST_FIELD_NUMBER;
+        hash = (53 * hash) + getHost().hashCode();
+      }
       hash = (37 * hash) + PORT_FIELD_NUMBER;
       hash = (53 * hash) + getPort();
       if (hasName()) {
@@ -9067,20 +8986,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private void buildPartial0(com.xiaoniucode.etp.core.message.Message.Target result) {
         int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.host_ = host_;
+          to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.port_ = port_;
         }
-        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.name_ = name_;
-          to_bitField0_ |= 0x00000001;
+          to_bitField0_ |= 0x00000002;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.weight_ = weight_;
-          to_bitField0_ |= 0x00000002;
+          to_bitField0_ |= 0x00000004;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -9097,7 +9017,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.Target other) {
         if (other == com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance()) return this;
-        if (!other.getHost().isEmpty()) {
+        if (other.hasHost()) {
           host_ = other.host_;
           bitField0_ |= 0x00000001;
           onChanged();
@@ -9178,7 +9098,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object host_ = "";
       /**
-       * <code>string host = 1;</code>
+       * <code>optional string host = 1;</code>
+       * @return Whether the host field is set.
+       */
+      public boolean hasHost() {
+        return ((bitField0_ & 0x00000001) != 0);
+      }
+      /**
+       * <code>optional string host = 1;</code>
        * @return The host.
        */
       public java.lang.String getHost() {
@@ -9194,7 +9121,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string host = 1;</code>
+       * <code>optional string host = 1;</code>
        * @return The bytes for host.
        */
       public com.google.protobuf.ByteString
@@ -9211,7 +9138,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string host = 1;</code>
+       * <code>optional string host = 1;</code>
        * @param value The host to set.
        * @return This builder for chaining.
        */
@@ -9224,7 +9151,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string host = 1;</code>
+       * <code>optional string host = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearHost() {
@@ -9234,7 +9161,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string host = 1;</code>
+       * <code>optional string host = 1;</code>
        * @param value The bytes for host to set.
        * @return This builder for chaining.
        */
@@ -10836,6 +10763,664 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface SslInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.SslInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string private_key_pem = 1;</code>
+     * @return The privateKeyPem.
+     */
+    java.lang.String getPrivateKeyPem();
+    /**
+     * <code>string private_key_pem = 1;</code>
+     * @return The bytes for privateKeyPem.
+     */
+    com.google.protobuf.ByteString
+        getPrivateKeyPemBytes();
+
+    /**
+     * <code>string cert_chain_pem = 2;</code>
+     * @return The certChainPem.
+     */
+    java.lang.String getCertChainPem();
+    /**
+     * <code>string cert_chain_pem = 2;</code>
+     * @return The bytes for certChainPem.
+     */
+    com.google.protobuf.ByteString
+        getCertChainPemBytes();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.SslInfo}
+   */
+  public static final class SslInfo extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.SslInfo)
+      SslInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "SslInfo");
+    }
+    // Use SslInfo.newBuilder() to construct.
+    private SslInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private SslInfo() {
+      privateKeyPem_ = "";
+      certChainPem_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_SslInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.xiaoniucode.etp.core.message.Message.SslInfo.class, com.xiaoniucode.etp.core.message.Message.SslInfo.Builder.class);
+    }
+
+    public static final int PRIVATE_KEY_PEM_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object privateKeyPem_ = "";
+    /**
+     * <code>string private_key_pem = 1;</code>
+     * @return The privateKeyPem.
+     */
+    @java.lang.Override
+    public java.lang.String getPrivateKeyPem() {
+      java.lang.Object ref = privateKeyPem_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        privateKeyPem_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string private_key_pem = 1;</code>
+     * @return The bytes for privateKeyPem.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPrivateKeyPemBytes() {
+      java.lang.Object ref = privateKeyPem_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        privateKeyPem_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CERT_CHAIN_PEM_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object certChainPem_ = "";
+    /**
+     * <code>string cert_chain_pem = 2;</code>
+     * @return The certChainPem.
+     */
+    @java.lang.Override
+    public java.lang.String getCertChainPem() {
+      java.lang.Object ref = certChainPem_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        certChainPem_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string cert_chain_pem = 2;</code>
+     * @return The bytes for certChainPem.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getCertChainPemBytes() {
+      java.lang.Object ref = certChainPem_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        certChainPem_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(privateKeyPem_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, privateKeyPem_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(certChainPem_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, certChainPem_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(privateKeyPem_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, privateKeyPem_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(certChainPem_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, certChainPem_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.SslInfo)) {
+        return super.equals(obj);
+      }
+      com.xiaoniucode.etp.core.message.Message.SslInfo other = (com.xiaoniucode.etp.core.message.Message.SslInfo) obj;
+
+      if (!getPrivateKeyPem()
+          .equals(other.getPrivateKeyPem())) return false;
+      if (!getCertChainPem()
+          .equals(other.getCertChainPem())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + PRIVATE_KEY_PEM_FIELD_NUMBER;
+      hash = (53 * hash) + getPrivateKeyPem().hashCode();
+      hash = (37 * hash) + CERT_CHAIN_PEM_FIELD_NUMBER;
+      hash = (53 * hash) + getCertChainPem().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.SslInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.SslInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.SslInfo)
+        com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_SslInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.xiaoniucode.etp.core.message.Message.SslInfo.class, com.xiaoniucode.etp.core.message.Message.SslInfo.Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.message.Message.SslInfo.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        privateKeyPem_ = "";
+        certChainPem_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.SslInfo getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.SslInfo build() {
+        com.xiaoniucode.etp.core.message.Message.SslInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.SslInfo buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.SslInfo result = new com.xiaoniucode.etp.core.message.Message.SslInfo(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.SslInfo result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.privateKeyPem_ = privateKeyPem_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.certChainPem_ = certChainPem_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.SslInfo) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.SslInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.SslInfo other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance()) return this;
+        if (!other.getPrivateKeyPem().isEmpty()) {
+          privateKeyPem_ = other.privateKeyPem_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getCertChainPem().isEmpty()) {
+          certChainPem_ = other.certChainPem_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                privateKeyPem_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                certChainPem_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object privateKeyPem_ = "";
+      /**
+       * <code>string private_key_pem = 1;</code>
+       * @return The privateKeyPem.
+       */
+      public java.lang.String getPrivateKeyPem() {
+        java.lang.Object ref = privateKeyPem_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          privateKeyPem_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string private_key_pem = 1;</code>
+       * @return The bytes for privateKeyPem.
+       */
+      public com.google.protobuf.ByteString
+          getPrivateKeyPemBytes() {
+        java.lang.Object ref = privateKeyPem_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          privateKeyPem_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string private_key_pem = 1;</code>
+       * @param value The privateKeyPem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPrivateKeyPem(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        privateKeyPem_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string private_key_pem = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPrivateKeyPem() {
+        privateKeyPem_ = getDefaultInstance().getPrivateKeyPem();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string private_key_pem = 1;</code>
+       * @param value The bytes for privateKeyPem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPrivateKeyPemBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        privateKeyPem_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object certChainPem_ = "";
+      /**
+       * <code>string cert_chain_pem = 2;</code>
+       * @return The certChainPem.
+       */
+      public java.lang.String getCertChainPem() {
+        java.lang.Object ref = certChainPem_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          certChainPem_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string cert_chain_pem = 2;</code>
+       * @return The bytes for certChainPem.
+       */
+      public com.google.protobuf.ByteString
+          getCertChainPemBytes() {
+        java.lang.Object ref = certChainPem_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          certChainPem_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string cert_chain_pem = 2;</code>
+       * @param value The certChainPem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCertChainPem(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        certChainPem_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string cert_chain_pem = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCertChainPem() {
+        certChainPem_ = getDefaultInstance().getCertChainPem();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string cert_chain_pem = 2;</code>
+       * @param value The bytes for certChainPem to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCertChainPemBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        certChainPem_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.SslInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.SslInfo)
+    private static final com.xiaoniucode.etp.core.message.Message.SslInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.SslInfo();
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.SslInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<SslInfo>
+        PARSER = new com.google.protobuf.AbstractParser<SslInfo>() {
+      @java.lang.Override
+      public SslInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<SslInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<SslInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.SslInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface TransportOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.Transport)
       com.google.protobuf.MessageOrBuilder {
@@ -11663,6 +12248,32 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
      */
     com.xiaoniucode.etp.core.message.Message.TransportOrBuilder getTransportOrBuilder();
+
+    /**
+     * <code>optional bool forceHttps = 16;</code>
+     * @return Whether the forceHttps field is set.
+     */
+    boolean hasForceHttps();
+    /**
+     * <code>optional bool forceHttps = 16;</code>
+     * @return The forceHttps.
+     */
+    boolean getForceHttps();
+
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     * @return Whether the sslInfo field is set.
+     */
+    boolean hasSslInfo();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     * @return The sslInfo.
+     */
+    com.xiaoniucode.etp.core.message.Message.SslInfo getSslInfo();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder getSslInfoOrBuilder();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.NewProxy}
@@ -11997,6 +12608,51 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return transport_ == null ? com.xiaoniucode.etp.core.message.Message.Transport.getDefaultInstance() : transport_;
     }
 
+    public static final int FORCEHTTPS_FIELD_NUMBER = 16;
+    private boolean forceHttps_ = false;
+    /**
+     * <code>optional bool forceHttps = 16;</code>
+     * @return Whether the forceHttps field is set.
+     */
+    @java.lang.Override
+    public boolean hasForceHttps() {
+      return ((bitField0_ & 0x00000100) != 0);
+    }
+    /**
+     * <code>optional bool forceHttps = 16;</code>
+     * @return The forceHttps.
+     */
+    @java.lang.Override
+    public boolean getForceHttps() {
+      return forceHttps_;
+    }
+
+    public static final int SSLINFO_FIELD_NUMBER = 17;
+    private com.xiaoniucode.etp.core.message.Message.SslInfo sslInfo_;
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     * @return Whether the sslInfo field is set.
+     */
+    @java.lang.Override
+    public boolean hasSslInfo() {
+      return ((bitField0_ & 0x00000200) != 0);
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     * @return The sslInfo.
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.SslInfo getSslInfo() {
+      return sslInfo_ == null ? com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance() : sslInfo_;
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder getSslInfoOrBuilder() {
+      return sslInfo_ == null ? com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance() : sslInfo_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -12043,6 +12699,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000080) != 0)) {
         output.writeMessage(15, getTransport());
+      }
+      if (((bitField0_ & 0x00000100) != 0)) {
+        output.writeBool(16, forceHttps_);
+      }
+      if (((bitField0_ & 0x00000200) != 0)) {
+        output.writeMessage(17, getSslInfo());
       }
       getUnknownFields().writeTo(output);
     }
@@ -12095,6 +12757,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000080) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(15, getTransport());
+      }
+      if (((bitField0_ & 0x00000100) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(16, forceHttps_);
+      }
+      if (((bitField0_ & 0x00000200) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, getSslInfo());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -12156,6 +12826,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getTransport()
             .equals(other.getTransport())) return false;
       }
+      if (hasForceHttps() != other.hasForceHttps()) return false;
+      if (hasForceHttps()) {
+        if (getForceHttps()
+            != other.getForceHttps()) return false;
+      }
+      if (hasSslInfo() != other.hasSslInfo()) return false;
+      if (hasSslInfo()) {
+        if (!getSslInfo()
+            .equals(other.getSslInfo())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -12207,6 +12887,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasTransport()) {
         hash = (37 * hash) + TRANSPORT_FIELD_NUMBER;
         hash = (53 * hash) + getTransport().hashCode();
+      }
+      if (hasForceHttps()) {
+        hash = (37 * hash) + FORCEHTTPS_FIELD_NUMBER;
+        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+            getForceHttps());
+      }
+      if (hasSslInfo()) {
+        hash = (37 * hash) + SSLINFO_FIELD_NUMBER;
+        hash = (53 * hash) + getSslInfo().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -12345,6 +13034,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetBandwidthFieldBuilder();
           internalGetLoadBalanceFieldBuilder();
           internalGetTransportFieldBuilder();
+          internalGetSslInfoFieldBuilder();
         }
       }
       @java.lang.Override
@@ -12391,6 +13081,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (transportBuilder_ != null) {
           transportBuilder_.dispose();
           transportBuilder_ = null;
+        }
+        forceHttps_ = false;
+        sslInfo_ = null;
+        if (sslInfoBuilder_ != null) {
+          sslInfoBuilder_.dispose();
+          sslInfoBuilder_ = null;
         }
         return this;
       }
@@ -12489,6 +13185,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               : transportBuilder_.build();
           to_bitField0_ |= 0x00000080;
         }
+        if (((from_bitField0_ & 0x00000800) != 0)) {
+          result.forceHttps_ = forceHttps_;
+          to_bitField0_ |= 0x00000100;
+        }
+        if (((from_bitField0_ & 0x00001000) != 0)) {
+          result.sslInfo_ = sslInfoBuilder_ == null
+              ? sslInfo_
+              : sslInfoBuilder_.build();
+          to_bitField0_ |= 0x00000200;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -12561,6 +13267,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.hasTransport()) {
           mergeTransport(other.getTransport());
+        }
+        if (other.hasForceHttps()) {
+          setForceHttps(other.getForceHttps());
+        }
+        if (other.hasSslInfo()) {
+          mergeSslInfo(other.getSslInfo());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -12663,6 +13375,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00000400;
                 break;
               } // case 122
+              case 128: {
+                forceHttps_ = input.readBool();
+                bitField0_ |= 0x00000800;
+                break;
+              } // case 128
+              case 138: {
+                input.readMessage(
+                    internalGetSslInfoFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00001000;
+                break;
+              } // case 138
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -13847,6 +14571,167 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           transport_ = null;
         }
         return transportBuilder_;
+      }
+
+      private boolean forceHttps_ ;
+      /**
+       * <code>optional bool forceHttps = 16;</code>
+       * @return Whether the forceHttps field is set.
+       */
+      @java.lang.Override
+      public boolean hasForceHttps() {
+        return ((bitField0_ & 0x00000800) != 0);
+      }
+      /**
+       * <code>optional bool forceHttps = 16;</code>
+       * @return The forceHttps.
+       */
+      @java.lang.Override
+      public boolean getForceHttps() {
+        return forceHttps_;
+      }
+      /**
+       * <code>optional bool forceHttps = 16;</code>
+       * @param value The forceHttps to set.
+       * @return This builder for chaining.
+       */
+      public Builder setForceHttps(boolean value) {
+
+        forceHttps_ = value;
+        bitField0_ |= 0x00000800;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool forceHttps = 16;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearForceHttps() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        forceHttps_ = false;
+        onChanged();
+        return this;
+      }
+
+      private com.xiaoniucode.etp.core.message.Message.SslInfo sslInfo_;
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.SslInfo, com.xiaoniucode.etp.core.message.Message.SslInfo.Builder, com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder> sslInfoBuilder_;
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       * @return Whether the sslInfo field is set.
+       */
+      public boolean hasSslInfo() {
+        return ((bitField0_ & 0x00001000) != 0);
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       * @return The sslInfo.
+       */
+      public com.xiaoniucode.etp.core.message.Message.SslInfo getSslInfo() {
+        if (sslInfoBuilder_ == null) {
+          return sslInfo_ == null ? com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance() : sslInfo_;
+        } else {
+          return sslInfoBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public Builder setSslInfo(com.xiaoniucode.etp.core.message.Message.SslInfo value) {
+        if (sslInfoBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          sslInfo_ = value;
+        } else {
+          sslInfoBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public Builder setSslInfo(
+          com.xiaoniucode.etp.core.message.Message.SslInfo.Builder builderForValue) {
+        if (sslInfoBuilder_ == null) {
+          sslInfo_ = builderForValue.build();
+        } else {
+          sslInfoBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public Builder mergeSslInfo(com.xiaoniucode.etp.core.message.Message.SslInfo value) {
+        if (sslInfoBuilder_ == null) {
+          if (((bitField0_ & 0x00001000) != 0) &&
+            sslInfo_ != null &&
+            sslInfo_ != com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance()) {
+            getSslInfoBuilder().mergeFrom(value);
+          } else {
+            sslInfo_ = value;
+          }
+        } else {
+          sslInfoBuilder_.mergeFrom(value);
+        }
+        if (sslInfo_ != null) {
+          bitField0_ |= 0x00001000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public Builder clearSslInfo() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        sslInfo_ = null;
+        if (sslInfoBuilder_ != null) {
+          sslInfoBuilder_.dispose();
+          sslInfoBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.SslInfo.Builder getSslInfoBuilder() {
+        bitField0_ |= 0x00001000;
+        onChanged();
+        return internalGetSslInfoFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder getSslInfoOrBuilder() {
+        if (sslInfoBuilder_ != null) {
+          return sslInfoBuilder_.getMessageOrBuilder();
+        } else {
+          return sslInfo_ == null ?
+              com.xiaoniucode.etp.core.message.Message.SslInfo.getDefaultInstance() : sslInfo_;
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.SslInfo sslInfo = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.SslInfo, com.xiaoniucode.etp.core.message.Message.SslInfo.Builder, com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder> 
+          internalGetSslInfoFieldBuilder() {
+        if (sslInfoBuilder_ == null) {
+          sslInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.xiaoniucode.etp.core.message.Message.SslInfo, com.xiaoniucode.etp.core.message.Message.SslInfo.Builder, com.xiaoniucode.etp.core.message.Message.SslInfoOrBuilder>(
+                  getSslInfo(),
+                  getParentForChildren(),
+                  isClean());
+          sslInfo_ = null;
+        }
+        return sslInfoBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.NewProxy)
@@ -16462,6 +17347,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_DomainInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_message_SslInfo_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -16519,51 +17409,55 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "iaoniucode.etp.core.message.HttpUser\"s\n\t" +
       "Bandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_i" +
       "n\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006" +
-      "_limitB\013\n\t_limit_inB\014\n\n_limit_out\"`\n\006Tar" +
-      "get\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030" +
-      "\004 \001(\tH\000\210\001\001\022\023\n\006weight\030\005 \001(\005H\001\210\001\001B\007\n\005_name" +
-      "B\t\n\007_weight\"h\n\013LoadBalance\022L\n\010strategy\030\001" +
-      " \001(\01625.com.xiaoniucode.etp.core.message." +
-      "LoadBalanceStrategyH\000\210\001\001B\013\n\t_strategy\"c\n" +
-      "\nDomainInfo\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026\n" +
-      "\016custom_domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 \003" +
-      "(\tB\016\n\014_auto_domain\"k\n\tTransport\022\020\n\003mux\030\001" +
-      " \001(\010H\000\210\001\001\022\024\n\007encrypt\030\003 \001(\010H\001\210\001\001\022\025\n\010compr" +
-      "ess\030\004 \001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_encryptB\013\n\t_c" +
-      "ompress\"\344\005\n\010NewProxy\022\014\n\004name\030\001 \001(\t\0229\n\007ta" +
-      "rgets\030\002 \003(\0132(.com.xiaoniucode.etp.core.m" +
-      "essage.Target\022\023\n\006enable\030\003 \001(\010H\000\210\001\001\022@\n\010pr" +
-      "otocol\030\006 \001(\0162..com.xiaoniucode.etp.core." +
-      "message.ProtocolType\022\030\n\013remote_port\030\007 \001(" +
-      "\rH\001\210\001\001\022A\n\006domain\030\010 \001(\0132,.com.xiaoniucode" +
-      ".etp.core.message.DomainInfoH\002\210\001\001\022L\n\016acc" +
-      "ess_control\030\013 \001(\0132/.com.xiaoniucode.etp." +
-      "core.message.AccessControlH\003\210\001\001\022D\n\nbasic" +
-      "_auth\030\014 \001(\0132+.com.xiaoniucode.etp.core.m" +
-      "essage.BasicAuthH\004\210\001\001\022C\n\tbandwidth\030\r \001(\013" +
-      "2+.com.xiaoniucode.etp.core.message.Band" +
-      "widthH\005\210\001\001\022H\n\014load_balance\030\016 \001(\0132-.com.x" +
-      "iaoniucode.etp.core.message.LoadBalanceH" +
-      "\006\210\001\001\022C\n\ttransport\030\017 \001(\0132+.com.xiaoniucod" +
-      "e.etp.core.message.TransportH\007\210\001\001B\t\n\007_en" +
-      "ableB\016\n\014_remote_portB\t\n\007_domainB\021\n\017_acce" +
-      "ss_controlB\r\n\013_basic_authB\014\n\n_bandwidthB" +
-      "\017\n\r_load_balanceB\014\n\n_transport\"H\n\014NewPro" +
-      "xyResp\022\017\n\007proxyId\030\001 \001(\t\022\022\n\nproxy_name\030\002 " +
-      "\001(\t\022\023\n\013remote_addr\030\003 \001(\t\"&\n\005Error\022\014\n\004cod" +
-      "e\030\001 \001(\005\022\017\n\007message\030\002 \001(\t\"\340\001\n\rConfigMessa" +
-      "ge\022?\n\tnew_proxy\030e \001(\0132*.com.xiaoniucode." +
-      "etp.core.message.NewProxyH\000\022H\n\016new_proxy" +
-      "_resp\030f \001(\0132..com.xiaoniucode.etp.core.m" +
-      "essage.NewProxyRespH\000\0229\n\005error\030\315\001 \001(\0132\'." +
-      "com.xiaoniucode.etp.core.message.ErrorH\000" +
-      "B\t\n\007payload*!\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004" +
-      "HTTP\020\001*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SESSI" +
-      "ON\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001*" +
-      "N\n\023LoadBalanceStrategy\022\017\n\013ROUND_ROBIN\020\000\022" +
-      "\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020\003*" +
-      "\"\n\025TransportProtocolType\022\t\n\005T_TCP\020\000b\006pro" +
-      "to3"
+      "_limitB\013\n\t_limit_inB\014\n\n_limit_out\"n\n\006Tar" +
+      "get\022\021\n\004host\030\001 \001(\tH\000\210\001\001\022\014\n\004port\030\002 \001(\r\022\021\n\004" +
+      "name\030\004 \001(\tH\001\210\001\001\022\023\n\006weight\030\005 \001(\005H\002\210\001\001B\007\n\005" +
+      "_hostB\007\n\005_nameB\t\n\007_weight\"h\n\013LoadBalance" +
+      "\022L\n\010strategy\030\001 \001(\01625.com.xiaoniucode.etp" +
+      ".core.message.LoadBalanceStrategyH\000\210\001\001B\013" +
+      "\n\t_strategy\"c\n\nDomainInfo\022\030\n\013auto_domain" +
+      "\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023\n\013s" +
+      "ub_domains\030\003 \003(\tB\016\n\014_auto_domain\":\n\007SslI" +
+      "nfo\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016cert_cha" +
+      "in_pem\030\002 \001(\t\"k\n\tTransport\022\020\n\003mux\030\001 \001(\010H\000" +
+      "\210\001\001\022\024\n\007encrypt\030\003 \001(\010H\001\210\001\001\022\025\n\010compress\030\004 " +
+      "\001(\010H\002\210\001\001B\006\n\004_muxB\n\n\010_encryptB\013\n\t_compres" +
+      "s\"\331\006\n\010NewProxy\022\014\n\004name\030\001 \001(\t\0229\n\007targets\030" +
+      "\002 \003(\0132(.com.xiaoniucode.etp.core.message" +
+      ".Target\022\023\n\006enable\030\003 \001(\010H\000\210\001\001\022@\n\010protocol" +
+      "\030\006 \001(\0162..com.xiaoniucode.etp.core.messag" +
+      "e.ProtocolType\022\030\n\013remote_port\030\007 \001(\rH\001\210\001\001" +
+      "\022A\n\006domain\030\010 \001(\0132,.com.xiaoniucode.etp.c" +
+      "ore.message.DomainInfoH\002\210\001\001\022L\n\016access_co" +
+      "ntrol\030\013 \001(\0132/.com.xiaoniucode.etp.core.m" +
+      "essage.AccessControlH\003\210\001\001\022D\n\nbasic_auth\030" +
+      "\014 \001(\0132+.com.xiaoniucode.etp.core.message" +
+      ".BasicAuthH\004\210\001\001\022C\n\tbandwidth\030\r \001(\0132+.com" +
+      ".xiaoniucode.etp.core.message.BandwidthH" +
+      "\005\210\001\001\022H\n\014load_balance\030\016 \001(\0132-.com.xiaoniu" +
+      "code.etp.core.message.LoadBalanceH\006\210\001\001\022C" +
+      "\n\ttransport\030\017 \001(\0132+.com.xiaoniucode.etp." +
+      "core.message.TransportH\007\210\001\001\022\027\n\nforceHttp" +
+      "s\030\020 \001(\010H\010\210\001\001\022?\n\007sslInfo\030\021 \001(\0132).com.xiao" +
+      "niucode.etp.core.message.SslInfoH\t\210\001\001B\t\n" +
+      "\007_enableB\016\n\014_remote_portB\t\n\007_domainB\021\n\017_" +
+      "access_controlB\r\n\013_basic_authB\014\n\n_bandwi" +
+      "dthB\017\n\r_load_balanceB\014\n\n_transportB\r\n\013_f" +
+      "orceHttpsB\n\n\010_sslInfo\"H\n\014NewProxyResp\022\017\n" +
+      "\007proxyId\030\001 \001(\t\022\022\n\nproxy_name\030\002 \001(\t\022\023\n\013re" +
+      "mote_addr\030\003 \001(\t\"&\n\005Error\022\014\n\004code\030\001 \001(\005\022\017" +
+      "\n\007message\030\002 \001(\t\"\340\001\n\rConfigMessage\022?\n\tnew" +
+      "_proxy\030e \001(\0132*.com.xiaoniucode.etp.core." +
+      "message.NewProxyH\000\022H\n\016new_proxy_resp\030f \001" +
+      "(\0132..com.xiaoniucode.etp.core.message.Ne" +
+      "wProxyRespH\000\0229\n\005error\030\315\001 \001(\0132\'.com.xiaon" +
+      "iucode.etp.core.message.ErrorH\000B\t\n\007paylo" +
+      "ad*,\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n" +
+      "\005HTTPS\020\002*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SES" +
+      "SION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020" +
+      "\001*N\n\023LoadBalanceStrategy\022\017\n\013ROUND_ROBIN\020" +
+      "\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020" +
+      "\003b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -16647,32 +17541,38 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_DomainInfo_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
-    internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor =
+    internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor =
       getDescriptor().getMessageType(13);
+    internal_static_com_xiaoniucode_etp_core_message_SslInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_message_SslInfo_descriptor,
+        new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
+    internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor =
+      getDescriptor().getMessageType(14);
     internal_static_com_xiaoniucode_etp_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor,
         new java.lang.String[] { "Mux", "Encrypt", "Compress", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(15);
     internal_static_com_xiaoniucode_etp_core_message_NewProxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxy_descriptor,
-        new java.lang.String[] { "Name", "Targets", "Enable", "Protocol", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalance", "Transport", });
+        new java.lang.String[] { "Name", "Targets", "Enable", "Protocol", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalance", "Transport", "ForceHttps", "SslInfo", });
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(16);
     internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_NewProxyResp_descriptor,
         new java.lang.String[] { "ProxyId", "ProxyName", "RemoteAddr", });
     internal_static_com_xiaoniucode_etp_core_message_Error_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(17);
     internal_static_com_xiaoniucode_etp_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Error_descriptor,
         new java.lang.String[] { "Code", "Message", });
     internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_descriptor =
-      getDescriptor().getMessageType(17);
+      getDescriptor().getMessageType(18);
     internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_ConfigMessage_descriptor,

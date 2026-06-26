@@ -58,6 +58,10 @@ public enum ProtocolType {
         return protocol != null ? protocol : defaultValue;
     }
 
+    public static boolean isHttpOrHttps(ProtocolType protocolType) {
+        return protocolType == HTTP || protocolType == HTTPS;
+    }
+
     public static boolean isTcp(ProtocolType protocolType) {
         return protocolType == TCP;
     }
@@ -66,9 +70,23 @@ public enum ProtocolType {
         return protocolType == HTTP;
     }
 
+    public static boolean isHttps(ProtocolType protocolType) {
+        return protocolType == HTTPS;
+    }
+
     public static boolean isHttp(String protocol) {
         ProtocolType protocolType = getByName(protocol);
         return protocolType == HTTP;
+    }
+
+    public static boolean isHttpOrHttps(String protocol) {
+        ProtocolType protocolType = getByName(protocol);
+        return protocolType == HTTP || protocolType == HTTPS;
+    }
+
+    public static boolean isHttps(String protocol) {
+        ProtocolType protocolType = getByName(protocol);
+        return protocolType == HTTPS;
     }
 
     public static boolean isTcp(String protocol) {
@@ -76,14 +94,23 @@ public enum ProtocolType {
         return protocolType == TCP;
     }
 
-    public int getCode() {
-        return code;
+    public boolean isHttpOrHttps() {
+        return this == HTTP || this == HTTPS;
+    }
+
+    public boolean isHttps() {
+        return this == HTTPS;
     }
 
     public boolean isHttp() {
-        return this ==HTTP;
+        return this == HTTP;
     }
+
     public boolean isTcp() {
-        return this ==TCP;
+        return this == TCP;
+    }
+
+    public int getCode() {
+        return code;
     }
 }

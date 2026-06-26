@@ -15,13 +15,19 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class AuthSuccessAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AuthSuccessAction.class);
     private final AtomicBoolean init = new AtomicBoolean(false);
 
     @Override
@@ -43,9 +49,10 @@ public class AuthSuccessAction extends AgentBaseAction {
         context.fireEvent(AgentEvent.CREATE_TUNNEL_POOL);
     }
 
-    private static Message.NewProxy buildNewProxy(ProxyConfig config) {
+    private Message.NewProxy buildNewProxy(ProxyConfig config) {
         ProtocolType protocol = config.getProtocol();
         Message.NewProxy.Builder newProxyBuilder = Message.NewProxy.newBuilder();
+
         List<Message.Target> targets = config.getTargets().stream().map(t -> {
                     Message.Target.Builder target = Message.Target.newBuilder()
                             .setHost(t.getHost())
@@ -62,6 +69,7 @@ public class AuthSuccessAction extends AgentBaseAction {
         ).collect(Collectors.toList());
         newProxyBuilder.setName(config.getName())
                 .addAllTargets(targets)
+                .setForceHttps(config.getForceHttps())
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
         if (config.getStatus().isOpen()) {
@@ -75,13 +83,16 @@ public class AuthSuccessAction extends AgentBaseAction {
                 }
                 break;
             case HTTP:
+            case HTTPS:
+                //域名配置
                 RouteConfig domainInfo = config.getRouteConfig();
                 if (domainInfo != null) {
-
                     Set<String> customDomains = domainInfo.getCustomDomains();
                     Boolean autoDomain = domainInfo.getAutoDomain();
                     Set<String> subDomains = domainInfo.getSubDomains();
-                    Message.DomainInfo domainReq = Message.DomainInfo.newBuilder().setAutoDomain(autoDomain).addAllCustomDomains(customDomains)
+                    Message.DomainInfo domainReq = Message.DomainInfo.newBuilder()
+                            .setAutoDomain(autoDomain)
+                            .addAllCustomDomains(customDomains)
                             .addAllSubDomains(subDomains).build();
                     newProxyBuilder.setDomain(domainReq);
                 }
@@ -89,7 +100,8 @@ public class AuthSuccessAction extends AgentBaseAction {
                 //Basic Auth 认证
                 if (config.hasBasicAuth()) {
                     BasicAuthConfig basicAuth = config.getBasicAuth();
-                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder().setEnable(basicAuth.isEnabled());
+                    Message.BasicAuth.Builder basicAuthBuilder = Message.BasicAuth.newBuilder()
+                            .setEnable(basicAuth.isEnabled());
                     Set<HttpUser> users = basicAuth.getUsers();
                     if (users != null && !users.isEmpty()) {
                         for (HttpUser user : users) {
@@ -100,7 +112,23 @@ public class AuthSuccessAction extends AgentBaseAction {
                             basicAuthBuilder.addHttpUsers(httpUser);
                         }
                     }
-                    newProxyBuilder.setBasicAuth(basicAuthBuilder.build());
+                    newProxyBuilder.setBasicAuth(basicAuthBuilder);
+                }
+                //HTTPS SSL证书
+                if (config.isHttps()) {
+                    SslConfig sslConfig = config.getSslConfig();
+                    if (sslConfig != null) {
+                        try {
+                            String keyPem = Files.readString(new File(sslConfig.getKeyFile()).toPath(), StandardCharsets.UTF_8);
+                            String certChainPem = Files.readString(new File(sslConfig.getCertFile()).toPath(), StandardCharsets.UTF_8);
+                            Message.SslInfo.Builder sslInfoBuilder = Message.SslInfo.newBuilder()
+                                    .setPrivateKeyPem(keyPem)
+                                    .setCertChainPem(certChainPem);
+                            newProxyBuilder.setSslInfo(sslInfoBuilder);
+                        } catch (Exception e) {
+                            logger.error(e);
+                        }
+                    }
                 }
                 break;
         }

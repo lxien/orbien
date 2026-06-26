@@ -66,6 +66,11 @@ public class ProxyConfig implements Serializable {
     @Setter
     private Integer listenPort;
     /**
+     * 是否强制HTTPS 访问，仅对HTTPS协议有效
+     */
+    @Setter
+    private Boolean forceHttps;
+    /**
      * 代理目标服务
      */
     private final List<Target> targets = new CopyOnWriteArrayList<>();
@@ -79,6 +84,11 @@ public class ProxyConfig implements Serializable {
      */
     @Setter
     private RouteConfig routeConfig;
+    /**
+     * HTTPS Ssl证书配置
+     */
+    @Setter
+    private SslConfig sslConfig;
     /**
      * IP 防火墙
      */
@@ -145,6 +155,15 @@ public class ProxyConfig implements Serializable {
      */
     public boolean isHttp() {
         return ProtocolType.isHttp(protocol);
+    }
+    /**
+     * 是否是 HTTPS 协议
+     */
+    public boolean isHttps() {
+        return ProtocolType.isHttps(protocol);
+    }
+    public boolean isHttpOrHttps() {
+        return ProtocolType.isHttp(protocol) || ProtocolType.isHttps(protocol);
     }
 
     /**

@@ -75,7 +75,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (isCertificateUnknownError(cause)) {
             ChannelUtils.closeOnFlush(ctx.channel());
-            logger.debug("证书未知错误，可能是客户端未信任自签名证书", cause);
+            logger.debug("证书未知错误，可能是客户端未信任自签名证书");
             return;
         }
         logger.error("[HTTP]发生异常", cause);

@@ -121,14 +121,22 @@ public class SslCertificateManager {
     public SslContext getSslContext(String domain) {
         rwLock.readLock().lock();
         try {
-            if (!StringUtils.hasText(domain)) return defaultSslContext;
+            if (!StringUtils.hasText(domain)) {
+                logger.debug("SNI 域名为空，使用默认证书");
+                return defaultSslContext;
+            }
             SslContext ctx = l1Cache.getIfPresent(domain);
-            if (ctx != null) return ctx;
+            if (ctx != null) {
+                logger.debug("从缓存获取证书成功: {}", domain);
+                return ctx;
+            }
             if (!deployedDomains.contains(domain)) {
+                logger.debug("域名 {} 未部署证书，使用默认证书", domain);
                 return defaultSslContext;
             }
             ctx = loadFromFileSystem(domain);
             if (ctx != null) {
+                logger.debug("从文件系统加载证书成功: {}", domain);
                 l1Cache.put(domain, ctx);
                 return ctx;
             }
@@ -141,6 +149,7 @@ public class SslCertificateManager {
 
     private SslContext loadFromFileSystem(String domain) {
         try {
+            logger.debug("尝试从文件系统加载证书: {}", domain);
             String certId = activeCert.get(domain);
             if (certId == null) {
                 return null;
@@ -150,7 +159,7 @@ public class SslCertificateManager {
             File keyFile = new File(domainDir, "privkey.pem");
 
             if (!certFile.exists() || !keyFile.exists()) {
-                logger.warn("域名 {} 的证书文件不完整，cert存在={}, key存在={}",
+                logger.debug("域名 {} 的证书文件不完整，cert存在={}, key存在={}",
                         domain, certFile.exists(), keyFile.exists());
                 return null;
             }
