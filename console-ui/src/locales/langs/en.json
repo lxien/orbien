@@ -246,7 +246,6 @@
       "title": "Home"
     },
     "etp": {
-      "embedded": "Temporary",
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",

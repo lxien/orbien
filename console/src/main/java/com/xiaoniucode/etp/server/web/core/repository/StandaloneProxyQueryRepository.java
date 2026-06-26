@@ -31,7 +31,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository("standaloneProxyQueryRepository")
+@Repository
 public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
     @Autowired
     private ProxyRepository proxyRepository;

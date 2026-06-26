@@ -16,6 +16,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.generator.UUIDGenerator;
+import com.xiaoniucode.etp.server.service.TokenConfigService;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
@@ -27,7 +28,6 @@ import com.xiaoniucode.etp.server.web.service.converter.AccessTokenConvert;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
 import com.xiaoniucode.etp.server.web.service.AccessTokenService;
-import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +47,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Autowired
     private AccessTokenConvert accessTokenConvert;
     @Autowired
-    private TransactionHelper transactionHelper;
+    private TokenConfigService tokenConfigService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -94,6 +94,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
             if (accessTokenRepository.existsByNameAndIdNot(param.getName(), param.getId())) {
                 throw new BizException("令牌名称已存在");
             }
+            tokenConfigService.evictByToken(accessTokenDO.getToken());
             accessTokenConvert.updateDO(accessTokenDO, param);
             accessTokenRepository.save(accessTokenDO);
         }
@@ -104,6 +105,8 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public void delete(Integer id) {
         Optional<AccessTokenDO> tokenOpt = accessTokenRepository.findById(id);
         if (tokenOpt.isPresent()) {
+            AccessTokenDO accessTokenDO = tokenOpt.get();
+            tokenConfigService.evictByToken(accessTokenDO.getToken());
             accessTokenRepository.deleteById(id);
         }
     }
@@ -113,6 +116,11 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     public void deleteBatch(AccessTokenBatchDeleteParam param) {
         List<Integer> ids = param.getIds();
         if (ids != null && !ids.isEmpty()) {
+            List<String> tokenList = accessTokenRepository.findAllById(ids)
+                    .stream()
+                    .map(AccessTokenDO::getToken)
+                    .toList();
+            tokenConfigService.evictByTokens(tokenList);
             accessTokenRepository.deleteAllById(ids);
         }
     }

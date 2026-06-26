@@ -40,12 +40,10 @@ public class AuthAction extends AgentBaseAction {
                     .setArch(OSUtils.getOSArch())
                     .setName(OSUtils.getHostName());
 
-            if (config.getAgentType() == AgentType.STANDALONE) {
-                AgentIdentity agentIdentity = ctx.getAgentIdentity();
-                String agentId = agentIdentity.getIdentity();
-                if (StringUtils.hasText(agentId)) {
-                    builder.setAgentId(agentId);
-                }
+            AgentIdentity agentIdentity = ctx.getAgentIdentity();
+            String agentId = agentIdentity.getIdentity();
+            if (StringUtils.hasText(agentId)) {
+                builder.setAgentId(agentId);
             }
 
             ByteBuf buf = ProtobufUtil.toByteBuf(builder.build(), control.alloc());

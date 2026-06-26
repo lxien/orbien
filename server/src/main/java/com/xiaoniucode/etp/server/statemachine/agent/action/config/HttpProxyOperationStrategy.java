@@ -24,7 +24,6 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
@@ -53,8 +52,7 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
     private UidGenerator uidGenerator;
     @Resource
     private AppConfig appConfig;
-    @Autowired
-    private EmbeddedAgentRegistry embeddedAgentRegistry;
+
     @Autowired
     private ProxyConfigService proxyConfigService;
 
@@ -92,10 +90,6 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
         }
         String proxyId = uidGenerator.getUIDAsString();
         config.setProxyId(proxyId);
-        if (agentInfo.getAgentType().isEmbedded()) {
-            embeddedAgentRegistry.addProxyId(agentInfo.getAgentId(), proxyId);
-            embeddedAgentRegistry.addDomains(agentInfo.getAgentId(), domains);
-        }
         proxyManager.activate(config, domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet()));
         logger.debug("HTTP代理 {} 创建成功，域名: {}", config.getName(), domains);
         return new ProxyOperationResult(domains, null, true);
@@ -108,10 +102,6 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
                     newConfig.getName(), oldConfig.getProtocol().name(), newConfig.getProtocol().name());
         }
         logger.debug("更新HTTP代理: {}", newConfig.getName());
-        if (agentInfo.getAgentType().isEmbedded()) {
-            Set<DomainInfo> domainInfos = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
-            embeddedAgentRegistry.removeDomains(agentInfo.getAgentId(), domainInfos);
-        }
         proxyManager.deactivate(oldConfig.getProxyId());
         return create(newConfig, agentInfo);
     }

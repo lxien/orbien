@@ -246,7 +246,6 @@
       "title": "首页"
     },
     "etp": {
-      "embedded": "临时隧道",
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",

@@ -26,7 +26,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-@Repository("standaloneAgentQueryRepository")
+@Repository
 public class StandaloneAgentQueryRepository implements AgentQueryRepository {
     @Autowired
     private AgentRepository agentRepository;

@@ -18,28 +18,14 @@ package com.xiaoniucode.etp.server.metrics;
 
 import lombok.Data;
 
-/**
- * 速率滑动窗口中的累计值快照。
- *
- * <p>由 {@link ProxyMetrics#updateRate()} 周期性写入速率环，字段值为进程启动后的累计量，
- * 速率通过相邻快照的差值计算。
- */
 @Data
 public class RateSnapshot {
-
     private final long readBytes;
     private final long writeBytes;
     private final long readMessages;
     private final long writeMessages;
     private final long timestamp;
 
-    /**
-     * @param timestamp     采样时刻，毫秒时间戳
-     * @param readBytes     累计入站字节数
-     * @param writeBytes    累计出站字节数
-     * @param readMessages  累计入站消息数
-     * @param writeMessages 累计出站消息数
-     */
     public RateSnapshot(long timestamp, long readBytes, long writeBytes, long readMessages, long writeMessages) {
         this.timestamp = timestamp;
         this.readBytes = readBytes;

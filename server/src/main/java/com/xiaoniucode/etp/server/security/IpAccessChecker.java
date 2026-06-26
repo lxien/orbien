@@ -27,10 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class IpAccessChecker {
-    /**
-     * proxyId --> CIDRMatcher
-     */
-    private final Map<String, CIDRMatcher> matcherMap = new ConcurrentHashMap<>();
+    private final Map<String/*proxyId*/, CIDRMatcher> matcherMap = new ConcurrentHashMap<>();
 
     public boolean checkAccess(ProxyConfig proxyConfig, String visitorIp) {
         if (proxyConfig == null || visitorIp == null) {

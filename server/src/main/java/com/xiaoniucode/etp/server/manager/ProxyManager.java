@@ -58,12 +58,6 @@ public class ProxyManager {
     @Autowired
     private StreamManager streamManager;
 
-    /**
-     * 激活代理
-     *
-     * @param config 代理配置信息
-     * @throws EtpException 异常
-     */
     public void activate(ProxyConfig config) throws EtpException {
         activate(config, null);
     }
@@ -85,18 +79,12 @@ public class ProxyManager {
         }
         if (config.isHttp()) {
             if (!CollectionUtils.isEmpty(domains) && !domainRegistry.exists(proxyId)) {
-                //将域名注册到域名注册中心
                 domainRegistry.register(proxyId, domains);
             }
         }
 
     }
 
-    /**
-     * 停用代理
-     *
-     * @throws EtpException
-     */
     public void deactivate(String proxyId) {
         logger.debug("停用代理: {}", proxyId);
         Integer listenPort = portMap.remove(proxyId);
@@ -110,7 +98,7 @@ public class ProxyManager {
                 set.remove(proxyId);
             }
         }
-        if (StringUtils.hasText(agentId)){
+        if (StringUtils.hasText(agentId)) {
             Set<String> agentProxies = agentProxyMap.remove(agentId);
             if (!CollectionUtils.isEmpty(agentProxies)) {
                 agentProxies.remove(proxyId);
@@ -152,11 +140,6 @@ public class ProxyManager {
         activate(config, domains);
     }
 
-    /**
-     * 批量停用某个 Agent 下的代理
-     *
-     * @throws EtpException
-     */
     public void onAgentOffline(String agentId) throws EtpException {
         logger.debug("停用客户端 {} 所有代理", agentId);
         Set<String> proxyIds = agentProxyMap.get(agentId);

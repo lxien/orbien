@@ -25,12 +25,6 @@ import java.util.BitSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-/**
- * 端口分配管理器
- *
- * @author xiaoniucode
- *
- */
 public class PortManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(PortManager.class);
 

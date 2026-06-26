@@ -195,7 +195,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 410,
+          width: 420,
           fixed: 'right',
           formatter: (row: HttpsProxyItem) =>
             h('div', [

@@ -80,6 +80,7 @@ public class ClientBootstrap implements DisposableBean {
         // 创建并配置 ProxyConfig
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(appName);
+        proxyConfig.setForceHttps(proxy.getForceHttps());
         proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, appName));
         proxyConfig.setStatus(ProxyStatus.OPEN);
         proxyConfig.setProtocol(proxy.getProtocol());

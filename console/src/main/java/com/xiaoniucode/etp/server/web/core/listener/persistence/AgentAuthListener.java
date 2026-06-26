@@ -21,7 +21,6 @@ import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.AgentAuthEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
-import com.xiaoniucode.etp.server.service.repository.AgentStore;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import jakarta.annotation.PostConstruct;
@@ -39,8 +38,6 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     private AgentRepository agentRepository;
     @Autowired
     private AgentModelConvert agentModelConvert;
-    @Autowired
-    private AgentStore agentStore;
 
     @PostConstruct
     public void init() {
@@ -52,18 +49,11 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
         logger.debug("Received AgentAuthEvent: {}", event);
         boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
-        if (agentInfo.getAgentType().isEmbedded()) {
-            agentStore.save(agentInfo);
-            logger.debug("嵌入式客户端信息保存成功: agentId={}, name={}",
+        if (!reconnect) {
+            AgentDO agentDO = agentModelConvert.toDO(agentInfo);
+            agentRepository.save(agentDO);
+            logger.debug("客户端信息保存成功: agentId={}, name={}",
                     agentInfo.getAgentId(), agentInfo.getName());
-        } else {
-            if (!reconnect) {
-                AgentDO agentDO = agentModelConvert.toDO(agentInfo);
-                agentRepository.save(agentDO);
-                logger.debug("客户端信息保存成功: agentId={}, name={}",
-                        agentInfo.getAgentId(), agentInfo.getName());
-            }
         }
-
     }
 }

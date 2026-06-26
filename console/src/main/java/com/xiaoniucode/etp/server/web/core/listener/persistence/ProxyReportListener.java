@@ -23,7 +23,6 @@ import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
-import com.xiaoniucode.etp.server.service.repository.ProxyStore;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
@@ -49,8 +48,6 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
     private final Logger logger = LoggerFactory.getLogger(ProxyReportListener.class);
     @Autowired
     private EventBus eventBus;
-    @Autowired
-    private ProxyStore proxyStore;
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired
@@ -82,31 +79,15 @@ public class ProxyReportListener implements EventListener<ProxyReportEvent> {
         if (event.isUpdate() && !event.isHasChange()) {
             return;//更新操作，无数据变更
         }
-
         ProxyConfig config = event.getProxyConfig();
-        AgentType agentType = config.getAgentType();
-
         transactionTemplate.executeWithoutResult(status -> {
             try {
-                if (agentType.isEmbedded()) {
-                    handleEmbeddedAgent(event, config);
-                } else {
-                    handleStandaloneAgent(event, config);
-                }
+                handleStandaloneAgent(event, config);
             } catch (Exception e) {
                 status.setRollbackOnly();
                 logger.error("代理配置信息保存到数据库失败", e);
             }
         });
-    }
-
-    private void handleEmbeddedAgent(ProxyReportEvent event, ProxyConfig config) {
-        ProtocolType protocol = config.getProtocol();
-        if (protocol.isTcp()) {
-            proxyStore.saveTcp(config);
-        } else if (protocol.isHttp()) {
-            proxyStore.saveHttp(config, event.getDomains());
-        }
     }
 
     private void handleStandaloneAgent(ProxyReportEvent event, ProxyConfig config) {

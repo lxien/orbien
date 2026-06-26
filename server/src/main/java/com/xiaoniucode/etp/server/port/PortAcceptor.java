@@ -8,35 +8,22 @@ import io.netty.channel.ChannelFuture;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.PreDestroy;
-import jakarta.annotation.Nonnull;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class PortAcceptor {
-
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(PortAcceptor.class);
-
     private final Map<Integer, Channel> portToChannel = new ConcurrentHashMap<>();
 
-    /**
-     * 绑定并监听指定端口。
-     *
-     * @param listenPort 要监听的端口。不可为null，需合法（0-65535）。
-     */
-    public void bindPort(@Nonnull final Integer listenPort) {
+    public void bindPort(final Integer listenPort) {
         if (listenPort < 0 || listenPort > 65535) {
             logger.warn("尝试绑定非法端口: {}", listenPort);
             return;
         }
-
         portToChannel.computeIfAbsent(listenPort, key -> {
             try {
                 TcpProxyServer tcpProxyServer = SpringContextHolder.getBean(TcpProxyServer.class);
-                if (tcpProxyServer == null) {
-                    logger.error("TcpProxyServer Bean 未注册！");
-                    return null;
-                }
                 ServerBootstrap serverBootstrap = tcpProxyServer.getServerBootstrap();
                 ChannelFuture future = serverBootstrap.bind(listenPort).sync();
                 return future.channel();
@@ -47,12 +34,7 @@ public final class PortAcceptor {
         });
     }
 
-    /**
-     * 停止监听指定端口。
-     *
-     * @param listenPort 要释放的端口
-     */
-    public void stopPortListen(@Nonnull final Integer listenPort) {
+    public void stopPortListen( final Integer listenPort) {
         if (listenPort < 0 || listenPort > 65535) {
             logger.warn("尝试停止非法端口: {}", listenPort);
             return;
@@ -70,9 +52,6 @@ public final class PortAcceptor {
         }
     }
 
-    /**
-     * Bean销毁时自动清理所有绑定端口资源。
-     */
     @PreDestroy
     public void clearAll() {
         logger.debug("开始清理所有代理端口资源占用...");

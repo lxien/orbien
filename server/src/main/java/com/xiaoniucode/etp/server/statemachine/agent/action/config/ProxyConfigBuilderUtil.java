@@ -35,6 +35,7 @@ public class ProxyConfigBuilderUtil {
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setSourceType(ProxySourceType.AGENT);
         proxyConfig.setName(proxy.getName());
+        proxyConfig.setForceHttps(proxy.getForceHttps());
         List<Target> targets = proxy.getTargetsList().stream().map(p -> {
             Target target = new Target();
             target.setHost(p.getHost());

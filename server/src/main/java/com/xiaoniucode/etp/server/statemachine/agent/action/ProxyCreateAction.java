@@ -9,7 +9,7 @@ import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
-import com.xiaoniucode.etp.server.service.diff.ConfigChangeDetector;
+import com.xiaoniucode.etp.server.service.ConfigChangeDetector;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.agent.action.config.*;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;

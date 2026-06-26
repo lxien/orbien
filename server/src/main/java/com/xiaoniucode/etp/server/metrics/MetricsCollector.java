@@ -28,24 +28,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-/**
- * 代理流量指标的注册中心，按 {@code proxyId} 维护 {@link ProxyMetrics} 实例。
- *
- * <p>写入由隧道桥接层在数据转发时触发；查询与聚合供控制台使用。
- */
 @Component
 public class MetricsCollector {
-
     private final InternalLogger logger = InternalLoggerFactory.getInstance(MetricsCollector.class);
-
     private static final Map<String, ProxyMetrics> PROXY_METRICS = new ConcurrentHashMap<>(256);
 
-    /**
-     * 获取或创建指定代理的计数器。
-     *
-     * @param proxyId 代理标识
-     * @return 计数器实例；{@code proxyId} 为空时返回 {@code null}
-     */
     public ProxyMetrics getOrCreate(String proxyId, AgentType agentType) {
         if (!StringUtils.hasText(proxyId) || agentType == null) {
             throw new IllegalArgumentException("proxyId or agentType not null");
@@ -53,11 +40,6 @@ public class MetricsCollector {
         return PROXY_METRICS.computeIfAbsent(proxyId, id -> new ProxyMetrics(id, agentType));
     }
 
-    /**
-     * 隧道通道建立时递增活跃通道数。
-     *
-     * @param proxyId 代理标识
-     */
     public void onChannelActive(String proxyId, AgentType agentType) {
         ProxyMetrics m = getOrCreate(proxyId, agentType);
         if (m != null) {
@@ -65,11 +47,6 @@ public class MetricsCollector {
         }
     }
 
-    /**
-     * 隧道通道关闭时递减活跃通道数。
-     *
-     * @param proxyId 代理标识
-     */
     public void onChannelInactive(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             return;
@@ -80,14 +57,6 @@ public class MetricsCollector {
         }
     }
 
-    /**
-     * 在已有计数器上执行写入操作。
-     *
-     * <p>计数器不存在时静默忽略。回调抛出异常时记录警告，不影响调用方。
-     *
-     * @param proxyId 代理标识
-     * @param action  写入回调
-     */
     public void collect(String proxyId, Consumer<ProxyMetrics> action) {
         if (!StringUtils.hasText(proxyId) || action == null) {
             return;
@@ -102,21 +71,10 @@ public class MetricsCollector {
         }
     }
 
-    /**
-     * 返回当前所有计数器的浅拷贝，调用方不可修改底层 Map。
-     *
-     * @return 不可变的 {@code proxyId} → {@link ProxyMetrics} 映射
-     */
     public Map<String, ProxyMetrics> getAllMetrics() {
         return Collections.unmodifiableMap(new ConcurrentHashMap<>(PROXY_METRICS));
     }
 
-    /**
-     * 移除指定代理的计数器。
-     *
-     * @param proxyId 代理标识
-     * @return 存在并已移除时返回 {@code true}
-     */
     public boolean removeByProxyId(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             return false;
@@ -129,12 +87,6 @@ public class MetricsCollector {
         return false;
     }
 
-    /**
-     * 查询单个代理的实时指标。
-     *
-     * @param proxyId 代理标识
-     * @return 指标快照；标识无效或代理不存在时返回 {@code null}
-     */
     public Metrics getProxyMetrics(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             return null;
@@ -143,13 +95,6 @@ public class MetricsCollector {
         return pm != null ? pm.toMetrics() : null;
     }
 
-    /**
-     * 按读写总流量降序分页查询所有代理指标。
-     *
-     * @param page 页码，从 0 开始
-     * @param size 每页条数，取值范围 [1, 100]
-     * @return 分页结果
-     */
     public PageResult<Metrics> listAllMetrics(int page, int size) {
         List<Metrics> pageData = PROXY_METRICS.values().stream()
                 .sorted(Comparator.comparingLong(m ->
@@ -164,12 +109,6 @@ public class MetricsCollector {
                 Math.max(0, page), pageSize);
     }
 
-    /**
-     * 查询单个代理最近 24 小时的小时流量。
-     *
-     * @param proxyId 代理标识
-     * @return 24 个小时桶；标识无效或代理不存在时返回空列表
-     */
     public List<HourlyTraffic> get24hTraffic(String proxyId) {
         if (!StringUtils.hasText(proxyId)) {
             return Collections.emptyList();
@@ -184,9 +123,7 @@ public class MetricsCollector {
     /**
      * 按小时下标对齐后，汇总所有代理最近 24 小时流量。
      *
-     * <p>仅纳入返回 24 个元素的代理数据；任一代理查询异常时返回空列表。
-     *
-     * @return 聚合后的小时流量列表；无代理时返回空列表
+     * @return 聚合后的小时流量列表
      */
     public List<HourlyTraffic> getTotal24hTraffic() {
         if (PROXY_METRICS.isEmpty()) {

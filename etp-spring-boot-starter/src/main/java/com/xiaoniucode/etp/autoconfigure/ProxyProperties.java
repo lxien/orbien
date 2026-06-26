@@ -41,6 +41,7 @@ public class ProxyProperties implements Serializable {
      * 协议
      */
     private ProtocolType protocol = ProtocolType.HTTP;
+    private Boolean forceHttps = false;
 
     /**
      * 自定义域名列表
@@ -56,8 +57,6 @@ public class ProxyProperties implements Serializable {
      * 子域名列表
      */
     private List<String> subDomains = new ArrayList<>();
-
-
 
     /**
      * 访问控制

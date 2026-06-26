@@ -13,7 +13,7 @@ import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamState;
 import com.xiaoniucode.etp.server.loadbalance.HealthManager;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
-import com.xiaoniucode.etp.server.vhost.DomainRouter;
+import com.xiaoniucode.etp.server.vhost.DomainRegistry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
@@ -37,8 +37,7 @@ public class TargetResolverAction extends StreamBaseAction {
     @Autowired
     private ProxyConfigService proxyConfigService;
     @Autowired
-    private DomainRouter domainRouter;
-
+    private DomainRegistry domainRegistry;
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
@@ -113,7 +112,7 @@ public class TargetResolverAction extends StreamBaseAction {
     private ProxyConfig resolveProxyConfig(StreamContext context) {
         if (context.getProtocol() == ProtocolType.HTTP) {
             String domain = context.getVisitorDomain();
-            String proxyId = domainRouter.route(domain);
+            String proxyId = domainRegistry.getProxyIdByDomain(domain);
             return proxyConfigService.findById(proxyId).orElse(null);
         } else if (context.getProtocol() == ProtocolType.TCP) {
             int remotePort = context.getListenerPort();

@@ -246,7 +246,6 @@
       "title": "ホーム"
     },
     "etp": {
-      "embedded": "一時隧道",
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",

@@ -22,7 +22,6 @@ import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
-import com.xiaoniucode.etp.server.service.EmbeddedAgentRegistry;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -38,8 +37,6 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
     private ProxyManager proxyManager;
     @Autowired
     private UidGenerator uidGenerator;
-    @Autowired
-    private EmbeddedAgentRegistry embeddedAgentRegistry;
 
     @Override
     public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
@@ -62,14 +59,8 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
         String proxyId = uidGenerator.getUIDAsString();
         config.setProxyId(proxyId);
         proxyManager.activate(config);
-        if (agentInfo.getAgentType().isEmbedded()) {
-            String agentId = agentInfo.getAgentId();
-            embeddedAgentRegistry.addProxyId(agentId,proxyId);
-            embeddedAgentRegistry.addListenPort(agentId, config.getListenPort());
-        }
-
         logger.debug("TCP代理 {} 注册成功，监听端口: {}", config.getName(), config.getListenPort());
-        return new ProxyOperationResult(null, config.getListenPort(),true);
+        return new ProxyOperationResult(null, config.getListenPort(), true);
     }
 
     @Override
@@ -90,16 +81,12 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
                     throw new PortConflictException(newRemotePort);
                 }
                 newConfig.setListenPort(newRemotePort);
-                if (agentInfo.getAgentType().isEmbedded()) {
-                    embeddedAgentRegistry.removeListenPort(agentInfo.getAgentId(), oldConfig.getListenPort());
-                    embeddedAgentRegistry.addListenPort(agentInfo.getAgentId(), newConfig.getListenPort());
-                }
                 portManager.addPort(newRemotePort);
             } else {
                 newConfig.setRemotePort(oldConfig.getListenPort());
             }
             proxyManager.reconcile(newConfig);
-            return new ProxyOperationResult(null, newConfig.getListenPort(),true);
+            return new ProxyOperationResult(null, newConfig.getListenPort(), true);
         }
     }
 

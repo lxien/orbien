@@ -16,21 +16,55 @@
 
 package com.xiaoniucode.etp.server.service;
 
-import com.xiaoniucode.etp.core.enums.AgentType;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.xiaoniucode.etp.common.utils.StringUtils;
+import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AgentConfigService {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentConfigService.class);
     @Autowired
-    private AgentQueryRepositoryRouter agentQueryRepositoryRouter;
-    @Autowired
-    private EmbeddedAgentRegistry embeddedAgentRegistry;
+    private AgentQueryRepository agentQueryRepository;
+    private final Cache<String/*agentId*/, AgentInfo> l1Cache = Caffeine.newBuilder()
+            .maximumSize(5000) //最大缓存个数
+            .expireAfterWrite(30, TimeUnit.MINUTES)  // 写后30分钟强制失效
+            .expireAfterAccess(2, TimeUnit.HOURS)    // 访问后2小时失效
+            .recordStats()
+            .build();
 
     public Optional<AgentInfo> findById(String agentId) {
-        AgentType agentType = embeddedAgentRegistry.identifyByAgentId(agentId);
-        return agentQueryRepositoryRouter.route(agentType).findById(agentId);
+        if (!StringUtils.hasText(agentId)) {
+            return Optional.empty();
+        }
+
+        AgentInfo agentInfo = l1Cache.get(agentId, id -> {
+            logger.debug("从数据库查询客户端信息：{}", id);
+            return agentQueryRepository.findById(id).orElse(null);
+        });
+
+        return Optional.ofNullable(agentInfo);
+    }
+
+    public void evictById(String agentId) {
+        if (StringUtils.hasText(agentId)) {
+            l1Cache.invalidate(agentId);
+        }
+    }
+
+    public void evictByIds(Collection<String> agentIds) {
+        if (CollectionUtils.isNotEmpty(agentIds)) {
+            l1Cache.invalidateAll(agentIds);
+        }
     }
 }
