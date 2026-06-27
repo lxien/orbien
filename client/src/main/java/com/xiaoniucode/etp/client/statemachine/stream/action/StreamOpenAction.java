@@ -2,7 +2,7 @@ package com.xiaoniucode.etp.client.statemachine.stream.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.command.CreateConnCommand;
+import com.xiaoniucode.etp.client.statemachine.agent.command.ConnCreateCommand;
 import com.xiaoniucode.etp.client.statemachine.stream.*;
 import com.xiaoniucode.etp.client.transport.bridge.TunnelBridgeFactory;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
@@ -74,12 +74,12 @@ public class StreamOpenAction extends StreamBaseAction {
                     streamContext.setTunnelEntry(tunnelEntry);
 
                     Integer connectionId = agentContext.getConnectionId();
-                    Message.StreamOpenResponse req = Message.StreamOpenResponse.newBuilder()
-                            .setCode(0)
+                    Message.OpenStreamResponse response = Message.OpenStreamResponse.newBuilder()
+                            .setStatus(Message.Status.newBuilder().setCode(0).build())
                             .setConnectionId(connectionId)
                             .setTunnelId(tunnelEntry.getTunnelId())
                             .build();
-                    ByteBuf payload = ProtobufUtil.toByteBuf(req, control.alloc());
+                    ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
                     TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
                     frame.setCompressed(streamContext.isCompress());
                     frame.setEncrypted(streamContext.isEncrypt());
@@ -125,13 +125,13 @@ public class StreamOpenAction extends StreamBaseAction {
 
         logger.debug("没有可用连接，开始创建新隧道");
 
-        CreateConnCommand createConnCommand;
+        ConnCreateCommand connCreateCommand;
         if (context.isMultiplex()) {
-            createConnCommand = CreateConnCommand.ofMultiplex(context.isEncrypt());
+            connCreateCommand = ConnCreateCommand.ofMultiplex(context.isEncrypt());
         } else {
-            createConnCommand = CreateConnCommand.ofDirect(context.isEncrypt(), 1);
+            connCreateCommand = ConnCreateCommand.ofDirect(context.isEncrypt(), 1);
         }
-        agentContext.setVariable("create_conn_command", createConnCommand);
+        agentContext.setVariable("create_conn_command", connCreateCommand);
         agentContext.fireEvent(AgentEvent.CREATE_NEW_CONN);
 
         // 等待后重试获取

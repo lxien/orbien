@@ -11,7 +11,7 @@ public class ErrorAction extends AgentBaseAction{
     private final InternalLogger logger= InternalLoggerFactory.getInstance(ErrorAction.class);
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        Message.Error error = context.getAndRemoveAs("ERROR", Message.Error.class);
-        logger.error(error.getMessage());
+//    todo     Message.Error error = context.getAndRemoveAs("ERROR", Message.Error.class);
+//        logger.error(error.getMessage());
     }
 }

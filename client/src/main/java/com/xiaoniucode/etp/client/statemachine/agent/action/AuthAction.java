@@ -4,7 +4,7 @@ import com.xiaoniucode.etp.client.common.AgentConstants;
 import com.xiaoniucode.etp.client.common.OSUtils;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.AuthConfig;
-import com.xiaoniucode.etp.client.manager.AgentIdentity;
+import com.xiaoniucode.etp.client.identity.AgentIdentity;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;

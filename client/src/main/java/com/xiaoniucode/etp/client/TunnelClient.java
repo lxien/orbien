@@ -1,14 +1,13 @@
 package com.xiaoniucode.etp.client;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
-import com.xiaoniucode.etp.client.event.ApplicationInitEvent;
-import com.xiaoniucode.etp.client.manager.AgentIdentity;
+import com.xiaoniucode.etp.client.config.ConfigUtils;
+import com.xiaoniucode.etp.client.identity.AgentIdentity;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.ControlIdleCheckHandler;
 import com.xiaoniucode.etp.client.transport.HeartbeatHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
-import com.xiaoniucode.etp.client.listener.ApplicationInitListener;
-import com.xiaoniucode.etp.client.manager.EventBusManager;
+import com.xiaoniucode.etp.client.identity.EventBusManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
@@ -25,8 +24,6 @@ import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.compression.SnappyFrameDecoder;
 import io.netty.handler.codec.compression.SnappyFrameEncoder;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -53,13 +50,11 @@ public final class TunnelClient implements Lifecycle {
     @Override
     public void start() {
         try {
-            EventBusManager.register(new ApplicationInitListener());
-            EventBusManager.publishAsync(new ApplicationInitEvent(config));
+            ConfigUtils.setConfig(config);
             initializeStateMachine();
             agentContext.fireEvent(AgentEvent.START);
-
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            logger.error(e);
         }
     }
 

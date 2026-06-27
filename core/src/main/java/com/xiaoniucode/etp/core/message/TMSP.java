@@ -9,51 +9,27 @@ public class TMSP {
     public static final int MAGIC = 0x544D5350; // 'T','M','S','P'
     public static final byte VERSION = 0x10;     // 1.0
 
-    // ────────────────────────────────────────────────
-    // 连接控制消息（Connection Level）
-    // ────────────────────────────────────────────────
-    public static final byte MSG_AUTH = 0x01;           // 认证请求
-    public static final byte MSG_AUTH_RESP = 0x02;      // 认证响应
+    public static final byte MSG_AUTH = 0x01;
+    public static final byte MSG_AUTH_RESP = 0x02;
+    public static final byte MSG_PING = 0x03;
+    public static final byte MSG_PONG = 0x04;
+    public static final byte MSG_GOAWAY = 0x05;
+    public static final byte MSG_ERROR = 0x06;
 
-    public static final byte MSG_PING = 0x03;           // 心跳请求
-    public static final byte MSG_PONG = 0x04;           // 心跳响应
+    public static final byte MSG_CONNECTION_CREATE = 0x07;
+    public static final byte MSG_CONNECTION_CREATE_RESP = 0x08;
 
-    public static final byte MSG_GOAWAY = 0x05;         // 优雅关闭连接
-    public static final byte MSG_ERROR = 0x06;          // 通用错误消息
-    public static final byte MSG_TUNNEL_CREATE = 0x07;  // 隧道创建 客户端发起
-    public static final byte MSG_TUNNEL_CREATE_RESP = 0x08;    // 隧道创建响应 服务端响应
-    public static final byte MSG_SERVICE_HEALTH_CHANGE = 0x09;    //内网服务健康改变
-     // ────────────────────────────────────────────────
-    // 配置管理消息（Proxy Config Control）—— 认证后才能使用
-    // ────────────────────────────────────────────────
-    public static final byte MSG_PROXY_CREATE = 0x10;
-    public static final byte MSG_PROXY_CREATE_RESP = 0x11;
+    public static final byte MSG_SERVICE_HEALTH_REPORT = 0x09;
+    public static final byte MSG_PROXY_REPORT_REQ = 0x10;
+    public static final byte MSG_PROXY_REPORT_RESP = 0x11;
+    public static final byte MSG_CONFIG_SYNC = 0x12;
 
-    public static final byte MSG_PROXY_UPDATE = 0x12;
-    public static final byte MSG_PROXY_UPDATE_RESP = 0x13;
+    public static final byte MSG_STREAM_OPEN = 0x20;
+    public static final byte MSG_STREAM_OPEN_RESP = 0x21;
+    public static final byte MSG_STREAM_CLOSE = 0x22;
+    public static final byte MSG_STREAM_RESET = 0x23;
+    public static final byte MSG_STREAM_DATA = 0x24;
 
-    public static final byte MSG_PROXY_DELETE = 0x14;
-    public static final byte MSG_PROXY_DELETE_RESP = 0x15;
-
-    public static final byte MSG_PROXY_LIST = 0x16;
-    public static final byte MSG_PROXY_LIST_RESP = 0x17;
-
-    public static final byte MSG_PROXY_GET = 0x18;
-    public static final byte MSG_PROXY_GET_RESP = 0x19;
-
-    public static final byte MSG_PROXY_NOTIFY = 0x1A;
-
-    // ────────────────────────────────────────────────
-    // 流消息（Stream Level）
-    // ────────────────────────────────────────────────
-    public static final byte MSG_STREAM_OPEN = 0x20;      // 打开新流
-    public static final byte MSG_STREAM_OPEN_RESP = 0x21;  // 打开流响应
-    public static final byte MSG_STREAM_CLOSE = 0x22;  // 优雅关闭流
-    public static final byte MSG_STREAM_RESET = 0x23;  // 强制重置流
-    public static final byte MSG_STREAM_DATA = 0x24;  // 实际隧道数据
-    // ────────────────────────────────────────────────
-    // 流量控制，用于控制远端流的读写状态（Flow Control）
-    // ─────────────────────────────────────────────
     public static final byte MSG_STREAM_PAUSE = 0x25;
     public static final byte MSG_STREAM_RESUME = 0x26;
 
@@ -66,7 +42,6 @@ public class TMSP {
     public static final byte COMPRESS_NONE = 0x00;   // 0000 0000
     public static final byte COMPRESS_LZ4 = 0x08;   // 0000 1000  (bit 3)
     public static final byte COMPRESS_SNAPPY = 0x10;   // 0001 0000  (bit 4)
-
     public static final byte COMPRESS_MASK = 0x38;   // 0011 1000  (bit 3~5，用于掩码)
 
     /**

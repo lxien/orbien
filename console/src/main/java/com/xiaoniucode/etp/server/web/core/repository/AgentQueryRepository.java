@@ -16,7 +16,6 @@
 
 package com.xiaoniucode.etp.server.web.core.repository;
 
-import com.xiaoniucode.etp.server.service.repository.AgentQueryRepository;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.web.core.converter.AgentModelConvert;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
@@ -27,7 +26,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public class StandaloneAgentQueryRepository implements AgentQueryRepository {
+public class AgentQueryRepository implements com.xiaoniucode.etp.server.service.repository.AgentQueryRepository {
     @Autowired
     private AgentRepository agentRepository;
     @Autowired

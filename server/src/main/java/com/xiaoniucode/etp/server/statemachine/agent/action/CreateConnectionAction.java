@@ -50,7 +50,7 @@ public class CreateConnectionAction extends AgentBaseAction {
                 .build();
 
         ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
-        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_TUNNEL_CREATE_RESP, payload);
+        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_CONNECTION_CREATE_RESP, payload);
         frame.setEncrypted(encrypt);
         frame.setMultiplexTunnel(multiplex);
         if (!control.isActive() || !control.isWritable()) {

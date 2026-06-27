@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action.tunnel;
+package com.xiaoniucode.etp.client.statemachine.agent.action.connection;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.domain.ConnectionConfig;
@@ -11,7 +11,7 @@ import com.xiaoniucode.etp.client.statemachine.agent.action.AgentBaseAction;
 /**
  * 预创建数据传输连接
  */
-public class CreateConnPoolAction extends AgentBaseAction {
+public class ConnPoolCreateAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
@@ -25,10 +25,10 @@ public class CreateConnPoolAction extends AgentBaseAction {
         // 创建多路复用隧道
        PoolConfig.MultiplexPoolConfig multiplexPoolConfig = connectionConfig.getPoolConfig().getMultiplex();
         if (multiplexPoolConfig.isPlain()) {
-            TunnelConnCreateHelper.createMultiplexTunnel(context, config, false);
+            ConnCreateHelper.createMultiplexTunnel(context, config, false);
         }
         if (hasTls && multiplexPoolConfig.isEncrypt()) {
-            TunnelConnCreateHelper.createMultiplexTunnel(context, config, true);
+            ConnCreateHelper.createMultiplexTunnel(context, config, true);
         }
 
         // 创建独立隧道
@@ -37,11 +37,11 @@ public class CreateConnPoolAction extends AgentBaseAction {
         int encryptCount = directPoolConfig.getEncryptCount();
         
         for (int i = 0; i < plainCount; i++) {
-            TunnelConnCreateHelper.createDirectTunnel(context, config, false);
+            ConnCreateHelper.createDirectTunnel(context, config, false);
         }
         if (hasTls) {
             for (int i = 0; i < encryptCount; i++) {
-                TunnelConnCreateHelper.createDirectTunnel(context, config, true);
+                ConnCreateHelper.createDirectTunnel(context, config, true);
             }
         }
     }

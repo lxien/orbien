@@ -3,7 +3,8 @@ package com.xiaoniucode.etp.client.statemachine.agent;
 import com.alibaba.cola.statemachine.StateMachine;
 import com.xiaoniucode.etp.client.TunnelClient;
 import com.xiaoniucode.etp.client.config.AppConfig;
-import com.xiaoniucode.etp.client.manager.AgentIdentity;
+import com.xiaoniucode.etp.client.health.HealthCheckManager;
+import com.xiaoniucode.etp.client.identity.AgentIdentity;
 import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
@@ -35,6 +36,7 @@ public class AgentContext extends AbstractAgentContext {
     private DirectPool directPool;
     private MultiplexPool multiplexPool;
     private ControlFrameHandler controlFrameHandler;
+    private HealthCheckManager healthCheckManager;
     private AgentIdentity agentIdentity;
     private final AtomicInteger retryCount = new AtomicInteger(0);
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;

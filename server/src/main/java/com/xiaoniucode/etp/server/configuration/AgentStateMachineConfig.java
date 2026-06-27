@@ -11,65 +11,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 服务端代理状态机配置
- * 负责配置服务端代理的状态机，管理代理的各种状态转换
- */
 @Configuration
 public class AgentStateMachineConfig {
-
-    /**
-     * 认证动作
-     */
     @Autowired
     private AuthAction authAction;
-
-    /**
-     * 代理初始化动作
-     */
     @Autowired
     private AgentInitAction agentInitAction;
-
-    /**
-     * 代理创建动作
-     */
     @Autowired
-    private ProxyCreateAction proxyCreateAction;
-
-    /**
-     * 创建隧道动作
-     */
+    private ConfigSyncAction configSyncAction;
+    @Autowired
+    private ProxyReportAction proxyReportAction;
     @Autowired
     private CreateConnectionAction createConnectionAction;
-
-    /**
-     * GoAway 动作
-     */
     @Autowired
     private GoawayAction goawayAction;
-
-    /**
-     * 认证失败动作
-     */
     @Autowired
     private AuthFailureAction authFailureAction;
-
-    /**
-     * 心跳超时动作
-     */
     @Autowired
     private HeartbeatTimeoutAction heartbeatTimeoutAction;
-
-    /**
-     * 重连超时动作
-     */
     @Autowired
     private RetryTimeoutAction retryTimeoutAction;
 
-    /**
-     * 创建代理状态机
-     * @return 代理状态机实例
-     */
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
         StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
@@ -82,16 +44,17 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform(authAction);
 
-        // 认证成功
+        // 认证成功-同步代理配置
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATING)
                 .to(AgentState.CONNECTED)
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true)
-                .perform(agentInitAction);
+                .perform(configSyncAction);
+        //初始化客户端运行时信息
         builder.internalTransition()
                 .within(AgentState.CONNECTED)
-                .on(AgentEvent.REBUILD_CONTEXT)
+                .on(AgentEvent.AGENT_INIT)
                 .when(ctx -> true)
                 .perform(agentInitAction);
         // 认证失败
@@ -105,9 +68,9 @@ public class AgentStateMachineConfig {
         // 处理代理创建请求
         builder.internalTransition()
                 .within(AgentState.CONNECTED)
-                .on(AgentEvent.PROXY_CREATE_REQUEST)
+                .on(AgentEvent.PROXY_REPORT)
                 .when(ctx -> true)
-                .perform(proxyCreateAction);
+                .perform(proxyReportAction);
 
         // 创建隧道
         builder.internalTransition()

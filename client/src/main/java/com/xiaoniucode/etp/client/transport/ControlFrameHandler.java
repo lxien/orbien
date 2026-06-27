@@ -16,13 +16,13 @@
 package com.xiaoniucode.etp.client.transport;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.ContextConstants;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.stream.*;
 import com.xiaoniucode.etp.core.codec.NewStreamCodec;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
-import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -61,14 +61,15 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             //********************Agent***********************//
             case TMSP.MSG_AUTH_RESP: {
                 Message.AuthResponse authResponse = ProtobufUtil.parseFrom(frame.getPayload(), Message.AuthResponse.parser());
-                agentContext.setVariable("authResponse", authResponse);
+                agentContext.setVariable(ContextConstants.AUTH_RESP, authResponse);
                 agentContext.fireEvent(AgentEvent.AUTH_RESPONSE);
                 break;
             }
-            case TMSP.MSG_PROXY_CREATE_RESP: {
-                Message.NewProxyResp newProxyResp = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxyResp.parser());
-                agentContext.setVariable("NEW_PROXY_RESP", newProxyResp);
-                agentContext.fireEvent(AgentEvent.PROXY_CREATE_RESP);
+            case TMSP.MSG_PROXY_REPORT_RESP: {
+                Message.BatchCreateProxiesResponse proxies = ProtobufUtil.parseFrom(frame.getPayload(),
+                        Message.BatchCreateProxiesResponse.parser());
+                agentContext.setVariable(ContextConstants.BATCH_CREATE_PROXIES_RESP, proxies);
+                agentContext.fireEvent(AgentEvent.PROXY_REPORT_RESP);
                 break;
             }
             case TMSP.MSG_GOAWAY: {
@@ -78,7 +79,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_ERROR: {
                 Message.Error error = ProtobufUtil.parseFrom(frame.getPayload(), Message.Error.parser());
-                agentContext.setVariable("ERROR", error);
+                agentContext.setVariable(ContextConstants.ERROR, error);
                 agentContext.fireEvent(AgentEvent.ERROR);
                 break;
             }
@@ -86,18 +87,23 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 logger.debug("收到来自服务端的 PONG 消息");
                 break;
             }
+            //配置同步
+            case TMSP.MSG_CONFIG_SYNC: {
+                break;
+
+            }
             //********************Tunnel***********************//
-            case TMSP.MSG_TUNNEL_CREATE_RESP: {
+            case TMSP.MSG_CONNECTION_CREATE_RESP: {
                 ByteBuf payload = frame.getPayload();
-                Message.TunnelCreateResponse resp = ProtobufUtil.parseFrom(payload, Message.TunnelCreateResponse.parser());
+                Message.CreateConnectionResponse resp = ProtobufUtil.parseFrom(payload, Message.CreateConnectionResponse.parser());
                 String tunnelId = resp.getTunnelId();
                 agentContext.getControl().eventLoop().execute(() -> {
-                    agentContext.setVariable("tunnelId", tunnelId);
-                    agentContext.setVariable("compress", frame.isCompressed());
-                    agentContext.setVariable("encrypt", frame.isEncrypted());
-                    agentContext.setVariable("multiplex", frame.isMuxTunnel());
-                    agentContext.setVariable("tunnel_create_response", resp);
-                    agentContext.fireEvent(AgentEvent.CREATE_TUNNEL_POOL_RESP);
+                    agentContext.setVariable(ContextConstants.TUNNEL_ID, tunnelId);
+                    agentContext.setVariable(ContextConstants.COMPRESS, frame.isCompressed());
+                    agentContext.setVariable(ContextConstants.ENCRYPT, frame.isEncrypted());
+                    agentContext.setVariable(ContextConstants.MULTIPLEX, frame.isMuxTunnel());
+                    agentContext.setVariable(ContextConstants.CREATE_CONN_RESP, resp);
+                    agentContext.fireEvent(AgentEvent.CREATE_CONN_POOL_RESP);
                 });
 
                 break;

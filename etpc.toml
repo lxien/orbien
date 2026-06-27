@@ -37,13 +37,36 @@ name = "web1"
 protocol = "https"
 custom_domains = ["a.domain1.com", "b.domain1.com"]
 targets = [
-    {  port = 8084},
+    { port = 8084 },
+    { host = "127.0.0.1", port = 8088, weight = 10, name = "web-instance-1" },
     { host = "127.0.0.1", port = 8084, weight = 1, name = "web-instance-1" }
 ]
 force_https = true
 [proxies.ssl]
 cert_file = "cert/domains/xiaoniucode.com/fullchain.pem"
 key_file = "cert/domains/xiaoniucode.com/privkey.pem"
+
+[proxies.health_check]
+enabled = true
+type = "http"
+interval = 8
+timeout = 5
+max_failed = 3
+path = "/health"
+
+[[proxies]]
+name = "tcp"
+protocol = "tcp"
+local_ip = "localhost"
+local_port = 8089
+
+[proxies.health_check]
+enabled = true
+type = "tcp"
+interval = 8
+timeout = 5
+max_failed = 3
+
 
 #
 ##################################################代理配置############################################################

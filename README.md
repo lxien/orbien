@@ -14,8 +14,8 @@
   <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/xiaoniucode/etp/releases/v0.10.0">
-    <img src="https://img.shields.io/badge/etp-0.10.0-blue?style=for-the-badge" alt="etp:0.10.0"/>
+ <a href="https://github.com/xiaoniucode/etp/releases/v0.15.0">
+    <img src="https://img.shields.io/badge/etp-0.15.0-blue?style=for-the-badge" alt="etp:0.15.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
   <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>

@@ -12,7 +12,7 @@
     <name>etp-test</name>
     <description>etp-test</description>
     <properties>
-        <etp-server.version>0.10.0</etp-server.version>
+        <etp-server.version>0.15.0</etp-server.version>
         <java.version>25</java.version>
         <maven.test.skip>false</maven.test.skip>
         <skipTests>false</skipTests>

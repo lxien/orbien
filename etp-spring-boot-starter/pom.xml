@@ -10,7 +10,7 @@
     <description>etp-spring-boot-starter</description>
     <properties>
         <java.version>8</java.version>
-        <etp.version>0.10.0</etp.version>
+        <etp.version>0.15.0</etp.version>
         <etp-spring-boot.version>0.3.0</etp-spring-boot.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

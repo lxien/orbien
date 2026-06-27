@@ -17,10 +17,12 @@ package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 
 import com.xiaoniucode.etp.client.config.AppConfig;
+import com.xiaoniucode.etp.client.health.HealthCheckHolder;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
@@ -41,8 +43,10 @@ public class ConnectAction extends AgentBaseAction {
             channelFuture.addListener((ChannelFutureListener) f -> {
                 if (f.isSuccess()) {
                     logger.debug("成功连接到服务器：{}:{}",appConfig.getServerAddr(),appConfig.getServerPort());
+                    Channel control = channelFuture.channel();
                     ctx.getRetryCount().set(0);
-                    ctx.setControl(channelFuture.channel());
+                    ctx.setControl(control);
+                    HealthCheckHolder.init(control);
                     ctx.fireEvent(AgentEvent.CONNECT_SUCCESS);
                 } else {
                     logger.error("无法连接到代理服务器：{}:{}",appConfig.getServerAddr(),appConfig.getServerPort());

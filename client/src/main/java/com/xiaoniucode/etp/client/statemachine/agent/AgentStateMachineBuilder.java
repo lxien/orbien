@@ -21,12 +21,12 @@ import com.alibaba.cola.statemachine.builder.StateMachineBuilder;
 import com.alibaba.cola.statemachine.builder.StateMachineBuilderFactory;
 import com.xiaoniucode.etp.client.statemachine.agent.action.*;
 import com.xiaoniucode.etp.client.statemachine.agent.action.AuthAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.AuthResponseAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.AuthRespAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.ConnectAction;
 import com.xiaoniucode.etp.client.statemachine.agent.action.DisconnectedAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.RetryConnAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateConnPoolAction;
-import com.xiaoniucode.etp.client.statemachine.agent.action.tunnel.CreateNewConnAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.ConnRetryAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.connection.ConnPoolCreateAction;
+import com.xiaoniucode.etp.client.statemachine.agent.action.connection.NewConnectionCreateAction;
 
 /**
  * 客户端代理状态机构建器
@@ -57,33 +57,34 @@ public class AgentStateMachineBuilder {
             StateMachineBuilder<AgentState, AgentEvent, AgentContext> builder = StateMachineBuilderFactory.create();
 
 
-            CheckConfigAction checkConfigAction = new CheckConfigAction();
-            InitSslAction initSslAction = new InitSslAction();
+            ConfigCheckAction configCheckAction = new ConfigCheckAction();
+            TlslnitAction tlslnitAction = new TlslnitAction();
             ConnectAction connectAction = new ConnectAction();
             AuthAction authAction = new AuthAction();
-            AuthResponseAction authResponseAction = new AuthResponseAction();
+            AuthRespAction authRespAction = new AuthRespAction();
             AuthSuccessAction authSuccessAction = new AuthSuccessAction();
+            ConfigSyncAction configSyncAction = new ConfigSyncAction();
             NetworkErrorAction networkErrorAction = new NetworkErrorAction();
             GoawayAction goawayAction = new GoawayAction();
-            CreateConnPoolAction createTunnelPoolAction = new CreateConnPoolAction();
-            TunnelCreateRespAction tunnelCreateRespAction = new TunnelCreateRespAction();
-            ProxyCreationResponseAction proxyCreationResponseAction = new ProxyCreationResponseAction();
+            ConnPoolCreateAction createTunnelPoolAction = new ConnPoolCreateAction();
+            ConnCreateRespAction connCreateRespAction = new ConnCreateRespAction();
+            ProxyReportRespAction proxyReportRespAction = new ProxyReportRespAction();
             ErrorAction errorAction = new ErrorAction();
-            CreateNewConnAction createNewConnAction = new CreateNewConnAction();
+            NewConnectionCreateAction newConnectionCreateAction = new NewConnectionCreateAction();
             DisconnectedAction disconnectedAction = new DisconnectedAction();
-            RetryConnAction retryConnAction = new RetryConnAction();
+            ConnRetryAction connRetryAction = new ConnRetryAction();
 
             builder.externalTransition()
                     .from(AgentState.IDLE)
                     .to(AgentState.CONNECTING)
                     .on(AgentEvent.START)
-                    .perform(checkConfigAction);
+                    .perform(configCheckAction);
 
             // 配置检查
             builder.internalTransition()
                     .within(AgentState.CONNECTING)
                     .on(AgentEvent.CONFIG_CHECKED)
-                    .perform(initSslAction);
+                    .perform(tlslnitAction);
 
             // SSL 初始化
             builder.internalTransition()
@@ -101,13 +102,20 @@ public class AgentStateMachineBuilder {
             builder.internalTransition()
                     .within(AgentState.CONNECTING)
                     .on(AgentEvent.AUTH_RESPONSE)
-                    .perform(authResponseAction);
+                    .perform(authRespAction);
             // 认证成功
             builder.externalTransition()
                     .from(AgentState.CONNECTING)
                     .to(AgentState.CONNECTED)
                     .on(AgentEvent.AUTH_SUCCESS)
                     .perform(authSuccessAction);
+
+            builder.internalTransition()
+                    .within(AgentState.CONNECTED)
+                    .on(AgentEvent.AUTH_RESPONSE)
+                    .perform(configSyncAction);
+
+
             // 运行中出现网络错误
             builder.externalTransition()
                     .from(AgentState.CONNECTED)
@@ -130,7 +138,7 @@ public class AgentStateMachineBuilder {
             builder.internalTransition()
                     .within(AgentState.CONNECTING)
                     .on(AgentEvent.CONNECT_FAILURE)
-                    .perform(retryConnAction);
+                    .perform(connRetryAction);
             //首次连接失败 尝试重试
             builder.internalTransition()
                     .within(AgentState.CONNECTING)
@@ -140,26 +148,26 @@ public class AgentStateMachineBuilder {
             // 处理创建隧道池请求
             builder.internalTransition()
                     .within(AgentState.CONNECTED)
-                    .on(AgentEvent.CREATE_TUNNEL_POOL)
+                    .on(AgentEvent.CREATE_CONN_POOL)
                     .perform(createTunnelPoolAction);
 
             // 处理隧道创建响应
             builder.internalTransition()
                     .within(AgentState.CONNECTED)
-                    .on(AgentEvent.CREATE_TUNNEL_POOL_RESP)
-                    .perform(tunnelCreateRespAction);
+                    .on(AgentEvent.CREATE_CONN_POOL_RESP)
+                    .perform(connCreateRespAction);
 
             // 处理代理创建响应
             builder.internalTransition()
                     .within(AgentState.CONNECTED)
-                    .on(AgentEvent.PROXY_CREATE_RESP)
-                    .perform(proxyCreationResponseAction);
+                    .on(AgentEvent.PROXY_REPORT_RESP)
+                    .perform(proxyReportRespAction);
 
             // 创建新连接
             builder.internalTransition()
                     .within(AgentState.CONNECTED)
                     .on(AgentEvent.CREATE_NEW_CONN)
-                    .perform(createNewConnAction);
+                    .perform(newConnectionCreateAction);
 
             // 处理错误
             builder.internalTransition()

@@ -25,9 +25,9 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class RetryConnAction extends AgentBaseAction {
+public class ConnRetryAction extends AgentBaseAction {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(RetryConnAction.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ConnRetryAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {

@@ -9,8 +9,8 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-public class CheckConfigAction extends AgentBaseAction {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(CheckConfigAction.class);
+public class ConfigCheckAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ConfigCheckAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {

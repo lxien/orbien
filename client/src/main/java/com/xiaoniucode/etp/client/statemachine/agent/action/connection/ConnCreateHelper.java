@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client.statemachine.agent.action.tunnel;
+package com.xiaoniucode.etp.client.statemachine.agent.action.connection;
 
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
@@ -18,9 +18,9 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 /**
  * 隧道连接创建辅助类
  */
-public class TunnelConnCreateHelper {
+public class ConnCreateHelper {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelConnCreateHelper.class);
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ConnCreateHelper.class);
 
     /**
      * 创建多路复用隧道并发送创建请求
@@ -67,12 +67,12 @@ public class TunnelConnCreateHelper {
                                                TunnelEntry tunnelEntry, boolean isEncrypt, boolean isMultiplex) {
         Integer connectionId = context.getConnectionId();
 
-        Message.TunnelCreateRequest body = Message.TunnelCreateRequest.newBuilder()
+        Message.CreateConnectionRequest body = Message.CreateConnectionRequest.newBuilder()
                 .setTunnelId(tunnelEntry.getTunnelId())
                 .build();
 
         ByteBuf payload = ProtobufUtil.toByteBuf(body, tunnel.alloc());
-        TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_TUNNEL_CREATE, payload);
+        TMSPFrame frame = new TMSPFrame(connectionId, TMSP.MSG_CONNECTION_CREATE, payload);
         frame.setMultiplexTunnel(isMultiplex);
         frame.setEncrypted(isEncrypt);
 

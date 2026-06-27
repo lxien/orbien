@@ -18,7 +18,6 @@ package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.service.ProxyConfigExt;
-import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.vhost.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
@@ -32,7 +31,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
-public class StandaloneProxyQueryRepository implements ProxyQueryRepository {
+public class ProxyQueryRepository implements com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository {
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired

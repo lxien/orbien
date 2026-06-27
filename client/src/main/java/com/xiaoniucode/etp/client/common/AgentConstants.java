@@ -17,5 +17,5 @@
 package com.xiaoniucode.etp.client.common;
 
 public interface AgentConstants {
-    String AGENT_VERSION = "0.10.0";
+    String AGENT_VERSION = "0.15.0";
 }

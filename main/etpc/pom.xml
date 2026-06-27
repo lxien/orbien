@@ -4,14 +4,14 @@
     <parent>
         <groupId>com.xiaoniucode</groupId>
         <artifactId>etp-main</artifactId>
-        <version>0.10.0</version>
+        <version>0.15.0</version>
     </parent>
     <artifactId>etpc</artifactId>
     <packaging>jar</packaging>
     <name>etpc</name>
     <properties>
         <java.version>25</java.version>
-        <etp.client.version>0.10.0</etp.client.version>
+        <etp.client.version>0.15.0</etp.client.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <native-maven-plugin.version>0.11.4</native-maven-plugin.version>

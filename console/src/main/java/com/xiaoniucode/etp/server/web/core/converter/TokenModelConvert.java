@@ -20,12 +20,7 @@ import com.xiaoniucode.etp.server.config.domain.TokenConfig;
 import com.xiaoniucode.etp.server.web.entity.AccessTokenDO;
 import org.mapstruct.Mapper;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface TokenModelConvert {
-
     TokenConfig toTokenConfig(AccessTokenDO accessTokenDO);
-
-    List<TokenConfig> toTokenConfigList(List<AccessTokenDO> accessTokenDOs);
 }

@@ -21,8 +21,6 @@ import com.xiaoniucode.etp.server.web.entity.AgentDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface AgentModelConvert {
     @Mapping(target = "agentId", source = "id")
@@ -30,6 +28,4 @@ public interface AgentModelConvert {
 
     @Mapping(target = "id", source = "agentId")
     AgentDO toDO(AgentInfo model);
-
-    List<AgentInfo> toAgentInfoList(List<AgentDO> agentDOs);
 }

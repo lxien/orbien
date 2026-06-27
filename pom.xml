@@ -9,7 +9,7 @@
     </parent>
     <groupId>io.github.xiaoniucode</groupId>
     <artifactId>etp</artifactId>
-    <version>0.10.0</version>
+    <version>0.15.0</version>
     <name>etp</name>
     <dependencies>
         <dependency>
@@ -61,7 +61,7 @@
     <properties>
         <!-- ==================== 项目基础配置 ==================== -->
         <java.version>25</java.version>
-        <revision>0.10.0</revision>
+        <revision>0.15.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 

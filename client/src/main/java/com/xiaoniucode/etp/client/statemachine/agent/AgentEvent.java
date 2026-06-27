@@ -65,59 +65,20 @@ public enum AgentEvent {
      */
     DISCONNECT,
     /**
-     * 创建隧道池
+     * 创建连接池
      */
-    CREATE_TUNNEL_POOL,
+    CREATE_CONN_POOL,
     /**
      * 创建单个连接
      */
     CREATE_NEW_CONN,
     /**
-     * 创建隧道池响应
+     * 创建连接池响应
      */
-    CREATE_TUNNEL_POOL_RESP,
+    CREATE_CONN_POOL_RESP,
+
     /**
-     * 发送创建代理请求
+     * 代理配置上报响应
      */
-    PROXY_CREATE,
-    /**
-     * 接收创建代理响应
-     */
-    PROXY_CREATE_RESP,
-    /**
-     * 发送更新代理请求
-     */
-    PROXY_UPDATE,
-    /**
-     * 接收更新代理响应
-     */
-    PROXY_UPDATE_RESP,
-    /**
-     * 发送删除代理请求
-     */
-    PROXY_DELETE,
-    /**
-     * 接收删除代理响应
-     */
-    PROXY_DELETE_RESP,
-    /**
-     * 发送查询代理列表请求
-     */
-    PROXY_LIST,
-    /**
-     * 接收代理列表响应
-     */
-    PROXY_LIST_RESP,
-    /**
-     * 发送查询单个代理请求
-     */
-    PROXY_GET,
-    /**
-     * 接收单个代理响应
-     */
-    PROXY_GET_RESP,
-    /**
-     * 接收服务端推送通知
-     */
-    PROXY_NOTIFY
+    PROXY_REPORT_RESP,
 }

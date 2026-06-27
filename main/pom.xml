@@ -3,7 +3,7 @@
     <groupId>com.xiaoniucode</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>etp-main</artifactId>
-    <version>0.10.0</version>
+    <version>0.15.0</version>
     <packaging>pom</packaging>
     <name>etp-main</name>
     <properties>

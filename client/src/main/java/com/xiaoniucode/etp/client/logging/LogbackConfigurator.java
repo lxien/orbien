@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.client.log;
+package com.xiaoniucode.etp.client.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -29,7 +29,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;

@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.github.xiaoniucode</groupId>
         <artifactId>etp</artifactId>
-        <version>0.10.0</version>
+        <version>0.15.0</version>
     </parent>
     <artifactId>etp-common</artifactId>
     <packaging>jar</packaging>

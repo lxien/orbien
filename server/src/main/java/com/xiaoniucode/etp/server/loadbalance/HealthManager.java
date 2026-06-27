@@ -8,50 +8,75 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * 代理内网服务健康状态管理器
+ */
 @Component
 public class HealthManager {
-    /**
-     * proxyId:host:port -> 健康状态
-     */
-    private final Map<String, Boolean> healthMap = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String/*proxyId*/, ConcurrentHashMap<String/*host:port*/, Boolean>> healthStore = new ConcurrentHashMap<>();
 
-    public boolean isHealthy(String proxyId, Target target) {
-        String key = proxyId + ":" + target.getHost() + ":" + target.getPort();
-        return healthMap.getOrDefault(key, true);
+    public void updateHealth(String proxyId, Target target, boolean healthy) {
+        if (proxyId == null || target == null) return;
+
+        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.computeIfAbsent(proxyId,
+                k -> new ConcurrentHashMap<>()
+        );
+        String key = buildTargetKey(target);
+        targetHealth.put(key, healthy);
     }
 
-    public void setHealthy(String proxyId, Target target, boolean healthy) {
-        String key = proxyId + ":" + target.getHost() + ":" + target.getPort();
-        healthMap.put(key, healthy);
+    public void batchUpdate(String proxyId, Map<Target, Boolean> statusMap) {
+        if (statusMap == null || statusMap.isEmpty()) return;
+
+        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.computeIfAbsent(proxyId,
+                k -> new ConcurrentHashMap<>());
+
+        statusMap.forEach((target, healthy) -> {
+            String key = buildTargetKey(target);
+            targetHealth.put(key, healthy);
+        });
     }
 
-    /**
-     * 更新健康状态
-     */
-    public void updateHealthy(String proxyId, Target target, boolean healthy) {
-        setHealthy(proxyId, target, healthy);
-    }
-
-    /**
-     * 批量更新健康状态
-     */
-    public void batchUpdateHealthy(String proxyId, Map<Target, Boolean> healthStatusMap) {
-        if (healthStatusMap != null && !healthStatusMap.isEmpty()) {
-            for (Map.Entry<Target, Boolean> entry : healthStatusMap.entrySet()) {
-                setHealthy(proxyId, entry.getKey(), entry.getValue());
-            }
-        }
-    }
-
-    /**
-     * 获取可用的目标列表
-     */
     public List<Target> getAvailableTargets(String proxyId, List<Target> targets) {
         if (targets == null || targets.isEmpty()) {
             return List.of();
         }
-        return targets.stream()
-                .filter(target -> isHealthy(proxyId, target))
-                .collect(Collectors.toList());
+
+        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.get(proxyId);
+        if (targetHealth == null) {
+            return targets;
+        }
+
+        return targets.stream().filter(target -> {
+            String key = buildTargetKey(target);
+            return targetHealth.getOrDefault(key, true);
+        }).collect(Collectors.toList());
+    }
+
+    public void removeProxy(String proxyId) {
+        if (proxyId != null) {
+            healthStore.remove(proxyId);
+        }
+    }
+
+    public void removeTarget(String proxyId, Target target) {
+        if (proxyId == null || target == null) return;
+
+        String key = buildTargetKey(target);
+        healthStore.computeIfPresent(proxyId, (pid, targetHealth) -> {
+            targetHealth.remove(key);
+            if (targetHealth.isEmpty()) {
+                return null;
+            }
+            return targetHealth;
+        });
+    }
+
+    public void clear() {
+        healthStore.clear();
+    }
+
+    private String buildTargetKey(Target target) {
+        return target.getHost() + ":" + target.getPort();
     }
 }

@@ -105,7 +105,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     ag.ifPresent(agentContext -> agentContext.fireEvent(AgentEvent.REMOTE_GOAWAY));
                 }
 
-                case TMSP.MSG_TUNNEL_CREATE -> {
+                case TMSP.MSG_CONNECTION_CREATE -> {
                     logger.debug("收到连接池创建消息");
                     Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
                     if (ag.isPresent()) {
@@ -117,8 +117,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             ChannelUtils.closeOnFlush(ctx.channel());
                             return;
                         }
-                        Message.TunnelCreateRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.TunnelCreateRequest.parser());
-                        ConnectionCreateCmd cmd = new ConnectionCreateCmd(tunnel, frame.isEncrypted(), frame.isMuxTunnel(), req.getTunnelId());
+                        Message.CreateConnectionRequest req = ProtobufUtil.parseFrom(frame.getPayload(),
+                                Message.CreateConnectionRequest.parser());
+                        ConnectionCreateCmd cmd = new ConnectionCreateCmd(tunnel, frame.isEncrypted(),
+                                frame.isMuxTunnel(), req.getTunnelId());
+
                         control.eventLoop().execute(() -> {
                             agentContext.setVariable(AgentConstants.TUNNEL_CREATE_CMD, cmd);
                             agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
@@ -148,7 +151,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         return;
                     }
                     ByteBuf payload = frame.getPayload();
-                    Message.StreamOpenResponse resp = ProtobufUtil.parseFrom(payload, Message.StreamOpenResponse.parser());
+                    Message.OpenStreamResponse resp = ProtobufUtil.parseFrom(payload, Message.OpenStreamResponse.parser());
                     String tunnelId = resp.getTunnelId();
                     streamContext.setMultiplex(frame.isMuxTunnel());
                     streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
@@ -189,12 +192,18 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
                     }
                 }
-                case TMSP.MSG_PROXY_CREATE -> {
+                //代理配置上报
+                case TMSP.MSG_PROXY_REPORT -> {
                     agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-                        Message.NewProxy newProxy = ProtobufUtil.parseFrom(frame.getPayload(), Message.NewProxy.parser());
-                        agentContext.setVariable(AgentConstants.NEWA_PROXY, newProxy);
-                        agentContext.fireEvent(AgentEvent.PROXY_CREATE_REQUEST);
+                        Message.BatchCreateProxiesRequest proxies = ProtobufUtil.parseFrom(frame.getPayload(),
+                                Message.BatchCreateProxiesRequest.parser());
+                        agentContext.setVariable(AgentConstants.BATCH_CREATE_PROXIES_REQUEST, proxies);
+                        agentContext.fireEvent(AgentEvent.PROXY_REPORT);
                     });
+                }
+                //代理服务节点健康状态上报
+                case TMSP.MSG_SERVICE_HEALTH_REPORT -> {
+
                 }
             }
         } catch (Exception e) {

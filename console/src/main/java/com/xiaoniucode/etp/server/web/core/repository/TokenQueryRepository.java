@@ -14,25 +14,19 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.statemachine.agent.action.config;
+package com.xiaoniucode.etp.server.web.core.repository;
 
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
-import lombok.Getter;
+import com.xiaoniucode.etp.server.web.repository.AccessTokenRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.Set;
+@Component
+public class TokenQueryRepository implements com.xiaoniucode.etp.server.service.repository.TokenQueryRepository {
+    @Autowired
+    private AccessTokenRepository accessTokenRepository;
 
-/**
- * 操作结果
- */
-@Getter
-public class ProxyOperationResult {
-    private final Set<DomainInfo> domains;
-    private final Integer listenPort;
-    private final boolean hasChange;
-
-    public ProxyOperationResult(Set<DomainInfo> domains, Integer listenPort, boolean hasChange) {
-        this.domains = domains;
-        this.listenPort = listenPort;
-        this.hasChange = hasChange;
+    @Override
+    public boolean existsByToken(String token) {
+        return accessTokenRepository.existsByToken(token);
     }
 }

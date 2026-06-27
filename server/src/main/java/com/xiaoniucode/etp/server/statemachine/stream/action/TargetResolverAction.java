@@ -72,7 +72,6 @@ public class TargetResolverAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
             logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
-            //客户端不可用
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         }
     }

@@ -4,8 +4,7 @@ import ch.qos.logback.classic.Level;
 import com.xiaoniucode.etp.client.config.AppConfig;
 import com.xiaoniucode.etp.client.config.TomlConfigLoader;
 import com.xiaoniucode.etp.client.config.domain.LogConfig;
-import com.xiaoniucode.etp.common.*;
-import com.xiaoniucode.etp.client.log.LogbackConfigurator;
+import com.xiaoniucode.etp.client.logging.LogbackConfigurator;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 

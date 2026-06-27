@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * 初始化登陆后的客户端运行时信息
+ */
 @Component
 public class AgentInitAction extends AgentBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentInitAction.class);

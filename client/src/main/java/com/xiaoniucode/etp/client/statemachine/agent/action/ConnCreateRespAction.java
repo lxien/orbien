@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.client.statemachine.agent.action;
 
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
+import com.xiaoniucode.etp.client.statemachine.ContextConstants;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.client.transport.connection.DirectPool;
@@ -10,17 +11,20 @@ import com.xiaoniucode.etp.core.transport.TunnelEntry;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-public class TunnelCreateRespAction extends AgentBaseAction {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelCreateRespAction.class);
+public class ConnCreateRespAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ConnCreateRespAction.class);
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext agentContext) {
         logger.debug("创建隧道成功");
-        boolean encrypt = agentContext.getAndRemoveAs("encrypt", Boolean.class);
-        boolean multiplex = agentContext.getAndRemoveAs("multiplex", Boolean.class);
-        Message.TunnelCreateResponse resp = agentContext.getAndRemoveAs("tunnel_create_response", Message.TunnelCreateResponse.class);
-        if (resp.getCode() == 1) {
-            logger.info("隧道创建失败: {}", resp.getMessage());
+        boolean encrypt = agentContext.getAndRemoveAs(ContextConstants.ENCRYPT, Boolean.class);
+        boolean multiplex = agentContext.getAndRemoveAs(ContextConstants.MULTIPLEX, Boolean.class);
+
+        Message.CreateConnectionResponse resp = agentContext.getAndRemoveAs(ContextConstants.CREATE_CONN_RESP,
+                Message.CreateConnectionResponse.class);
+        Message.Status status = resp.getStatus();
+        if (status.getCode() == 1) {
+            logger.warn("隧道创建失败: {}", status.getMessage());
             removeCreateFailConn(agentContext, multiplex, resp.getTunnelId());
             return;
         }

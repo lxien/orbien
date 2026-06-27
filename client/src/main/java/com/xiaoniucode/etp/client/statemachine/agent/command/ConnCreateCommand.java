@@ -9,7 +9,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class CreateConnCommand {
+public class ConnCreateCommand {
 
     /**
      * 是否为多路复用连接（必填）
@@ -33,8 +33,8 @@ public class CreateConnCommand {
      * @param encrypt 是否加密
      * @return 创建连接命令
      */
-    public static CreateConnCommand ofMultiplex(boolean encrypt) {
-        CreateConnCommand command = new CreateConnCommand();
+    public static ConnCreateCommand ofMultiplex(boolean encrypt) {
+        ConnCreateCommand command = new ConnCreateCommand();
         command.setMultiplex(true);
         command.setEncrypt(encrypt);
         return command;
@@ -46,8 +46,8 @@ public class CreateConnCommand {
      * @param encrypt 是否加密
      * @return 创建连接命令
      */
-    public static CreateConnCommand ofDirect(boolean encrypt) {
-        CreateConnCommand command = new CreateConnCommand();
+    public static ConnCreateCommand ofDirect(boolean encrypt) {
+        ConnCreateCommand command = new ConnCreateCommand();
         command.setMultiplex(false);
         command.setEncrypt(encrypt);
         return command;
@@ -59,8 +59,8 @@ public class CreateConnCommand {
      * @param encrypt 是否加密
      * @return 创建连接命令
      */
-    public static CreateConnCommand ofDirect(boolean encrypt, int directCount) {
-        CreateConnCommand command = ofDirect(encrypt);
+    public static ConnCreateCommand ofDirect(boolean encrypt, int directCount) {
+        ConnCreateCommand command = ofDirect(encrypt);
         command.setDirectCount(directCount);
         return command;
     }

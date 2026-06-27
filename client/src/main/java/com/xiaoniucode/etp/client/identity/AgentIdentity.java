@@ -1,4 +1,4 @@
-package com.xiaoniucode.etp.client.manager;
+package com.xiaoniucode.etp.client.identity;
 
 import com.xiaoniucode.etp.common.utils.StringUtils;
 

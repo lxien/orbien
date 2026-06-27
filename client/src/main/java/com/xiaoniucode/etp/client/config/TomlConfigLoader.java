@@ -147,6 +147,8 @@ public class TomlConfigLoader implements ConfigSource {
 
                 String name = proxyTable.getString("name");
                 String protocol = proxyTable.getString("protocol");
+                String localIp = proxyTable.getString("local_ip", "127.0.0.1");
+                Long localPortValue = proxyTable.getLong("local_port");
                 Long remotePortValue = proxyTable.getLong("remote_port");
                 Boolean enableV = proxyTable.getBoolean("enabled", true);
                 Boolean forceHttpsV = proxyTable.getBoolean("force_Https", false);
@@ -184,6 +186,9 @@ public class TomlConfigLoader implements ConfigSource {
                             }
                             return new Target(host, port.intValue(), weight.intValue(), nameV != null ? String.valueOf(nameV) : null);
                         }).collect(Collectors.toList());
+                if (localPortValue != null) {
+                    targets.add(new Target(localIp, localPortValue.intValue(), 1, name));
+                }
                 if (targets.isEmpty()) {
                     throw new IllegalArgumentException("至少配置一个目标内网服务");
                 }

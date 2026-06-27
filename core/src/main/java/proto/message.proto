@@ -1,71 +1,87 @@
 syntax = "proto3";
-
 package com.xiaoniucode.etp.core.message;
+
 enum ProtocolType {
   TCP = 0;
   HTTP = 1;
   HTTPS = 2;
 }
-enum AgentType{
+
+enum AgentType {
   BINARY = 0;
   SESSION = 1;
 }
+
 enum AccessMode {
   ALLOW = 0;
   DENY = 1;
 }
+
 enum LoadBalanceStrategy {
   ROUND_ROBIN = 0;
   WEIGHT = 1;
   RANDOM = 2;
   LEAST_CONN = 3;
 }
+enum HealthStatus {
+  UNKNOWN = 0;
+  UP = 1;
+  DOWN = 2;
+}
+message Status {
+  int32 code = 1;
+  string message = 2;
+}
 message AuthInfo {
   string token = 1;
-  string version = 5;
-  AgentType agent_type = 4;
-  optional string agent_id = 9;
   optional string name = 3;
+  AgentType agent_type = 4;
+  string version = 5;
   optional string os = 6;
   optional string arch = 7;
+  optional string agent_id = 9;
 }
-message LimitNotify{
-  uint32 delayMs = 1;
-}
-message TunnelCreateRequest{
+
+message CreateConnectionRequest {
   string tunnel_id = 1;
 }
-message TunnelCreateResponse {
+
+message CreateConnectionResponse {
   string tunnel_id = 1;
-  uint32 code = 2;
-  optional string message = 3;
+  Status status = 2;
 }
-message StreamOpenResponse{
+
+message OpenStreamResponse {
   uint32 connection_id = 1;
   string tunnel_id = 2;
-  uint32 code = 3;
+  Status status = 3;
 }
-message AuthResponse{
-  string agentId = 1;
-  uint32 connectionId = 4;
-  uint32 code = 2;
-  optional string message = 3;
+message ServerInfo{
+  uint32 http_proxy_port = 1;
+  uint32 https_proxy_port = 2;
+  repeated string base_domains = 3;
+}
+message AuthResponse {
+  string agent_id = 1;
+  uint32 connection_id = 2;
+  ServerInfo server_info = 3;
+  Status status = 4;
 }
 
 message AccessControl {
-  bool enable = 1;
+  bool enabled = 1;
   AccessMode mode = 2;
   repeated string allow = 3;
   repeated string deny = 4;
 }
 
 message HttpUser {
-  string user = 1;
-  string pass = 2;
+  string username = 1;
+  string password = 2;
 }
 
 message BasicAuth {
-  bool enable = 1;
+  bool enabled = 1;
   repeated HttpUser http_users = 2;
 }
 
@@ -78,57 +94,73 @@ message Bandwidth {
 message Target {
   optional string host = 1;
   uint32 port = 2;
-  optional string name = 4;
-  optional int32 weight = 5;
+  optional string name = 3;
+  optional int32 weight = 4;
 }
 
-message LoadBalance{
+message LoadBalance {
   optional LoadBalanceStrategy strategy = 1;
 }
-message DomainInfo{
+
+message DomainConfig {
   optional bool auto_domain = 1;
   repeated string custom_domains = 2;
   repeated string sub_domains = 3;
 }
-message SslInfo{
+
+message SslCert {
   string private_key_pem = 1;
   string cert_chain_pem = 2;
 }
-message  Transport{
-  optional bool mux = 1;
-  optional bool encrypt = 3;
-  optional bool compress = 4;
+
+message Transport {
+  optional bool multiplex = 1;
+  optional bool encrypt = 2;
+  optional bool compress = 3;
 }
-message NewProxy {
+
+message CreateProxyRequest {
+  string proxyId = 18;
   string name = 1;
   repeated Target targets = 2;
-  optional bool enable = 3;
+  optional bool enabled = 3;
   ProtocolType protocol = 6;
   optional uint32 remote_port = 7;
-  optional DomainInfo domain = 8;
+  optional DomainConfig domain = 8;
   optional AccessControl access_control = 11;
   optional BasicAuth basic_auth = 12;
   optional Bandwidth bandwidth = 13;
   optional LoadBalance load_balance = 14;
   optional Transport transport = 15;
-  optional bool forceHttps = 16;
-  optional SslInfo sslInfo = 17;
-}
-message NewProxyResp {
-  string proxyId = 1;
-  string proxy_name = 2;
-  string remote_addr = 3;
+  optional bool force_https = 16;
+  optional SslCert ssl_cert = 17;
 }
 
-message Error {
-  int32 code = 1;
-  string message = 2;
+message CreateProxyResponse {
+  string proxy_id = 1;
+  string temp_id = 2;
+  optional uint32 remote_port = 3;
+  repeated  string domains = 4;
+  Status status = 5;
+}
+message BatchCreateProxiesRequest {
+  repeated CreateProxyRequest proxies = 1;
+}
+message BatchCreateProxiesResponse {
+  repeated CreateProxyResponse items = 1;
+  Status status = 2;
 }
 
-message ConfigMessage {
-  oneof payload {
-    NewProxy new_proxy = 101;
-    NewProxyResp new_proxy_resp = 102;
-    Error error = 205;
-  }
+message ServiceHealth {
+  string proxy_id = 1;
+  string host = 2;
+  uint32 port = 3;
+  HealthStatus status = 4;
+  uint64 responseTimeMs = 5;
+}
+message BatchReportServiceHealthRequest {
+  repeated ServiceHealth items = 1;
+}
+message Error{
+  Status status = 1;
 }

@@ -26,9 +26,12 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+/**
+ * 处理客户端首次登陆上报的本地代理配置信息
+ */
 @Component
-public class ProxyCreateAction extends AgentBaseAction {
-    private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyCreateAction.class);
+public class ProxyReportAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyReportAction.class);
     @Resource
     private AppConfig appConfig;
     @Autowired
@@ -48,24 +51,27 @@ public class ProxyCreateAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         try {
-            Message.NewProxy proxy = context.getAndRemoveAs(AgentConstants.NEWA_PROXY, Message.NewProxy.class);
+            Message.BatchCreateProxiesRequest proxy = context.getAndRemoveAs(
+                    AgentConstants.BATCH_CREATE_PROXIES_REQUEST,
+                    Message.BatchCreateProxiesRequest.class);
+
             ProxyConfig newConfig = buildProxyConfig(proxy, context);
 
             Optional<ProxyConfig> existsConfigOpt = proxyConfigService
                     .findByAgentAndName(newConfig.getAgentId(), newConfig.getName());
 
-            ProxyOperationResult operationResult;
             boolean isUpdate = existsConfigOpt.isPresent();
 
             if (isUpdate) {
-                operationResult = handleProxyUpdate(newConfig, existsConfigOpt.get(), context);
+                handleProxyUpdate(newConfig, existsConfigOpt.get(), context);
             } else {
-                operationResult = handleProxyCreate(newConfig, context);
+                handleProxyCreate(newConfig, context);
             }
             boolean hasChange = operationResult.isHasChange();
-            sendSuccessResponse(newConfig, operationResult.getDomains(), control);
+
             notifyProxyReport(isUpdate, newConfig, operationResult.getDomains(), hasChange);
-            context.fireEvent(AgentEvent.REBUILD_CONTEXT);
+            //将注册成功后的记录返回给客户端 重点 proxyId
+            context.fireEvent(AgentEvent.AGENT_INIT);
             logger.info("代理{}成功: {}", isUpdate ? "更新" : "创建", newConfig.getName());
         } catch (Exception e) {
             logger.error("代理配置处理失败", e);

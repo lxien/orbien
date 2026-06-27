@@ -1,5 +1,6 @@
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
+import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.AgentType;
 import com.xiaoniucode.etp.core.message.Message;
@@ -17,6 +18,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -38,6 +40,8 @@ public class AuthAction extends AgentBaseAction {
     private EventBus eventBus;
     @Autowired
     private AgentConfigService agentConfigService;
+    @Resource
+    private AppConfig appConfig;
 
     /**
      * 检查 Token 是否存在
@@ -59,8 +63,8 @@ public class AuthAction extends AgentBaseAction {
             if (!Objects.equals(token, existAgentInfo.getToken())) {
                 logger.warn("断线重连认证失败，令牌不匹配，当前令牌：{}，历史令牌：{}", token, context.getAgentInfo().getToken());
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setCode(1)
-                        .setMessage("重连认证失败，令牌不匹配").build();
+                        .setStatus(Message.Status.newBuilder().setCode(1).setMessage("重连认证失败，令牌不匹配"))
+                        .build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;
@@ -69,8 +73,8 @@ public class AuthAction extends AgentBaseAction {
             if (!StringUtils.hasText(agentId) || !Objects.equals(agentId, existAgentInfo.getAgentId())) {
                 logger.warn("断线重连认证失败，设备ID不匹配，当前设备ID：{}，历史设备ID：{}", agentId, context.getAgentInfo().getAgentId());
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setCode(1)
-                        .setMessage("重连认证失败，设备ID不匹配").build();
+                        .setStatus(Message.Status.newBuilder().setCode(1).setMessage("重连认证失败，设备ID不匹配"))
+                        .build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;
@@ -80,8 +84,8 @@ public class AuthAction extends AgentBaseAction {
         if (!tokenConfigService.existsByToken(token) && !isReconnect) {
             logger.error("客户端认证失败，无效令牌：{}", token);
             Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                    .setCode(1)
-                    .setMessage("认证失败，无效令牌:" + token).build();
+                    .setStatus(Message.Status.newBuilder().setCode(100).setMessage("认证失败，无效令牌:" + token))
+                    .build();
             sendAuthError(control, authResponse);
             context.fireEvent(AgentEvent.AUTH_FAILURE);
             return;
@@ -98,8 +102,8 @@ public class AuthAction extends AgentBaseAction {
             if (agentInfoOpt.isEmpty()) {
                 logger.warn("设备ID {} 不存在", agentId);
                 Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setCode(100)//todo 暂时写死
-                        .setMessage("AgentId " + agentId + " 不存在").build();
+                        .setStatus(Message.Status.newBuilder().setCode(100).setMessage("AgentId " + agentId + " 不存在"))
+                        .build();
                 sendAuthError(control, authResponse);
                 context.fireEvent(AgentEvent.AUTH_FAILURE);
                 return;
@@ -112,10 +116,17 @@ public class AuthAction extends AgentBaseAction {
         context.setAgentInfo(agentInfo);
 
         agentManager.addAgentContextIndex(agentId, context);
-        Message.AuthResponse authResponse = Message.AuthResponse.newBuilder().setCode(0)
+
+        Message.ServerInfo.Builder serverInfoBuilder = Message.ServerInfo.newBuilder()
+                .setHttpProxyPort(appConfig.getHttpProxyPort())
+                .setHttpsProxyPort(appConfig.getHttpsProxyPort())
+                .addBaseDomains(appConfig.getBaseDomain());
+
+        Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
+                .setStatus(Message.Status.newBuilder().setCode(0).setMessage("认证成功"))
                 .setConnectionId(context.getConnectionId())
                 .setAgentId(agentId)
-                .setMessage("认证成功")
+                .setServerInfo(serverInfoBuilder)
                 .build();
         TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());

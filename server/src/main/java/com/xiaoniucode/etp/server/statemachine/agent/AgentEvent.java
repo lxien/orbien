@@ -50,8 +50,11 @@ public enum AgentEvent {
     RETRY_CONNECT,
 
     /**
-     * 接收创建代理请求
+     * 代理配置上报
      */
-    PROXY_CREATE_REQUEST,
-    REBUILD_CONTEXT
+    PROXY_REPORT,
+    /**
+     * 初始化新注册客户端
+     */
+    AGENT_INIT
 }
