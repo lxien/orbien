@@ -18,26 +18,35 @@
 
 package com.xiaoniucode.etp.server.statemachine.agent.action;
 
-import com.xiaoniucode.etp.server.service.ProxyConfigService;
+import com.xiaoniucode.etp.core.message.Message;
+import com.xiaoniucode.etp.server.loadbalance.HealthManager;
+import com.xiaoniucode.etp.server.statemachine.agent.AgentConstants;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * 将代理配置信息同步给在线客户端
- */
+import java.util.List;
+
 @Component
-public class ConfigSyncAction extends AgentBaseAction{
+public class ServiceHealthReportAction extends AgentBaseAction {
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ServiceHealthReportAction.class);
     @Autowired
-    private ProxyConfigService proxyConfigService;
+    private HealthManager healthManager;
+
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        Message.BatchReportServiceHealthRequest req = context.getAndRemoveAs(
+                AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST,
+                Message.BatchReportServiceHealthRequest.class);
 
-
-        //将系统配置 代理配置 同步给客户端
-
-
+        List<Message.ServiceHealth> items = req.getItemsList();
+        for (Message.ServiceHealth item : items) {
+            logger.debug("更新代理服务健康：{},{}:{},{}", item.getProxyId(), item.getHost(), item.getPort(), item.getStatus());
+            healthManager.updateHealth(item.getProxyId(), item.getHost(), item.getPort(), item.getStatus());
+        }
     }
 }

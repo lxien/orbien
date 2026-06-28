@@ -16,17 +16,34 @@
  *
  */
 
-package com.xiaoniucode.etp.client.statemachine;
+package com.xiaoniucode.etp.core.domain;
 
-public interface ContextConstants {
-    String CREATE_CONN_RESP = "create_connection_resp";
-    String BATCH_CREATE_PROXIES_RESP = "batch_create_proxies_resp";
-    String CREATE_CONN_COMMAND = "create_conn_command";
-    String AUTH_RESP = "auth_resp";
-    String ERROR = "error";
-    String TUNNEL_ID = "tunnel_Id";
-    String COMPRESS = "compress";
-    String ENCRYPT = "encrypt";
-    String MULTIPLEX = "multiplex";
-    String PROXY_SYNC_RESP = "Proxy_Sync_Resp";
+import com.xiaoniucode.etp.core.enums.DomainType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class DomainInfo {
+    /**
+     * 基础域名
+     */
+    private String baseDomain;
+    /**
+     * 域名
+     */
+    private String domain;
+    /**
+     * 域名类型
+     */
+    private DomainType domainType;
+
+
+    public String getFullDomain() {
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            return domain;
+        }
+        return domain + "." + baseDomain;
+    }
+
 }

@@ -28,6 +28,12 @@ enum HealthStatus {
   UP = 1;
   DOWN = 2;
 }
+enum ProxySyncType {
+  FULL = 0;
+  ADD = 1;
+  UPDATE = 2;
+  DELETE = 3;
+}
 message Status {
   int32 code = 1;
   string message = 2;
@@ -119,7 +125,7 @@ message Transport {
   optional bool compress = 3;
 }
 
-message CreateProxyRequest {
+message Proxy {
   string proxyId = 18;
   string name = 1;
   repeated Target targets = 2;
@@ -136,21 +142,29 @@ message CreateProxyRequest {
   optional SslCert ssl_cert = 17;
 }
 
-message CreateProxyResponse {
-  string proxy_id = 1;
-  string temp_id = 2;
-  optional uint32 remote_port = 3;
-  repeated  string domains = 4;
-  Status status = 5;
+message DomainResult {
+  string baseDomain = 1;
+  string domain = 2;
+}
+
+message ProxyRuntime {
+  Proxy proxy = 1;
+  optional DomainResult domain = 2;
+  optional uint32 listen_port = 3;
 }
 message BatchCreateProxiesRequest {
-  repeated CreateProxyRequest proxies = 1;
+  repeated Proxy proxies = 1;
 }
 message BatchCreateProxiesResponse {
-  repeated CreateProxyResponse items = 1;
+  repeated ProxyRuntime items = 1;
   Status status = 2;
 }
 
+message ProxySyncResponse {
+  ProxySyncType proxy_sync_type = 1;
+  repeated ProxyRuntime items = 2;
+  repeated string proxy_ids = 3;
+}
 message ServiceHealth {
   string proxy_id = 1;
   string host = 2;
@@ -158,6 +172,7 @@ message ServiceHealth {
   HealthStatus status = 4;
   uint64 responseTimeMs = 5;
 }
+
 message BatchReportServiceHealthRequest {
   repeated ServiceHealth items = 1;
 }

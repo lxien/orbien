@@ -16,17 +16,13 @@
  *
  */
 
-package com.xiaoniucode.etp.client.statemachine;
+package com.xiaoniucode.etp.client.manager;
 
-public interface ContextConstants {
-    String CREATE_CONN_RESP = "create_connection_resp";
-    String BATCH_CREATE_PROXIES_RESP = "batch_create_proxies_resp";
-    String CREATE_CONN_COMMAND = "create_conn_command";
-    String AUTH_RESP = "auth_resp";
-    String ERROR = "error";
-    String TUNNEL_ID = "tunnel_Id";
-    String COMPRESS = "compress";
-    String ENCRYPT = "encrypt";
-    String MULTIPLEX = "multiplex";
-    String PROXY_SYNC_RESP = "Proxy_Sync_Resp";
+public class ProxyManagerHolder {
+
+    private static final ProxyManager INSTANCE = new ProxyManager();
+
+    public static ProxyManager get() {
+        return INSTANCE;
+    }
 }

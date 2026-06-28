@@ -29,13 +29,13 @@ import java.util.concurrent.CompletableFuture;
 
 public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
     private final HealthCheckConfig config;
-    private final CompletableFuture<Message.ServiceHealth> resultFuture;
+    private final CompletableFuture<ServiceHealth> resultFuture;
     private final long startTime;
     private final String proxyId;
     private final Target target;
 
     public HttpHealthHandler(HealthCheckConfig config,
-                             CompletableFuture<Message.ServiceHealth> resultFuture,
+                             CompletableFuture<ServiceHealth> resultFuture,
                              long startTime,
                              String proxyId,
                              Target target) {
@@ -79,7 +79,7 @@ public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpRespo
             errorMsg = "Response parse error: " + e.getMessage();
         }
 
-        Message.ServiceHealth health = buildServiceHealth(isHealthy, responseTime, errorMsg);
+        ServiceHealth health = buildServiceHealth(isHealthy, responseTime, errorMsg);
         resultFuture.complete(health);
         ctx.close();
     }
@@ -87,18 +87,18 @@ public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpRespo
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         long responseTime = System.currentTimeMillis() - startTime;
-        Message.ServiceHealth health = buildServiceHealth(false, responseTime, cause.getMessage());
+        ServiceHealth health = buildServiceHealth(false, responseTime, cause.getMessage());
         resultFuture.complete(health);
         ctx.close();
     }
 
-    private Message.ServiceHealth buildServiceHealth(boolean isHealthy, long responseTime, String errorMsg) {
-        Message.ServiceHealth.Builder health = Message.ServiceHealth.newBuilder();
-        health.setProxyId(proxyId);
-        health.setHost(target.getHost());
-        health.setPort(target.getPort());
-        health.setStatus(isHealthy ? Message.HealthStatus.UP : Message.HealthStatus.DOWN);
-        health.setResponseTimeMs(responseTime);
+    private ServiceHealth buildServiceHealth(boolean isHealthy, long responseTime, String errorMsg) {
+        ServiceHealth.ServiceHealthBuilder health = ServiceHealth.builder();
+        health.proxyId(proxyId);
+        health.host(target.getHost());
+        health.port(target.getPort());
+        health.status(isHealthy ? Message.HealthStatus.UP : Message.HealthStatus.DOWN);
+        health.responseTimeMs(responseTime);
         return health.build();
     }
 }

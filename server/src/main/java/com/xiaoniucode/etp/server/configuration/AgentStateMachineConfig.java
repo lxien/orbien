@@ -18,7 +18,7 @@ public class AgentStateMachineConfig {
     @Autowired
     private AgentInitAction agentInitAction;
     @Autowired
-    private ConfigSyncAction configSyncAction;
+    private ProxyConfigSyncAction proxyConfigSyncAction;
     @Autowired
     private ProxyReportAction proxyReportAction;
     @Autowired
@@ -31,6 +31,8 @@ public class AgentStateMachineConfig {
     private HeartbeatTimeoutAction heartbeatTimeoutAction;
     @Autowired
     private RetryTimeoutAction retryTimeoutAction;
+    @Autowired
+    private ServiceHealthReportAction serviceHealthReportAction;
 
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
@@ -50,7 +52,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.CONNECTED)
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true)
-                .perform(configSyncAction);
+                .perform(proxyConfigSyncAction);
         //初始化客户端运行时信息
         builder.internalTransition()
                 .within(AgentState.CONNECTED)
@@ -78,7 +80,12 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.CREATE_TUNNEL)
                 .when(ctx -> true)
                 .perform(createConnectionAction);
-
+        // 内网真实服务健康状态上报
+        builder.internalTransition()
+                .within(AgentState.CONNECTED)
+                .on(AgentEvent.SERVICE_HEALTH_REPORT)
+                .when(ctx -> true)
+                .perform(serviceHealthReportAction);
         // 网络断开
         builder.externalTransition()
                 .from(AgentState.CONNECTED)

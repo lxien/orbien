@@ -49,7 +49,7 @@ key_file = "cert/domains/xiaoniucode.com/privkey.pem"
 [proxies.health_check]
 enabled = true
 type = "http"
-interval = 8
+interval = 4
 timeout = 5
 max_failed = 3
 path = "/health"

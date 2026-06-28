@@ -32,7 +32,7 @@ public class DefaultAppConfig implements AppConfig {
         private String serverAddr = "127.0.0.1";
         private int serverPort = 9527;
         private AuthConfig authConfig = new AuthConfig();
-        private List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
+        private final List<ProxyConfig> proxies = new CopyOnWriteArrayList<>();
         private LogConfig logConfig;
         private AgentType agentType = AgentType.STANDALONE;
         private TransportConfig transportConfig = new TransportConfig();
@@ -70,9 +70,7 @@ public class DefaultAppConfig implements AppConfig {
         }
 
         public Builder addProxy(ProxyConfig proxyConfig) {
-            if (this.proxies != null) {
-                this.proxies.add(proxyConfig);
-            }
+            this.proxies.add(proxyConfig);
             return this;
         }
 

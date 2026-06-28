@@ -18,8 +18,43 @@
 
 package com.xiaoniucode.etp.core.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum HealthCheckType {
-    TCP,
-    HTTP,
-    AUTO;
+    TCP("TCP", "TCP 连接检查"),
+    HTTP("HTTP", "HTTP 请求检查"),
+    AUTO("AUTO", "根据协议自动选择");
+    private final String code;
+    private final String description;
+
+    HealthCheckType(String code, String description) {
+        this.code = code;
+        this.description = description;
+    }
+
+    public static HealthCheckType fromCode(String code) {
+        if (code == null) {
+            return AUTO;
+        }
+        for (HealthCheckType type : values()) {
+            if (type.getCode().equalsIgnoreCase(code)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+
+    public boolean isHttpCheck() {
+        return this == HTTP;
+    }
+
+    public boolean isTcpCheck() {
+        return this == TCP;
+    }
+
+    public boolean isAuto() {
+        return this == AUTO;
+    }
 }

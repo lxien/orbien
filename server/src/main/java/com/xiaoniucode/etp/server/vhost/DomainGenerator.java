@@ -37,15 +37,15 @@ public class DomainGenerator {
     @Autowired
     private ProxyConfigService proxyConfigService;
 
-    public DomainInfo generateRandomSubdomain(String baseDomain) throws DomainConflictException {
+    public com.xiaoniucode.etp.core.domain.DomainInfo generateRandomSubdomain(String baseDomain) throws DomainConflictException {
         return generateRandomDomainPrefix(baseDomain);
     }
 
-    private DomainInfo generateRandomDomainPrefix(String baseDomain) {
+    private com.xiaoniucode.etp.core.domain.DomainInfo generateRandomDomainPrefix(String baseDomain) {
         for (int i = 0; i < 20; i++) {
             String prefix = generateRandomPrefix();
             if (!proxyConfigService.exists(prefix + "." + baseDomain)) {
-                return new DomainInfo(baseDomain, prefix, DomainType.AUTO);
+                return new com.xiaoniucode.etp.core.domain.DomainInfo(baseDomain, prefix, DomainType.AUTO);
 
             }
         }
@@ -61,26 +61,26 @@ public class DomainGenerator {
         return sb.toString();
     }
 
-    public Set<DomainInfo> generateSubdomains(String baseDomain, Set<String> subDomains) {
-        Set<DomainInfo> res = new HashSet<>();
+    public Set<com.xiaoniucode.etp.core.domain.DomainInfo> generateSubdomains(String baseDomain, Set<String> subDomains) {
+        Set<com.xiaoniucode.etp.core.domain.DomainInfo> res = new HashSet<>();
         //todo 一次性检查所有子域名是否存在，避免多次查询
         for (String subDomain : subDomains) {
             if (proxyConfigService.exists(subDomain + "." + baseDomain)) {
                 throw new DomainConflictException("域名[" + subDomain + "." + baseDomain + "]已被占用");
             }
-            res.add(new DomainInfo(baseDomain, subDomain, DomainType.SUBDOMAIN));
+            res.add(new com.xiaoniucode.etp.core.domain.DomainInfo(baseDomain, subDomain, DomainType.SUBDOMAIN));
         }
         return res;
     }
 
-    public Set<DomainInfo> generateCustomDomains(Set<String> customDomains) {
+    public Set<com.xiaoniucode.etp.core.domain.DomainInfo> generateCustomDomains(Set<String> customDomains) {
         //todo 一次性检查所有子域名是否存在，避免多次查询
-        Set<DomainInfo> domainInfos = new HashSet<>();
+        Set<com.xiaoniucode.etp.core.domain.DomainInfo> domainInfos = new HashSet<>();
         for (String domain : customDomains) {
             if (proxyConfigService.exists(domain)) {
                 throw new DomainConflictException("域名[" + domain + "]已被占用");
             }
-            domainInfos.add(new DomainInfo(null, domain, DomainType.CUSTOM_DOMAIN));
+            domainInfos.add(new com.xiaoniucode.etp.core.domain.DomainInfo(null, domain, DomainType.CUSTOM_DOMAIN));
         }
         return domainInfos;
     }

@@ -18,12 +18,12 @@ package com.xiaoniucode.etp.server.statemachine.agent.action;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.service.ProxyConfigExt;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentState;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

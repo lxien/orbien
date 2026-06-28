@@ -7,7 +7,6 @@ import com.xiaoniucode.etp.client.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.client.transport.ControlIdleCheckHandler;
 import com.xiaoniucode.etp.client.transport.HeartbeatHandler;
 import com.xiaoniucode.etp.client.transport.RealServerHandler;
-import com.xiaoniucode.etp.client.identity.EventBusManager;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentStateMachineBuilder;
 import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
@@ -120,7 +119,6 @@ public final class TunnelClient implements Lifecycle {
         if (serverWorkBootstrap != null) {
             serverWorkBootstrap.shutdownGracefully();
         }
-        EventBusManager.shutdown();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

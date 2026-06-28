@@ -20,7 +20,7 @@ import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -34,19 +34,19 @@ public class ProxyConfigResponseBuilder {
     @Resource
     private AppConfig appConfig;
 
-    /**
-     * 构建新代理响应
-     */
-    public Message.NewProxyResp buildNewProxyResponse(ProxyConfig config, Set<DomainInfo> domains) {
-        String remoteAddr = buildRemoteAddress(config, domains);
-
-        return Message.NewProxyResp.newBuilder()
-                .setProxyId(config.getProxyId())
-                .setProxyName(config.getName())
-                .setRemoteAddr(remoteAddr)
-                .build();
-    }
-
+//    /**
+//     * 构建新代理响应
+//     */
+//    public Message.CreateProxyResponse buildNewProxyResponse(ProxyConfig config, Set<DomainInfo> domains) {
+//        String remoteAddr = buildRemoteAddress(config, domains);
+//
+//        return Message.CreateProxyResponse.newBuilder()
+//                .setProxyId(config.getProxyId())
+//               //todo .setProxyName(config.getName())
+//               //todo .setRemoteAddr(remoteAddr)
+//                .build();
+//    }
+//
     /**
      * 构建远程地址信息
      */
@@ -90,8 +90,7 @@ public class ProxyConfigResponseBuilder {
      */
     public Message.Error buildErrorResponse(String message) {
         return Message.Error.newBuilder()
-                .setCode(1)
-                .setMessage(message)
+                .setStatus(Message.Status.newBuilder().setCode(1).setMessage(message))
                 .build();
     }
 }

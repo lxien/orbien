@@ -19,8 +19,8 @@
 package com.xiaoniucode.etp.server.service.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.service.ProxyConfigExt;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 
 import java.util.List;
 import java.util.Optional;

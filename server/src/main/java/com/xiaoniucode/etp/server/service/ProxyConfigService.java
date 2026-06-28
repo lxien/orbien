@@ -17,8 +17,9 @@
 package com.xiaoniucode.etp.server.service;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -44,9 +44,9 @@ public class CreateConnectionAction extends AgentBaseAction {
         String agentId = context.getAgentInfo().getAgentId();
         createPool(agentId, tunnelId, multiplex, encrypt, tunnel);
         Channel control = context.getControl();
-        Message.TunnelCreateResponse resp = Message.TunnelCreateResponse.newBuilder()
+        Message.CreateConnectionResponse resp = Message.CreateConnectionResponse.newBuilder()
                 .setTunnelId(tunnelId)
-                .setCode(0)
+                .setStatus(Message.Status.newBuilder().setCode(0))
                 .build();
 
         ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());

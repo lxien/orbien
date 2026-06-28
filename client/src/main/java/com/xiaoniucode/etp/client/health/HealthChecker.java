@@ -38,11 +38,11 @@ import java.util.concurrent.CompletableFuture;
 public class HealthChecker {
     private final EventLoopGroup group = new NioEventLoopGroup(1);
 
-    public CompletableFuture<Message.ServiceHealth> check(String proxyId, ProtocolType protocol,
+    public CompletableFuture<ServiceHealth> check(String proxyId, ProtocolType protocol,
                                                           Target target,
                                                           HealthCheckConfig config) {
         long startTime = System.currentTimeMillis();
-        CompletableFuture<Message.ServiceHealth> future = new CompletableFuture<>();
+        CompletableFuture<ServiceHealth> future = new CompletableFuture<>();
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
@@ -77,19 +77,19 @@ public class HealthChecker {
                 (type == com.xiaoniucode.etp.core.enums.HealthCheckType.AUTO && protocol.isHttpOrHttps());
     }
 
-    private void completeAsDown(CompletableFuture<Message.ServiceHealth> future, String proxyId, Target target,
+    private void completeAsDown(CompletableFuture<ServiceHealth> future, String proxyId, Target target,
                                 long startTime) {
-        Message.ServiceHealth health = createHealth(proxyId, target, System.currentTimeMillis() - startTime);
+        ServiceHealth health = createHealth(proxyId, target, System.currentTimeMillis() - startTime);
         future.complete(health);
     }
 
-    private Message.ServiceHealth createHealth(String proxyId, Target target, long responseTime) {
-        Message.ServiceHealth.Builder h = Message.ServiceHealth.newBuilder();
-        h.setProxyId(proxyId);
-        h.setHost(target.getHost());
-        h.setPort(target.getPort());
-        h.setStatus(Message.HealthStatus.DOWN);
-        h.setResponseTimeMs(responseTime);
+    private ServiceHealth createHealth(String proxyId, Target target, long responseTime) {
+        ServiceHealth.ServiceHealthBuilder h = ServiceHealth.builder();
+        h.proxyId(proxyId);
+        h.host(target.getHost());
+        h.port(target.getPort());
+        h.status(Message.HealthStatus.DOWN);
+        h.responseTimeMs(responseTime);
         return h.build();
     }
 

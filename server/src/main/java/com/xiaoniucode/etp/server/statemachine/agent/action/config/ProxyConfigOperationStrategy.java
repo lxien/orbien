@@ -28,12 +28,12 @@ public interface ProxyConfigOperationStrategy {
     /**
      * 创建新的代理
      */
-    ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo)throws Exception;
+    void create(ProxyConfig config, AgentInfo agentInfo)throws Exception;
 
     /**
      * 更新代理配置
      */
-    ProxyOperationResult update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo)throws Exception;
+    void update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo)throws Exception;
 
     /**
      * 是否支持此配置类型

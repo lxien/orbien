@@ -19,7 +19,7 @@ package com.xiaoniucode.etp.server.event;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.notify.Event;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import lombok.Getter;
 
 import java.util.Set;

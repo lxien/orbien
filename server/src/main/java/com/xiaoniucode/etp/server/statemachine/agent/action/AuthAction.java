@@ -132,15 +132,15 @@ public class AuthAction extends AgentBaseAction {
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());
         authFrame.setPayload(payload);
 
-        //发布客户端认证异步事件
-        eventBus.publishAsync(new AgentAuthEvent(agentInfo, isReconnect));
-        //发布状态机 认证成功事件
-        context.fireEvent(AgentEvent.AUTH_SUCCESS);
         control.writeAndFlush(authFrame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 logger.error("发送认证成功消息失败", future.cause());
             }
         });
+        //发布客户端认证异步事件
+        eventBus.publishAsync(new AgentAuthEvent(agentInfo, isReconnect));
+        //发布状态机 认证成功事件
+        context.fireEvent(AgentEvent.AUTH_SUCCESS);
         logger.debug("设备认证成功：[设备ID={}，设备类型={}，版本号={}]", agentId, agentInfo.getAgentType(), agentInfo.getVersion());
     }
 

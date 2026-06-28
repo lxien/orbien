@@ -21,7 +21,7 @@ import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;

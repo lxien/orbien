@@ -12,10 +12,9 @@ import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.service.ConfigChangeDetector;
 import com.xiaoniucode.etp.server.statemachine.agent.*;
 import com.xiaoniucode.etp.server.statemachine.agent.action.config.*;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -51,28 +50,40 @@ public class ProxyReportAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         Channel control = context.getControl();
         try {
-            Message.BatchCreateProxiesRequest proxy = context.getAndRemoveAs(
-                    AgentConstants.BATCH_CREATE_PROXIES_REQUEST,
-                    Message.BatchCreateProxiesRequest.class);
+//            Message.BatchCreateProxiesRequest proxies = context.getAndRemoveAs(
+//                    AgentConstants.BATCH_CREATE_PROXIES_REQUEST,
+//                    Message.BatchCreateProxiesRequest.class);
+//            if (proxies == null) return;
+//
+//            List<Message.CreateProxyRequest> proxiesList = proxies.getProxiesList();
+//            for (Message.CreateProxyRequest proxy : proxiesList) {
+//
+//            }
+//
+//            ProxyConfig newConfig = buildProxyConfig(proxy, context);
+//
+//            Optional<ProxyConfig> existsConfigOpt = proxyConfigService
+//                    .findByAgentAndName(newConfig.getAgentId(), newConfig.getName());
+//
+//            boolean isUpdate = existsConfigOpt.isPresent();
+//
+//            if (isUpdate) {
+//                handleProxyUpdate(newConfig, existsConfigOpt.get(), context);
+//            } else {
+//                handleProxyCreate(newConfig, context);
+//            }
+//            boolean hasChange = operationResult.isHasChange();
 
-            ProxyConfig newConfig = buildProxyConfig(proxy, context);
+            //  notifyProxyReport(isUpdate, newConfig, operationResult.getDomains(), hasChange);
 
-            Optional<ProxyConfig> existsConfigOpt = proxyConfigService
-                    .findByAgentAndName(newConfig.getAgentId(), newConfig.getName());
+            TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_REPORT_RESP);
 
-            boolean isUpdate = existsConfigOpt.isPresent();
+        control.writeAndFlush(frame);
 
-            if (isUpdate) {
-                handleProxyUpdate(newConfig, existsConfigOpt.get(), context);
-            } else {
-                handleProxyCreate(newConfig, context);
-            }
-            boolean hasChange = operationResult.isHasChange();
 
-            notifyProxyReport(isUpdate, newConfig, operationResult.getDomains(), hasChange);
             //将注册成功后的记录返回给客户端 重点 proxyId
             context.fireEvent(AgentEvent.AGENT_INIT);
-            logger.info("代理{}成功: {}", isUpdate ? "更新" : "创建", newConfig.getName());
+            //  logger.info("代理{}成功: {}", isUpdate ? "更新" : "创建", newConfig.getName());
         } catch (Exception e) {
             logger.error("代理配置处理失败", e);
             sendErrorResponse(e.getMessage(), control);
@@ -95,59 +106,59 @@ public class ProxyReportAction extends AgentBaseAction {
             }
         }
     }
-
-    /**
-     * 处理代理创建
-     */
-    private ProxyOperationResult handleProxyCreate(ProxyConfig newConfig, AgentContext context) throws Exception {
-        logger.debug("准备创建新代理: {}", newConfig.getName());
-        ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
-        return strategy.create(newConfig, context.getAgentInfo());
-    }
-
-    /**
-     * 处理代理更新
-     */
-    private ProxyOperationResult handleProxyUpdate(ProxyConfig newConfig, ProxyConfig oldConfig, AgentContext context) throws Exception {
-        logger.debug("准备更新代理: {}", newConfig.getName());
-        newConfig.setProxyId(oldConfig.getProxyId());
-        if (!configChangeDetector.hasChanges(oldConfig, newConfig)) {
-            logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
-            Set<DomainInfo> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
-
-            return new ProxyOperationResult(domains, oldConfig.getListenPort(), false);
-        }
-        ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
-        return strategy.update(newConfig, oldConfig, context.getAgentInfo());
-    }
-
-    /**
-     * 构建代理配置
-     */
-    private ProxyConfig buildProxyConfig(Message.NewProxy proxy, AgentContext context) {
-        AgentInfo agentInfo = context.getAgentInfo();
-        ProxyConfig config = ProxyConfigBuilderUtil.buildProxyConfig(proxy, passwordEncoder);
-        config.setAgentId(agentInfo.getAgentId());
-        config.setAgentType(agentInfo.getAgentType());
-        return config;
-    }
-
-    /**
-     * 发送成功响应
-     */
-    private void sendSuccessResponse(ProxyConfig config, Set<DomainInfo> domains, Channel control) {
-        Message.NewProxyResp response = responseBuilder.buildNewProxyResponse(config, domains);
-        ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
-        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
-
-        control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
-            if (future.isSuccess()) {
-                logger.debug("代理响应发送成功: {}", config.getName());
-            } else {
-                logger.error("代理响应发送失败: {}", config.getName(), future.cause());
-            }
-        });
-    }
+//
+//    /**
+//     * 处理代理创建
+//     */
+//    private ProxyOperationResult handleProxyCreate(ProxyConfig newConfig, AgentContext context) throws Exception {
+//        logger.debug("准备创建新代理: {}", newConfig.getName());
+//        ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
+//        return strategy.create(newConfig, context.getAgentInfo());
+//    }
+//
+//    /**
+//     * 处理代理更新
+//     */
+//    private ProxyOperationResult handleProxyUpdate(ProxyConfig newConfig, ProxyConfig oldConfig, AgentContext context) throws Exception {
+//        logger.debug("准备更新代理: {}", newConfig.getName());
+//        newConfig.setProxyId(oldConfig.getProxyId());
+//        if (!configChangeDetector.hasChanges(oldConfig, newConfig)) {
+//            logger.debug("代理配置 {} 没有发生变更，无需更新", newConfig.getName());
+//            Set<DomainInfo> domains = proxyConfigService.findDomainsByProxyId(oldConfig.getProxyId());
+//
+//            return new ProxyOperationResult(domains, oldConfig.getListenPort(), false);
+//        }
+//        ProxyConfigOperationStrategy strategy = strategyFactory.getStrategy(newConfig);
+//        return strategy.update(newConfig, oldConfig, context.getAgentInfo());
+//    }
+//
+//    /**
+//     * 构建代理配置
+//     */
+//    private ProxyConfig buildProxyConfig(Message.NewProxy proxy, AgentContext context) {
+//        AgentInfo agentInfo = context.getAgentInfo();
+//        ProxyConfig config = ProxyConfigBuilderUtil.buildProxyConfig(proxy, passwordEncoder);
+//        config.setAgentId(agentInfo.getAgentId());
+//        config.setAgentType(agentInfo.getAgentType());
+//        return config;
+//    }
+//
+//    /**
+//     * 发送成功响应
+//     */
+//    private void sendSuccessResponse(ProxyConfig config, Set<DomainInfo> domains, Channel control) {
+//        Message.NewProxyResp response = responseBuilder.buildNewProxyResponse(config, domains);
+//        ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
+//        TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_PROXY_CREATE_RESP, payload);
+//
+//        control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+//            if (future.isSuccess()) {
+//                logger.debug("代理响应发送成功: {}", config.getName());
+//            } else {
+//                logger.error("代理响应发送失败: {}", config.getName(), future.cause());
+//            }
+//        });
+//    }
 
     /**
      * 发送错误响应

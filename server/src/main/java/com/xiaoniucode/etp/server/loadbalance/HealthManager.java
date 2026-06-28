@@ -1,10 +1,10 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
 import com.xiaoniucode.etp.core.domain.Target;
+import com.xiaoniucode.etp.core.message.Message;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -13,28 +13,16 @@ import java.util.stream.Collectors;
  */
 @Component
 public class HealthManager {
-    private final ConcurrentHashMap<String/*proxyId*/, ConcurrentHashMap<String/*host:port*/, Boolean>> healthStore = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String/*proxyId*/, ConcurrentHashMap<String/*host:port*/, Message.HealthStatus>> healthStore = new ConcurrentHashMap<>();
 
-    public void updateHealth(String proxyId, Target target, boolean healthy) {
-        if (proxyId == null || target == null) return;
+    public void updateHealth(String proxyId, String host, Integer port, Message.HealthStatus status) {
+        if (proxyId == null || host == null || port == null) return;
 
-        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.computeIfAbsent(proxyId,
+        ConcurrentHashMap<String, Message.HealthStatus> targetHealth = healthStore.computeIfAbsent(proxyId,
                 k -> new ConcurrentHashMap<>()
         );
-        String key = buildTargetKey(target);
-        targetHealth.put(key, healthy);
-    }
-
-    public void batchUpdate(String proxyId, Map<Target, Boolean> statusMap) {
-        if (statusMap == null || statusMap.isEmpty()) return;
-
-        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.computeIfAbsent(proxyId,
-                k -> new ConcurrentHashMap<>());
-
-        statusMap.forEach((target, healthy) -> {
-            String key = buildTargetKey(target);
-            targetHealth.put(key, healthy);
-        });
+        String key = buildTargetKey(host, port);
+        targetHealth.put(key, status);
     }
 
     public List<Target> getAvailableTargets(String proxyId, List<Target> targets) {
@@ -42,14 +30,15 @@ public class HealthManager {
             return List.of();
         }
 
-        ConcurrentHashMap<String, Boolean> targetHealth = healthStore.get(proxyId);
+        ConcurrentHashMap<String, Message.HealthStatus> targetHealth = healthStore.get(proxyId);
         if (targetHealth == null) {
             return targets;
         }
 
         return targets.stream().filter(target -> {
-            String key = buildTargetKey(target);
-            return targetHealth.getOrDefault(key, true);
+            String key = buildTargetKey(target.getHost(),target.getPort());
+            Message.HealthStatus status = targetHealth.get(key);
+            return status == null || status == Message.HealthStatus.UP;
         }).collect(Collectors.toList());
     }
 
@@ -59,10 +48,10 @@ public class HealthManager {
         }
     }
 
-    public void removeTarget(String proxyId, Target target) {
-        if (proxyId == null || target == null) return;
+    public void removeTarget(String proxyId, String host, Integer port) {
+        if (proxyId == null || host == null || port == null) return;
 
-        String key = buildTargetKey(target);
+        String key = buildTargetKey(host, port);
         healthStore.computeIfPresent(proxyId, (pid, targetHealth) -> {
             targetHealth.remove(key);
             if (targetHealth.isEmpty()) {
@@ -72,11 +61,7 @@ public class HealthManager {
         });
     }
 
-    public void clear() {
-        healthStore.clear();
-    }
-
-    private String buildTargetKey(Target target) {
-        return target.getHost() + ":" + target.getPort();
+    private String buildTargetKey(String host, Integer port) {
+        return host + ":" + port;
     }
 }

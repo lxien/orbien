@@ -8,10 +8,7 @@ import com.xiaoniucode.etp.common.config.ConfigSource;
 import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.core.domain.*;
 import com.xiaoniucode.etp.core.domain.TransportCustomConfig;
-import com.xiaoniucode.etp.core.enums.AccessControl;
-import com.xiaoniucode.etp.core.enums.LoadBalanceType;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.core.enums.ProxyStatus;
+import com.xiaoniucode.etp.core.enums.*;
 import lombok.Getter;
 
 import java.io.File;
@@ -279,6 +276,37 @@ public class TomlConfigLoader implements ConfigSource {
                         }
                         proxyConfig.setSslConfig(new SslConfig(keyFile, certFile));
                     }
+                }
+                Toml healthCheck = proxyTable.getTable("health_check");
+                if (healthCheck != null) {
+                    HealthCheckConfig healthCheckConfig = new HealthCheckConfig();
+                    Boolean enabled = healthCheck.getBoolean("enabled");
+                    if (enabled != null) {
+                        healthCheckConfig.setEnabled(enabled);
+                    }
+                    String type = healthCheck.getString("type");
+                    HealthCheckType healthCheckType = HealthCheckType.fromCode(type);
+                    if (healthCheckType == null) {
+                        throw new IllegalArgumentException("健康检查类型不可用：" + type);
+                    }
+                    healthCheckConfig.setType(healthCheckType);
+                    Long interval = healthCheck.getLong("interval");
+                    if (interval != null) {
+                        healthCheckConfig.setInterval(interval.intValue());
+                    }
+                    Long timeout = healthCheck.getLong("timeout");
+                    if (timeout != null) {
+                        healthCheckConfig.setTimeout(timeout.intValue());
+                    }
+                    Long maxFailed = healthCheck.getLong("max_failed");
+                    if (maxFailed != null) {
+                        healthCheckConfig.setMaxFailed(maxFailed.intValue());
+                    }
+                    String path = healthCheck.getString("path");
+                    if (StringUtils.hasText(path)) {
+                        healthCheckConfig.setPath(path);
+                    }
+                    proxyConfig.setHealthCheck(healthCheckConfig);
                 }
 
                 //带宽限制

@@ -16,7 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

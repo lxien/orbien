@@ -23,7 +23,7 @@ import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyReportEvent;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.entity.AccessControlDO;
 import com.xiaoniucode.etp.server.web.entity.BasicAuthDO;

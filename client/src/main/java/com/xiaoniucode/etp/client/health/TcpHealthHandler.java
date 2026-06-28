@@ -24,15 +24,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.concurrent.CompletableFuture;
-
-
 public class TcpHealthHandler extends ChannelInboundHandlerAdapter {
-    private final CompletableFuture<Message.ServiceHealth> future;
+    private final CompletableFuture<ServiceHealth> future;
     private final long startTime;
     private final String proxyId;
     private final Target target;
 
-    public TcpHealthHandler(CompletableFuture<Message.ServiceHealth> future, String proxyId, Target target, long startTime) {
+    public TcpHealthHandler(CompletableFuture<ServiceHealth> future, String proxyId, Target target, long startTime) {
         this.future = future;
         this.startTime = startTime;
         this.proxyId = proxyId;
@@ -43,17 +41,17 @@ public class TcpHealthHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.close();
         // TCP 连接成功 = UP
-        Message.ServiceHealth health = createHealth(System.currentTimeMillis() - startTime);
+        ServiceHealth health = createHealth(System.currentTimeMillis() - startTime);
         future.complete(health);
     }
 
-    private Message.ServiceHealth createHealth(long responseTime) {
-        Message.ServiceHealth.Builder health = Message.ServiceHealth.newBuilder();
-        health.setProxyId(proxyId);
-        health.setHost(target.getHost());
-        health.setPort(target.getPort());
-        health.setStatus(Message.HealthStatus.UP);
-        health.setResponseTimeMs(responseTime);
+    private ServiceHealth createHealth(long responseTime) {
+        ServiceHealth.ServiceHealthBuilder health = ServiceHealth.builder();
+        health.proxyId(proxyId);
+        health.host(target.getHost());
+        health.port(target.getPort());
+        health.status(Message.HealthStatus.UP);
+        health.responseTimeMs(responseTime);
         return health.build();
     }
 

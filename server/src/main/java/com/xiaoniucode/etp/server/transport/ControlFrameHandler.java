@@ -193,17 +193,27 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     }
                 }
                 //代理配置上报
-                case TMSP.MSG_PROXY_REPORT -> {
+                case TMSP.MSG_PROXY_REPORT_REQ -> {
+                    logger.debug("客户端代理配置上报");
                     agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-                        Message.BatchCreateProxiesRequest proxies = ProtobufUtil.parseFrom(frame.getPayload(),
-                                Message.BatchCreateProxiesRequest.parser());
-                        agentContext.setVariable(AgentConstants.BATCH_CREATE_PROXIES_REQUEST, proxies);
+                        if (frame.getPayload()!=null){
+                            Message.BatchCreateProxiesRequest proxies = ProtobufUtil.parseFrom(
+                                    frame.getPayload(),
+                                    Message.BatchCreateProxiesRequest.parser());
+                            agentContext.setVariable(AgentConstants.BATCH_CREATE_PROXIES_REQUEST, proxies);
+                        }
                         agentContext.fireEvent(AgentEvent.PROXY_REPORT);
                     });
                 }
                 //代理服务节点健康状态上报
                 case TMSP.MSG_SERVICE_HEALTH_REPORT -> {
-
+                     logger.debug("代理服务节点健康状态上报");
+                    agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
+                        Message.BatchReportServiceHealthRequest proxies = ProtobufUtil.parseFrom(frame.getPayload(),
+                                Message.BatchReportServiceHealthRequest.parser());
+                        agentContext.setVariable(AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST, proxies);
+                        agentContext.fireEvent(AgentEvent.SERVICE_HEALTH_REPORT);
+                    });
                 }
             }
         } catch (Exception e) {

@@ -56,5 +56,9 @@ public enum AgentEvent {
     /**
      * 初始化新注册客户端
      */
-    AGENT_INIT
+    AGENT_INIT,
+    /**
+     * 代理真实服务健康状态上报
+     */
+    SERVICE_HEALTH_REPORT
 }

@@ -63,7 +63,7 @@ public class AgentStateMachineBuilder {
             AuthAction authAction = new AuthAction();
             AuthRespAction authRespAction = new AuthRespAction();
             AuthSuccessAction authSuccessAction = new AuthSuccessAction();
-            ConfigSyncAction configSyncAction = new ConfigSyncAction();
+            ProxySyncAction proxySyncAction = new ProxySyncAction();
             NetworkErrorAction networkErrorAction = new NetworkErrorAction();
             GoawayAction goawayAction = new GoawayAction();
             ConnPoolCreateAction createTunnelPoolAction = new ConnPoolCreateAction();
@@ -112,8 +112,8 @@ public class AgentStateMachineBuilder {
 
             builder.internalTransition()
                     .within(AgentState.CONNECTED)
-                    .on(AgentEvent.AUTH_RESPONSE)
-                    .perform(configSyncAction);
+                    .on(AgentEvent.PROXY_CONFIG_SYNC)
+                    .perform(proxySyncAction);
 
 
             // 运行中出现网络错误

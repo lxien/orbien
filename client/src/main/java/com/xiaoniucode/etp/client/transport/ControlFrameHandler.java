@@ -66,9 +66,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_PROXY_REPORT_RESP: {
-                Message.BatchCreateProxiesResponse proxies = ProtobufUtil.parseFrom(frame.getPayload(),
-                        Message.BatchCreateProxiesResponse.parser());
-                agentContext.setVariable(ContextConstants.BATCH_CREATE_PROXIES_RESP, proxies);
+                if (frame.getPayload() != null) {
+                    Message.BatchCreateProxiesResponse proxies = ProtobufUtil.parseFrom(frame.getPayload(),
+                            Message.BatchCreateProxiesResponse.parser());
+                    agentContext.setVariable(ContextConstants.BATCH_CREATE_PROXIES_RESP, proxies);
+                }
                 agentContext.fireEvent(AgentEvent.PROXY_REPORT_RESP);
                 break;
             }
@@ -89,6 +91,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             //配置同步
             case TMSP.MSG_CONFIG_SYNC: {
+                agentContext.fireEvent(AgentEvent.PROXY_CONFIG_SYNC);
                 break;
 
             }

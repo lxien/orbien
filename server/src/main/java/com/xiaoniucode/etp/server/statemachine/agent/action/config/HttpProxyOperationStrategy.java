@@ -27,7 +27,7 @@ import com.xiaoniucode.etp.server.manager.ProxyManager;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -62,7 +62,7 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
     }
 
     @Override
-    public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
+    public void create(ProxyConfig config, AgentInfo agentInfo) {
         String baseDomain = appConfig.getBaseDomain();
         logger.debug("创建HTTP代理: {}", config.getName());
         Set<DomainInfo> domains;
@@ -92,18 +92,18 @@ public class HttpProxyOperationStrategy implements ProxyConfigOperationStrategy 
         config.setProxyId(proxyId);
         proxyManager.activate(config, domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet()));
         logger.debug("HTTP代理 {} 创建成功，域名: {}", config.getName(), domains);
-        return new ProxyOperationResult(domains, null, true);
+      //  return new ProxyOperationResult(domains, null, true);
     }
 
     @Override
-    public ProxyOperationResult update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo) {
+    public void update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo) {
         if (oldConfig.getProtocol() != newConfig.getProtocol()) {
             logger.debug("HTTP代理更新 {} 协议类型发生变化，旧: {}, 新: {}",
                     newConfig.getName(), oldConfig.getProtocol().name(), newConfig.getProtocol().name());
         }
         logger.debug("更新HTTP代理: {}", newConfig.getName());
         proxyManager.deactivate(oldConfig.getProxyId());
-        return create(newConfig, agentInfo);
+       // return create(newConfig, agentInfo);
     }
 
     @Override

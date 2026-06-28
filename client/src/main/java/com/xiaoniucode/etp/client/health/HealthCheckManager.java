@@ -13,9 +13,7 @@ import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 
 public class HealthCheckManager {
@@ -25,7 +23,7 @@ public class HealthCheckManager {
     private final ScheduledExecutorService reportScheduler;
 
     private final Map<String, ScheduledFuture<?>> proxyTasks = new ConcurrentHashMap<>();
-    private final List<Message.ServiceHealth> pendingReports = new CopyOnWriteArrayList<>();
+    private final Set<ServiceHealth> pendingReports = ConcurrentHashMap.newKeySet();
 
     private final Channel control;
 
@@ -47,7 +45,11 @@ public class HealthCheckManager {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "HealthCheck-Shutdown"));
     }
 
-
+    /**
+     * 启动心跳健康检查，如果存在则先取消再启动
+     *
+     * @param proxy 代理配置信息
+     */
     public void startHealthCheck(ProxyConfig proxy) {
         HealthCheckConfig config = proxy.getHealthCheck();
         if (config == null || !config.isEnabled()) {
@@ -86,10 +88,10 @@ public class HealthCheckManager {
         List<Target> targets = proxy.getTargets();
         if (targets == null || targets.isEmpty()) return;
 
-        List<CompletableFuture<Message.ServiceHealth>> futures = new ArrayList<>();
+        List<CompletableFuture<ServiceHealth>> futures = new ArrayList<>();
 
         for (Target target : targets) {
-            CompletableFuture<Message.ServiceHealth> f = healthChecker.check(
+            CompletableFuture<ServiceHealth> f = healthChecker.check(
                     proxy.getProxyId(),
                     proxy.getProtocol(),
                     target,
@@ -99,8 +101,8 @@ public class HealthCheckManager {
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenRun(() -> {
-                    List<Message.ServiceHealth> results = new ArrayList<>();
-                    for (CompletableFuture<Message.ServiceHealth> f : futures) {
+                    List<ServiceHealth> results = new ArrayList<>();
+                    for (CompletableFuture<ServiceHealth> f : futures) {
                         try {
                             results.add(f.get());
                         } catch (Exception e) {
@@ -117,12 +119,21 @@ public class HealthCheckManager {
 
     private void reportHealthBatch() {
         if (pendingReports.isEmpty()) return;
-        List<Message.ServiceHealth> toReport = new ArrayList<>(pendingReports);
+        List<ServiceHealth> toReport = new ArrayList<>(pendingReports);
         logger.debug("上报服务健康状态个数：{}", toReport.size());
         pendingReports.clear();
+        List<Message.ServiceHealth> list = toReport.stream().map(serviceHealth -> {
+            return Message.ServiceHealth.newBuilder()
+                    .setProxyId(serviceHealth.getProxyId())
+                    .setHost(serviceHealth.getHost())
+                    .setPort(serviceHealth.getPort())
+                    .setStatus(serviceHealth.getStatus())
+                    .setResponseTimeMs(serviceHealth.getResponseTimeMs() != null ? serviceHealth.getResponseTimeMs() : 0L)
+                    .build();
+        }).toList();
         Message.BatchReportServiceHealthRequest request = Message.BatchReportServiceHealthRequest
                 .newBuilder()
-                .addAllItems(toReport)
+                .addAllItems(list)
                 .build();
 
         ByteBuf buf = ProtobufUtil.toByteBuf(request, control.alloc());

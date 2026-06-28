@@ -39,7 +39,7 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
     private UidGenerator uidGenerator;
 
     @Override
-    public ProxyOperationResult create(ProxyConfig config, AgentInfo agentInfo) {
+    public void create(ProxyConfig config, AgentInfo agentInfo) {
         logger.debug("创建TCP代理: {}", config.getName());
         Integer remotePort = config.getRemotePort();
         if (remotePort == null || remotePort == 0) {
@@ -60,16 +60,16 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
         config.setProxyId(proxyId);
         proxyManager.activate(config);
         logger.debug("TCP代理 {} 注册成功，监听端口: {}", config.getName(), config.getListenPort());
-        return new ProxyOperationResult(null, config.getListenPort(), true);
+       // return new ProxyOperationResult(null, config.getListenPort(), true);
     }
 
     @Override
-    public ProxyOperationResult update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo) {
+    public void update(ProxyConfig newConfig, ProxyConfig oldConfig, AgentInfo agentInfo) {
         if (oldConfig.getProtocol() != newConfig.getProtocol()) {
             logger.debug("TCP代理更新 {} 协议类型发生变化，旧: {}, 新: {}",
                     newConfig.getName(), oldConfig.getProtocol().name(), newConfig.getProtocol().name());
             proxyManager.deactivate(oldConfig.getProxyId());
-            return create(newConfig, agentInfo);
+           // return create(newConfig, agentInfo);
         } else {
             logger.debug("TCP代理更新 {} 协议类型未发生变化", newConfig.getName());
             Integer oldRemotePort = oldConfig.getRemotePort();
@@ -86,7 +86,7 @@ public class TcpProxyOperationStrategy implements ProxyConfigOperationStrategy {
                 newConfig.setRemotePort(oldConfig.getListenPort());
             }
             proxyManager.reconcile(newConfig);
-            return new ProxyOperationResult(null, newConfig.getListenPort(), true);
+            //return new ProxyOperationResult(null, newConfig.getListenPort(), true);
         }
     }
 

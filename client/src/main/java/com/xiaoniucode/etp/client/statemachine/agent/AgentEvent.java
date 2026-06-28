@@ -81,4 +81,5 @@ public enum AgentEvent {
      * 代理配置上报响应
      */
     PROXY_REPORT_RESP,
+    PROXY_CONFIG_SYNC,
 }

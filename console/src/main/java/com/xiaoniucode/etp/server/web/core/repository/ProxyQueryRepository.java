@@ -17,8 +17,8 @@
 package com.xiaoniucode.etp.server.web.core.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.service.ProxyConfigExt;
-import com.xiaoniucode.etp.server.vhost.DomainInfo;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.core.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.entity.*;

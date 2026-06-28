@@ -16,24 +16,28 @@
  *
  */
 
-package com.xiaoniucode.etp.client.statemachine.agent.action;
+package com.xiaoniucode.etp.core.domain;
 
 
-import com.xiaoniucode.etp.client.statemachine.agent.AgentContext;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentEvent;
-import com.xiaoniucode.etp.client.statemachine.agent.AgentState;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/**
- * 处理来自服务端的配置信息
- */
-public class ConfigSyncAction extends AgentBaseAction {
+import java.util.Set;
 
-    @Override
-    protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-       //配置同步
+@Data
+@NoArgsConstructor
+public class ProxyConfigExt {
+    private ProxyConfig proxyConfig;
+    private Set<DomainInfo> domains;
+    private Integer listenPort;
 
+    public ProxyConfigExt(ProxyConfig proxyConfig, Set<DomainInfo> domains) {
+        this.proxyConfig = proxyConfig;
+        this.domains = domains;
+    }
 
-        //上报本地配置
-
+    public ProxyConfigExt(ProxyConfig proxyConfig, Integer listenPort) {
+        this.proxyConfig = proxyConfig;
+        this.listenPort = listenPort;
     }
 }
