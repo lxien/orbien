@@ -16,46 +16,158 @@
 
 package com.xiaoniucode.etp.server.service;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
-import com.xiaoniucode.etp.core.domain.DomainInfo;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ProxyConfigService {
-
+    private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyConfigService.class);
     @Autowired
     private ProxyQueryRepository proxyQueryRepository;
 
-    public Optional<ProxyConfig> findById(String proxyId) {
-        return proxyQueryRepository.findById(proxyId);
+    /**
+     * 一级缓存：各种查询条件 -> proxyId
+     */
+    private final Cache<String/*bizKey*/, String/*proxyId*/> proxyIdCache = Caffeine.newBuilder()
+            .maximumSize(50000)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build();
+
+    /**
+     * 二级缓存：proxyId -> ProxyConfigExt
+     */
+    private final Cache<String, ProxyConfigExt> configCache = Caffeine.newBuilder()
+            .maximumSize(50000)
+            .expireAfterWrite(30, TimeUnit.SECONDS)
+            .build();
+
+    public ProxyConfigExt findById(String proxyId) {
+        return configCache.get(proxyId, key -> {
+            ProxyConfigExt config = proxyQueryRepository.findById(key);
+            if (config != null) {
+                fillIndexCaches(config);
+            }
+            return config;
+        });
     }
 
-    public Optional<ProxyConfig> findByDomain(String domain) {
-        return proxyQueryRepository.findByFullDomain(domain);
+    /**
+     * 根据 proxyId 清理所有相关缓存
+     */
+    public void evictByProxyId(String proxyId) {
+        if (proxyId == null) {
+            return;
+        }
+
+        // 从二级缓存中取出配置（用于构建一级缓存的 key）
+        ProxyConfigExt ext = configCache.getIfPresent(proxyId);
+        // 清理二级缓存
+        configCache.invalidate(proxyId);
+        // 清理一级缓存中所有相关的 key
+        if (ext != null) {
+            ProxyConfig config = ext.getProxyConfig();
+
+            String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
+            proxyIdCache.invalidate(agentNameKey);
+
+            // 端口索引
+            if (config.isTcp() && config.getListenPort() != null) {
+                String portKey = "port:" + config.getListenPort();
+                proxyIdCache.invalidate(portKey);
+            }
+        }
+
+        logger.debug("已清理代理缓存: proxyId={}", proxyId);
     }
 
-    public Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName) {
-        return proxyQueryRepository.findByAgentAndName(agentId, proxyName);
+    /**
+     * 批量清理缓存
+     */
+    public void evictByProxyIds(Collection<String> proxyIds) {
+        if (CollectionUtils.isEmpty(proxyIds)) {
+            return;
+        }
+
+        for (String proxyId : proxyIds) {
+            evictByProxyId(proxyId);
+        }
+        logger.debug("已批量清理代理缓存: count={}", proxyIds.size());
     }
 
-    public Optional<ProxyConfig> findByListenPort(int remotePort) {
-
-        return proxyQueryRepository.findByListenPort(remotePort);
+    public void evictAll() {
+        proxyIdCache.invalidateAll();
+        configCache.invalidateAll();
+        logger.debug("已清理所有代理缓存");
     }
 
-    public boolean exists(String fullDomain) {
-        return proxyQueryRepository.existsByFullDomain(fullDomain);
+
+    private void fillIndexCaches(ProxyConfigExt ext) {
+        ProxyConfig config = ext.getProxyConfig();
+        String proxyId = config.getProxyId();
+        String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
+        proxyIdCache.put(agentNameKey, proxyId);
+        if (config.isTcp()) {
+            String portKey = "port:" + config.getListenPort();
+            proxyIdCache.put(portKey, proxyId);
+        }
     }
 
-    public Set<DomainInfo> findDomainsByProxyId(String proxyId) {
-        return proxyQueryRepository.findDomainsByProxyId(proxyId);
+    public ProxyConfigExt findByAgentAndName(String agentId, String proxyName) {
+        String indexKey = "agent:" + agentId + ":name:" + proxyName;
+
+        // 先查一级缓存
+        String proxyId = proxyIdCache.getIfPresent(indexKey);
+        if (proxyId != null) {
+            // 一级缓存命中，走二级缓存
+            return findById(proxyId);
+        }
+
+        // 一级缓存未命中，查一次数据库
+        ProxyConfigExt ext = proxyQueryRepository.findByAgentAndName(agentId, proxyName);
+        if (ext == null) {
+            return null;
+        }
+
+        // 回填两级缓存
+        ProxyConfig config = ext.getProxyConfig();
+        proxyIdCache.put(indexKey, config.getProxyId());
+        configCache.put(config.getProxyId(), ext);
+
+        return ext;
+    }
+
+    public ProxyConfigExt findByListenPort(int listenPort) {
+        String indexKey = "port:" + listenPort;
+
+        // 先查一级缓存
+        String proxyId = proxyIdCache.getIfPresent(indexKey);
+        if (proxyId != null) {
+            return findById(proxyId);
+        }
+
+        // 一级缓存未命中，查一次数据库
+        ProxyConfigExt ext = proxyQueryRepository.findByListenPort(listenPort);
+        if (ext == null) {
+            return null;
+        }
+        ProxyConfig config = ext.getProxyConfig();
+        // 回填两级缓存
+        proxyIdCache.put(indexKey, config.getProxyId());
+        configCache.put(config.getProxyId(), ext);
+
+        return ext;
     }
 
     public List<Integer> getAllListenPorts() {

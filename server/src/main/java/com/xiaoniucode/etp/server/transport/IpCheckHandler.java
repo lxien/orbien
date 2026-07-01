@@ -39,12 +39,12 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         return sa.getPort();
     }
 
-    protected boolean doCheckAccess(Channel visitor, ProxyConfig proxyConfig) {
+    protected boolean doCheckAccess(Channel visitor, ProxyConfig config) {
         String visitorIp = NetUtils.getIp(visitor);
-        boolean checkAccess = ipAccessChecker.checkAccess(proxyConfig, visitorIp);
+        boolean checkAccess = ipAccessChecker.checkAccess(config.getProxyId(),config.getAccessControl(), visitorIp);
         if (!checkAccess) {
             logger.debug("来源IP {} 无访问权限", visitorIp);
-            ProtocolType protocol = proxyConfig.getProtocol();
+            ProtocolType protocol = config.getProtocol();
             if (protocol.isHttp()) {
                 NettyHttpUtils.sendHttp403(visitor).addListener(future -> {
                     ChannelUtils.closeOnFlush(visitor);
@@ -54,7 +54,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
             }
             //尝试关闭流，可能之前已经建立过连接，后来权限发生变化
             streamManager.getStreamContext(visitor).ifPresent(context -> {
-                logger.debug("没有隧道访问权限，关闭 {} 流", proxyConfig.getName());
+                logger.debug("没有隧道访问权限，关闭 {} 流", config.getName());
                 context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             });
             return false;

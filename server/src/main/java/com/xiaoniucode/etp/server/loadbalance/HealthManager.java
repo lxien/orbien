@@ -5,18 +5,23 @@ import com.xiaoniucode.etp.core.message.Message;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 代理内网服务健康状态管理器
+ * 内网服务健康状态管理器
  */
 @Component
 public class HealthManager {
-    private final ConcurrentHashMap<String/*proxyId*/, ConcurrentHashMap<String/*host:port*/, Message.HealthStatus>> healthStore = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String/*proxyId*/,
+            ConcurrentHashMap<String/*host:port*/, Message.HealthStatus>> healthStore = new ConcurrentHashMap<>();
 
     public void updateHealth(String proxyId, String host, Integer port, Message.HealthStatus status) {
-        if (proxyId == null || host == null || port == null) return;
+        Objects.requireNonNull(proxyId, "proxyId不能为空");
+        Objects.requireNonNull(host, "host不能为空");
+        Objects.requireNonNull(port, "port不能为空");
+        Objects.requireNonNull(status, "status不能为空");
 
         ConcurrentHashMap<String, Message.HealthStatus> targetHealth = healthStore.computeIfAbsent(proxyId,
                 k -> new ConcurrentHashMap<>()
@@ -26,9 +31,8 @@ public class HealthManager {
     }
 
     public List<Target> getAvailableTargets(String proxyId, List<Target> targets) {
-        if (targets == null || targets.isEmpty()) {
-            return List.of();
-        }
+        Objects.requireNonNull(proxyId, "proxyId不能为空");
+        Objects.requireNonNull(targets, "targets不能为空");
 
         ConcurrentHashMap<String, Message.HealthStatus> targetHealth = healthStore.get(proxyId);
         if (targetHealth == null) {
@@ -43,13 +47,14 @@ public class HealthManager {
     }
 
     public void removeProxy(String proxyId) {
-        if (proxyId != null) {
-            healthStore.remove(proxyId);
-        }
+        Objects.requireNonNull(proxyId, "proxyId不能为空");
+        healthStore.remove(proxyId);
     }
 
     public void removeTarget(String proxyId, String host, Integer port) {
-        if (proxyId == null || host == null || port == null) return;
+        Objects.requireNonNull(proxyId, "proxyId不能为空");
+        Objects.requireNonNull(host, "host不能为空");
+        Objects.requireNonNull(port, "port不能为空");
 
         String key = buildTargetKey(host, port);
         healthStore.computeIfPresent(proxyId, (pid, targetHealth) -> {

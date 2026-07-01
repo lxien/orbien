@@ -249,6 +249,7 @@
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",
+      "portPool": "Port Pool",
       "agent": "Agent",
       "domain": "Domain",
       "ssl": "SSL Certificate",

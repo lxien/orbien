@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.statemachine.stream.action;
 
 import com.xiaoniucode.etp.core.domain.*;
+import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancer;
 import com.xiaoniucode.etp.server.loadbalance.LoadBalancerFactory;
@@ -38,16 +39,18 @@ public class TargetResolverAction extends StreamBaseAction {
     private ProxyConfigService proxyConfigService;
     @Autowired
     private DomainRegistry domainRegistry;
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
-        ProxyConfig config = resolveProxyConfig(context);
-        if (config == null || config.getStatus().isClosed()) {
+        ProxyConfigExt ext = resolveProxyConfig(context);
+        if (ext == null || ext.getProxyConfig().getStatus().isClosed()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
+        ProxyConfig config = ext.getProxyConfig();
         Optional<AgentContext> gentContextOpt = agentManager.getAgentContext(config.getAgentId());
         if (gentContextOpt.isPresent()) {
             context.setAgentContext(gentContextOpt.get());
@@ -92,12 +95,11 @@ public class TargetResolverAction extends StreamBaseAction {
             return null;
         }
         if (config.isLoadBalanceNeeded()) {
-            LoadBalanceConfig loadBalanceConfig = config.getLoadBalance();
-            LoadBalancer loadBalancer = loadBalancerFactory.getLoadBalancer(loadBalanceConfig);
+            LoadBalanceType loadBalanceType = config.getLoadBalanceType();
+            LoadBalancer loadBalancer = loadBalancerFactory.getLoadBalancer(loadBalanceType);
             Target selected = loadBalancer.select(config.getProxyId(), availableTargets);
             if (selected != null) {
-                logger.debug("负载均衡选择: {} -> {}:{}",
-                        config.getName(), selected.getHost(), selected.getPort());
+                logger.debug("负载均衡选择: {} -> {}:{}", config.getName(), selected.getHost(), selected.getPort());
             }
             return selected;
         } else {
@@ -108,14 +110,14 @@ public class TargetResolverAction extends StreamBaseAction {
         }
     }
 
-    private ProxyConfig resolveProxyConfig(StreamContext context) {
-        if (context.getProtocol() == ProtocolType.HTTP) {
+    private ProxyConfigExt resolveProxyConfig(StreamContext context) {
+        if (context.getProtocol().isHttpOrHttps()) {
             String domain = context.getVisitorDomain();
             String proxyId = domainRegistry.getProxyIdByDomain(domain);
-            return proxyConfigService.findById(proxyId).orElse(null);
+            return proxyConfigService.findById(proxyId);
         } else if (context.getProtocol() == ProtocolType.TCP) {
             int remotePort = context.getListenerPort();
-            return proxyConfigService.findByListenPort(remotePort).orElse(null);
+            return proxyConfigService.findByListenPort(remotePort);
         }
         return null;
     }

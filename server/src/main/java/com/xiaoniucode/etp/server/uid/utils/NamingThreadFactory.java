@@ -17,10 +17,10 @@
  */
 package com.xiaoniucode.etp.server.uid.utils;
 
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author yutianbao
  */
 public class NamingThreadFactory implements ThreadFactory {
-    private static final Logger LOGGER = LoggerFactory.getLogger(NamingThreadFactory.class);
+    private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(NamingThreadFactory.class);
 
     /**
      * Thread name pre

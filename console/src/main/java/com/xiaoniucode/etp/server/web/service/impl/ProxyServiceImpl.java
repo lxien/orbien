@@ -15,6 +15,8 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
@@ -32,6 +34,7 @@ import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.param.proxy.ProxyTargetSaveParam;
+import com.xiaoniucode.etp.server.web.proxy.service.ProxyConfigSyncService;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
@@ -62,10 +65,7 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyDomainRepository proxyDomainRepository;
     @Autowired
     private ProxyTargetRepository proxyTargetRepository;
-    @Autowired
-    private LoadBalanceRepository loadBalanceRepository;
-    @Autowired
-    private TransportRepository transportRepository;
+
     @Autowired
     private BasicAuthRepository basicAuthRepository;
     @Autowired
@@ -81,10 +81,6 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyTargetConvert proxyTargetConvert;
     @Autowired
-    private TransportConvert transportConvert;
-    @Autowired
-    private LoadBalanceConvert loadBalanceConvert;
-    @Autowired
     private ProxyAssembler proxyAssembler;
     @Resource
     private AppConfig appConfig;
@@ -98,13 +94,16 @@ public class ProxyServiceImpl implements ProxyService {
     private PortManager portManager;
     @Autowired
     private TransactionHelper transactionHelper;
+    @Autowired
+    private ProxyConfigSyncService proxyConfigSyncService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateParam param) {
-        String baseDomain = appConfig.getBaseDomain();
+
         DomainType domainType = DomainType.fromCode(param.getDomainType());
-        if (!StringUtils.hasText(baseDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
+        String baseDomain=appConfig.getBaseDomains().stream().toList().getFirst();
+        if (StringUtils.hasText(baseDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
             throw new BizException("不支持改域名类型的自动生成！");
         }
         //1.基础信息
@@ -133,12 +132,9 @@ public class ProxyServiceImpl implements ProxyService {
             throw new BizException("单机模式只能配置一个服务节点");
         }
         proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(param.getTargets(), proxyId));
-        //3.负载均衡
-        if (proxyDO.getDeploymentMode().isCluster()) {
-            loadBalanceRepository.save(loadBalanceConvert.toDO(param.getLoadBalance(), proxyId));
-        }
+
         //4.传输
-        transportRepository.save(transportConvert.toDO(param.getTransport(), proxyId));
+
         //5.域名
         Set<String> fullDomains = new HashSet<>();
         if (domainType.isAuto()) {
@@ -179,10 +175,18 @@ public class ProxyServiceImpl implements ProxyService {
         //7.初始化BasicAuth认证
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
 
+
+       // proxyConfigSyncService.syncOnCreate(ext);
+
         if (proxyDO.getStatus().isOpen()) {
-            transactionHelper.afterCommit(() ->
-                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO), fullDomains));
+            ProxyConfig proxyConfig = proxyAssembler.toProxyConfig(proxyDO);
+            ProxyConfigExt ext = ProxyConfigExt.of(proxyConfig, null);
+
+//            transactionHelper.afterCommit(() ->
+//                    proxyManager.activate(proxyConfig));
         }
+
+
         logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
     }
 
@@ -195,10 +199,6 @@ public class ProxyServiceImpl implements ProxyService {
                 existsProxyDO.getAgentId(), param.getName(), proxyId)) {
             throw new BizException("代理名称已经存在: " + param.getName());
         }
-        //1.基本信息
-        DeploymentMode existsDeploymentMode = existsProxyDO.getDeploymentMode();
-        DeploymentMode requestDeploymentMode = DeploymentMode.fromCode(param.getDeploymentMode());
-
         DomainType existsDomainType = existsProxyDO.getDomainType();
         DomainType requestDomainType = DomainType.fromCode(param.getDomainType());
         BandwidthSaveParam bandwidth = param.getBandwidth();
@@ -221,21 +221,14 @@ public class ProxyServiceImpl implements ProxyService {
         if (!CollectionUtils.isEmpty(param.getTargets())) {
             proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(param.getTargets(), proxyId));
         }
-        //4.负载均衡
-        boolean wasCluster = existsDeploymentMode.isCluster();
-        boolean isClusterNow = requestDeploymentMode.isCluster();
-        if ((wasCluster && isClusterNow) || (!wasCluster && isClusterNow)) {
-            loadBalanceRepository.save(new LoadBalanceDO(proxyId, LoadBalanceType.fromCode(param.getLoadBalance().getStrategy())));
-        } else if (wasCluster) {
-            loadBalanceRepository.deleteById(proxyId);
-        }
         //6.传输
-        transportRepository.save(transportConvert.toDO(param.getTransport(), proxyId));
+
         //7.HTTP域名信息
         if (!(existsDomainType == requestDomainType && existsDomainType.isAuto())) {
             proxyDomainRepository.deleteByProxyId(proxyId);
         }
-        String baseDomain = appConfig.getBaseDomain();
+        //todo String baseDomain = appConfig.getBaseDomain();
+        String baseDomain=appConfig.getBaseDomains().stream().toList().getFirst();
         Set<String> fullDomains = new HashSet<>();
         //请求域名类型和存在域名相同且是自动生成域名类型的时保持不变，其他都删除后重新生成
         if (!((requestDomainType == existsDomainType) && existsDomainType.isAuto())) {
@@ -277,8 +270,8 @@ public class ProxyServiceImpl implements ProxyService {
                     .map(prefix -> new ProxyDomainDO(proxyId, prefix, baseDomain, requestDomainType)).toList();
             proxyDomainRepository.saveAll(list);
         }
-        transactionHelper.afterCommit(() ->
-                proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO), fullDomains));
+//        transactionHelper.afterCommit(() ->
+//                proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO), fullDomains));
         logger.debug("HTTP代理更新成功：{}", existsProxyDO.getName());
     }
 
@@ -336,22 +329,13 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
         AgentDO agentDO = detail.getAgentDO();
         ProxyDO proxyDO = detail.getProxyDO();
-        TransportDO transportDO = detail.getTransportDO();
-        LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
 
         List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
         List<ProxyDomainDO> httpProxyDomainDOs = proxyDomainRepository.findByProxyId(id);
 
         HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
-        TransportDTO transportDTO = transportConvert.toDTO(transportDO);
 
         List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
-        httpProxyDetailDTO.setTransport(transportDTO);
-
-        if (proxyDO.getDeploymentMode().isCluster()) {
-            LoadBalanceDTO loadBalanceDTO = loadBalanceConvert.toDTO(loadBalanceDO);
-            httpProxyDetailDTO.setLoadBalance(loadBalanceDTO);
-        }
 
         httpProxyDetailDTO.setTargets(targetDTOList);
         List<String> domains = httpProxyDomainDOs.stream().map(ProxyDomainDO::getDomain).toList();
@@ -405,21 +389,16 @@ public class ProxyServiceImpl implements ProxyService {
         }
         List<ProxyTargetDO> proxyTargetDOList = proxyTargetConvert.toDOList(param.getTargets(), proxyId);
         proxyTargetRepository.saveAll(proxyTargetDOList);
-        //4.负载均衡
-        if (proxyDO.getDeploymentMode().isCluster()) {
-            LoadBalanceDO loadBalanceDO = loadBalanceConvert.toDO(param.getLoadBalance(), proxyId);
-            loadBalanceRepository.save(loadBalanceDO);
-        }
+
         //5.传输
-        TransportDO transportDO = transportConvert.toDO(param.getTransport(), proxyId);
-        transportRepository.save(transportDO);
+
         //6.初始化访问控制
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
 
-        if (proxyDO.getStatus().isOpen()) {
-            transactionHelper.afterCommit(() ->
-                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
-        }
+//        if (proxyDO.getStatus().isOpen()) {
+//            transactionHelper.afterCommit(() ->
+//                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
+//        }
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
 
@@ -467,18 +446,10 @@ public class ProxyServiceImpl implements ProxyService {
         }
         proxyTargetRepository.deleteByProxyId(proxyId);
         proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(targets, proxyId));
-        //4.负载均衡
-        boolean wasCluster = existsDeploymentMode.isCluster();
-        boolean isClusterNow = requestDeploymentMode.isCluster();
-        if ((wasCluster && isClusterNow) || (!wasCluster && isClusterNow)) {
-            loadBalanceRepository.save(new LoadBalanceDO(proxyId, LoadBalanceType.fromCode(param.getLoadBalance().getStrategy())));
-        } else if (wasCluster) {
-            loadBalanceRepository.deleteById(proxyId);
-        }
+
         //5.传输
-        transportRepository.save(transportConvert.toDO(param.getTransport(), proxyId));
         transactionHelper.afterCommit(() -> {
-            proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO));
+           // proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO));
         });
         logger.debug("TCP 代理更新成功：{}", existsProxyDO.getName());
     }
@@ -487,15 +458,11 @@ public class ProxyServiceImpl implements ProxyService {
     public TcpProxyDetailDTO getTcpProxyById(String id) {
         ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
         ProxyDO proxyDO = detail.getProxyDO();
-        LoadBalanceDO loadBalanceDO = detail.getLoadBalanceDO();
+
 
         List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
         TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, detail.getAgentDO().getAgentType().getCode());
-        tcpProxyDetailDTO.setTransport(transportConvert.toDTO(detail.getTransportDO()));
 
-        if (proxyDO.getDeploymentMode().isCluster()) {
-            tcpProxyDetailDTO.setLoadBalance(loadBalanceConvert.toDTO(loadBalanceDO));
-        }
         tcpProxyDetailDTO.setTargets(proxyTargetConvert.toDTOList(proxyTargetDos));
         return tcpProxyDetailDTO;
     }
@@ -536,8 +503,7 @@ public class ProxyServiceImpl implements ProxyService {
         ProtocolType protocolType = ProtocolType.fromCode(param.getProtocol());
         //Common
         proxyTargetRepository.deleteByProxyIdIn(ids);
-        loadBalanceRepository.deleteByProxyIdIn(ids);
-        transportRepository.deleteByProxyIdIn(ids);
+
         //IP CIDR
         accessControlRepository.deleteByProxyIdIn(ids);
         accessControlRuleRepository.deleteByProxyIdIn(ids);

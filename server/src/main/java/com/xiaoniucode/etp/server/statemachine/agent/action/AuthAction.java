@@ -117,16 +117,11 @@ public class AuthAction extends AgentBaseAction {
 
         agentManager.addAgentContextIndex(agentId, context);
 
-        Message.ServerInfo.Builder serverInfoBuilder = Message.ServerInfo.newBuilder()
-                .setHttpProxyPort(appConfig.getHttpProxyPort())
-                .setHttpsProxyPort(appConfig.getHttpsProxyPort())
-                .addBaseDomains(appConfig.getBaseDomain());
 
         Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
                 .setStatus(Message.Status.newBuilder().setCode(0).setMessage("认证成功"))
                 .setConnectionId(context.getConnectionId())
                 .setAgentId(agentId)
-                .setServerInfo(serverInfoBuilder)
                 .build();
         TMSPFrame authFrame = new TMSPFrame(0, TMSP.MSG_AUTH_RESP);
         ByteBuf payload = ProtobufUtil.toByteBuf(authResponse, control.alloc());

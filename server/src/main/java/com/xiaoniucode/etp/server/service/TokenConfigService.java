@@ -35,9 +35,9 @@ public class TokenConfigService {
     @Autowired
     private TokenQueryRepository tokenQueryRepository;
     private final Cache<String, Boolean> tokenCache = Caffeine.newBuilder()
-            .maximumSize(10000) // Token最大数量
-            .expireAfterWrite(20, TimeUnit.MINUTES)      // 写后20分钟强制失效
-            .expireAfterAccess(1, TimeUnit.HOURS)        // 不活跃清理
+            .maximumSize(10000)
+            .expireAfterWrite(20, TimeUnit.MINUTES)
+            .expireAfterAccess(1, TimeUnit.HOURS)
             .recordStats()
             .build();
 

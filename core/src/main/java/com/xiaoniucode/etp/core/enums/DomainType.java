@@ -33,4 +33,5 @@ public enum DomainType {
     public boolean isCustomDomain(){
         return this==CUSTOM_DOMAIN;
     }
+
 }

@@ -18,8 +18,6 @@
 
 package com.xiaoniucode.etp.client.health;
 
-import com.xiaoniucode.etp.core.domain.HealthCheckConfig;
-import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -28,18 +26,15 @@ import io.netty.handler.codec.http.*;
 import java.util.concurrent.CompletableFuture;
 
 public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpResponse> {
-    private final HealthCheckConfig config;
+    private final Message.HealthCheck healthCheck;
     private final CompletableFuture<ServiceHealth> resultFuture;
     private final long startTime;
     private final String proxyId;
-    private final Target target;
+    private final Message.Target target;
 
-    public HttpHealthHandler(HealthCheckConfig config,
-                             CompletableFuture<ServiceHealth> resultFuture,
-                             long startTime,
-                             String proxyId,
-                             Target target) {
-        this.config = config;
+    public HttpHealthHandler(Message.HealthCheck healthCheck, CompletableFuture<ServiceHealth> resultFuture,
+                             long startTime, String proxyId, Message.Target target) {
+        this.healthCheck = healthCheck;
         this.resultFuture = resultFuture;
         this.startTime = startTime;
         this.proxyId = proxyId;
@@ -51,7 +46,7 @@ public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpRespo
         FullHttpRequest request = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1,
                 HttpMethod.GET,
-                config.getPath()
+                healthCheck.getPath()
         );
 
         request.headers()
@@ -70,8 +65,7 @@ public class HttpHealthHandler extends SimpleChannelInboundHandler<FullHttpRespo
 
         try {
             int statusCode = response.status().code();
-            isHealthy = config.getExpectedStatus().contains(statusCode);
-
+            isHealthy = statusCode == 200;
             if (!isHealthy) {
                 errorMsg = "Unexpected status code: " + statusCode;
             }

@@ -1,62 +1,49 @@
 <template>
   <div class="domain-page art-full-height">
-    <ElCard class="art-table-card">
-      <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-      </ArtTableHeader>
+    <DomainOverview
+      v-model:active="activeView"
+      class="shrink-0"
+      :base-count="summary.baseCount"
+      :used-count="summary.usedCount"
+    />
 
-      <ArtTable
-        :loading="loading"
-        :data="data"
-        :columns="columns"
-        :pagination="pagination"
-        @pagination:size-change="handleSizeChange"
-        @pagination:current-change="handleCurrentChange"
-      >
-      </ArtTable>
+    <ElCard class="art-table-card">
+      <DomainList v-if="activeView === 'pool'" @change="loadSummary" />
+      <UsedDomainList v-else @change="loadSummary" />
     </ElCard>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetDomainListByPage } from '@/api/domain'
+  import { reactive, onMounted } from 'vue'
+  import DomainOverview, { type DomainView } from './modules/domain-overview.vue'
+  import DomainList from './modules/domain-list.vue'
+  import UsedDomainList from './modules/used-domain-list.vue'
+  import { fetchGetDomainListByPage, fetchGetUsedDomainListByPage } from '@/api/domain'
 
   defineOptions({ name: 'DomainManagement' })
 
-  type DomainItem = Api.Domain.DomainDTO
+  const activeView = ref<DomainView>('pool')
 
-  const {
-    columns,
-    columnChecks,
-    data,
-    loading,
-    pagination,
-    handleSizeChange,
-    handleCurrentChange,
-    refreshData
-  } = useTable({
-    core: {
-      apiFn: fetchGetDomainListByPage,
-      apiParams: {
-        current: 1,
-        size: 20
-      },
-      columnsFactory: () => [
-        {
-          prop: 'domain',
-          label: '域名'
-        },
-        {
-          prop: 'createdAt',
-          label: '创建时间'
-        },
-        {
-          prop: 'updatedAt',
-          label: '更新时间'
-        }
-      ]
+  const summary = reactive({
+    baseCount: 0,
+    usedCount: 0
+  })
+
+  const loadSummary = async () => {
+    try {
+      const [baseRes, usedRes] = await Promise.all([
+        fetchGetDomainListByPage({ current: 1, size: 1 }),
+        fetchGetUsedDomainListByPage({ current: 1, size: 1 })
+      ])
+      summary.baseCount = baseRes.total ?? 0
+      summary.usedCount = usedRes.total ?? 0
+    } catch {
+      // 概览统计失败时不阻断列表展示
     }
+  }
+
+  onMounted(() => {
+    loadSummary()
   })
 </script>
-
-<style lang="scss" scoped></style>

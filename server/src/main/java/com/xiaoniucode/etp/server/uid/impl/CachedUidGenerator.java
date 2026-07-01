@@ -24,8 +24,8 @@ import com.xiaoniucode.etp.server.uid.buffer.RejectedPutBufferHandler;
 import com.xiaoniucode.etp.server.uid.buffer.RejectedTakeBufferHandler;
 import com.xiaoniucode.etp.server.uid.buffer.RingBuffer;
 import com.xiaoniucode.etp.server.uid.exception.UidGenerateException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.Assert;
 
@@ -50,7 +50,7 @@ import java.util.List;
  * @author yutianbao
  */
 public class CachedUidGenerator extends DefaultUidGenerator implements DisposableBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CachedUidGenerator.class);
+    private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(CachedUidGenerator.class);
     private static final int DEFAULT_BOOST_POWER = 3;
 
     /** Spring properties */

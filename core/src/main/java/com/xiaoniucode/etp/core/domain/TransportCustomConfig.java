@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class TransportCustomConfig {
-    private Boolean multiplex = true;
-    private Boolean encrypt = true;
-    private Boolean compress = true;
+    private Boolean multiplex;
+    private Boolean encrypt;
+    private Boolean compress;
 }

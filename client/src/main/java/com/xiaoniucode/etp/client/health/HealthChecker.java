@@ -18,9 +18,7 @@
 
 package com.xiaoniucode.etp.client.health;
 
-import com.xiaoniucode.etp.core.domain.HealthCheckConfig;
 import com.xiaoniucode.etp.core.domain.Target;
-import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
@@ -38,23 +36,21 @@ import java.util.concurrent.CompletableFuture;
 public class HealthChecker {
     private final EventLoopGroup group = new NioEventLoopGroup(1);
 
-    public CompletableFuture<ServiceHealth> check(String proxyId, ProtocolType protocol,
-                                                          Target target,
-                                                          HealthCheckConfig config) {
+    public CompletableFuture<ServiceHealth> check(String proxyId, Message.Target target, Message.HealthCheck healthCheck) {
         long startTime = System.currentTimeMillis();
         CompletableFuture<ServiceHealth> future = new CompletableFuture<>();
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, config.getTimeout() * 1000)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, healthCheck.getTimeout() * 1000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        if (isHttpCheck(protocol, config)) {
+                        if (isHttpCheck(healthCheck)) {
                             ch.pipeline().addLast(new HttpClientCodec());
                             ch.pipeline().addLast(new HttpObjectAggregator(8192));
-                            ch.pipeline().addLast(new HttpHealthHandler(config, future, startTime, proxyId, target));
+                            ch.pipeline().addLast(new HttpHealthHandler(healthCheck, future, startTime, proxyId, target));
                         } else {
                             ch.pipeline().addLast(new TcpHealthHandler(future, proxyId, target, startTime));
                         }
@@ -71,19 +67,17 @@ public class HealthChecker {
         return future;
     }
 
-    private boolean isHttpCheck(ProtocolType protocol, HealthCheckConfig config) {
-        com.xiaoniucode.etp.core.enums.HealthCheckType type = config.getType();
-        return type == com.xiaoniucode.etp.core.enums.HealthCheckType.HTTP ||
-                (type == com.xiaoniucode.etp.core.enums.HealthCheckType.AUTO && protocol.isHttpOrHttps());
+    private boolean isHttpCheck(Message.HealthCheck config) {
+        return config.getType() == Message.HealthCheckType.HEALTH_CHECK_TYPE_HTTP;
     }
 
-    private void completeAsDown(CompletableFuture<ServiceHealth> future, String proxyId, Target target,
+    private void completeAsDown(CompletableFuture<ServiceHealth> future, String proxyId, Message.Target target,
                                 long startTime) {
         ServiceHealth health = createHealth(proxyId, target, System.currentTimeMillis() - startTime);
         future.complete(health);
     }
 
-    private ServiceHealth createHealth(String proxyId, Target target, long responseTime) {
+    private ServiceHealth createHealth(String proxyId, Message.Target target, long responseTime) {
         ServiceHealth.ServiceHealthBuilder h = ServiceHealth.builder();
         h.proxyId(proxyId);
         h.host(target.getHost());

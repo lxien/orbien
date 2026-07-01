@@ -5,4 +5,14 @@ declare namespace Api.Domain {
     createdAt: string
     updatedAt: string
   }
+
+  interface UsedDomainDTO {
+    id: number
+    fullDomain: string
+    domain: string
+    baseDomain?: string
+    domainType: number
+    proxyId: string
+    proxyName?: string
+  }
 }

@@ -16,14 +16,12 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
  * 流打开成功处理
  */
-@Slf4j
 @Component
 public class StreamOpenResponseAction extends StreamBaseAction {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamOpenResponseAction.class);

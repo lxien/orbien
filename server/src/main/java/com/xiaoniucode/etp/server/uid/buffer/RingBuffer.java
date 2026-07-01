@@ -18,8 +18,8 @@
 package com.xiaoniucode.etp.server.uid.buffer;
 
 import com.xiaoniucode.etp.server.uid.utils.PaddedAtomicLong;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.util.Assert;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author yutianbao
  */
 public class RingBuffer {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RingBuffer.class);
+    private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(RingBuffer.class);
 
     /** Constants */
     private static final int START_POINT = -1;

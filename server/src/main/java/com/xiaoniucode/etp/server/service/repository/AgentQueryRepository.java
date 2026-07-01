@@ -23,5 +23,5 @@ import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import java.util.Optional;
 
 public interface AgentQueryRepository {
-    Optional<AgentInfo> findById(String agentId);
+    AgentInfo findById(String agentId);
 }

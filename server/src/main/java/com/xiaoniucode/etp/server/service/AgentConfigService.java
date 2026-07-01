@@ -37,9 +37,9 @@ public class AgentConfigService {
     @Autowired
     private AgentQueryRepository agentQueryRepository;
     private final Cache<String/*agentId*/, AgentInfo> l1Cache = Caffeine.newBuilder()
-            .maximumSize(5000) //最大缓存个数
-            .expireAfterWrite(30, TimeUnit.MINUTES)  // 写后30分钟强制失效
-            .expireAfterAccess(2, TimeUnit.HOURS)    // 访问后2小时失效
+            .maximumSize(5000)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .expireAfterAccess(2, TimeUnit.HOURS)
             .recordStats()
             .build();
 
@@ -50,7 +50,7 @@ public class AgentConfigService {
 
         AgentInfo agentInfo = l1Cache.get(agentId, id -> {
             logger.debug("从数据库查询客户端信息：{}", id);
-            return agentQueryRepository.findById(id).orElse(null);
+            return agentQueryRepository.findById(id);
         });
 
         return Optional.ofNullable(agentInfo);

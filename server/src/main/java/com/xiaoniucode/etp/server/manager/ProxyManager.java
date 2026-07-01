@@ -16,13 +16,13 @@
 
 package com.xiaoniucode.etp.server.manager;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
 import com.xiaoniucode.etp.server.port.PortManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
+import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
 import com.xiaoniucode.etp.server.vhost.DomainRegistry;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -31,10 +31,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 运行时代理管理器，负责代理的注册、注销和状态变更等操作。
@@ -57,64 +60,94 @@ public class ProxyManager {
     private DomainRegistry domainRegistry;
     @Autowired
     private StreamManager streamManager;
+    @Autowired
+    private SslCertificateManager sslCertificateManager;
+    private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
+    private final Lock readLock = rwLock.readLock();
+    private final Lock writeLock = rwLock.writeLock();
 
-    public void activate(ProxyConfig config) throws EtpException {
-        activate(config, null);
-    }
-
-    public void activate(ProxyConfig config, Set<String> domains) throws EtpException {
-        if (config == null || config.getStatus().isClosed()) {
-            return;
+    public void registerTcp(String agentId, String proxyId, Integer listenPort) throws EtpException {
+        if (agentId == null || proxyId == null || listenPort == null) {
+            throw new IllegalArgumentException("无效输入参数");
         }
-        logger.debug("激活代理: {}", config.getProxyId());
-        String agentId = config.getAgentId();
-        String proxyId = config.getProxyId();
-        proxyAgentMap.put(proxyId, agentId);
-        agentProxyMap.computeIfAbsent(config.getAgentId(), k -> ConcurrentHashMap.newKeySet())
-                .add(proxyId);
-        if (config.isTcp()) {
-            Integer listenPort = config.getListenPort();
+        logger.debug("激活TCP代理: {}", proxyId);
+        writeLock.lock();
+        try {
+            proxyAgentMap.put(proxyId, agentId);
+            agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
             portMap.put(proxyId, listenPort);
             portAcceptor.bindPort(listenPort);
+        } finally {
+            writeLock.unlock();
         }
-        if (config.isHttp()) {
-            if (!CollectionUtils.isEmpty(domains) && !domainRegistry.exists(proxyId)) {
-                domainRegistry.register(proxyId, domains);
-            }
-        }
-
     }
 
-    public void deactivate(String proxyId) {
+    public void registerHttp(String agentId, String proxyId, Set<String> domains) throws EtpException {
+        if (agentId == null || proxyId == null) {
+            throw new IllegalArgumentException("无效输入参数");
+        }
+        if (CollectionUtils.isEmpty(domains)) {
+            throw new IllegalArgumentException("至少配置一个域名");
+        }
+        logger.debug("激活HTTP代理: {}", proxyId);
+        writeLock.lock();
+        try {
+            proxyAgentMap.put(proxyId, agentId);
+            agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
+            domainRegistry.register(proxyId, domains);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void registerHttps(String agentId, String proxyId, Set<String> domains) throws EtpException {
+        if (agentId == null || proxyId == null) {
+            throw new IllegalArgumentException("无效输入参数");
+        }
+        if (CollectionUtils.isEmpty(domains)) {
+            throw new IllegalArgumentException("至少配置一个域名");
+        }
+        logger.debug("激活HTTPS代理: {}", proxyId);
+        writeLock.lock();
+        try {
+            proxyAgentMap.put(proxyId, agentId);
+            agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
+            domainRegistry.register(proxyId, domains);
+            //todo sslCertificateManager.addDeployedDomains(domains);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    private void doDeactivate(String proxyId) {
+        if (!StringUtils.hasText(proxyId)) {
+            throw new IllegalArgumentException("proxyId 不能为空");
+        }
         logger.debug("停用代理: {}", proxyId);
+
+        // TCP 协议
         Integer listenPort = portMap.remove(proxyId);
         if (listenPort != null) {
             shutdownPortResources(listenPort);
         }
         String agentId = proxyAgentMap.remove(proxyId);
-        if (agentId != null) {
+        if (StringUtils.hasText(agentId)) {
             Set<String> set = agentProxyMap.get(agentId);
-            if (set != null) {
+            if (!CollectionUtils.isEmpty(set)) {
                 set.remove(proxyId);
             }
         }
-        if (StringUtils.hasText(agentId)) {
-            Set<String> agentProxies = agentProxyMap.remove(agentId);
-            if (!CollectionUtils.isEmpty(agentProxies)) {
-                agentProxies.remove(proxyId);
-            } else {
-                agentProxyMap.remove(agentId);
-            }
-        }
+        // HTTP(S)协议
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
+           //todo  sslCertificateManager.cancelDeploy(domain);// HTTPS协议
             streamManager.fireCloseByDomain(domain);
         }
-        //从注册中心删除
+        //从注册中心删除域名
         domainRegistry.unregister(proxyId);
         //删除IP访问控制
         ipAccessChecker.invalidate(proxyId);
-        //删除代理流量统计记录
+        //删除代理流量最近内存统计记录
         metricsCollector.removeByProxyId(proxyId);
     }
 
@@ -122,31 +155,42 @@ public class ProxyManager {
         if (CollectionUtils.isEmpty(proxyIds)) {
             return;
         }
-        proxyIds.forEach(this::deactivate);
-    }
-
-    public void reconcile(ProxyConfig config) throws EtpException {
-        reconcile(config, null);
-    }
-
-    public void reconcile(ProxyConfig config, Set<String> domains) throws EtpException {
-        logger.debug("更新代理：{}", config.getProxyId());
-        String proxyId = config.getProxyId();
-        if (config.getStatus().isClosed()) {
-            deactivate(proxyId);
-            return;
+        writeLock.lock();
+        try {
+            for (String proxyId : proxyIds) {
+                doDeactivate(proxyId);
+            }
+        } finally {
+            writeLock.unlock();
         }
-        deactivate(proxyId);
-        activate(config, domains);
+    }
+
+    public void deactivate(String proxyId) {
+        if (StringUtils.hasText(proxyId)) {
+            throw new IllegalArgumentException("proxyId 不能为空");
+        }
+        writeLock.lock();
+        try {
+            doDeactivate(proxyId);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     public void onAgentOffline(String agentId) throws EtpException {
-        logger.debug("停用客户端 {} 所有代理", agentId);
-        Set<String> proxyIds = agentProxyMap.get(agentId);
-        if (!CollectionUtils.isEmpty(proxyIds)) {
-            for (String proxyId : proxyIds) {
-                deactivate(proxyId);
+        writeLock.lock();
+        try {
+            Set<String> proxyIds = agentProxyMap.remove(agentId);
+            if (CollectionUtils.isEmpty(proxyIds)) {
+                return;
             }
+            logger.info("清理 {} 个代理: agentId={}", proxyIds.size(), agentId);
+            List<String> idsToRemove = new ArrayList<>(proxyIds);
+            for (String proxyId : idsToRemove) {
+                doDeactivate(proxyId);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 

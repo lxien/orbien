@@ -18,7 +18,6 @@ package com.xiaoniucode.etp.core.domain;
 import com.xiaoniucode.etp.core.enums.*;
 
 import lombok.*;
-import org.javers.core.metamodel.annotation.DiffIgnore;
 
 import java.io.Serializable;
 import java.util.List;
@@ -36,13 +35,11 @@ public class ProxyConfig implements Serializable {
      * 代理ID 唯一标识
      */
     @Setter
-    @DiffIgnore
     private String proxyId;
     /**
      * 代理名称
      */
     @Setter
-    @DiffIgnore
     private String name;
     /**
      * 协议类型
@@ -62,7 +59,6 @@ public class ProxyConfig implements Serializable {
     /**
      * 实际监听的端口
      */
-    @DiffIgnore
     @Setter
     private Integer listenPort;
     /**
@@ -79,6 +75,11 @@ public class ProxyConfig implements Serializable {
      */
     @Setter
     private ProxyStatus status;
+    /**
+     * 负载均衡配置
+     */
+    @Setter
+    private LoadBalanceType loadBalanceType;
     /**
      * HTTP(s) 域名配置
      */
@@ -104,11 +105,7 @@ public class ProxyConfig implements Serializable {
      */
     @Setter
     private BandwidthConfig bandwidth;
-    /**
-     * 负载均衡配置
-     */
-    @Setter
-    private LoadBalanceConfig loadBalance;
+
     /**
      * 传输配置
      */
@@ -177,10 +174,6 @@ public class ProxyConfig implements Serializable {
         return remotePort != null;
     }
 
-    public boolean hasLoadBalance() {
-        return loadBalance != null;
-    }
-
     /**
      * 是否需要使用负载均衡
      */
@@ -212,22 +205,8 @@ public class ProxyConfig implements Serializable {
         return addedCount;
     }
 
-    public BasicAuthConfig getOrCreateBasicAuthConfig() {
-        if (basicAuth == null) {
-            return new BasicAuthConfig();
-        }
-        return basicAuth;
-    }
-
     public boolean isMuxTunnel() {
         return transport != null && transport.getMultiplex();
-    }
-
-    public AccessControlConfig getOrCreateAccessControlConfig() {
-        if (accessControl == null) {
-            return new AccessControlConfig();
-        }
-        return accessControl;
     }
 
     public DeploymentMode getDeploymentMode() {

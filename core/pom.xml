@@ -31,20 +31,12 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.lz4</groupId>
-            <artifactId>lz4-java</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.github.xiaoniucode</groupId>
             <artifactId>etp-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cola</groupId>
             <artifactId>cola-component-statemachine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.javers</groupId>
-            <artifactId>javers-core</artifactId>
         </dependency>
     </dependencies>
     <build>

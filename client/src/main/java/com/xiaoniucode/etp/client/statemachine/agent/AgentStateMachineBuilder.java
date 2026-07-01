@@ -63,7 +63,7 @@ public class AgentStateMachineBuilder {
             AuthAction authAction = new AuthAction();
             AuthRespAction authRespAction = new AuthRespAction();
             AuthSuccessAction authSuccessAction = new AuthSuccessAction();
-            ProxySyncAction proxySyncAction = new ProxySyncAction();
+            RuntimeConfigSyncAction proxySyncAction = new RuntimeConfigSyncAction();
             NetworkErrorAction networkErrorAction = new NetworkErrorAction();
             GoawayAction goawayAction = new GoawayAction();
             ConnPoolCreateAction createTunnelPoolAction = new ConnPoolCreateAction();

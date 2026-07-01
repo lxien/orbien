@@ -23,6 +23,7 @@ import com.moandjiezana.toml.Toml;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.*;
 import lombok.Getter;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -66,9 +67,10 @@ public class TomlConfigSource implements ConfigSource {
         validatePort(serverPortValue.intValue());
         builder.serverPort(serverPortValue.intValue());
 
-        String baseDomain = root.getString("base_domain");
-        builder.baseDomain(baseDomain);
-
+        List<String> baseDomains = root.getList("base_domains");
+        if (!CollectionUtils.isEmpty(baseDomains)) {
+            builder.baseDomain(new HashSet<>(baseDomains));
+        }
         Long httpProxyPort = root.getLong("http_proxy_port", 80L);
         int httpPort = httpProxyPort.intValue();
         validatePort(httpPort);

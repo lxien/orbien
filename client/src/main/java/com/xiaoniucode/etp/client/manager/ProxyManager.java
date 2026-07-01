@@ -19,8 +19,7 @@
 package com.xiaoniucode.etp.client.manager;
 
 import com.xiaoniucode.etp.client.health.HealthCheckHolder;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.message.Message;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -31,65 +30,42 @@ import java.util.*;
 
 public class ProxyManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyManager.class);
-    private final Map<String, ProxyConfigExt> map = new ConcurrentHashMap<>();
-    private final Set<String> nameSet = ConcurrentHashMap.newKeySet();
+    private final Map<String, Message.RuntimeInfo> map = new ConcurrentHashMap<>();
 
     /**
      * 同步来自服务端全量最新配置
-     *
-     * @param proxies 代理配置
      */
-    public void apply(List<ProxyConfigExt> proxies) {
+    public void apply(List<Message.RuntimeInfo> proxies) {
         map.clear();
-        nameSet.clear();
-        for (ProxyConfigExt config : proxies) {
-            ProxyConfig proxyConfig = config.getProxyConfig();
-
-            map.put(proxyConfig.getProxyId(), config);
-            nameSet.add(proxyConfig.getName());
-            HealthCheckHolder.get().startHealthCheck(proxyConfig);
+        for (Message.RuntimeInfo runtimeInfo : proxies) {
+            map.put(runtimeInfo.getProxyId(), runtimeInfo);
+            HealthCheckHolder.get().startHealthCheck(runtimeInfo);
         }
     }
 
-    public void add(ProxyConfigExt config) {
-        ProxyConfig proxyConfig = config.getProxyConfig();
-        map.put(proxyConfig.getProxyId(), config);
-        nameSet.add(proxyConfig.getName());
-        HealthCheckHolder.get().startHealthCheck(proxyConfig);
+    public void add(Message.RuntimeInfo runtimeInfo) {
+        map.put(runtimeInfo.getProxyId(), runtimeInfo);
+        HealthCheckHolder.get().startHealthCheck(runtimeInfo);
     }
 
-    public void batchAdd(List<ProxyConfigExt> configs) {
+    public void batchAdd(List<Message.RuntimeInfo> configs) {
         configs.forEach(this::add);
     }
 
-    public void update(ProxyConfigExt config) {
-        if (config == null) {
-            return;
-        }
-        ProxyConfig proxyConfig = config.getProxyConfig();
-        delete(proxyConfig.getProxyId());
-        add(config);
-    }
-
-    public void batchUpdate(List<ProxyConfigExt> configs) {
+    public void batchUpdate(List<Message.RuntimeInfo> configs) {
         if (configs == null || configs.isEmpty()) return;
 
-        for (ProxyConfigExt config : configs) {
-            ProxyConfig proxyConfig = config.getProxyConfig();
-            delete(proxyConfig.getProxyId());
+        for (Message.RuntimeInfo config : configs) {
+            delete(config.getProxyId());
         }
 
-        for (ProxyConfigExt config : configs) {
+        for (Message.RuntimeInfo config : configs) {
             add(config);
         }
     }
 
     public void delete(String proxyId) {
-        ProxyConfigExt removed = map.remove(proxyId);
-        if (removed != null) {
-            ProxyConfig proxyConfig = removed.getProxyConfig();
-            nameSet.remove(proxyConfig.getName());
-        }
+        map.remove(proxyId);
         HealthCheckHolder.get().stopHealthCheck(proxyId);
     }
 
@@ -97,20 +73,12 @@ public class ProxyManager {
         proxyIds.forEach(this::delete);
     }
 
-    public ProxyConfigExt get(String proxyId) {
+    public Message.RuntimeInfo get(String proxyId) {
         return map.get(proxyId);
     }
 
-    public Collection<ProxyConfigExt> list() {
+    public Collection<Message.RuntimeInfo> list() {
         return map.values();
-    }
-
-    public boolean exists(String proxyId) {
-        return map.containsKey(proxyId);
-    }
-
-    public boolean nameExists(String name) {
-        return nameSet.contains(name);
     }
 
 }

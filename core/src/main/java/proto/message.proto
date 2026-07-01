@@ -34,9 +34,13 @@ enum ProxySyncType {
   UPDATE = 2;
   DELETE = 3;
 }
+enum HealthCheckType {
+  HEALTH_CHECK_TYPE_TCP = 0;
+  HEALTH_CHECK_TYPE_HTTP = 1;
+}
 message Status {
   int32 code = 1;
-  string message = 2;
+  optional string message = 2;
 }
 message AuthInfo {
   string token = 1;
@@ -62,16 +66,11 @@ message OpenStreamResponse {
   string tunnel_id = 2;
   Status status = 3;
 }
-message ServerInfo{
-  uint32 http_proxy_port = 1;
-  uint32 https_proxy_port = 2;
-  repeated string base_domains = 3;
-}
+
 message AuthResponse {
   string agent_id = 1;
   uint32 connection_id = 2;
-  ServerInfo server_info = 3;
-  Status status = 4;
+  Status status = 3;
 }
 
 message AccessControl {
@@ -98,17 +97,12 @@ message Bandwidth {
 }
 
 message Target {
-  optional string host = 1;
+  string host = 1;
   uint32 port = 2;
   optional string name = 3;
   optional int32 weight = 4;
 }
-
-message LoadBalance {
-  optional LoadBalanceStrategy strategy = 1;
-}
-
-message DomainConfig {
+message Domain {
   optional bool auto_domain = 1;
   repeated string custom_domains = 2;
   repeated string sub_domains = 3;
@@ -124,45 +118,51 @@ message Transport {
   optional bool encrypt = 2;
   optional bool compress = 3;
 }
+message HealthCheck{
+  HealthCheckType type = 1;
+  int32 interval = 2;
+  int32 timeout = 3;
+  int32 max_failed = 4;
+  string path = 5;
+  bool enabled = 6;
+}
 
 message Proxy {
-  string proxyId = 18;
-  string name = 1;
-  repeated Target targets = 2;
-  optional bool enabled = 3;
-  ProtocolType protocol = 6;
+  string proxyId = 1;
+  string name = 2;
+  ProtocolType protocol = 3;
+  bool enabled = 4;
+  repeated Target targets = 5;
+  bool force_https = 6;
   optional uint32 remote_port = 7;
-  optional DomainConfig domain = 8;
-  optional AccessControl access_control = 11;
-  optional BasicAuth basic_auth = 12;
-  optional Bandwidth bandwidth = 13;
-  optional LoadBalance load_balance = 14;
-  optional Transport transport = 15;
-  optional bool force_https = 16;
-  optional SslCert ssl_cert = 17;
+  optional Domain domain = 8;
+  optional AccessControl access_control = 9;
+  optional BasicAuth basic_auth = 10;
+  optional Bandwidth bandwidth = 11;
+  optional LoadBalanceStrategy load_balance_strategy = 12;
+  optional Transport transport = 13;
+  optional SslCert ssl_cert = 14;
+  optional HealthCheck health_check = 15;
 }
 
-message DomainResult {
-  string baseDomain = 1;
-  string domain = 2;
-}
-
-message ProxyRuntime {
-  Proxy proxy = 1;
-  optional DomainResult domain = 2;
-  optional uint32 listen_port = 3;
+message RuntimeInfo {
+  string proxyId = 1;
+  string name = 2;
+  repeated Target targets = 3;
+  repeated string remote_addr = 4;
+  optional HealthCheck health_check = 5;
 }
 message BatchCreateProxiesRequest {
   repeated Proxy proxies = 1;
 }
 message BatchCreateProxiesResponse {
-  repeated ProxyRuntime items = 1;
+  repeated RuntimeInfo items = 1;
   Status status = 2;
 }
 
 message ProxySyncResponse {
   ProxySyncType proxy_sync_type = 1;
-  repeated ProxyRuntime items = 2;
+  repeated RuntimeInfo items = 2;
   repeated string proxy_ids = 3;
 }
 message ServiceHealth {

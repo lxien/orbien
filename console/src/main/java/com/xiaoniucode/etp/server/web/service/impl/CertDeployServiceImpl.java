@@ -93,7 +93,6 @@ public class CertDeployServiceImpl implements CertDeployService {
                 sslCertificateManager.cancelDeploy(domain.getDomain()));
         certDeployRepository.deleteById(deployId);
         certDeployDomainRepository.deleteByDeployId(deployId);
-
     }
 
     @Override

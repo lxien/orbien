@@ -123,11 +123,6 @@
         </div>
       </div>
     </div>
-    <template #footer>
-      <div class="dialog-footer">
-        <ElButton @click="dialogVisible = false">关闭</ElButton>
-      </div>
-    </template>
   </ElDialog>
 </template>
 

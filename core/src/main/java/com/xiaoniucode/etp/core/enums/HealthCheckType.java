@@ -22,23 +22,31 @@ import lombok.Getter;
 
 @Getter
 public enum HealthCheckType {
-    TCP("TCP", "TCP 连接检查"),
-    HTTP("HTTP", "HTTP 请求检查"),
-    AUTO("AUTO", "根据协议自动选择");
-    private final String code;
+    TCP(0, "TCP", "TCP 连接检查"),
+    HTTP(1, "HTTP", "HTTP 请求检查");
+
+    private final Integer code;
+    private final String name;
     private final String description;
 
-    HealthCheckType(String code, String description) {
+    HealthCheckType(Integer code, String name, String description) {
         this.code = code;
+        this.name = name;
         this.description = description;
     }
 
-    public static HealthCheckType fromCode(String code) {
-        if (code == null) {
-            return AUTO;
-        }
+    public static HealthCheckType fromCode(Integer code) {
         for (HealthCheckType type : values()) {
-            if (type.getCode().equalsIgnoreCase(code)) {
+            if (type.getCode().equals(code)) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    public static HealthCheckType fromName(String name) {
+        for (HealthCheckType type : values()) {
+            if (type.getName().equalsIgnoreCase(name)) {
                 return type;
             }
         }
@@ -52,9 +60,5 @@ public enum HealthCheckType {
 
     public boolean isTcpCheck() {
         return this == TCP;
-    }
-
-    public boolean isAuto() {
-        return this == AUTO;
     }
 }

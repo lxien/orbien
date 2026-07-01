@@ -23,8 +23,8 @@ import com.xiaoniucode.etp.server.uid.exception.UidGenerateException;
 import com.xiaoniucode.etp.server.uid.utils.DateUtils;
 import com.xiaoniucode.etp.server.uid.worker.WorkerIdAssigner;
 import com.xiaoniucode.etp.common.utils.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Date;
@@ -60,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  * @author yutianbao
  */
 public class DefaultUidGenerator implements UidGenerator, InitializingBean {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultUidGenerator.class);
+    private static final InternalLogger LOGGER = InternalLoggerFactory.getInstance(DefaultUidGenerator.class);
 
     /** Bits allocate */
     protected int timeBits = 28;

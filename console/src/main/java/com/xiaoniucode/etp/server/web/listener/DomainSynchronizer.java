@@ -28,7 +28,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> {
@@ -47,16 +51,30 @@ public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> 
 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
-        String baseDomain = appConfig.getBaseDomain();
-        if (!StringUtils.hasText(baseDomain)) {
+        Set<String> baseDomains = appConfig.getBaseDomains();
+        if (CollectionUtils.isEmpty(baseDomains)) {
             return;
         }
-        boolean exists = domainRepository.existsByDomain(baseDomain);
-        if (!exists) {
-            domainRepository.save(new DomainDO(baseDomain));
-            logger.info("同步域名到数据库, domain={}", baseDomain);
+        // 一次性查询已存在的域名
+        Set<DomainDO> existingDomains = domainRepository.findByDomainIn(baseDomains);
+
+        //提取已存在的域名集合
+        Set<String> existingDomainNames = existingDomains.stream()
+                .map(DomainDO::getDomain)
+                .collect(Collectors.toSet());
+
+        // 筛选出需要新增的域名
+        List<DomainDO> newDomains = baseDomains.stream()
+                .filter(domain -> !existingDomainNames.contains(domain))
+                .map(DomainDO::new)
+                .collect(Collectors.toList());
+
+        // 批量保存
+        if (!newDomains.isEmpty()) {
+            domainRepository.saveAll(newDomains);
+            logger.info("同步域名到数据库, domains={}", newDomains.stream().map(DomainDO::getDomain).collect(Collectors.toList()));
         } else {
-            logger.debug("域名 {} 已经存在，跳过持久化", baseDomain);
+            logger.debug("所有域名已存在，跳过持久化");
         }
     }
 }

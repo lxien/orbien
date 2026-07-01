@@ -19,8 +19,10 @@ package com.xiaoniucode.etp.server.web.service;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
+import com.xiaoniucode.etp.server.web.dto.domain.UsedDomainDTO;
 
 public interface DomainService {
     PageResult<DomainDTO> findByPage(PageQuery pageQuery);
+    PageResult<UsedDomainDTO> findUsedByPage(PageQuery pageQuery);
     DomainDTO getById(Integer id);
 }

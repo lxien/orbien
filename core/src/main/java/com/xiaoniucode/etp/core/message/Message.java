@@ -782,6 +782,123 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.ProxySyncType)
   }
 
+  /**
+   * Protobuf enum {@code com.xiaoniucode.etp.core.message.HealthCheckType}
+   */
+  public enum HealthCheckType
+      implements com.google.protobuf.ProtocolMessageEnum {
+    /**
+     * <code>HEALTH_CHECK_TYPE_TCP = 0;</code>
+     */
+    HEALTH_CHECK_TYPE_TCP(0),
+    /**
+     * <code>HEALTH_CHECK_TYPE_HTTP = 1;</code>
+     */
+    HEALTH_CHECK_TYPE_HTTP(1),
+    UNRECOGNIZED(-1),
+    ;
+
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "HealthCheckType");
+    }
+    /**
+     * <code>HEALTH_CHECK_TYPE_TCP = 0;</code>
+     */
+    public static final int HEALTH_CHECK_TYPE_TCP_VALUE = 0;
+    /**
+     * <code>HEALTH_CHECK_TYPE_HTTP = 1;</code>
+     */
+    public static final int HEALTH_CHECK_TYPE_HTTP_VALUE = 1;
+
+
+    public final int getNumber() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalArgumentException(
+            "Can't get the number of an unknown enum value.");
+      }
+      return value;
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     * @deprecated Use {@link #forNumber(int)} instead.
+     */
+    @java.lang.Deprecated
+    public static HealthCheckType valueOf(int value) {
+      return forNumber(value);
+    }
+
+    /**
+     * @param value The numeric wire value of the corresponding enum entry.
+     * @return The enum associated with the given numeric wire value.
+     */
+    public static HealthCheckType forNumber(int value) {
+      switch (value) {
+        case 0: return HEALTH_CHECK_TYPE_TCP;
+        case 1: return HEALTH_CHECK_TYPE_HTTP;
+        default: return null;
+      }
+    }
+
+    public static com.google.protobuf.Internal.EnumLiteMap<HealthCheckType>
+        internalGetValueMap() {
+      return internalValueMap;
+    }
+    private static final com.google.protobuf.Internal.EnumLiteMap<
+        HealthCheckType> internalValueMap =
+          new com.google.protobuf.Internal.EnumLiteMap<HealthCheckType>() {
+            public HealthCheckType findValueByNumber(int number) {
+              return HealthCheckType.forNumber(number);
+            }
+          };
+
+    public final com.google.protobuf.Descriptors.EnumValueDescriptor
+        getValueDescriptor() {
+      if (this == UNRECOGNIZED) {
+        throw new java.lang.IllegalStateException(
+            "Can't get the descriptor of an unrecognized enum value.");
+      }
+      return getDescriptor().getValues().get(ordinal());
+    }
+    public final com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptorForType() {
+      return getDescriptor();
+    }
+    public static com.google.protobuf.Descriptors.EnumDescriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.getDescriptor().getEnumTypes().get(6);
+    }
+
+    private static final HealthCheckType[] VALUES = values();
+
+    public static HealthCheckType valueOf(
+        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+      if (desc.getType() != getDescriptor()) {
+        throw new java.lang.IllegalArgumentException(
+          "EnumValueDescriptor is not for this type.");
+      }
+      if (desc.getIndex() == -1) {
+        return UNRECOGNIZED;
+      }
+      return VALUES[desc.getIndex()];
+    }
+
+    private final int value;
+
+    private HealthCheckType(int value) {
+      this.value = value;
+    }
+
+    // @@protoc_insertion_point(enum_scope:com.xiaoniucode.etp.core.message.HealthCheckType)
+  }
+
   public interface StatusOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.Status)
       com.google.protobuf.MessageOrBuilder {
@@ -793,12 +910,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     int getCode();
 
     /**
-     * <code>string message = 2;</code>
+     * <code>optional string message = 2;</code>
+     * @return Whether the message field is set.
+     */
+    boolean hasMessage();
+    /**
+     * <code>optional string message = 2;</code>
      * @return The message.
      */
     java.lang.String getMessage();
     /**
-     * <code>string message = 2;</code>
+     * <code>optional string message = 2;</code>
      * @return The bytes for message.
      */
     com.google.protobuf.ByteString
@@ -842,6 +964,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               com.xiaoniucode.etp.core.message.Message.Status.class, com.xiaoniucode.etp.core.message.Message.Status.Builder.class);
     }
 
+    private int bitField0_;
     public static final int CODE_FIELD_NUMBER = 1;
     private int code_ = 0;
     /**
@@ -857,7 +980,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @SuppressWarnings("serial")
     private volatile java.lang.Object message_ = "";
     /**
-     * <code>string message = 2;</code>
+     * <code>optional string message = 2;</code>
+     * @return Whether the message field is set.
+     */
+    @java.lang.Override
+    public boolean hasMessage() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>optional string message = 2;</code>
      * @return The message.
      */
     @java.lang.Override
@@ -874,7 +1005,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>string message = 2;</code>
+     * <code>optional string message = 2;</code>
      * @return The bytes for message.
      */
     @java.lang.Override
@@ -909,7 +1040,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (code_ != 0) {
         output.writeInt32(1, code_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 2, message_);
       }
       getUnknownFields().writeTo(output);
@@ -925,7 +1056,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(1, code_);
       }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(message_)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(2, message_);
       }
       size += getUnknownFields().getSerializedSize();
@@ -945,8 +1076,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       if (getCode()
           != other.getCode()) return false;
-      if (!getMessage()
-          .equals(other.getMessage())) return false;
+      if (hasMessage() != other.hasMessage()) return false;
+      if (hasMessage()) {
+        if (!getMessage()
+            .equals(other.getMessage())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -960,8 +1094,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + CODE_FIELD_NUMBER;
       hash = (53 * hash) + getCode();
-      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
-      hash = (53 * hash) + getMessage().hashCode();
+      if (hasMessage()) {
+        hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getMessage().hashCode();
+      }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1131,9 +1267,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.code_ = code_;
         }
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.message_ = message_;
+          to_bitField0_ |= 0x00000001;
         }
+        result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
@@ -1151,7 +1290,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (other.getCode() != 0) {
           setCode(other.getCode());
         }
-        if (!other.getMessage().isEmpty()) {
+        if (other.hasMessage()) {
           message_ = other.message_;
           bitField0_ |= 0x00000002;
           onChanged();
@@ -1243,7 +1382,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object message_ = "";
       /**
-       * <code>string message = 2;</code>
+       * <code>optional string message = 2;</code>
+       * @return Whether the message field is set.
+       */
+      public boolean hasMessage() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>optional string message = 2;</code>
        * @return The message.
        */
       public java.lang.String getMessage() {
@@ -1259,7 +1405,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string message = 2;</code>
+       * <code>optional string message = 2;</code>
        * @return The bytes for message.
        */
       public com.google.protobuf.ByteString
@@ -1276,7 +1422,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string message = 2;</code>
+       * <code>optional string message = 2;</code>
        * @param value The message to set.
        * @return This builder for chaining.
        */
@@ -1289,7 +1435,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string message = 2;</code>
+       * <code>optional string message = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearMessage() {
@@ -1299,7 +1445,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string message = 2;</code>
+       * <code>optional string message = 2;</code>
        * @param value The bytes for message to set.
        * @return This builder for chaining.
        */
@@ -4842,726 +4988,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
-  public interface ServerInfoOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.ServerInfo)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>uint32 http_proxy_port = 1;</code>
-     * @return The httpProxyPort.
-     */
-    int getHttpProxyPort();
-
-    /**
-     * <code>uint32 https_proxy_port = 2;</code>
-     * @return The httpsProxyPort.
-     */
-    int getHttpsProxyPort();
-
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @return A list containing the baseDomains.
-     */
-    java.util.List<java.lang.String>
-        getBaseDomainsList();
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @return The count of baseDomains.
-     */
-    int getBaseDomainsCount();
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @param index The index of the element to return.
-     * @return The baseDomains at the given index.
-     */
-    java.lang.String getBaseDomains(int index);
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @param index The index of the value to return.
-     * @return The bytes of the baseDomains at the given index.
-     */
-    com.google.protobuf.ByteString
-        getBaseDomainsBytes(int index);
-  }
-  /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.message.ServerInfo}
-   */
-  public static final class ServerInfo extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.ServerInfo)
-      ServerInfoOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 33,
-        /* patch= */ 4,
-        /* suffix= */ "",
-        "ServerInfo");
-    }
-    // Use ServerInfo.newBuilder() to construct.
-    private ServerInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private ServerInfo() {
-      baseDomains_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ServerInfo_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.xiaoniucode.etp.core.message.Message.ServerInfo.class, com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder.class);
-    }
-
-    public static final int HTTP_PROXY_PORT_FIELD_NUMBER = 1;
-    private int httpProxyPort_ = 0;
-    /**
-     * <code>uint32 http_proxy_port = 1;</code>
-     * @return The httpProxyPort.
-     */
-    @java.lang.Override
-    public int getHttpProxyPort() {
-      return httpProxyPort_;
-    }
-
-    public static final int HTTPS_PROXY_PORT_FIELD_NUMBER = 2;
-    private int httpsProxyPort_ = 0;
-    /**
-     * <code>uint32 https_proxy_port = 2;</code>
-     * @return The httpsProxyPort.
-     */
-    @java.lang.Override
-    public int getHttpsProxyPort() {
-      return httpsProxyPort_;
-    }
-
-    public static final int BASE_DOMAINS_FIELD_NUMBER = 3;
-    @SuppressWarnings("serial")
-    private com.google.protobuf.LazyStringArrayList baseDomains_ =
-        com.google.protobuf.LazyStringArrayList.emptyList();
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @return A list containing the baseDomains.
-     */
-    public com.google.protobuf.ProtocolStringList
-        getBaseDomainsList() {
-      return baseDomains_;
-    }
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @return The count of baseDomains.
-     */
-    public int getBaseDomainsCount() {
-      return baseDomains_.size();
-    }
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @param index The index of the element to return.
-     * @return The baseDomains at the given index.
-     */
-    public java.lang.String getBaseDomains(int index) {
-      return baseDomains_.get(index);
-    }
-    /**
-     * <code>repeated string base_domains = 3;</code>
-     * @param index The index of the value to return.
-     * @return The bytes of the baseDomains at the given index.
-     */
-    public com.google.protobuf.ByteString
-        getBaseDomainsBytes(int index) {
-      return baseDomains_.getByteString(index);
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (httpProxyPort_ != 0) {
-        output.writeUInt32(1, httpProxyPort_);
-      }
-      if (httpsProxyPort_ != 0) {
-        output.writeUInt32(2, httpsProxyPort_);
-      }
-      for (int i = 0; i < baseDomains_.size(); i++) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 3, baseDomains_.getRaw(i));
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (httpProxyPort_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(1, httpProxyPort_);
-      }
-      if (httpsProxyPort_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(2, httpsProxyPort_);
-      }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < baseDomains_.size(); i++) {
-          dataSize += computeStringSizeNoTag(baseDomains_.getRaw(i));
-        }
-        size += dataSize;
-        size += 1 * getBaseDomainsList().size();
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.ServerInfo)) {
-        return super.equals(obj);
-      }
-      com.xiaoniucode.etp.core.message.Message.ServerInfo other = (com.xiaoniucode.etp.core.message.Message.ServerInfo) obj;
-
-      if (getHttpProxyPort()
-          != other.getHttpProxyPort()) return false;
-      if (getHttpsProxyPort()
-          != other.getHttpsProxyPort()) return false;
-      if (!getBaseDomainsList()
-          .equals(other.getBaseDomainsList())) return false;
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + HTTP_PROXY_PORT_FIELD_NUMBER;
-      hash = (53 * hash) + getHttpProxyPort();
-      hash = (37 * hash) + HTTPS_PROXY_PORT_FIELD_NUMBER;
-      hash = (53 * hash) + getHttpsProxyPort();
-      if (getBaseDomainsCount() > 0) {
-        hash = (37 * hash) + BASE_DOMAINS_FIELD_NUMBER;
-        hash = (53 * hash) + getBaseDomainsList().hashCode();
-      }
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.ServerInfo prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.message.ServerInfo}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.ServerInfo)
-        com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ServerInfo_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.xiaoniucode.etp.core.message.Message.ServerInfo.class, com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder.class);
-      }
-
-      // Construct using com.xiaoniucode.etp.core.message.Message.ServerInfo.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        httpProxyPort_ = 0;
-        httpsProxyPort_ = 0;
-        baseDomains_ =
-            com.google.protobuf.LazyStringArrayList.emptyList();
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ServerInfo getDefaultInstanceForType() {
-        return com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ServerInfo build() {
-        com.xiaoniucode.etp.core.message.Message.ServerInfo result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ServerInfo buildPartial() {
-        com.xiaoniucode.etp.core.message.Message.ServerInfo result = new com.xiaoniucode.etp.core.message.Message.ServerInfo(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.ServerInfo result) {
-        int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.httpProxyPort_ = httpProxyPort_;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.httpsProxyPort_ = httpsProxyPort_;
-        }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          baseDomains_.makeImmutable();
-          result.baseDomains_ = baseDomains_;
-        }
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.xiaoniucode.etp.core.message.Message.ServerInfo) {
-          return mergeFrom((com.xiaoniucode.etp.core.message.Message.ServerInfo)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.ServerInfo other) {
-        if (other == com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance()) return this;
-        if (other.getHttpProxyPort() != 0) {
-          setHttpProxyPort(other.getHttpProxyPort());
-        }
-        if (other.getHttpsProxyPort() != 0) {
-          setHttpsProxyPort(other.getHttpsProxyPort());
-        }
-        if (!other.baseDomains_.isEmpty()) {
-          if (baseDomains_.isEmpty()) {
-            baseDomains_ = other.baseDomains_;
-            bitField0_ |= 0x00000004;
-          } else {
-            ensureBaseDomainsIsMutable();
-            baseDomains_.addAll(other.baseDomains_);
-          }
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 8: {
-                httpProxyPort_ = input.readUInt32();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 8
-              case 16: {
-                httpsProxyPort_ = input.readUInt32();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 16
-              case 26: {
-                java.lang.String s = input.readStringRequireUtf8();
-                ensureBaseDomainsIsMutable();
-                baseDomains_.add(s);
-                break;
-              } // case 26
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private int httpProxyPort_ ;
-      /**
-       * <code>uint32 http_proxy_port = 1;</code>
-       * @return The httpProxyPort.
-       */
-      @java.lang.Override
-      public int getHttpProxyPort() {
-        return httpProxyPort_;
-      }
-      /**
-       * <code>uint32 http_proxy_port = 1;</code>
-       * @param value The httpProxyPort to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHttpProxyPort(int value) {
-
-        httpProxyPort_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>uint32 http_proxy_port = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearHttpProxyPort() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        httpProxyPort_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private int httpsProxyPort_ ;
-      /**
-       * <code>uint32 https_proxy_port = 2;</code>
-       * @return The httpsProxyPort.
-       */
-      @java.lang.Override
-      public int getHttpsProxyPort() {
-        return httpsProxyPort_;
-      }
-      /**
-       * <code>uint32 https_proxy_port = 2;</code>
-       * @param value The httpsProxyPort to set.
-       * @return This builder for chaining.
-       */
-      public Builder setHttpsProxyPort(int value) {
-
-        httpsProxyPort_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>uint32 https_proxy_port = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearHttpsProxyPort() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        httpsProxyPort_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.LazyStringArrayList baseDomains_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
-      private void ensureBaseDomainsIsMutable() {
-        if (!baseDomains_.isModifiable()) {
-          baseDomains_ = new com.google.protobuf.LazyStringArrayList(baseDomains_);
-        }
-        bitField0_ |= 0x00000004;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @return A list containing the baseDomains.
-       */
-      public com.google.protobuf.ProtocolStringList
-          getBaseDomainsList() {
-        baseDomains_.makeImmutable();
-        return baseDomains_;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @return The count of baseDomains.
-       */
-      public int getBaseDomainsCount() {
-        return baseDomains_.size();
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param index The index of the element to return.
-       * @return The baseDomains at the given index.
-       */
-      public java.lang.String getBaseDomains(int index) {
-        return baseDomains_.get(index);
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param index The index of the value to return.
-       * @return The bytes of the baseDomains at the given index.
-       */
-      public com.google.protobuf.ByteString
-          getBaseDomainsBytes(int index) {
-        return baseDomains_.getByteString(index);
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param index The index to set the value at.
-       * @param value The baseDomains to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBaseDomains(
-          int index, java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        ensureBaseDomainsIsMutable();
-        baseDomains_.set(index, value);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param value The baseDomains to add.
-       * @return This builder for chaining.
-       */
-      public Builder addBaseDomains(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        ensureBaseDomainsIsMutable();
-        baseDomains_.add(value);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param values The baseDomains to add.
-       * @return This builder for chaining.
-       */
-      public Builder addAllBaseDomains(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureBaseDomainsIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, baseDomains_);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearBaseDomains() {
-        baseDomains_ =
-          com.google.protobuf.LazyStringArrayList.emptyList();
-        bitField0_ = (bitField0_ & ~0x00000004);;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>repeated string base_domains = 3;</code>
-       * @param value The bytes of the baseDomains to add.
-       * @return This builder for chaining.
-       */
-      public Builder addBaseDomainsBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        ensureBaseDomainsIsMutable();
-        baseDomains_.add(value);
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.ServerInfo)
-    }
-
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.ServerInfo)
-    private static final com.xiaoniucode.etp.core.message.Message.ServerInfo DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.ServerInfo();
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.ServerInfo getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ServerInfo>
-        PARSER = new com.google.protobuf.AbstractParser<ServerInfo>() {
-      @java.lang.Override
-      public ServerInfo parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<ServerInfo> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ServerInfo> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ServerInfo getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface AuthResponseOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.AuthResponse)
       com.google.protobuf.MessageOrBuilder {
@@ -5585,32 +5011,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     int getConnectionId();
 
     /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     * @return Whether the serverInfo field is set.
-     */
-    boolean hasServerInfo();
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     * @return The serverInfo.
-     */
-    com.xiaoniucode.etp.core.message.Message.ServerInfo getServerInfo();
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     */
-    com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder getServerInfoOrBuilder();
-
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      * @return Whether the status field is set.
      */
     boolean hasStatus();
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      * @return The status.
      */
     com.xiaoniucode.etp.core.message.Message.Status getStatus();
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      */
     com.xiaoniucode.etp.core.message.Message.StatusOrBuilder getStatusOrBuilder();
   }
@@ -5703,44 +5114,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return connectionId_;
     }
 
-    public static final int SERVER_INFO_FIELD_NUMBER = 3;
-    private com.xiaoniucode.etp.core.message.Message.ServerInfo serverInfo_;
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     * @return Whether the serverInfo field is set.
-     */
-    @java.lang.Override
-    public boolean hasServerInfo() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     * @return The serverInfo.
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ServerInfo getServerInfo() {
-      return serverInfo_ == null ? com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance() : serverInfo_;
-    }
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder getServerInfoOrBuilder() {
-      return serverInfo_ == null ? com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance() : serverInfo_;
-    }
-
-    public static final int STATUS_FIELD_NUMBER = 4;
+    public static final int STATUS_FIELD_NUMBER = 3;
     private com.xiaoniucode.etp.core.message.Message.Status status_;
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      * @return Whether the status field is set.
      */
     @java.lang.Override
     public boolean hasStatus() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      * @return The status.
      */
     @java.lang.Override
@@ -5748,7 +5133,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return status_ == null ? com.xiaoniucode.etp.core.message.Message.Status.getDefaultInstance() : status_;
     }
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+     * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
@@ -5776,10 +5161,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         output.writeUInt32(2, connectionId_);
       }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeMessage(3, getServerInfo());
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeMessage(4, getStatus());
+        output.writeMessage(3, getStatus());
       }
       getUnknownFields().writeTo(output);
     }
@@ -5799,11 +5181,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getServerInfo());
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getStatus());
+          .computeMessageSize(3, getStatus());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -5824,11 +5202,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .equals(other.getAgentId())) return false;
       if (getConnectionId()
           != other.getConnectionId()) return false;
-      if (hasServerInfo() != other.hasServerInfo()) return false;
-      if (hasServerInfo()) {
-        if (!getServerInfo()
-            .equals(other.getServerInfo())) return false;
-      }
       if (hasStatus() != other.hasStatus()) return false;
       if (hasStatus()) {
         if (!getStatus()
@@ -5849,10 +5222,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       hash = (53 * hash) + getAgentId().hashCode();
       hash = (37 * hash) + CONNECTION_ID_FIELD_NUMBER;
       hash = (53 * hash) + getConnectionId();
-      if (hasServerInfo()) {
-        hash = (37 * hash) + SERVER_INFO_FIELD_NUMBER;
-        hash = (53 * hash) + getServerInfo().hashCode();
-      }
       if (hasStatus()) {
         hash = (37 * hash) + STATUS_FIELD_NUMBER;
         hash = (53 * hash) + getStatus().hashCode();
@@ -5987,7 +5356,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage
                 .alwaysUseFieldBuilders) {
-          internalGetServerInfoFieldBuilder();
           internalGetStatusFieldBuilder();
         }
       }
@@ -5997,11 +5365,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         bitField0_ = 0;
         agentId_ = "";
         connectionId_ = 0;
-        serverInfo_ = null;
-        if (serverInfoBuilder_ != null) {
-          serverInfoBuilder_.dispose();
-          serverInfoBuilder_ = null;
-        }
         status_ = null;
         if (statusBuilder_ != null) {
           statusBuilder_.dispose();
@@ -6048,16 +5411,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.serverInfo_ = serverInfoBuilder_ == null
-              ? serverInfo_
-              : serverInfoBuilder_.build();
-          to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000008) != 0)) {
           result.status_ = statusBuilder_ == null
               ? status_
               : statusBuilder_.build();
-          to_bitField0_ |= 0x00000002;
+          to_bitField0_ |= 0x00000001;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -6081,9 +5438,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.getConnectionId() != 0) {
           setConnectionId(other.getConnectionId());
-        }
-        if (other.hasServerInfo()) {
-          mergeServerInfo(other.getServerInfo());
         }
         if (other.hasStatus()) {
           mergeStatus(other.getStatus());
@@ -6126,18 +5480,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               } // case 16
               case 26: {
                 input.readMessage(
-                    internalGetServerInfoFieldBuilder().getBuilder(),
+                    internalGetStatusFieldBuilder().getBuilder(),
                     extensionRegistry);
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
-              case 34: {
-                input.readMessage(
-                    internalGetStatusFieldBuilder().getBuilder(),
-                    extensionRegistry);
-                bitField0_ |= 0x00000008;
-                break;
-              } // case 34
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -6259,139 +5606,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
-      private com.xiaoniucode.etp.core.message.Message.ServerInfo serverInfo_;
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ServerInfo, com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder, com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder> serverInfoBuilder_;
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       * @return Whether the serverInfo field is set.
-       */
-      public boolean hasServerInfo() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       * @return The serverInfo.
-       */
-      public com.xiaoniucode.etp.core.message.Message.ServerInfo getServerInfo() {
-        if (serverInfoBuilder_ == null) {
-          return serverInfo_ == null ? com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance() : serverInfo_;
-        } else {
-          return serverInfoBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public Builder setServerInfo(com.xiaoniucode.etp.core.message.Message.ServerInfo value) {
-        if (serverInfoBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          serverInfo_ = value;
-        } else {
-          serverInfoBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public Builder setServerInfo(
-          com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder builderForValue) {
-        if (serverInfoBuilder_ == null) {
-          serverInfo_ = builderForValue.build();
-        } else {
-          serverInfoBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public Builder mergeServerInfo(com.xiaoniucode.etp.core.message.Message.ServerInfo value) {
-        if (serverInfoBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) != 0) &&
-            serverInfo_ != null &&
-            serverInfo_ != com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance()) {
-            getServerInfoBuilder().mergeFrom(value);
-          } else {
-            serverInfo_ = value;
-          }
-        } else {
-          serverInfoBuilder_.mergeFrom(value);
-        }
-        if (serverInfo_ != null) {
-          bitField0_ |= 0x00000004;
-          onChanged();
-        }
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public Builder clearServerInfo() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        serverInfo_ = null;
-        if (serverInfoBuilder_ != null) {
-          serverInfoBuilder_.dispose();
-          serverInfoBuilder_ = null;
-        }
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder getServerInfoBuilder() {
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return internalGetServerInfoFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      public com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder getServerInfoOrBuilder() {
-        if (serverInfoBuilder_ != null) {
-          return serverInfoBuilder_.getMessageOrBuilder();
-        } else {
-          return serverInfo_ == null ?
-              com.xiaoniucode.etp.core.message.Message.ServerInfo.getDefaultInstance() : serverInfo_;
-        }
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ServerInfo server_info = 3;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ServerInfo, com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder, com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder> 
-          internalGetServerInfoFieldBuilder() {
-        if (serverInfoBuilder_ == null) {
-          serverInfoBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.ServerInfo, com.xiaoniucode.etp.core.message.Message.ServerInfo.Builder, com.xiaoniucode.etp.core.message.Message.ServerInfoOrBuilder>(
-                  getServerInfo(),
-                  getParentForChildren(),
-                  isClean());
-          serverInfo_ = null;
-        }
-        return serverInfoBuilder_;
-      }
-
       private com.xiaoniucode.etp.core.message.Message.Status status_;
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Status, com.xiaoniucode.etp.core.message.Message.Status.Builder, com.xiaoniucode.etp.core.message.Message.StatusOrBuilder> statusBuilder_;
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        * @return Whether the status field is set.
        */
       public boolean hasStatus() {
-        return ((bitField0_ & 0x00000008) != 0);
+        return ((bitField0_ & 0x00000004) != 0);
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        * @return The status.
        */
       public com.xiaoniucode.etp.core.message.Message.Status getStatus() {
@@ -6402,7 +5628,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public Builder setStatus(com.xiaoniucode.etp.core.message.Message.Status value) {
         if (statusBuilder_ == null) {
@@ -6413,12 +5639,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           statusBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public Builder setStatus(
           com.xiaoniucode.etp.core.message.Message.Status.Builder builderForValue) {
@@ -6427,16 +5653,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           statusBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         onChanged();
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public Builder mergeStatus(com.xiaoniucode.etp.core.message.Message.Status value) {
         if (statusBuilder_ == null) {
-          if (((bitField0_ & 0x00000008) != 0) &&
+          if (((bitField0_ & 0x00000004) != 0) &&
             status_ != null &&
             status_ != com.xiaoniucode.etp.core.message.Message.Status.getDefaultInstance()) {
             getStatusBuilder().mergeFrom(value);
@@ -6447,16 +5673,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           statusBuilder_.mergeFrom(value);
         }
         if (status_ != null) {
-          bitField0_ |= 0x00000008;
+          bitField0_ |= 0x00000004;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public Builder clearStatus() {
-        bitField0_ = (bitField0_ & ~0x00000008);
+        bitField0_ = (bitField0_ & ~0x00000004);
         status_ = null;
         if (statusBuilder_ != null) {
           statusBuilder_.dispose();
@@ -6466,15 +5692,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Status.Builder getStatusBuilder() {
-        bitField0_ |= 0x00000008;
+        bitField0_ |= 0x00000004;
         onChanged();
         return internalGetStatusFieldBuilder().getBuilder();
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
         if (statusBuilder_ != null) {
@@ -6485,7 +5711,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Status status = 4;</code>
+       * <code>.com.xiaoniucode.etp.core.message.Status status = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Status, com.xiaoniucode.etp.core.message.Message.Status.Builder, com.xiaoniucode.etp.core.message.Message.StatusOrBuilder> 
@@ -9881,17 +9107,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>optional string host = 1;</code>
-     * @return Whether the host field is set.
-     */
-    boolean hasHost();
-    /**
-     * <code>optional string host = 1;</code>
+     * <code>string host = 1;</code>
      * @return The host.
      */
     java.lang.String getHost();
     /**
-     * <code>optional string host = 1;</code>
+     * <code>string host = 1;</code>
      * @return The bytes for host.
      */
     com.google.protobuf.ByteString
@@ -9975,15 +9196,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @SuppressWarnings("serial")
     private volatile java.lang.Object host_ = "";
     /**
-     * <code>optional string host = 1;</code>
-     * @return Whether the host field is set.
-     */
-    @java.lang.Override
-    public boolean hasHost() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional string host = 1;</code>
+     * <code>string host = 1;</code>
      * @return The host.
      */
     @java.lang.Override
@@ -10000,7 +9213,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>optional string host = 1;</code>
+     * <code>string host = 1;</code>
      * @return The bytes for host.
      */
     @java.lang.Override
@@ -10038,7 +9251,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasName() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>optional string name = 3;</code>
@@ -10084,7 +9297,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasWeight() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
      * <code>optional int32 weight = 4;</code>
@@ -10109,16 +9322,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) != 0)) {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(host_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 1, host_);
       }
       if (port_ != 0) {
         output.writeUInt32(2, port_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 3, name_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         output.writeInt32(4, weight_);
       }
       getUnknownFields().writeTo(output);
@@ -10130,17 +9343,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
-      if (((bitField0_ & 0x00000001) != 0)) {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(host_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(1, host_);
       }
       if (port_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(2, port_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(3, name_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, weight_);
       }
@@ -10159,11 +9372,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       com.xiaoniucode.etp.core.message.Message.Target other = (com.xiaoniucode.etp.core.message.Message.Target) obj;
 
-      if (hasHost() != other.hasHost()) return false;
-      if (hasHost()) {
-        if (!getHost()
-            .equals(other.getHost())) return false;
-      }
+      if (!getHost()
+          .equals(other.getHost())) return false;
       if (getPort()
           != other.getPort()) return false;
       if (hasName() != other.hasName()) return false;
@@ -10187,10 +9397,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasHost()) {
-        hash = (37 * hash) + HOST_FIELD_NUMBER;
-        hash = (53 * hash) + getHost().hashCode();
-      }
+      hash = (37 * hash) + HOST_FIELD_NUMBER;
+      hash = (53 * hash) + getHost().hashCode();
       hash = (37 * hash) + PORT_FIELD_NUMBER;
       hash = (53 * hash) + getPort();
       if (hasName()) {
@@ -10369,21 +9577,20 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private void buildPartial0(com.xiaoniucode.etp.core.message.Message.Target result) {
         int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.host_ = host_;
-          to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.port_ = port_;
         }
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.name_ = name_;
-          to_bitField0_ |= 0x00000002;
+          to_bitField0_ |= 0x00000001;
         }
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.weight_ = weight_;
-          to_bitField0_ |= 0x00000004;
+          to_bitField0_ |= 0x00000002;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -10400,7 +9607,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.Target other) {
         if (other == com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance()) return this;
-        if (other.hasHost()) {
+        if (!other.getHost().isEmpty()) {
           host_ = other.host_;
           bitField0_ |= 0x00000001;
           onChanged();
@@ -10481,14 +9688,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object host_ = "";
       /**
-       * <code>optional string host = 1;</code>
-       * @return Whether the host field is set.
-       */
-      public boolean hasHost() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>optional string host = 1;</code>
+       * <code>string host = 1;</code>
        * @return The host.
        */
       public java.lang.String getHost() {
@@ -10504,7 +9704,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional string host = 1;</code>
+       * <code>string host = 1;</code>
        * @return The bytes for host.
        */
       public com.google.protobuf.ByteString
@@ -10521,7 +9721,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional string host = 1;</code>
+       * <code>string host = 1;</code>
        * @param value The host to set.
        * @return This builder for chaining.
        */
@@ -10534,7 +9734,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional string host = 1;</code>
+       * <code>string host = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearHost() {
@@ -10544,7 +9744,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional string host = 1;</code>
+       * <code>string host = 1;</code>
        * @param value The bytes for host to set.
        * @return This builder for chaining.
        */
@@ -10760,501 +9960,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
-  public interface LoadBalanceOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.LoadBalance)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return Whether the strategy field is set.
-     */
-    boolean hasStrategy();
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return The enum numeric value on the wire for strategy.
-     */
-    int getStrategyValue();
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return The strategy.
-     */
-    com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getStrategy();
-  }
-  /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.message.LoadBalance}
-   */
-  public static final class LoadBalance extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.LoadBalance)
-      LoadBalanceOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 33,
-        /* patch= */ 4,
-        /* suffix= */ "",
-        "LoadBalance");
-    }
-    // Use LoadBalance.newBuilder() to construct.
-    private LoadBalance(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private LoadBalance() {
-      strategy_ = 0;
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LoadBalance_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.xiaoniucode.etp.core.message.Message.LoadBalance.class, com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder.class);
-    }
-
-    private int bitField0_;
-    public static final int STRATEGY_FIELD_NUMBER = 1;
-    private int strategy_ = 0;
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return Whether the strategy field is set.
-     */
-    @java.lang.Override public boolean hasStrategy() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return The enum numeric value on the wire for strategy.
-     */
-    @java.lang.Override public int getStrategyValue() {
-      return strategy_;
-    }
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-     * @return The strategy.
-     */
-    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getStrategy() {
-      com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy result = com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.forNumber(strategy_);
-      return result == null ? com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.UNRECOGNIZED : result;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeEnum(1, strategy_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, strategy_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.LoadBalance)) {
-        return super.equals(obj);
-      }
-      com.xiaoniucode.etp.core.message.Message.LoadBalance other = (com.xiaoniucode.etp.core.message.Message.LoadBalance) obj;
-
-      if (hasStrategy() != other.hasStrategy()) return false;
-      if (hasStrategy()) {
-        if (strategy_ != other.strategy_) return false;
-      }
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasStrategy()) {
-        hash = (37 * hash) + STRATEGY_FIELD_NUMBER;
-        hash = (53 * hash) + strategy_;
-      }
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.LoadBalance prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.message.LoadBalance}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.LoadBalance)
-        com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LoadBalance_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.xiaoniucode.etp.core.message.Message.LoadBalance.class, com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder.class);
-      }
-
-      // Construct using com.xiaoniucode.etp.core.message.Message.LoadBalance.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        strategy_ = 0;
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.LoadBalance getDefaultInstanceForType() {
-        return com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.LoadBalance build() {
-        com.xiaoniucode.etp.core.message.Message.LoadBalance result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.LoadBalance buildPartial() {
-        com.xiaoniucode.etp.core.message.Message.LoadBalance result = new com.xiaoniucode.etp.core.message.Message.LoadBalance(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.LoadBalance result) {
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.strategy_ = strategy_;
-          to_bitField0_ |= 0x00000001;
-        }
-        result.bitField0_ |= to_bitField0_;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.xiaoniucode.etp.core.message.Message.LoadBalance) {
-          return mergeFrom((com.xiaoniucode.etp.core.message.Message.LoadBalance)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.LoadBalance other) {
-        if (other == com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance()) return this;
-        if (other.hasStrategy()) {
-          setStrategyValue(other.getStrategyValue());
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 8: {
-                strategy_ = input.readEnum();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 8
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private int strategy_ = 0;
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @return Whether the strategy field is set.
-       */
-      @java.lang.Override public boolean hasStrategy() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @return The enum numeric value on the wire for strategy.
-       */
-      @java.lang.Override public int getStrategyValue() {
-        return strategy_;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @param value The enum numeric value on the wire for strategy to set.
-       * @return This builder for chaining.
-       */
-      public Builder setStrategyValue(int value) {
-        strategy_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @return The strategy.
-       */
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getStrategy() {
-        com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy result = com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.forNumber(strategy_);
-        return result == null ? com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @param value The strategy to set.
-       * @return This builder for chaining.
-       */
-      public Builder setStrategy(com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy value) {
-        if (value == null) { throw new NullPointerException(); }
-        bitField0_ |= 0x00000001;
-        strategy_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy strategy = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearStrategy() {
-        bitField0_ = (bitField0_ & ~0x00000001);
-        strategy_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.LoadBalance)
-    }
-
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.LoadBalance)
-    private static final com.xiaoniucode.etp.core.message.Message.LoadBalance DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.LoadBalance();
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.LoadBalance getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<LoadBalance>
-        PARSER = new com.google.protobuf.AbstractParser<LoadBalance>() {
-      @java.lang.Override
-      public LoadBalance parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<LoadBalance> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<LoadBalance> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.LoadBalance getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface DomainConfigOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.DomainConfig)
+  public interface DomainOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.Domain)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -11319,12 +10026,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getSubDomainsBytes(int index);
   }
   /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.message.DomainConfig}
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.Domain}
    */
-  public static final class DomainConfig extends
+  public static final class Domain extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.DomainConfig)
-      DomainConfigOrBuilder {
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.Domain)
+      DomainOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -11333,13 +10040,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         /* minor= */ 33,
         /* patch= */ 4,
         /* suffix= */ "",
-        "DomainConfig");
+        "Domain");
     }
-    // Use DomainConfig.newBuilder() to construct.
-    private DomainConfig(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use Domain.newBuilder() to construct.
+    private Domain(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private DomainConfig() {
+    private Domain() {
       customDomains_ =
           com.google.protobuf.LazyStringArrayList.emptyList();
       subDomains_ =
@@ -11348,15 +10055,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor;
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainConfig_fieldAccessorTable
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Domain_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.xiaoniucode.etp.core.message.Message.DomainConfig.class, com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder.class);
+              com.xiaoniucode.etp.core.message.Message.Domain.class, com.xiaoniucode.etp.core.message.Message.Domain.Builder.class);
     }
 
     private int bitField0_;
@@ -11515,10 +10222,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.DomainConfig)) {
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.Domain)) {
         return super.equals(obj);
       }
-      com.xiaoniucode.etp.core.message.Message.DomainConfig other = (com.xiaoniucode.etp.core.message.Message.DomainConfig) obj;
+      com.xiaoniucode.etp.core.message.Message.Domain other = (com.xiaoniucode.etp.core.message.Message.Domain) obj;
 
       if (hasAutoDomain() != other.hasAutoDomain()) return false;
       if (hasAutoDomain()) {
@@ -11558,44 +10265,44 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return hash;
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(byte[] data)
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(java.io.InputStream input)
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -11603,26 +10310,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseDelimitedFrom(java.io.InputStream input)
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseDelimitedFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.Domain parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -11635,7 +10342,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.DomainConfig prototype) {
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.Domain prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -11651,26 +10358,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return builder;
     }
     /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.message.DomainConfig}
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.Domain}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.DomainConfig)
-        com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder {
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.Domain)
+        com.xiaoniucode.etp.core.message.Message.DomainOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor;
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainConfig_fieldAccessorTable
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Domain_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                com.xiaoniucode.etp.core.message.Message.DomainConfig.class, com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder.class);
+                com.xiaoniucode.etp.core.message.Message.Domain.class, com.xiaoniucode.etp.core.message.Message.Domain.Builder.class);
       }
 
-      // Construct using com.xiaoniucode.etp.core.message.Message.DomainConfig.newBuilder()
+      // Construct using com.xiaoniucode.etp.core.message.Message.Domain.newBuilder()
       private Builder() {
 
       }
@@ -11695,17 +10402,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor;
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor;
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainConfig getDefaultInstanceForType() {
-        return com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance();
+      public com.xiaoniucode.etp.core.message.Message.Domain getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance();
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainConfig build() {
-        com.xiaoniucode.etp.core.message.Message.DomainConfig result = buildPartial();
+      public com.xiaoniucode.etp.core.message.Message.Domain build() {
+        com.xiaoniucode.etp.core.message.Message.Domain result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -11713,14 +10420,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainConfig buildPartial() {
-        com.xiaoniucode.etp.core.message.Message.DomainConfig result = new com.xiaoniucode.etp.core.message.Message.DomainConfig(this);
+      public com.xiaoniucode.etp.core.message.Message.Domain buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.Domain result = new com.xiaoniucode.etp.core.message.Message.Domain(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.DomainConfig result) {
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.Domain result) {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
@@ -11740,16 +10447,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.xiaoniucode.etp.core.message.Message.DomainConfig) {
-          return mergeFrom((com.xiaoniucode.etp.core.message.Message.DomainConfig)other);
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.Domain) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.Domain)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.DomainConfig other) {
-        if (other == com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance()) return this;
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.Domain other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance()) return this;
         if (other.hasAutoDomain()) {
           setAutoDomain(other.getAutoDomain());
         }
@@ -12095,23 +10802,23 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.DomainConfig)
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.Domain)
     }
 
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.DomainConfig)
-    private static final com.xiaoniucode.etp.core.message.Message.DomainConfig DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.Domain)
+    private static final com.xiaoniucode.etp.core.message.Message.Domain DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.DomainConfig();
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.Domain();
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.DomainConfig getDefaultInstance() {
+    public static com.xiaoniucode.etp.core.message.Message.Domain getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<DomainConfig>
-        PARSER = new com.google.protobuf.AbstractParser<DomainConfig>() {
+    private static final com.google.protobuf.Parser<Domain>
+        PARSER = new com.google.protobuf.AbstractParser<Domain>() {
       @java.lang.Override
-      public DomainConfig parsePartialFrom(
+      public Domain parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -12130,17 +10837,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     };
 
-    public static com.google.protobuf.Parser<DomainConfig> parser() {
+    public static com.google.protobuf.Parser<Domain> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<DomainConfig> getParserForType() {
+    public com.google.protobuf.Parser<Domain> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainConfig getDefaultInstanceForType() {
+    public com.xiaoniucode.etp.core.message.Message.Domain getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -13469,79 +12176,982 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface HealthCheckOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.HealthCheck)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+     * @return The enum numeric value on the wire for type.
+     */
+    int getTypeValue();
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+     * @return The type.
+     */
+    com.xiaoniucode.etp.core.message.Message.HealthCheckType getType();
+
+    /**
+     * <code>int32 interval = 2;</code>
+     * @return The interval.
+     */
+    int getInterval();
+
+    /**
+     * <code>int32 timeout = 3;</code>
+     * @return The timeout.
+     */
+    int getTimeout();
+
+    /**
+     * <code>int32 max_failed = 4;</code>
+     * @return The maxFailed.
+     */
+    int getMaxFailed();
+
+    /**
+     * <code>string path = 5;</code>
+     * @return The path.
+     */
+    java.lang.String getPath();
+    /**
+     * <code>string path = 5;</code>
+     * @return The bytes for path.
+     */
+    com.google.protobuf.ByteString
+        getPathBytes();
+
+    /**
+     * <code>bool enabled = 6;</code>
+     * @return The enabled.
+     */
+    boolean getEnabled();
+  }
+  /**
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.HealthCheck}
+   */
+  public static final class HealthCheck extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.HealthCheck)
+      HealthCheckOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "HealthCheck");
+    }
+    // Use HealthCheck.newBuilder() to construct.
+    private HealthCheck(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private HealthCheck() {
+      type_ = 0;
+      path_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_HealthCheck_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.xiaoniucode.etp.core.message.Message.HealthCheck.class, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder.class);
+    }
+
+    public static final int TYPE_FIELD_NUMBER = 1;
+    private int type_ = 0;
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+     * @return The enum numeric value on the wire for type.
+     */
+    @java.lang.Override public int getTypeValue() {
+      return type_;
+    }
+    /**
+     * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+     * @return The type.
+     */
+    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.HealthCheckType getType() {
+      com.xiaoniucode.etp.core.message.Message.HealthCheckType result = com.xiaoniucode.etp.core.message.Message.HealthCheckType.forNumber(type_);
+      return result == null ? com.xiaoniucode.etp.core.message.Message.HealthCheckType.UNRECOGNIZED : result;
+    }
+
+    public static final int INTERVAL_FIELD_NUMBER = 2;
+    private int interval_ = 0;
+    /**
+     * <code>int32 interval = 2;</code>
+     * @return The interval.
+     */
+    @java.lang.Override
+    public int getInterval() {
+      return interval_;
+    }
+
+    public static final int TIMEOUT_FIELD_NUMBER = 3;
+    private int timeout_ = 0;
+    /**
+     * <code>int32 timeout = 3;</code>
+     * @return The timeout.
+     */
+    @java.lang.Override
+    public int getTimeout() {
+      return timeout_;
+    }
+
+    public static final int MAX_FAILED_FIELD_NUMBER = 4;
+    private int maxFailed_ = 0;
+    /**
+     * <code>int32 max_failed = 4;</code>
+     * @return The maxFailed.
+     */
+    @java.lang.Override
+    public int getMaxFailed() {
+      return maxFailed_;
+    }
+
+    public static final int PATH_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object path_ = "";
+    /**
+     * <code>string path = 5;</code>
+     * @return The path.
+     */
+    @java.lang.Override
+    public java.lang.String getPath() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        path_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string path = 5;</code>
+     * @return The bytes for path.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPathBytes() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ENABLED_FIELD_NUMBER = 6;
+    private boolean enabled_ = false;
+    /**
+     * <code>bool enabled = 6;</code>
+     * @return The enabled.
+     */
+    @java.lang.Override
+    public boolean getEnabled() {
+      return enabled_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (type_ != com.xiaoniucode.etp.core.message.Message.HealthCheckType.HEALTH_CHECK_TYPE_TCP.getNumber()) {
+        output.writeEnum(1, type_);
+      }
+      if (interval_ != 0) {
+        output.writeInt32(2, interval_);
+      }
+      if (timeout_ != 0) {
+        output.writeInt32(3, timeout_);
+      }
+      if (maxFailed_ != 0) {
+        output.writeInt32(4, maxFailed_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, path_);
+      }
+      if (enabled_ != false) {
+        output.writeBool(6, enabled_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (type_ != com.xiaoniucode.etp.core.message.Message.HealthCheckType.HEALTH_CHECK_TYPE_TCP.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(1, type_);
+      }
+      if (interval_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, interval_);
+      }
+      if (timeout_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, timeout_);
+      }
+      if (maxFailed_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, maxFailed_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, path_);
+      }
+      if (enabled_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, enabled_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.HealthCheck)) {
+        return super.equals(obj);
+      }
+      com.xiaoniucode.etp.core.message.Message.HealthCheck other = (com.xiaoniucode.etp.core.message.Message.HealthCheck) obj;
+
+      if (type_ != other.type_) return false;
+      if (getInterval()
+          != other.getInterval()) return false;
+      if (getTimeout()
+          != other.getTimeout()) return false;
+      if (getMaxFailed()
+          != other.getMaxFailed()) return false;
+      if (!getPath()
+          .equals(other.getPath())) return false;
+      if (getEnabled()
+          != other.getEnabled()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + type_;
+      hash = (37 * hash) + INTERVAL_FIELD_NUMBER;
+      hash = (53 * hash) + getInterval();
+      hash = (37 * hash) + TIMEOUT_FIELD_NUMBER;
+      hash = (53 * hash) + getTimeout();
+      hash = (37 * hash) + MAX_FAILED_FIELD_NUMBER;
+      hash = (53 * hash) + getMaxFailed();
+      hash = (37 * hash) + PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getPath().hashCode();
+      hash = (37 * hash) + ENABLED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnabled());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.HealthCheck prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.HealthCheck}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.HealthCheck)
+        com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_HealthCheck_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.xiaoniucode.etp.core.message.Message.HealthCheck.class, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder.class);
+      }
+
+      // Construct using com.xiaoniucode.etp.core.message.Message.HealthCheck.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        type_ = 0;
+        interval_ = 0;
+        timeout_ = 0;
+        maxFailed_ = 0;
+        path_ = "";
+        enabled_ = false;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck build() {
+        com.xiaoniucode.etp.core.message.Message.HealthCheck result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.HealthCheck result = new com.xiaoniucode.etp.core.message.Message.HealthCheck(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.HealthCheck result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.type_ = type_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.interval_ = interval_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.timeout_ = timeout_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.maxFailed_ = maxFailed_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.path_ = path_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.enabled_ = enabled_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.HealthCheck) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.HealthCheck)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.HealthCheck other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance()) return this;
+        if (other.type_ != 0) {
+          setTypeValue(other.getTypeValue());
+        }
+        if (other.getInterval() != 0) {
+          setInterval(other.getInterval());
+        }
+        if (other.getTimeout() != 0) {
+          setTimeout(other.getTimeout());
+        }
+        if (other.getMaxFailed() != 0) {
+          setMaxFailed(other.getMaxFailed());
+        }
+        if (!other.getPath().isEmpty()) {
+          path_ = other.path_;
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        if (other.getEnabled() != false) {
+          setEnabled(other.getEnabled());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                type_ = input.readEnum();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 16: {
+                interval_ = input.readInt32();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                timeout_ = input.readInt32();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                maxFailed_ = input.readInt32();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 42: {
+                path_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              case 48: {
+                enabled_ = input.readBool();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private int type_ = 0;
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+       * @return The enum numeric value on the wire for type.
+       */
+      @java.lang.Override public int getTypeValue() {
+        return type_;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+       * @param value The enum numeric value on the wire for type to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTypeValue(int value) {
+        type_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+       * @return The type.
+       */
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.HealthCheckType getType() {
+        com.xiaoniucode.etp.core.message.Message.HealthCheckType result = com.xiaoniucode.etp.core.message.Message.HealthCheckType.forNumber(type_);
+        return result == null ? com.xiaoniucode.etp.core.message.Message.HealthCheckType.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+       * @param value The type to set.
+       * @return This builder for chaining.
+       */
+      public Builder setType(com.xiaoniucode.etp.core.message.Message.HealthCheckType value) {
+        if (value == null) { throw new NullPointerException(); }
+        bitField0_ |= 0x00000001;
+        type_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.HealthCheckType type = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearType() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        type_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int interval_ ;
+      /**
+       * <code>int32 interval = 2;</code>
+       * @return The interval.
+       */
+      @java.lang.Override
+      public int getInterval() {
+        return interval_;
+      }
+      /**
+       * <code>int32 interval = 2;</code>
+       * @param value The interval to set.
+       * @return This builder for chaining.
+       */
+      public Builder setInterval(int value) {
+
+        interval_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 interval = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearInterval() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        interval_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int timeout_ ;
+      /**
+       * <code>int32 timeout = 3;</code>
+       * @return The timeout.
+       */
+      @java.lang.Override
+      public int getTimeout() {
+        return timeout_;
+      }
+      /**
+       * <code>int32 timeout = 3;</code>
+       * @param value The timeout to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTimeout(int value) {
+
+        timeout_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 timeout = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearTimeout() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        timeout_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int maxFailed_ ;
+      /**
+       * <code>int32 max_failed = 4;</code>
+       * @return The maxFailed.
+       */
+      @java.lang.Override
+      public int getMaxFailed() {
+        return maxFailed_;
+      }
+      /**
+       * <code>int32 max_failed = 4;</code>
+       * @param value The maxFailed to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMaxFailed(int value) {
+
+        maxFailed_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 max_failed = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMaxFailed() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        maxFailed_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object path_ = "";
+      /**
+       * <code>string path = 5;</code>
+       * @return The path.
+       */
+      public java.lang.String getPath() {
+        java.lang.Object ref = path_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string path = 5;</code>
+       * @return The bytes for path.
+       */
+      public com.google.protobuf.ByteString
+          getPathBytes() {
+        java.lang.Object ref = path_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          path_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string path = 5;</code>
+       * @param value The path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        path_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPath() {
+        path_ = getDefaultInstance().getPath();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 5;</code>
+       * @param value The bytes for path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        path_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
+      private boolean enabled_ ;
+      /**
+       * <code>bool enabled = 6;</code>
+       * @return The enabled.
+       */
+      @java.lang.Override
+      public boolean getEnabled() {
+        return enabled_;
+      }
+      /**
+       * <code>bool enabled = 6;</code>
+       * @param value The enabled to set.
+       * @return This builder for chaining.
+       */
+      public Builder setEnabled(boolean value) {
+
+        enabled_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool enabled = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearEnabled() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        enabled_ = false;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.HealthCheck)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.HealthCheck)
+    private static final com.xiaoniucode.etp.core.message.Message.HealthCheck DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.HealthCheck();
+    }
+
+    public static com.xiaoniucode.etp.core.message.Message.HealthCheck getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<HealthCheck>
+        PARSER = new com.google.protobuf.AbstractParser<HealthCheck>() {
+      @java.lang.Override
+      public HealthCheck parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<HealthCheck> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<HealthCheck> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.HealthCheck getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface ProxyOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.Proxy)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string proxyId = 18;</code>
+     * <code>string proxyId = 1;</code>
      * @return The proxyId.
      */
     java.lang.String getProxyId();
     /**
-     * <code>string proxyId = 18;</code>
+     * <code>string proxyId = 1;</code>
      * @return The bytes for proxyId.
      */
     com.google.protobuf.ByteString
         getProxyIdBytes();
 
     /**
-     * <code>string name = 1;</code>
+     * <code>string name = 2;</code>
      * @return The name.
      */
     java.lang.String getName();
     /**
-     * <code>string name = 1;</code>
+     * <code>string name = 2;</code>
      * @return The bytes for name.
      */
     com.google.protobuf.ByteString
         getNameBytes();
 
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+     * @return The enum numeric value on the wire for protocol.
      */
-    java.util.List<com.xiaoniucode.etp.core.message.Message.Target> 
-        getTargetsList();
+    int getProtocolValue();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+     * @return The protocol.
      */
-    com.xiaoniucode.etp.core.message.Message.Target getTargets(int index);
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    int getTargetsCount();
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
-        getTargetsOrBuilderList();
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
-        int index);
+    com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol();
 
     /**
-     * <code>optional bool enabled = 3;</code>
-     * @return Whether the enabled field is set.
-     */
-    boolean hasEnabled();
-    /**
-     * <code>optional bool enabled = 3;</code>
+     * <code>bool enabled = 4;</code>
      * @return The enabled.
      */
     boolean getEnabled();
 
     /**
-     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-     * @return The enum numeric value on the wire for protocol.
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
      */
-    int getProtocolValue();
+    java.util.List<com.xiaoniucode.etp.core.message.Message.Target> 
+        getTargetsList();
     /**
-     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-     * @return The protocol.
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol();
+    com.xiaoniucode.etp.core.message.Message.Target getTargets(int index);
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    int getTargetsCount();
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+        getTargetsOrBuilderList();
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
+        int index);
+
+    /**
+     * <code>bool force_https = 6;</code>
+     * @return The forceHttps.
+     */
+    boolean getForceHttps();
 
     /**
      * <code>optional uint32 remote_port = 7;</code>
@@ -13555,120 +13165,125 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     int getRemotePort();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      * @return Whether the domain field is set.
      */
     boolean hasDomain();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      * @return The domain.
      */
-    com.xiaoniucode.etp.core.message.Message.DomainConfig getDomain();
+    com.xiaoniucode.etp.core.message.Message.Domain getDomain();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder getDomainOrBuilder();
+    com.xiaoniucode.etp.core.message.Message.DomainOrBuilder getDomainOrBuilder();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      * @return Whether the accessControl field is set.
      */
     boolean hasAccessControl();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      * @return The accessControl.
      */
     com.xiaoniucode.etp.core.message.Message.AccessControl getAccessControl();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      */
     com.xiaoniucode.etp.core.message.Message.AccessControlOrBuilder getAccessControlOrBuilder();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      * @return Whether the basicAuth field is set.
      */
     boolean hasBasicAuth();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      * @return The basicAuth.
      */
     com.xiaoniucode.etp.core.message.Message.BasicAuth getBasicAuth();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      */
     com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder getBasicAuthOrBuilder();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      * @return Whether the bandwidth field is set.
      */
     boolean hasBandwidth();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      * @return The bandwidth.
      */
     com.xiaoniucode.etp.core.message.Message.Bandwidth getBandwidth();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      */
     com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-     * @return Whether the loadBalance field is set.
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return Whether the loadBalanceStrategy field is set.
      */
-    boolean hasLoadBalance();
+    boolean hasLoadBalanceStrategy();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-     * @return The loadBalance.
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return The enum numeric value on the wire for loadBalanceStrategy.
      */
-    com.xiaoniucode.etp.core.message.Message.LoadBalance getLoadBalance();
+    int getLoadBalanceStrategyValue();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return The loadBalanceStrategy.
      */
-    com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder getLoadBalanceOrBuilder();
+    com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getLoadBalanceStrategy();
 
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      * @return Whether the transport field is set.
      */
     boolean hasTransport();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      * @return The transport.
      */
     com.xiaoniucode.etp.core.message.Message.Transport getTransport();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      */
     com.xiaoniucode.etp.core.message.Message.TransportOrBuilder getTransportOrBuilder();
 
     /**
-     * <code>optional bool force_https = 16;</code>
-     * @return Whether the forceHttps field is set.
-     */
-    boolean hasForceHttps();
-    /**
-     * <code>optional bool force_https = 16;</code>
-     * @return The forceHttps.
-     */
-    boolean getForceHttps();
-
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      * @return Whether the sslCert field is set.
      */
     boolean hasSslCert();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      * @return The sslCert.
      */
     com.xiaoniucode.etp.core.message.Message.SslCert getSslCert();
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      */
     com.xiaoniucode.etp.core.message.Message.SslCertOrBuilder getSslCertOrBuilder();
+
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     * @return Whether the healthCheck field is set.
+     */
+    boolean hasHealthCheck();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     * @return The healthCheck.
+     */
+    com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder();
   }
   /**
    * Protobuf type {@code com.xiaoniucode.etp.core.message.Proxy}
@@ -13694,8 +13309,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     private Proxy() {
       proxyId_ = "";
       name_ = "";
-      targets_ = java.util.Collections.emptyList();
       protocol_ = 0;
+      targets_ = java.util.Collections.emptyList();
+      loadBalanceStrategy_ = 0;
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -13712,11 +13328,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     private int bitField0_;
-    public static final int PROXYID_FIELD_NUMBER = 18;
+    public static final int PROXYID_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
     private volatile java.lang.Object proxyId_ = "";
     /**
-     * <code>string proxyId = 18;</code>
+     * <code>string proxyId = 1;</code>
      * @return The proxyId.
      */
     @java.lang.Override
@@ -13733,7 +13349,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>string proxyId = 18;</code>
+     * <code>string proxyId = 1;</code>
      * @return The bytes for proxyId.
      */
     @java.lang.Override
@@ -13751,11 +13367,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
-    public static final int NAME_FIELD_NUMBER = 1;
+    public static final int NAME_FIELD_NUMBER = 2;
     @SuppressWarnings("serial")
     private volatile java.lang.Object name_ = "";
     /**
-     * <code>string name = 1;</code>
+     * <code>string name = 2;</code>
      * @return The name.
      */
     @java.lang.Override
@@ -13772,7 +13388,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
     /**
-     * <code>string name = 1;</code>
+     * <code>string name = 2;</code>
      * @return The bytes for name.
      */
     @java.lang.Override
@@ -13790,59 +13406,28 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
-    public static final int TARGETS_FIELD_NUMBER = 2;
-    @SuppressWarnings("serial")
-    private java.util.List<com.xiaoniucode.etp.core.message.Message.Target> targets_;
+    public static final int PROTOCOL_FIELD_NUMBER = 3;
+    private int protocol_ = 0;
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+     * @return The enum numeric value on the wire for protocol.
      */
-    @java.lang.Override
-    public java.util.List<com.xiaoniucode.etp.core.message.Message.Target> getTargetsList() {
-      return targets_;
+    @java.lang.Override public int getProtocolValue() {
+      return protocol_;
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+     * @return The protocol.
      */
-    @java.lang.Override
-    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
-        getTargetsOrBuilderList() {
-      return targets_;
-    }
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    @java.lang.Override
-    public int getTargetsCount() {
-      return targets_.size();
-    }
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.Target getTargets(int index) {
-      return targets_.get(index);
-    }
-    /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
-        int index) {
-      return targets_.get(index);
+    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol() {
+      com.xiaoniucode.etp.core.message.Message.ProtocolType result = com.xiaoniucode.etp.core.message.Message.ProtocolType.forNumber(protocol_);
+      return result == null ? com.xiaoniucode.etp.core.message.Message.ProtocolType.UNRECOGNIZED : result;
     }
 
-    public static final int ENABLED_FIELD_NUMBER = 3;
+    public static final int ENABLED_FIELD_NUMBER = 4;
     private boolean enabled_ = false;
     /**
-     * <code>optional bool enabled = 3;</code>
-     * @return Whether the enabled field is set.
-     */
-    @java.lang.Override
-    public boolean hasEnabled() {
-      return ((bitField0_ & 0x00000001) != 0);
-    }
-    /**
-     * <code>optional bool enabled = 3;</code>
+     * <code>bool enabled = 4;</code>
      * @return The enabled.
      */
     @java.lang.Override
@@ -13850,22 +13435,56 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return enabled_;
     }
 
-    public static final int PROTOCOL_FIELD_NUMBER = 6;
-    private int protocol_ = 0;
+    public static final int TARGETS_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private java.util.List<com.xiaoniucode.etp.core.message.Message.Target> targets_;
     /**
-     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-     * @return The enum numeric value on the wire for protocol.
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
      */
-    @java.lang.Override public int getProtocolValue() {
-      return protocol_;
+    @java.lang.Override
+    public java.util.List<com.xiaoniucode.etp.core.message.Message.Target> getTargetsList() {
+      return targets_;
     }
     /**
-     * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-     * @return The protocol.
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
      */
-    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol() {
-      com.xiaoniucode.etp.core.message.Message.ProtocolType result = com.xiaoniucode.etp.core.message.Message.ProtocolType.forNumber(protocol_);
-      return result == null ? com.xiaoniucode.etp.core.message.Message.ProtocolType.UNRECOGNIZED : result;
+    @java.lang.Override
+    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+        getTargetsOrBuilderList() {
+      return targets_;
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    @java.lang.Override
+    public int getTargetsCount() {
+      return targets_.size();
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.Target getTargets(int index) {
+      return targets_.get(index);
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
+        int index) {
+      return targets_.get(index);
+    }
+
+    public static final int FORCE_HTTPS_FIELD_NUMBER = 6;
+    private boolean forceHttps_ = false;
+    /**
+     * <code>bool force_https = 6;</code>
+     * @return The forceHttps.
+     */
+    @java.lang.Override
+    public boolean getForceHttps() {
+      return forceHttps_;
     }
 
     public static final int REMOTE_PORT_FIELD_NUMBER = 7;
@@ -13876,7 +13495,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     @java.lang.Override
     public boolean hasRemotePort() {
-      return ((bitField0_ & 0x00000002) != 0);
+      return ((bitField0_ & 0x00000001) != 0);
     }
     /**
      * <code>optional uint32 remote_port = 7;</code>
@@ -13888,43 +13507,43 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     }
 
     public static final int DOMAIN_FIELD_NUMBER = 8;
-    private com.xiaoniucode.etp.core.message.Message.DomainConfig domain_;
+    private com.xiaoniucode.etp.core.message.Message.Domain domain_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      * @return Whether the domain field is set.
      */
     @java.lang.Override
     public boolean hasDomain() {
-      return ((bitField0_ & 0x00000004) != 0);
+      return ((bitField0_ & 0x00000002) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      * @return The domain.
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainConfig getDomain() {
-      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance() : domain_;
+    public com.xiaoniucode.etp.core.message.Message.Domain getDomain() {
+      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance() : domain_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder getDomainOrBuilder() {
-      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance() : domain_;
+    public com.xiaoniucode.etp.core.message.Message.DomainOrBuilder getDomainOrBuilder() {
+      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance() : domain_;
     }
 
-    public static final int ACCESS_CONTROL_FIELD_NUMBER = 11;
+    public static final int ACCESS_CONTROL_FIELD_NUMBER = 9;
     private com.xiaoniucode.etp.core.message.Message.AccessControl accessControl_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      * @return Whether the accessControl field is set.
      */
     @java.lang.Override
     public boolean hasAccessControl() {
-      return ((bitField0_ & 0x00000008) != 0);
+      return ((bitField0_ & 0x00000004) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      * @return The accessControl.
      */
     @java.lang.Override
@@ -13932,25 +13551,25 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return accessControl_ == null ? com.xiaoniucode.etp.core.message.Message.AccessControl.getDefaultInstance() : accessControl_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.AccessControlOrBuilder getAccessControlOrBuilder() {
       return accessControl_ == null ? com.xiaoniucode.etp.core.message.Message.AccessControl.getDefaultInstance() : accessControl_;
     }
 
-    public static final int BASIC_AUTH_FIELD_NUMBER = 12;
+    public static final int BASIC_AUTH_FIELD_NUMBER = 10;
     private com.xiaoniucode.etp.core.message.Message.BasicAuth basicAuth_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      * @return Whether the basicAuth field is set.
      */
     @java.lang.Override
     public boolean hasBasicAuth() {
-      return ((bitField0_ & 0x00000010) != 0);
+      return ((bitField0_ & 0x00000008) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      * @return The basicAuth.
      */
     @java.lang.Override
@@ -13958,25 +13577,25 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return basicAuth_ == null ? com.xiaoniucode.etp.core.message.Message.BasicAuth.getDefaultInstance() : basicAuth_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder getBasicAuthOrBuilder() {
       return basicAuth_ == null ? com.xiaoniucode.etp.core.message.Message.BasicAuth.getDefaultInstance() : basicAuth_;
     }
 
-    public static final int BANDWIDTH_FIELD_NUMBER = 13;
+    public static final int BANDWIDTH_FIELD_NUMBER = 11;
     private com.xiaoniucode.etp.core.message.Message.Bandwidth bandwidth_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      * @return Whether the bandwidth field is set.
      */
     @java.lang.Override
     public boolean hasBandwidth() {
-      return ((bitField0_ & 0x00000020) != 0);
+      return ((bitField0_ & 0x00000010) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      * @return The bandwidth.
      */
     @java.lang.Override
@@ -13984,51 +13603,50 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return bandwidth_ == null ? com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
       return bandwidth_ == null ? com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance() : bandwidth_;
     }
 
-    public static final int LOAD_BALANCE_FIELD_NUMBER = 14;
-    private com.xiaoniucode.etp.core.message.Message.LoadBalance loadBalance_;
+    public static final int LOAD_BALANCE_STRATEGY_FIELD_NUMBER = 12;
+    private int loadBalanceStrategy_ = 0;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-     * @return Whether the loadBalance field is set.
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return Whether the loadBalanceStrategy field is set.
      */
-    @java.lang.Override
-    public boolean hasLoadBalance() {
-      return ((bitField0_ & 0x00000040) != 0);
+    @java.lang.Override public boolean hasLoadBalanceStrategy() {
+      return ((bitField0_ & 0x00000020) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-     * @return The loadBalance.
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return The enum numeric value on the wire for loadBalanceStrategy.
      */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.LoadBalance getLoadBalance() {
-      return loadBalance_ == null ? com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance() : loadBalance_;
+    @java.lang.Override public int getLoadBalanceStrategyValue() {
+      return loadBalanceStrategy_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+     * @return The loadBalanceStrategy.
      */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder getLoadBalanceOrBuilder() {
-      return loadBalance_ == null ? com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance() : loadBalance_;
+    @java.lang.Override public com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getLoadBalanceStrategy() {
+      com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy result = com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.forNumber(loadBalanceStrategy_);
+      return result == null ? com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.UNRECOGNIZED : result;
     }
 
-    public static final int TRANSPORT_FIELD_NUMBER = 15;
+    public static final int TRANSPORT_FIELD_NUMBER = 13;
     private com.xiaoniucode.etp.core.message.Message.Transport transport_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      * @return Whether the transport field is set.
      */
     @java.lang.Override
     public boolean hasTransport() {
-      return ((bitField0_ & 0x00000080) != 0);
+      return ((bitField0_ & 0x00000040) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      * @return The transport.
      */
     @java.lang.Override
@@ -14036,44 +13654,25 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return transport_ == null ? com.xiaoniucode.etp.core.message.Message.Transport.getDefaultInstance() : transport_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.TransportOrBuilder getTransportOrBuilder() {
       return transport_ == null ? com.xiaoniucode.etp.core.message.Message.Transport.getDefaultInstance() : transport_;
     }
 
-    public static final int FORCE_HTTPS_FIELD_NUMBER = 16;
-    private boolean forceHttps_ = false;
-    /**
-     * <code>optional bool force_https = 16;</code>
-     * @return Whether the forceHttps field is set.
-     */
-    @java.lang.Override
-    public boolean hasForceHttps() {
-      return ((bitField0_ & 0x00000100) != 0);
-    }
-    /**
-     * <code>optional bool force_https = 16;</code>
-     * @return The forceHttps.
-     */
-    @java.lang.Override
-    public boolean getForceHttps() {
-      return forceHttps_;
-    }
-
-    public static final int SSL_CERT_FIELD_NUMBER = 17;
+    public static final int SSL_CERT_FIELD_NUMBER = 14;
     private com.xiaoniucode.etp.core.message.Message.SslCert sslCert_;
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      * @return Whether the sslCert field is set.
      */
     @java.lang.Override
     public boolean hasSslCert() {
-      return ((bitField0_ & 0x00000200) != 0);
+      return ((bitField0_ & 0x00000080) != 0);
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      * @return The sslCert.
      */
     @java.lang.Override
@@ -14081,11 +13680,37 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return sslCert_ == null ? com.xiaoniucode.etp.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
     }
     /**
-     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
      */
     @java.lang.Override
     public com.xiaoniucode.etp.core.message.Message.SslCertOrBuilder getSslCertOrBuilder() {
       return sslCert_ == null ? com.xiaoniucode.etp.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
+    }
+
+    public static final int HEALTH_CHECK_FIELD_NUMBER = 15;
+    private com.xiaoniucode.etp.core.message.Message.HealthCheck healthCheck_;
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     * @return Whether the healthCheck field is set.
+     */
+    @java.lang.Override
+    public boolean hasHealthCheck() {
+      return ((bitField0_ & 0x00000100) != 0);
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     * @return The healthCheck.
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck() {
+      return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
+    }
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder() {
+      return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -14102,47 +13727,50 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyId_);
+      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, name_);
-      }
-      for (int i = 0; i < targets_.size(); i++) {
-        output.writeMessage(2, targets_.get(i));
-      }
-      if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeBool(3, enabled_);
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
       }
       if (protocol_ != com.xiaoniucode.etp.core.message.Message.ProtocolType.TCP.getNumber()) {
-        output.writeEnum(6, protocol_);
+        output.writeEnum(3, protocol_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (enabled_ != false) {
+        output.writeBool(4, enabled_);
+      }
+      for (int i = 0; i < targets_.size(); i++) {
+        output.writeMessage(5, targets_.get(i));
+      }
+      if (forceHttps_ != false) {
+        output.writeBool(6, forceHttps_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
         output.writeUInt32(7, remotePort_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         output.writeMessage(8, getDomain());
       }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeMessage(9, getAccessControl());
+      }
       if (((bitField0_ & 0x00000008) != 0)) {
-        output.writeMessage(11, getAccessControl());
+        output.writeMessage(10, getBasicAuth());
       }
       if (((bitField0_ & 0x00000010) != 0)) {
-        output.writeMessage(12, getBasicAuth());
+        output.writeMessage(11, getBandwidth());
       }
       if (((bitField0_ & 0x00000020) != 0)) {
-        output.writeMessage(13, getBandwidth());
+        output.writeEnum(12, loadBalanceStrategy_);
       }
       if (((bitField0_ & 0x00000040) != 0)) {
-        output.writeMessage(14, getLoadBalance());
+        output.writeMessage(13, getTransport());
       }
       if (((bitField0_ & 0x00000080) != 0)) {
-        output.writeMessage(15, getTransport());
+        output.writeMessage(14, getSslCert());
       }
       if (((bitField0_ & 0x00000100) != 0)) {
-        output.writeBool(16, forceHttps_);
-      }
-      if (((bitField0_ & 0x00000200) != 0)) {
-        output.writeMessage(17, getSslCert());
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 18, proxyId_);
+        output.writeMessage(15, getHealthCheck());
       }
       getUnknownFields().writeTo(output);
     }
@@ -14153,59 +13781,63 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyId_);
+      }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, name_);
-      }
-      for (int i = 0; i < targets_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, targets_.get(i));
-      }
-      if (((bitField0_ & 0x00000001) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, enabled_);
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
       }
       if (protocol_ != com.xiaoniucode.etp.core.message.Message.ProtocolType.TCP.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(6, protocol_);
+          .computeEnumSize(3, protocol_);
       }
-      if (((bitField0_ & 0x00000002) != 0)) {
+      if (enabled_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, enabled_);
+      }
+      for (int i = 0; i < targets_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, targets_.get(i));
+      }
+      if (forceHttps_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(6, forceHttps_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt32Size(7, remotePort_);
       }
-      if (((bitField0_ & 0x00000004) != 0)) {
+      if (((bitField0_ & 0x00000002) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getDomain());
       }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getAccessControl());
+      }
       if (((bitField0_ & 0x00000008) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(11, getAccessControl());
+          .computeMessageSize(10, getBasicAuth());
       }
       if (((bitField0_ & 0x00000010) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(12, getBasicAuth());
+          .computeMessageSize(11, getBandwidth());
       }
       if (((bitField0_ & 0x00000020) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(13, getBandwidth());
+          .computeEnumSize(12, loadBalanceStrategy_);
       }
       if (((bitField0_ & 0x00000040) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, getLoadBalance());
+          .computeMessageSize(13, getTransport());
       }
       if (((bitField0_ & 0x00000080) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(15, getTransport());
+          .computeMessageSize(14, getSslCert());
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(16, forceHttps_);
-      }
-      if (((bitField0_ & 0x00000200) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(17, getSslCert());
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(18, proxyId_);
+          .computeMessageSize(15, getHealthCheck());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -14226,14 +13858,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .equals(other.getProxyId())) return false;
       if (!getName()
           .equals(other.getName())) return false;
+      if (protocol_ != other.protocol_) return false;
+      if (getEnabled()
+          != other.getEnabled()) return false;
       if (!getTargetsList()
           .equals(other.getTargetsList())) return false;
-      if (hasEnabled() != other.hasEnabled()) return false;
-      if (hasEnabled()) {
-        if (getEnabled()
-            != other.getEnabled()) return false;
-      }
-      if (protocol_ != other.protocol_) return false;
+      if (getForceHttps()
+          != other.getForceHttps()) return false;
       if (hasRemotePort() != other.hasRemotePort()) return false;
       if (hasRemotePort()) {
         if (getRemotePort()
@@ -14259,25 +13890,24 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getBandwidth()
             .equals(other.getBandwidth())) return false;
       }
-      if (hasLoadBalance() != other.hasLoadBalance()) return false;
-      if (hasLoadBalance()) {
-        if (!getLoadBalance()
-            .equals(other.getLoadBalance())) return false;
+      if (hasLoadBalanceStrategy() != other.hasLoadBalanceStrategy()) return false;
+      if (hasLoadBalanceStrategy()) {
+        if (loadBalanceStrategy_ != other.loadBalanceStrategy_) return false;
       }
       if (hasTransport() != other.hasTransport()) return false;
       if (hasTransport()) {
         if (!getTransport()
             .equals(other.getTransport())) return false;
       }
-      if (hasForceHttps() != other.hasForceHttps()) return false;
-      if (hasForceHttps()) {
-        if (getForceHttps()
-            != other.getForceHttps()) return false;
-      }
       if (hasSslCert() != other.hasSslCert()) return false;
       if (hasSslCert()) {
         if (!getSslCert()
             .equals(other.getSslCert())) return false;
+      }
+      if (hasHealthCheck() != other.hasHealthCheck()) return false;
+      if (hasHealthCheck()) {
+        if (!getHealthCheck()
+            .equals(other.getHealthCheck())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -14294,17 +13924,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       hash = (53 * hash) + getProxyId().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + PROTOCOL_FIELD_NUMBER;
+      hash = (53 * hash) + protocol_;
+      hash = (37 * hash) + ENABLED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnabled());
       if (getTargetsCount() > 0) {
         hash = (37 * hash) + TARGETS_FIELD_NUMBER;
         hash = (53 * hash) + getTargetsList().hashCode();
       }
-      if (hasEnabled()) {
-        hash = (37 * hash) + ENABLED_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getEnabled());
-      }
-      hash = (37 * hash) + PROTOCOL_FIELD_NUMBER;
-      hash = (53 * hash) + protocol_;
+      hash = (37 * hash) + FORCE_HTTPS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getForceHttps());
       if (hasRemotePort()) {
         hash = (37 * hash) + REMOTE_PORT_FIELD_NUMBER;
         hash = (53 * hash) + getRemotePort();
@@ -14325,22 +13956,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         hash = (37 * hash) + BANDWIDTH_FIELD_NUMBER;
         hash = (53 * hash) + getBandwidth().hashCode();
       }
-      if (hasLoadBalance()) {
-        hash = (37 * hash) + LOAD_BALANCE_FIELD_NUMBER;
-        hash = (53 * hash) + getLoadBalance().hashCode();
+      if (hasLoadBalanceStrategy()) {
+        hash = (37 * hash) + LOAD_BALANCE_STRATEGY_FIELD_NUMBER;
+        hash = (53 * hash) + loadBalanceStrategy_;
       }
       if (hasTransport()) {
         hash = (37 * hash) + TRANSPORT_FIELD_NUMBER;
         hash = (53 * hash) + getTransport().hashCode();
       }
-      if (hasForceHttps()) {
-        hash = (37 * hash) + FORCE_HTTPS_FIELD_NUMBER;
-        hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-            getForceHttps());
-      }
       if (hasSslCert()) {
         hash = (37 * hash) + SSL_CERT_FIELD_NUMBER;
         hash = (53 * hash) + getSslCert().hashCode();
+      }
+      if (hasHealthCheck()) {
+        hash = (37 * hash) + HEALTH_CHECK_FIELD_NUMBER;
+        hash = (53 * hash) + getHealthCheck().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -14477,9 +14107,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetAccessControlFieldBuilder();
           internalGetBasicAuthFieldBuilder();
           internalGetBandwidthFieldBuilder();
-          internalGetLoadBalanceFieldBuilder();
           internalGetTransportFieldBuilder();
           internalGetSslCertFieldBuilder();
+          internalGetHealthCheckFieldBuilder();
         }
       }
       @java.lang.Override
@@ -14488,15 +14118,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         bitField0_ = 0;
         proxyId_ = "";
         name_ = "";
+        protocol_ = 0;
+        enabled_ = false;
         if (targetsBuilder_ == null) {
           targets_ = java.util.Collections.emptyList();
         } else {
           targets_ = null;
           targetsBuilder_.clear();
         }
-        bitField0_ = (bitField0_ & ~0x00000004);
-        enabled_ = false;
-        protocol_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        forceHttps_ = false;
         remotePort_ = 0;
         domain_ = null;
         if (domainBuilder_ != null) {
@@ -14518,21 +14149,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           bandwidthBuilder_.dispose();
           bandwidthBuilder_ = null;
         }
-        loadBalance_ = null;
-        if (loadBalanceBuilder_ != null) {
-          loadBalanceBuilder_.dispose();
-          loadBalanceBuilder_ = null;
-        }
+        loadBalanceStrategy_ = 0;
         transport_ = null;
         if (transportBuilder_ != null) {
           transportBuilder_.dispose();
           transportBuilder_ = null;
         }
-        forceHttps_ = false;
         sslCert_ = null;
         if (sslCertBuilder_ != null) {
           sslCertBuilder_.dispose();
           sslCertBuilder_ = null;
+        }
+        healthCheck_ = null;
+        if (healthCheckBuilder_ != null) {
+          healthCheckBuilder_.dispose();
+          healthCheckBuilder_ = null;
         }
         return this;
       }
@@ -14568,9 +14199,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private void buildPartialRepeatedFields(com.xiaoniucode.etp.core.message.Message.Proxy result) {
         if (targetsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) != 0)) {
+          if (((bitField0_ & 0x00000010) != 0)) {
             targets_ = java.util.Collections.unmodifiableList(targets_);
-            bitField0_ = (bitField0_ & ~0x00000004);
+            bitField0_ = (bitField0_ & ~0x00000010);
           }
           result.targets_ = targets_;
         } else {
@@ -14586,63 +14217,65 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (((from_bitField0_ & 0x00000002) != 0)) {
           result.name_ = name_;
         }
-        int to_bitField0_ = 0;
-        if (((from_bitField0_ & 0x00000008) != 0)) {
-          result.enabled_ = enabled_;
-          to_bitField0_ |= 0x00000001;
-        }
-        if (((from_bitField0_ & 0x00000010) != 0)) {
+        if (((from_bitField0_ & 0x00000004) != 0)) {
           result.protocol_ = protocol_;
         }
-        if (((from_bitField0_ & 0x00000020) != 0)) {
-          result.remotePort_ = remotePort_;
-          to_bitField0_ |= 0x00000002;
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.enabled_ = enabled_;
         }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.forceHttps_ = forceHttps_;
+        }
+        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.remotePort_ = remotePort_;
+          to_bitField0_ |= 0x00000001;
+        }
+        if (((from_bitField0_ & 0x00000080) != 0)) {
           result.domain_ = domainBuilder_ == null
               ? domain_
               : domainBuilder_.build();
-          to_bitField0_ |= 0x00000004;
+          to_bitField0_ |= 0x00000002;
         }
-        if (((from_bitField0_ & 0x00000080) != 0)) {
+        if (((from_bitField0_ & 0x00000100) != 0)) {
           result.accessControl_ = accessControlBuilder_ == null
               ? accessControl_
               : accessControlBuilder_.build();
-          to_bitField0_ |= 0x00000008;
+          to_bitField0_ |= 0x00000004;
         }
-        if (((from_bitField0_ & 0x00000100) != 0)) {
+        if (((from_bitField0_ & 0x00000200) != 0)) {
           result.basicAuth_ = basicAuthBuilder_ == null
               ? basicAuth_
               : basicAuthBuilder_.build();
-          to_bitField0_ |= 0x00000010;
+          to_bitField0_ |= 0x00000008;
         }
-        if (((from_bitField0_ & 0x00000200) != 0)) {
+        if (((from_bitField0_ & 0x00000400) != 0)) {
           result.bandwidth_ = bandwidthBuilder_ == null
               ? bandwidth_
               : bandwidthBuilder_.build();
-          to_bitField0_ |= 0x00000020;
-        }
-        if (((from_bitField0_ & 0x00000400) != 0)) {
-          result.loadBalance_ = loadBalanceBuilder_ == null
-              ? loadBalance_
-              : loadBalanceBuilder_.build();
-          to_bitField0_ |= 0x00000040;
+          to_bitField0_ |= 0x00000010;
         }
         if (((from_bitField0_ & 0x00000800) != 0)) {
+          result.loadBalanceStrategy_ = loadBalanceStrategy_;
+          to_bitField0_ |= 0x00000020;
+        }
+        if (((from_bitField0_ & 0x00001000) != 0)) {
           result.transport_ = transportBuilder_ == null
               ? transport_
               : transportBuilder_.build();
-          to_bitField0_ |= 0x00000080;
-        }
-        if (((from_bitField0_ & 0x00001000) != 0)) {
-          result.forceHttps_ = forceHttps_;
-          to_bitField0_ |= 0x00000100;
+          to_bitField0_ |= 0x00000040;
         }
         if (((from_bitField0_ & 0x00002000) != 0)) {
           result.sslCert_ = sslCertBuilder_ == null
               ? sslCert_
               : sslCertBuilder_.build();
-          to_bitField0_ |= 0x00000200;
+          to_bitField0_ |= 0x00000080;
+        }
+        if (((from_bitField0_ & 0x00004000) != 0)) {
+          result.healthCheck_ = healthCheckBuilder_ == null
+              ? healthCheck_
+              : healthCheckBuilder_.build();
+          to_bitField0_ |= 0x00000100;
         }
         result.bitField0_ |= to_bitField0_;
       }
@@ -14669,11 +14302,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           bitField0_ |= 0x00000002;
           onChanged();
         }
+        if (other.protocol_ != 0) {
+          setProtocolValue(other.getProtocolValue());
+        }
+        if (other.getEnabled() != false) {
+          setEnabled(other.getEnabled());
+        }
         if (targetsBuilder_ == null) {
           if (!other.targets_.isEmpty()) {
             if (targets_.isEmpty()) {
               targets_ = other.targets_;
-              bitField0_ = (bitField0_ & ~0x00000004);
+              bitField0_ = (bitField0_ & ~0x00000010);
             } else {
               ensureTargetsIsMutable();
               targets_.addAll(other.targets_);
@@ -14686,7 +14325,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               targetsBuilder_.dispose();
               targetsBuilder_ = null;
               targets_ = other.targets_;
-              bitField0_ = (bitField0_ & ~0x00000004);
+              bitField0_ = (bitField0_ & ~0x00000010);
               targetsBuilder_ = 
                 com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
                    internalGetTargetsFieldBuilder() : null;
@@ -14695,11 +14334,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
             }
           }
         }
-        if (other.hasEnabled()) {
-          setEnabled(other.getEnabled());
-        }
-        if (other.protocol_ != 0) {
-          setProtocolValue(other.getProtocolValue());
+        if (other.getForceHttps() != false) {
+          setForceHttps(other.getForceHttps());
         }
         if (other.hasRemotePort()) {
           setRemotePort(other.getRemotePort());
@@ -14716,17 +14352,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (other.hasBandwidth()) {
           mergeBandwidth(other.getBandwidth());
         }
-        if (other.hasLoadBalance()) {
-          mergeLoadBalance(other.getLoadBalance());
+        if (other.hasLoadBalanceStrategy()) {
+          setLoadBalanceStrategyValue(other.getLoadBalanceStrategyValue());
         }
         if (other.hasTransport()) {
           mergeTransport(other.getTransport());
         }
-        if (other.hasForceHttps()) {
-          setForceHttps(other.getForceHttps());
-        }
         if (other.hasSslCert()) {
           mergeSslCert(other.getSslCert());
+        }
+        if (other.hasHealthCheck()) {
+          mergeHealthCheck(other.getHealthCheck());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -14755,11 +14391,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 done = true;
                 break;
               case 10: {
-                name_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000002;
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
                 break;
               } // case 10
               case 18: {
+                name_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 24: {
+                protocol_ = input.readEnum();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                enabled_ = input.readBool();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 42: {
                 com.xiaoniucode.etp.core.message.Message.Target m =
                     input.readMessage(
                         com.xiaoniucode.etp.core.message.Message.Target.parser(),
@@ -14771,81 +14422,71 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                   targetsBuilder_.addMessage(m);
                 }
                 break;
-              } // case 18
-              case 24: {
-                enabled_ = input.readBool();
-                bitField0_ |= 0x00000008;
-                break;
-              } // case 24
+              } // case 42
               case 48: {
-                protocol_ = input.readEnum();
-                bitField0_ |= 0x00000010;
+                forceHttps_ = input.readBool();
+                bitField0_ |= 0x00000020;
                 break;
               } // case 48
               case 56: {
                 remotePort_ = input.readUInt32();
-                bitField0_ |= 0x00000020;
+                bitField0_ |= 0x00000040;
                 break;
               } // case 56
               case 66: {
                 input.readMessage(
                     internalGetDomainFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000040;
+                bitField0_ |= 0x00000080;
                 break;
               } // case 66
-              case 90: {
+              case 74: {
                 input.readMessage(
                     internalGetAccessControlFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000080;
+                bitField0_ |= 0x00000100;
                 break;
-              } // case 90
-              case 98: {
+              } // case 74
+              case 82: {
                 input.readMessage(
                     internalGetBasicAuthFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000100;
+                bitField0_ |= 0x00000200;
                 break;
-              } // case 98
-              case 106: {
+              } // case 82
+              case 90: {
                 input.readMessage(
                     internalGetBandwidthFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000200;
-                break;
-              } // case 106
-              case 114: {
-                input.readMessage(
-                    internalGetLoadBalanceFieldBuilder().getBuilder(),
-                    extensionRegistry);
                 bitField0_ |= 0x00000400;
                 break;
-              } // case 114
-              case 122: {
+              } // case 90
+              case 96: {
+                loadBalanceStrategy_ = input.readEnum();
+                bitField0_ |= 0x00000800;
+                break;
+              } // case 96
+              case 106: {
                 input.readMessage(
                     internalGetTransportFieldBuilder().getBuilder(),
                     extensionRegistry);
-                bitField0_ |= 0x00000800;
-                break;
-              } // case 122
-              case 128: {
-                forceHttps_ = input.readBool();
                 bitField0_ |= 0x00001000;
                 break;
-              } // case 128
-              case 138: {
+              } // case 106
+              case 114: {
                 input.readMessage(
                     internalGetSslCertFieldBuilder().getBuilder(),
                     extensionRegistry);
                 bitField0_ |= 0x00002000;
                 break;
-              } // case 138
-              case 146: {
-                proxyId_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000001;
+              } // case 114
+              case 122: {
+                input.readMessage(
+                    internalGetHealthCheckFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00004000;
                 break;
-              } // case 146
+              } // case 122
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -14865,7 +14506,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object proxyId_ = "";
       /**
-       * <code>string proxyId = 18;</code>
+       * <code>string proxyId = 1;</code>
        * @return The proxyId.
        */
       public java.lang.String getProxyId() {
@@ -14881,7 +14522,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string proxyId = 18;</code>
+       * <code>string proxyId = 1;</code>
        * @return The bytes for proxyId.
        */
       public com.google.protobuf.ByteString
@@ -14898,7 +14539,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string proxyId = 18;</code>
+       * <code>string proxyId = 1;</code>
        * @param value The proxyId to set.
        * @return This builder for chaining.
        */
@@ -14911,7 +14552,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string proxyId = 18;</code>
+       * <code>string proxyId = 1;</code>
        * @return This builder for chaining.
        */
       public Builder clearProxyId() {
@@ -14921,7 +14562,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string proxyId = 18;</code>
+       * <code>string proxyId = 1;</code>
        * @param value The bytes for proxyId to set.
        * @return This builder for chaining.
        */
@@ -14937,7 +14578,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       private java.lang.Object name_ = "";
       /**
-       * <code>string name = 1;</code>
+       * <code>string name = 2;</code>
        * @return The name.
        */
       public java.lang.String getName() {
@@ -14953,7 +14594,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string name = 1;</code>
+       * <code>string name = 2;</code>
        * @return The bytes for name.
        */
       public com.google.protobuf.ByteString
@@ -14970,7 +14611,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>string name = 1;</code>
+       * <code>string name = 2;</code>
        * @param value The name to set.
        * @return This builder for chaining.
        */
@@ -14983,7 +14624,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string name = 1;</code>
+       * <code>string name = 2;</code>
        * @return This builder for chaining.
        */
       public Builder clearName() {
@@ -14993,7 +14634,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>string name = 1;</code>
+       * <code>string name = 2;</code>
        * @param value The bytes for name to set.
        * @return This builder for chaining.
        */
@@ -15007,12 +14648,95 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
+      private int protocol_ = 0;
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+       * @return The enum numeric value on the wire for protocol.
+       */
+      @java.lang.Override public int getProtocolValue() {
+        return protocol_;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+       * @param value The enum numeric value on the wire for protocol to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProtocolValue(int value) {
+        protocol_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+       * @return The protocol.
+       */
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol() {
+        com.xiaoniucode.etp.core.message.Message.ProtocolType result = com.xiaoniucode.etp.core.message.Message.ProtocolType.forNumber(protocol_);
+        return result == null ? com.xiaoniucode.etp.core.message.Message.ProtocolType.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+       * @param value The protocol to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProtocol(com.xiaoniucode.etp.core.message.Message.ProtocolType value) {
+        if (value == null) { throw new NullPointerException(); }
+        bitField0_ |= 0x00000004;
+        protocol_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProtocol() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        protocol_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean enabled_ ;
+      /**
+       * <code>bool enabled = 4;</code>
+       * @return The enabled.
+       */
+      @java.lang.Override
+      public boolean getEnabled() {
+        return enabled_;
+      }
+      /**
+       * <code>bool enabled = 4;</code>
+       * @param value The enabled to set.
+       * @return This builder for chaining.
+       */
+      public Builder setEnabled(boolean value) {
+
+        enabled_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool enabled = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearEnabled() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        enabled_ = false;
+        onChanged();
+        return this;
+      }
+
       private java.util.List<com.xiaoniucode.etp.core.message.Message.Target> targets_ =
         java.util.Collections.emptyList();
       private void ensureTargetsIsMutable() {
-        if (!((bitField0_ & 0x00000004) != 0)) {
+        if (!((bitField0_ & 0x00000010) != 0)) {
           targets_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.Target>(targets_);
-          bitField0_ |= 0x00000004;
+          bitField0_ |= 0x00000010;
          }
       }
 
@@ -15020,7 +14744,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           com.xiaoniucode.etp.core.message.Message.Target, com.xiaoniucode.etp.core.message.Message.Target.Builder, com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> targetsBuilder_;
 
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public java.util.List<com.xiaoniucode.etp.core.message.Message.Target> getTargetsList() {
         if (targetsBuilder_ == null) {
@@ -15030,7 +14754,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public int getTargetsCount() {
         if (targetsBuilder_ == null) {
@@ -15040,7 +14764,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Target getTargets(int index) {
         if (targetsBuilder_ == null) {
@@ -15050,7 +14774,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder setTargets(
           int index, com.xiaoniucode.etp.core.message.Message.Target value) {
@@ -15067,7 +14791,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder setTargets(
           int index, com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
@@ -15081,7 +14805,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder addTargets(com.xiaoniucode.etp.core.message.Message.Target value) {
         if (targetsBuilder_ == null) {
@@ -15097,7 +14821,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder addTargets(
           int index, com.xiaoniucode.etp.core.message.Message.Target value) {
@@ -15114,7 +14838,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder addTargets(
           com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
@@ -15128,7 +14852,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder addTargets(
           int index, com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
@@ -15142,7 +14866,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder addAllTargets(
           java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.Target> values) {
@@ -15157,12 +14881,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder clearTargets() {
         if (targetsBuilder_ == null) {
           targets_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000004);
+          bitField0_ = (bitField0_ & ~0x00000010);
           onChanged();
         } else {
           targetsBuilder_.clear();
@@ -15170,7 +14894,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public Builder removeTargets(int index) {
         if (targetsBuilder_ == null) {
@@ -15183,14 +14907,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Target.Builder getTargetsBuilder(
           int index) {
         return internalGetTargetsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
           int index) {
@@ -15200,7 +14924,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
            getTargetsOrBuilderList() {
@@ -15211,14 +14935,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Target.Builder addTargetsBuilder() {
         return internalGetTargetsFieldBuilder().addBuilder(
             com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Target.Builder addTargetsBuilder(
           int index) {
@@ -15226,7 +14950,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
             index, com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 5;</code>
        */
       public java.util.List<com.xiaoniucode.etp.core.message.Message.Target.Builder> 
            getTargetsBuilderList() {
@@ -15239,7 +14963,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           targetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
               com.xiaoniucode.etp.core.message.Message.Target, com.xiaoniucode.etp.core.message.Message.Target.Builder, com.xiaoniucode.etp.core.message.Message.TargetOrBuilder>(
                   targets_,
-                  ((bitField0_ & 0x00000004) != 0),
+                  ((bitField0_ & 0x00000010) != 0),
                   getParentForChildren(),
                   isClean());
           targets_ = null;
@@ -15247,93 +14971,34 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return targetsBuilder_;
       }
 
-      private boolean enabled_ ;
+      private boolean forceHttps_ ;
       /**
-       * <code>optional bool enabled = 3;</code>
-       * @return Whether the enabled field is set.
+       * <code>bool force_https = 6;</code>
+       * @return The forceHttps.
        */
       @java.lang.Override
-      public boolean hasEnabled() {
-        return ((bitField0_ & 0x00000008) != 0);
+      public boolean getForceHttps() {
+        return forceHttps_;
       }
       /**
-       * <code>optional bool enabled = 3;</code>
-       * @return The enabled.
-       */
-      @java.lang.Override
-      public boolean getEnabled() {
-        return enabled_;
-      }
-      /**
-       * <code>optional bool enabled = 3;</code>
-       * @param value The enabled to set.
+       * <code>bool force_https = 6;</code>
+       * @param value The forceHttps to set.
        * @return This builder for chaining.
        */
-      public Builder setEnabled(boolean value) {
+      public Builder setForceHttps(boolean value) {
 
-        enabled_ = value;
-        bitField0_ |= 0x00000008;
+        forceHttps_ = value;
+        bitField0_ |= 0x00000020;
         onChanged();
         return this;
       }
       /**
-       * <code>optional bool enabled = 3;</code>
+       * <code>bool force_https = 6;</code>
        * @return This builder for chaining.
        */
-      public Builder clearEnabled() {
-        bitField0_ = (bitField0_ & ~0x00000008);
-        enabled_ = false;
-        onChanged();
-        return this;
-      }
-
-      private int protocol_ = 0;
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-       * @return The enum numeric value on the wire for protocol.
-       */
-      @java.lang.Override public int getProtocolValue() {
-        return protocol_;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-       * @param value The enum numeric value on the wire for protocol to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProtocolValue(int value) {
-        protocol_ = value;
-        bitField0_ |= 0x00000010;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-       * @return The protocol.
-       */
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ProtocolType getProtocol() {
-        com.xiaoniucode.etp.core.message.Message.ProtocolType result = com.xiaoniucode.etp.core.message.Message.ProtocolType.forNumber(protocol_);
-        return result == null ? com.xiaoniucode.etp.core.message.Message.ProtocolType.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-       * @param value The protocol to set.
-       * @return This builder for chaining.
-       */
-      public Builder setProtocol(com.xiaoniucode.etp.core.message.Message.ProtocolType value) {
-        if (value == null) { throw new NullPointerException(); }
-        bitField0_ |= 0x00000010;
-        protocol_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.ProtocolType protocol = 6;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearProtocol() {
-        bitField0_ = (bitField0_ & ~0x00000010);
-        protocol_ = 0;
+      public Builder clearForceHttps() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        forceHttps_ = false;
         onChanged();
         return this;
       }
@@ -15345,7 +15010,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
        */
       @java.lang.Override
       public boolean hasRemotePort() {
-        return ((bitField0_ & 0x00000020) != 0);
+        return ((bitField0_ & 0x00000040) != 0);
       }
       /**
        * <code>optional uint32 remote_port = 7;</code>
@@ -15363,7 +15028,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       public Builder setRemotePort(int value) {
 
         remotePort_ = value;
-        bitField0_ |= 0x00000020;
+        bitField0_ |= 0x00000040;
         onChanged();
         return this;
       }
@@ -15372,37 +15037,37 @@ public final class Message extends com.google.protobuf.GeneratedFile {
        * @return This builder for chaining.
        */
       public Builder clearRemotePort() {
-        bitField0_ = (bitField0_ & ~0x00000020);
+        bitField0_ = (bitField0_ & ~0x00000040);
         remotePort_ = 0;
         onChanged();
         return this;
       }
 
-      private com.xiaoniucode.etp.core.message.Message.DomainConfig domain_;
+      private com.xiaoniucode.etp.core.message.Message.Domain domain_;
       private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.DomainConfig, com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder, com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder> domainBuilder_;
+          com.xiaoniucode.etp.core.message.Message.Domain, com.xiaoniucode.etp.core.message.Message.Domain.Builder, com.xiaoniucode.etp.core.message.Message.DomainOrBuilder> domainBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        * @return Whether the domain field is set.
        */
       public boolean hasDomain() {
-        return ((bitField0_ & 0x00000040) != 0);
+        return ((bitField0_ & 0x00000080) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        * @return The domain.
        */
-      public com.xiaoniucode.etp.core.message.Message.DomainConfig getDomain() {
+      public com.xiaoniucode.etp.core.message.Message.Domain getDomain() {
         if (domainBuilder_ == null) {
-          return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance() : domain_;
+          return domain_ == null ? com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance() : domain_;
         } else {
           return domainBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
-      public Builder setDomain(com.xiaoniucode.etp.core.message.Message.DomainConfig value) {
+      public Builder setDomain(com.xiaoniucode.etp.core.message.Message.Domain value) {
         if (domainBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -15411,32 +15076,32 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           domainBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
       public Builder setDomain(
-          com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder builderForValue) {
+          com.xiaoniucode.etp.core.message.Message.Domain.Builder builderForValue) {
         if (domainBuilder_ == null) {
           domain_ = builderForValue.build();
         } else {
           domainBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000040;
+        bitField0_ |= 0x00000080;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
-      public Builder mergeDomain(com.xiaoniucode.etp.core.message.Message.DomainConfig value) {
+      public Builder mergeDomain(com.xiaoniucode.etp.core.message.Message.Domain value) {
         if (domainBuilder_ == null) {
-          if (((bitField0_ & 0x00000040) != 0) &&
+          if (((bitField0_ & 0x00000080) != 0) &&
             domain_ != null &&
-            domain_ != com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance()) {
+            domain_ != com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance()) {
             getDomainBuilder().mergeFrom(value);
           } else {
             domain_ = value;
@@ -15445,16 +15110,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           domainBuilder_.mergeFrom(value);
         }
         if (domain_ != null) {
-          bitField0_ |= 0x00000040;
+          bitField0_ |= 0x00000080;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
       public Builder clearDomain() {
-        bitField0_ = (bitField0_ & ~0x00000040);
+        bitField0_ = (bitField0_ & ~0x00000080);
         domain_ = null;
         if (domainBuilder_ != null) {
           domainBuilder_.dispose();
@@ -15464,33 +15129,33 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder getDomainBuilder() {
-        bitField0_ |= 0x00000040;
+      public com.xiaoniucode.etp.core.message.Message.Domain.Builder getDomainBuilder() {
+        bitField0_ |= 0x00000080;
         onChanged();
         return internalGetDomainFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder getDomainOrBuilder() {
+      public com.xiaoniucode.etp.core.message.Message.DomainOrBuilder getDomainOrBuilder() {
         if (domainBuilder_ != null) {
           return domainBuilder_.getMessageOrBuilder();
         } else {
           return domain_ == null ?
-              com.xiaoniucode.etp.core.message.Message.DomainConfig.getDefaultInstance() : domain_;
+              com.xiaoniucode.etp.core.message.Message.Domain.getDefaultInstance() : domain_;
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainConfig domain = 8;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Domain domain = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.DomainConfig, com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder, com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder> 
+          com.xiaoniucode.etp.core.message.Message.Domain, com.xiaoniucode.etp.core.message.Message.Domain.Builder, com.xiaoniucode.etp.core.message.Message.DomainOrBuilder> 
           internalGetDomainFieldBuilder() {
         if (domainBuilder_ == null) {
           domainBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.DomainConfig, com.xiaoniucode.etp.core.message.Message.DomainConfig.Builder, com.xiaoniucode.etp.core.message.Message.DomainConfigOrBuilder>(
+              com.xiaoniucode.etp.core.message.Message.Domain, com.xiaoniucode.etp.core.message.Message.Domain.Builder, com.xiaoniucode.etp.core.message.Message.DomainOrBuilder>(
                   getDomain(),
                   getParentForChildren(),
                   isClean());
@@ -15503,14 +15168,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.AccessControl, com.xiaoniucode.etp.core.message.Message.AccessControl.Builder, com.xiaoniucode.etp.core.message.Message.AccessControlOrBuilder> accessControlBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        * @return Whether the accessControl field is set.
        */
       public boolean hasAccessControl() {
-        return ((bitField0_ & 0x00000080) != 0);
+        return ((bitField0_ & 0x00000100) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        * @return The accessControl.
        */
       public com.xiaoniucode.etp.core.message.Message.AccessControl getAccessControl() {
@@ -15521,7 +15186,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public Builder setAccessControl(com.xiaoniucode.etp.core.message.Message.AccessControl value) {
         if (accessControlBuilder_ == null) {
@@ -15532,12 +15197,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           accessControlBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public Builder setAccessControl(
           com.xiaoniucode.etp.core.message.Message.AccessControl.Builder builderForValue) {
@@ -15546,16 +15211,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           accessControlBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public Builder mergeAccessControl(com.xiaoniucode.etp.core.message.Message.AccessControl value) {
         if (accessControlBuilder_ == null) {
-          if (((bitField0_ & 0x00000080) != 0) &&
+          if (((bitField0_ & 0x00000100) != 0) &&
             accessControl_ != null &&
             accessControl_ != com.xiaoniucode.etp.core.message.Message.AccessControl.getDefaultInstance()) {
             getAccessControlBuilder().mergeFrom(value);
@@ -15566,16 +15231,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           accessControlBuilder_.mergeFrom(value);
         }
         if (accessControl_ != null) {
-          bitField0_ |= 0x00000080;
+          bitField0_ |= 0x00000100;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public Builder clearAccessControl() {
-        bitField0_ = (bitField0_ & ~0x00000080);
+        bitField0_ = (bitField0_ & ~0x00000100);
         accessControl_ = null;
         if (accessControlBuilder_ != null) {
           accessControlBuilder_.dispose();
@@ -15585,15 +15250,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.AccessControl.Builder getAccessControlBuilder() {
-        bitField0_ |= 0x00000080;
+        bitField0_ |= 0x00000100;
         onChanged();
         return internalGetAccessControlFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.AccessControlOrBuilder getAccessControlOrBuilder() {
         if (accessControlBuilder_ != null) {
@@ -15604,7 +15269,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 11;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.AccessControl access_control = 9;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.AccessControl, com.xiaoniucode.etp.core.message.Message.AccessControl.Builder, com.xiaoniucode.etp.core.message.Message.AccessControlOrBuilder> 
@@ -15624,14 +15289,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.BasicAuth, com.xiaoniucode.etp.core.message.Message.BasicAuth.Builder, com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder> basicAuthBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        * @return Whether the basicAuth field is set.
        */
       public boolean hasBasicAuth() {
-        return ((bitField0_ & 0x00000100) != 0);
+        return ((bitField0_ & 0x00000200) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        * @return The basicAuth.
        */
       public com.xiaoniucode.etp.core.message.Message.BasicAuth getBasicAuth() {
@@ -15642,7 +15307,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public Builder setBasicAuth(com.xiaoniucode.etp.core.message.Message.BasicAuth value) {
         if (basicAuthBuilder_ == null) {
@@ -15653,12 +15318,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           basicAuthBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public Builder setBasicAuth(
           com.xiaoniucode.etp.core.message.Message.BasicAuth.Builder builderForValue) {
@@ -15667,16 +15332,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           basicAuthBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public Builder mergeBasicAuth(com.xiaoniucode.etp.core.message.Message.BasicAuth value) {
         if (basicAuthBuilder_ == null) {
-          if (((bitField0_ & 0x00000100) != 0) &&
+          if (((bitField0_ & 0x00000200) != 0) &&
             basicAuth_ != null &&
             basicAuth_ != com.xiaoniucode.etp.core.message.Message.BasicAuth.getDefaultInstance()) {
             getBasicAuthBuilder().mergeFrom(value);
@@ -15687,16 +15352,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           basicAuthBuilder_.mergeFrom(value);
         }
         if (basicAuth_ != null) {
-          bitField0_ |= 0x00000100;
+          bitField0_ |= 0x00000200;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public Builder clearBasicAuth() {
-        bitField0_ = (bitField0_ & ~0x00000100);
+        bitField0_ = (bitField0_ & ~0x00000200);
         basicAuth_ = null;
         if (basicAuthBuilder_ != null) {
           basicAuthBuilder_.dispose();
@@ -15706,15 +15371,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.BasicAuth.Builder getBasicAuthBuilder() {
-        bitField0_ |= 0x00000100;
+        bitField0_ |= 0x00000200;
         onChanged();
         return internalGetBasicAuthFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder getBasicAuthOrBuilder() {
         if (basicAuthBuilder_ != null) {
@@ -15725,7 +15390,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 12;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.BasicAuth basic_auth = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.BasicAuth, com.xiaoniucode.etp.core.message.Message.BasicAuth.Builder, com.xiaoniucode.etp.core.message.Message.BasicAuthOrBuilder> 
@@ -15745,14 +15410,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Bandwidth, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder, com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder> bandwidthBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        * @return Whether the bandwidth field is set.
        */
       public boolean hasBandwidth() {
-        return ((bitField0_ & 0x00000200) != 0);
+        return ((bitField0_ & 0x00000400) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        * @return The bandwidth.
        */
       public com.xiaoniucode.etp.core.message.Message.Bandwidth getBandwidth() {
@@ -15763,7 +15428,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public Builder setBandwidth(com.xiaoniucode.etp.core.message.Message.Bandwidth value) {
         if (bandwidthBuilder_ == null) {
@@ -15774,12 +15439,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           bandwidthBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public Builder setBandwidth(
           com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder builderForValue) {
@@ -15788,16 +15453,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           bandwidthBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public Builder mergeBandwidth(com.xiaoniucode.etp.core.message.Message.Bandwidth value) {
         if (bandwidthBuilder_ == null) {
-          if (((bitField0_ & 0x00000200) != 0) &&
+          if (((bitField0_ & 0x00000400) != 0) &&
             bandwidth_ != null &&
             bandwidth_ != com.xiaoniucode.etp.core.message.Message.Bandwidth.getDefaultInstance()) {
             getBandwidthBuilder().mergeFrom(value);
@@ -15808,16 +15473,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           bandwidthBuilder_.mergeFrom(value);
         }
         if (bandwidth_ != null) {
-          bitField0_ |= 0x00000200;
+          bitField0_ |= 0x00000400;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public Builder clearBandwidth() {
-        bitField0_ = (bitField0_ & ~0x00000200);
+        bitField0_ = (bitField0_ & ~0x00000400);
         bandwidth_ = null;
         if (bandwidthBuilder_ != null) {
           bandwidthBuilder_.dispose();
@@ -15827,15 +15492,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder getBandwidthBuilder() {
-        bitField0_ |= 0x00000200;
+        bitField0_ |= 0x00000400;
         onChanged();
         return internalGetBandwidthFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder getBandwidthOrBuilder() {
         if (bandwidthBuilder_ != null) {
@@ -15846,7 +15511,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 13;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Bandwidth bandwidth = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Bandwidth, com.xiaoniucode.etp.core.message.Message.Bandwidth.Builder, com.xiaoniucode.etp.core.message.Message.BandwidthOrBuilder> 
@@ -15862,139 +15527,76 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return bandwidthBuilder_;
       }
 
-      private com.xiaoniucode.etp.core.message.Message.LoadBalance loadBalance_;
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.LoadBalance, com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder, com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder> loadBalanceBuilder_;
+      private int loadBalanceStrategy_ = 0;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       * @return Whether the loadBalance field is set.
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @return Whether the loadBalanceStrategy field is set.
        */
-      public boolean hasLoadBalance() {
-        return ((bitField0_ & 0x00000400) != 0);
+      @java.lang.Override public boolean hasLoadBalanceStrategy() {
+        return ((bitField0_ & 0x00000800) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       * @return The loadBalance.
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @return The enum numeric value on the wire for loadBalanceStrategy.
        */
-      public com.xiaoniucode.etp.core.message.Message.LoadBalance getLoadBalance() {
-        if (loadBalanceBuilder_ == null) {
-          return loadBalance_ == null ? com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance() : loadBalance_;
-        } else {
-          return loadBalanceBuilder_.getMessage();
-        }
+      @java.lang.Override public int getLoadBalanceStrategyValue() {
+        return loadBalanceStrategy_;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @param value The enum numeric value on the wire for loadBalanceStrategy to set.
+       * @return This builder for chaining.
        */
-      public Builder setLoadBalance(com.xiaoniucode.etp.core.message.Message.LoadBalance value) {
-        if (loadBalanceBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          loadBalance_ = value;
-        } else {
-          loadBalanceBuilder_.setMessage(value);
-        }
-        bitField0_ |= 0x00000400;
+      public Builder setLoadBalanceStrategyValue(int value) {
+        loadBalanceStrategy_ = value;
+        bitField0_ |= 0x00000800;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @return The loadBalanceStrategy.
        */
-      public Builder setLoadBalance(
-          com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder builderForValue) {
-        if (loadBalanceBuilder_ == null) {
-          loadBalance_ = builderForValue.build();
-        } else {
-          loadBalanceBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000400;
+      @java.lang.Override
+      public com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy getLoadBalanceStrategy() {
+        com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy result = com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.forNumber(loadBalanceStrategy_);
+        return result == null ? com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy.UNRECOGNIZED : result;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @param value The loadBalanceStrategy to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLoadBalanceStrategy(com.xiaoniucode.etp.core.message.Message.LoadBalanceStrategy value) {
+        if (value == null) { throw new NullPointerException(); }
+        bitField0_ |= 0x00000800;
+        loadBalanceStrategy_ = value.getNumber();
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalanceStrategy load_balance_strategy = 12;</code>
+       * @return This builder for chaining.
        */
-      public Builder mergeLoadBalance(com.xiaoniucode.etp.core.message.Message.LoadBalance value) {
-        if (loadBalanceBuilder_ == null) {
-          if (((bitField0_ & 0x00000400) != 0) &&
-            loadBalance_ != null &&
-            loadBalance_ != com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance()) {
-            getLoadBalanceBuilder().mergeFrom(value);
-          } else {
-            loadBalance_ = value;
-          }
-        } else {
-          loadBalanceBuilder_.mergeFrom(value);
-        }
-        if (loadBalance_ != null) {
-          bitField0_ |= 0x00000400;
-          onChanged();
-        }
-        return this;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       */
-      public Builder clearLoadBalance() {
-        bitField0_ = (bitField0_ & ~0x00000400);
-        loadBalance_ = null;
-        if (loadBalanceBuilder_ != null) {
-          loadBalanceBuilder_.dispose();
-          loadBalanceBuilder_ = null;
-        }
+      public Builder clearLoadBalanceStrategy() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        loadBalanceStrategy_ = 0;
         onChanged();
         return this;
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       */
-      public com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder getLoadBalanceBuilder() {
-        bitField0_ |= 0x00000400;
-        onChanged();
-        return internalGetLoadBalanceFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       */
-      public com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder getLoadBalanceOrBuilder() {
-        if (loadBalanceBuilder_ != null) {
-          return loadBalanceBuilder_.getMessageOrBuilder();
-        } else {
-          return loadBalance_ == null ?
-              com.xiaoniucode.etp.core.message.Message.LoadBalance.getDefaultInstance() : loadBalance_;
-        }
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.LoadBalance load_balance = 14;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.LoadBalance, com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder, com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder> 
-          internalGetLoadBalanceFieldBuilder() {
-        if (loadBalanceBuilder_ == null) {
-          loadBalanceBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.LoadBalance, com.xiaoniucode.etp.core.message.Message.LoadBalance.Builder, com.xiaoniucode.etp.core.message.Message.LoadBalanceOrBuilder>(
-                  getLoadBalance(),
-                  getParentForChildren(),
-                  isClean());
-          loadBalance_ = null;
-        }
-        return loadBalanceBuilder_;
       }
 
       private com.xiaoniucode.etp.core.message.Message.Transport transport_;
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Transport, com.xiaoniucode.etp.core.message.Message.Transport.Builder, com.xiaoniucode.etp.core.message.Message.TransportOrBuilder> transportBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        * @return Whether the transport field is set.
        */
       public boolean hasTransport() {
-        return ((bitField0_ & 0x00000800) != 0);
+        return ((bitField0_ & 0x00001000) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        * @return The transport.
        */
       public com.xiaoniucode.etp.core.message.Message.Transport getTransport() {
@@ -16005,7 +15607,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public Builder setTransport(com.xiaoniucode.etp.core.message.Message.Transport value) {
         if (transportBuilder_ == null) {
@@ -16016,12 +15618,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           transportBuilder_.setMessage(value);
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public Builder setTransport(
           com.xiaoniucode.etp.core.message.Message.Transport.Builder builderForValue) {
@@ -16030,16 +15632,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         } else {
           transportBuilder_.setMessage(builderForValue.build());
         }
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public Builder mergeTransport(com.xiaoniucode.etp.core.message.Message.Transport value) {
         if (transportBuilder_ == null) {
-          if (((bitField0_ & 0x00000800) != 0) &&
+          if (((bitField0_ & 0x00001000) != 0) &&
             transport_ != null &&
             transport_ != com.xiaoniucode.etp.core.message.Message.Transport.getDefaultInstance()) {
             getTransportBuilder().mergeFrom(value);
@@ -16050,16 +15652,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           transportBuilder_.mergeFrom(value);
         }
         if (transport_ != null) {
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00001000;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public Builder clearTransport() {
-        bitField0_ = (bitField0_ & ~0x00000800);
+        bitField0_ = (bitField0_ & ~0x00001000);
         transport_ = null;
         if (transportBuilder_ != null) {
           transportBuilder_.dispose();
@@ -16069,15 +15671,15 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.Transport.Builder getTransportBuilder() {
-        bitField0_ |= 0x00000800;
+        bitField0_ |= 0x00001000;
         onChanged();
         return internalGetTransportFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.TransportOrBuilder getTransportOrBuilder() {
         if (transportBuilder_ != null) {
@@ -16088,7 +15690,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 15;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.Transport transport = 13;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.Transport, com.xiaoniucode.etp.core.message.Message.Transport.Builder, com.xiaoniucode.etp.core.message.Message.TransportOrBuilder> 
@@ -16104,58 +15706,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return transportBuilder_;
       }
 
-      private boolean forceHttps_ ;
-      /**
-       * <code>optional bool force_https = 16;</code>
-       * @return Whether the forceHttps field is set.
-       */
-      @java.lang.Override
-      public boolean hasForceHttps() {
-        return ((bitField0_ & 0x00001000) != 0);
-      }
-      /**
-       * <code>optional bool force_https = 16;</code>
-       * @return The forceHttps.
-       */
-      @java.lang.Override
-      public boolean getForceHttps() {
-        return forceHttps_;
-      }
-      /**
-       * <code>optional bool force_https = 16;</code>
-       * @param value The forceHttps to set.
-       * @return This builder for chaining.
-       */
-      public Builder setForceHttps(boolean value) {
-
-        forceHttps_ = value;
-        bitField0_ |= 0x00001000;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional bool force_https = 16;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearForceHttps() {
-        bitField0_ = (bitField0_ & ~0x00001000);
-        forceHttps_ = false;
-        onChanged();
-        return this;
-      }
-
       private com.xiaoniucode.etp.core.message.Message.SslCert sslCert_;
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.SslCert, com.xiaoniucode.etp.core.message.Message.SslCert.Builder, com.xiaoniucode.etp.core.message.Message.SslCertOrBuilder> sslCertBuilder_;
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        * @return Whether the sslCert field is set.
        */
       public boolean hasSslCert() {
         return ((bitField0_ & 0x00002000) != 0);
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        * @return The sslCert.
        */
       public com.xiaoniucode.etp.core.message.Message.SslCert getSslCert() {
@@ -16166,7 +15728,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public Builder setSslCert(com.xiaoniucode.etp.core.message.Message.SslCert value) {
         if (sslCertBuilder_ == null) {
@@ -16182,7 +15744,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public Builder setSslCert(
           com.xiaoniucode.etp.core.message.Message.SslCert.Builder builderForValue) {
@@ -16196,7 +15758,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public Builder mergeSslCert(com.xiaoniucode.etp.core.message.Message.SslCert value) {
         if (sslCertBuilder_ == null) {
@@ -16217,7 +15779,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public Builder clearSslCert() {
         bitField0_ = (bitField0_ & ~0x00002000);
@@ -16230,7 +15792,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.SslCert.Builder getSslCertBuilder() {
         bitField0_ |= 0x00002000;
@@ -16238,7 +15800,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return internalGetSslCertFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       public com.xiaoniucode.etp.core.message.Message.SslCertOrBuilder getSslCertOrBuilder() {
         if (sslCertBuilder_ != null) {
@@ -16249,7 +15811,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 17;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.SslCert ssl_cert = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
           com.xiaoniucode.etp.core.message.Message.SslCert, com.xiaoniucode.etp.core.message.Message.SslCert.Builder, com.xiaoniucode.etp.core.message.Message.SslCertOrBuilder> 
@@ -16263,6 +15825,127 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           sslCert_ = null;
         }
         return sslCertBuilder_;
+      }
+
+      private com.xiaoniucode.etp.core.message.Message.HealthCheck healthCheck_;
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder> healthCheckBuilder_;
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       * @return Whether the healthCheck field is set.
+       */
+      public boolean hasHealthCheck() {
+        return ((bitField0_ & 0x00004000) != 0);
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       * @return The healthCheck.
+       */
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck() {
+        if (healthCheckBuilder_ == null) {
+          return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
+        } else {
+          return healthCheckBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public Builder setHealthCheck(com.xiaoniucode.etp.core.message.Message.HealthCheck value) {
+        if (healthCheckBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          healthCheck_ = value;
+        } else {
+          healthCheckBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00004000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public Builder setHealthCheck(
+          com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder builderForValue) {
+        if (healthCheckBuilder_ == null) {
+          healthCheck_ = builderForValue.build();
+        } else {
+          healthCheckBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00004000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public Builder mergeHealthCheck(com.xiaoniucode.etp.core.message.Message.HealthCheck value) {
+        if (healthCheckBuilder_ == null) {
+          if (((bitField0_ & 0x00004000) != 0) &&
+            healthCheck_ != null &&
+            healthCheck_ != com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance()) {
+            getHealthCheckBuilder().mergeFrom(value);
+          } else {
+            healthCheck_ = value;
+          }
+        } else {
+          healthCheckBuilder_.mergeFrom(value);
+        }
+        if (healthCheck_ != null) {
+          bitField0_ |= 0x00004000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public Builder clearHealthCheck() {
+        bitField0_ = (bitField0_ & ~0x00004000);
+        healthCheck_ = null;
+        if (healthCheckBuilder_ != null) {
+          healthCheckBuilder_.dispose();
+          healthCheckBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder getHealthCheckBuilder() {
+        bitField0_ |= 0x00004000;
+        onChanged();
+        return internalGetHealthCheckFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder() {
+        if (healthCheckBuilder_ != null) {
+          return healthCheckBuilder_.getMessageOrBuilder();
+        } else {
+          return healthCheck_ == null ?
+              com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 15;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder> 
+          internalGetHealthCheckFieldBuilder() {
+        if (healthCheckBuilder_ == null) {
+          healthCheckBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder>(
+                  getHealthCheck(),
+                  getParentForChildren(),
+                  isClean());
+          healthCheck_ = null;
+        }
+        return healthCheckBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.Proxy)
@@ -16316,41 +15999,105 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
-  public interface DomainResultOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.DomainResult)
+  public interface RuntimeInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.RuntimeInfo)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>string baseDomain = 1;</code>
-     * @return The baseDomain.
+     * <code>string proxyId = 1;</code>
+     * @return The proxyId.
      */
-    java.lang.String getBaseDomain();
+    java.lang.String getProxyId();
     /**
-     * <code>string baseDomain = 1;</code>
-     * @return The bytes for baseDomain.
+     * <code>string proxyId = 1;</code>
+     * @return The bytes for proxyId.
      */
     com.google.protobuf.ByteString
-        getBaseDomainBytes();
+        getProxyIdBytes();
 
     /**
-     * <code>string domain = 2;</code>
-     * @return The domain.
+     * <code>string name = 2;</code>
+     * @return The name.
      */
-    java.lang.String getDomain();
+    java.lang.String getName();
     /**
-     * <code>string domain = 2;</code>
-     * @return The bytes for domain.
+     * <code>string name = 2;</code>
+     * @return The bytes for name.
      */
     com.google.protobuf.ByteString
-        getDomainBytes();
+        getNameBytes();
+
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    java.util.List<com.xiaoniucode.etp.core.message.Message.Target> 
+        getTargetsList();
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.Target getTargets(int index);
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    int getTargetsCount();
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+        getTargetsOrBuilderList();
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
+        int index);
+
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @return A list containing the remoteAddr.
+     */
+    java.util.List<java.lang.String>
+        getRemoteAddrList();
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @return The count of remoteAddr.
+     */
+    int getRemoteAddrCount();
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @param index The index of the element to return.
+     * @return The remoteAddr at the given index.
+     */
+    java.lang.String getRemoteAddr(int index);
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @param index The index of the value to return.
+     * @return The bytes of the remoteAddr at the given index.
+     */
+    com.google.protobuf.ByteString
+        getRemoteAddrBytes(int index);
+
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+     * @return Whether the healthCheck field is set.
+     */
+    boolean hasHealthCheck();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+     * @return The healthCheck.
+     */
+    com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck();
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+     */
+    com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder();
   }
   /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.message.DomainResult}
+   * Protobuf type {@code com.xiaoniucode.etp.core.message.RuntimeInfo}
    */
-  public static final class DomainResult extends
+  public static final class RuntimeInfo extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.DomainResult)
-      DomainResultOrBuilder {
+      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.RuntimeInfo)
+      RuntimeInfoOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -16359,773 +16106,214 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         /* minor= */ 33,
         /* patch= */ 4,
         /* suffix= */ "",
-        "DomainResult");
+        "RuntimeInfo");
     }
-    // Use DomainResult.newBuilder() to construct.
-    private DomainResult(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use RuntimeInfo.newBuilder() to construct.
+    private RuntimeInfo(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private DomainResult() {
-      baseDomain_ = "";
-      domain_ = "";
+    private RuntimeInfo() {
+      proxyId_ = "";
+      name_ = "";
+      targets_ = java.util.Collections.emptyList();
+      remoteAddr_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor;
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainResult_fieldAccessorTable
+      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              com.xiaoniucode.etp.core.message.Message.DomainResult.class, com.xiaoniucode.etp.core.message.Message.DomainResult.Builder.class);
-    }
-
-    public static final int BASEDOMAIN_FIELD_NUMBER = 1;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object baseDomain_ = "";
-    /**
-     * <code>string baseDomain = 1;</code>
-     * @return The baseDomain.
-     */
-    @java.lang.Override
-    public java.lang.String getBaseDomain() {
-      java.lang.Object ref = baseDomain_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        baseDomain_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string baseDomain = 1;</code>
-     * @return The bytes for baseDomain.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getBaseDomainBytes() {
-      java.lang.Object ref = baseDomain_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        baseDomain_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int DOMAIN_FIELD_NUMBER = 2;
-    @SuppressWarnings("serial")
-    private volatile java.lang.Object domain_ = "";
-    /**
-     * <code>string domain = 2;</code>
-     * @return The domain.
-     */
-    @java.lang.Override
-    public java.lang.String getDomain() {
-      java.lang.Object ref = domain_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        domain_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string domain = 2;</code>
-     * @return The bytes for domain.
-     */
-    @java.lang.Override
-    public com.google.protobuf.ByteString
-        getDomainBytes() {
-      java.lang.Object ref = domain_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        domain_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(baseDomain_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 1, baseDomain_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(domain_)) {
-        com.google.protobuf.GeneratedMessage.writeString(output, 2, domain_);
-      }
-      getUnknownFields().writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(baseDomain_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, baseDomain_);
-      }
-      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(domain_)) {
-        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, domain_);
-      }
-      size += getUnknownFields().getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.DomainResult)) {
-        return super.equals(obj);
-      }
-      com.xiaoniucode.etp.core.message.Message.DomainResult other = (com.xiaoniucode.etp.core.message.Message.DomainResult) obj;
-
-      if (!getBaseDomain()
-          .equals(other.getBaseDomain())) return false;
-      if (!getDomain()
-          .equals(other.getDomain())) return false;
-      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + BASEDOMAIN_FIELD_NUMBER;
-      hash = (53 * hash) + getBaseDomain().hashCode();
-      hash = (37 * hash) + DOMAIN_FIELD_NUMBER;
-      hash = (53 * hash) + getDomain().hashCode();
-      hash = (29 * hash) + getUnknownFields().hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input);
-    }
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessage
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.DomainResult prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.message.DomainResult}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.DomainResult)
-        com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainResult_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                com.xiaoniucode.etp.core.message.Message.DomainResult.class, com.xiaoniucode.etp.core.message.Message.DomainResult.Builder.class);
-      }
-
-      // Construct using com.xiaoniucode.etp.core.message.Message.DomainResult.newBuilder()
-      private Builder() {
-
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
-        super(parent);
-
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        bitField0_ = 0;
-        baseDomain_ = "";
-        domain_ = "";
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainResult getDefaultInstanceForType() {
-        return com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainResult build() {
-        com.xiaoniucode.etp.core.message.Message.DomainResult result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.DomainResult buildPartial() {
-        com.xiaoniucode.etp.core.message.Message.DomainResult result = new com.xiaoniucode.etp.core.message.Message.DomainResult(this);
-        if (bitField0_ != 0) { buildPartial0(result); }
-        onBuilt();
-        return result;
-      }
-
-      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.DomainResult result) {
-        int from_bitField0_ = bitField0_;
-        if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.baseDomain_ = baseDomain_;
-        }
-        if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.domain_ = domain_;
-        }
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.xiaoniucode.etp.core.message.Message.DomainResult) {
-          return mergeFrom((com.xiaoniucode.etp.core.message.Message.DomainResult)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.DomainResult other) {
-        if (other == com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance()) return this;
-        if (!other.getBaseDomain().isEmpty()) {
-          baseDomain_ = other.baseDomain_;
-          bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        if (!other.getDomain().isEmpty()) {
-          domain_ = other.domain_;
-          bitField0_ |= 0x00000002;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.getUnknownFields());
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        if (extensionRegistry == null) {
-          throw new java.lang.NullPointerException();
-        }
-        try {
-          boolean done = false;
-          while (!done) {
-            int tag = input.readTag();
-            switch (tag) {
-              case 0:
-                done = true;
-                break;
-              case 10: {
-                baseDomain_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000001;
-                break;
-              } // case 10
-              case 18: {
-                domain_ = input.readStringRequireUtf8();
-                bitField0_ |= 0x00000002;
-                break;
-              } // case 18
-              default: {
-                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
-                  done = true; // was an endgroup tag
-                }
-                break;
-              } // default:
-            } // switch (tag)
-          } // while (!done)
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.unwrapIOException();
-        } finally {
-          onChanged();
-        } // finally
-        return this;
-      }
-      private int bitField0_;
-
-      private java.lang.Object baseDomain_ = "";
-      /**
-       * <code>string baseDomain = 1;</code>
-       * @return The baseDomain.
-       */
-      public java.lang.String getBaseDomain() {
-        java.lang.Object ref = baseDomain_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          baseDomain_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string baseDomain = 1;</code>
-       * @return The bytes for baseDomain.
-       */
-      public com.google.protobuf.ByteString
-          getBaseDomainBytes() {
-        java.lang.Object ref = baseDomain_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          baseDomain_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string baseDomain = 1;</code>
-       * @param value The baseDomain to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBaseDomain(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        baseDomain_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string baseDomain = 1;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearBaseDomain() {
-        baseDomain_ = getDefaultInstance().getBaseDomain();
-        bitField0_ = (bitField0_ & ~0x00000001);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string baseDomain = 1;</code>
-       * @param value The bytes for baseDomain to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBaseDomainBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        baseDomain_ = value;
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object domain_ = "";
-      /**
-       * <code>string domain = 2;</code>
-       * @return The domain.
-       */
-      public java.lang.String getDomain() {
-        java.lang.Object ref = domain_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          domain_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string domain = 2;</code>
-       * @return The bytes for domain.
-       */
-      public com.google.protobuf.ByteString
-          getDomainBytes() {
-        java.lang.Object ref = domain_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          domain_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string domain = 2;</code>
-       * @param value The domain to set.
-       * @return This builder for chaining.
-       */
-      public Builder setDomain(
-          java.lang.String value) {
-        if (value == null) { throw new NullPointerException(); }
-        domain_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string domain = 2;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearDomain() {
-        domain_ = getDefaultInstance().getDomain();
-        bitField0_ = (bitField0_ & ~0x00000002);
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string domain = 2;</code>
-       * @param value The bytes for domain to set.
-       * @return This builder for chaining.
-       */
-      public Builder setDomainBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) { throw new NullPointerException(); }
-        checkByteStringIsUtf8(value);
-        domain_ = value;
-        bitField0_ |= 0x00000002;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.DomainResult)
-    }
-
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.DomainResult)
-    private static final com.xiaoniucode.etp.core.message.Message.DomainResult DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.DomainResult();
-    }
-
-    public static com.xiaoniucode.etp.core.message.Message.DomainResult getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<DomainResult>
-        PARSER = new com.google.protobuf.AbstractParser<DomainResult>() {
-      @java.lang.Override
-      public DomainResult parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        Builder builder = newBuilder();
-        try {
-          builder.mergeFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          throw e.setUnfinishedMessage(builder.buildPartial());
-        } catch (com.google.protobuf.UninitializedMessageException e) {
-          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
-        } catch (java.io.IOException e) {
-          throw new com.google.protobuf.InvalidProtocolBufferException(e)
-              .setUnfinishedMessage(builder.buildPartial());
-        }
-        return builder.buildPartial();
-      }
-    };
-
-    public static com.google.protobuf.Parser<DomainResult> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<DomainResult> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainResult getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface ProxyRuntimeOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:com.xiaoniucode.etp.core.message.ProxyRuntime)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-     * @return Whether the proxy field is set.
-     */
-    boolean hasProxy();
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-     * @return The proxy.
-     */
-    com.xiaoniucode.etp.core.message.Message.Proxy getProxy();
-    /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-     */
-    com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder getProxyOrBuilder();
-
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     * @return Whether the domain field is set.
-     */
-    boolean hasDomain();
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     * @return The domain.
-     */
-    com.xiaoniucode.etp.core.message.Message.DomainResult getDomain();
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     */
-    com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder getDomainOrBuilder();
-
-    /**
-     * <code>optional uint32 listen_port = 3;</code>
-     * @return Whether the listenPort field is set.
-     */
-    boolean hasListenPort();
-    /**
-     * <code>optional uint32 listen_port = 3;</code>
-     * @return The listenPort.
-     */
-    int getListenPort();
-  }
-  /**
-   * Protobuf type {@code com.xiaoniucode.etp.core.message.ProxyRuntime}
-   */
-  public static final class ProxyRuntime extends
-      com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:com.xiaoniucode.etp.core.message.ProxyRuntime)
-      ProxyRuntimeOrBuilder {
-  private static final long serialVersionUID = 0L;
-    static {
-      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
-        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
-        /* major= */ 4,
-        /* minor= */ 33,
-        /* patch= */ 4,
-        /* suffix= */ "",
-        "ProxyRuntime");
-    }
-    // Use ProxyRuntime.newBuilder() to construct.
-    private ProxyRuntime(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
-      super(builder);
-    }
-    private ProxyRuntime() {
-    }
-
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              com.xiaoniucode.etp.core.message.Message.ProxyRuntime.class, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder.class);
+              com.xiaoniucode.etp.core.message.Message.RuntimeInfo.class, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder.class);
     }
 
     private int bitField0_;
-    public static final int PROXY_FIELD_NUMBER = 1;
-    private com.xiaoniucode.etp.core.message.Message.Proxy proxy_;
+    public static final int PROXYID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object proxyId_ = "";
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-     * @return Whether the proxy field is set.
+     * <code>string proxyId = 1;</code>
+     * @return The proxyId.
      */
     @java.lang.Override
-    public boolean hasProxy() {
+    public java.lang.String getProxyId() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxyId = 1;</code>
+     * @return The bytes for proxyId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NAME_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <code>string name = 2;</code>
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string name = 2;</code>
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TARGETS_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private java.util.List<com.xiaoniucode.etp.core.message.Message.Target> targets_;
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<com.xiaoniucode.etp.core.message.Message.Target> getTargetsList() {
+      return targets_;
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+        getTargetsOrBuilderList() {
+      return targets_;
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    @java.lang.Override
+    public int getTargetsCount() {
+      return targets_.size();
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.Target getTargets(int index) {
+      return targets_.get(index);
+    }
+    /**
+     * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+     */
+    @java.lang.Override
+    public com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
+        int index) {
+      return targets_.get(index);
+    }
+
+    public static final int REMOTE_ADDR_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private com.google.protobuf.LazyStringArrayList remoteAddr_ =
+        com.google.protobuf.LazyStringArrayList.emptyList();
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @return A list containing the remoteAddr.
+     */
+    public com.google.protobuf.ProtocolStringList
+        getRemoteAddrList() {
+      return remoteAddr_;
+    }
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @return The count of remoteAddr.
+     */
+    public int getRemoteAddrCount() {
+      return remoteAddr_.size();
+    }
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @param index The index of the element to return.
+     * @return The remoteAddr at the given index.
+     */
+    public java.lang.String getRemoteAddr(int index) {
+      return remoteAddr_.get(index);
+    }
+    /**
+     * <code>repeated string remote_addr = 4;</code>
+     * @param index The index of the value to return.
+     * @return The bytes of the remoteAddr at the given index.
+     */
+    public com.google.protobuf.ByteString
+        getRemoteAddrBytes(int index) {
+      return remoteAddr_.getByteString(index);
+    }
+
+    public static final int HEALTH_CHECK_FIELD_NUMBER = 5;
+    private com.xiaoniucode.etp.core.message.Message.HealthCheck healthCheck_;
+    /**
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+     * @return Whether the healthCheck field is set.
+     */
+    @java.lang.Override
+    public boolean hasHealthCheck() {
       return ((bitField0_ & 0x00000001) != 0);
     }
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-     * @return The proxy.
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+     * @return The healthCheck.
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.Proxy getProxy() {
-      return proxy_ == null ? com.xiaoniucode.etp.core.message.Message.Proxy.getDefaultInstance() : proxy_;
+    public com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck() {
+      return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
     }
     /**
-     * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
+     * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder getProxyOrBuilder() {
-      return proxy_ == null ? com.xiaoniucode.etp.core.message.Message.Proxy.getDefaultInstance() : proxy_;
-    }
-
-    public static final int DOMAIN_FIELD_NUMBER = 2;
-    private com.xiaoniucode.etp.core.message.Message.DomainResult domain_;
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     * @return Whether the domain field is set.
-     */
-    @java.lang.Override
-    public boolean hasDomain() {
-      return ((bitField0_ & 0x00000002) != 0);
-    }
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     * @return The domain.
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainResult getDomain() {
-      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance() : domain_;
-    }
-    /**
-     * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-     */
-    @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder getDomainOrBuilder() {
-      return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance() : domain_;
-    }
-
-    public static final int LISTEN_PORT_FIELD_NUMBER = 3;
-    private int listenPort_ = 0;
-    /**
-     * <code>optional uint32 listen_port = 3;</code>
-     * @return Whether the listenPort field is set.
-     */
-    @java.lang.Override
-    public boolean hasListenPort() {
-      return ((bitField0_ & 0x00000004) != 0);
-    }
-    /**
-     * <code>optional uint32 listen_port = 3;</code>
-     * @return The listenPort.
-     */
-    @java.lang.Override
-    public int getListenPort() {
-      return listenPort_;
+    public com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder() {
+      return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -17142,14 +16330,20 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, name_);
+      }
+      for (int i = 0; i < targets_.size(); i++) {
+        output.writeMessage(3, targets_.get(i));
+      }
+      for (int i = 0; i < remoteAddr_.size(); i++) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, remoteAddr_.getRaw(i));
+      }
       if (((bitField0_ & 0x00000001) != 0)) {
-        output.writeMessage(1, getProxy());
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        output.writeMessage(2, getDomain());
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        output.writeUInt32(3, listenPort_);
+        output.writeMessage(5, getHealthCheck());
       }
       getUnknownFields().writeTo(output);
     }
@@ -17160,17 +16354,27 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (size != -1) return size;
 
       size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, name_);
+      }
+      for (int i = 0; i < targets_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, targets_.get(i));
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < remoteAddr_.size(); i++) {
+          dataSize += computeStringSizeNoTag(remoteAddr_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getRemoteAddrList().size();
+      }
       if (((bitField0_ & 0x00000001) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getProxy());
-      }
-      if (((bitField0_ & 0x00000002) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getDomain());
-      }
-      if (((bitField0_ & 0x00000004) != 0)) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeUInt32Size(3, listenPort_);
+          .computeMessageSize(5, getHealthCheck());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -17182,25 +16386,23 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.ProxyRuntime)) {
+      if (!(obj instanceof com.xiaoniucode.etp.core.message.Message.RuntimeInfo)) {
         return super.equals(obj);
       }
-      com.xiaoniucode.etp.core.message.Message.ProxyRuntime other = (com.xiaoniucode.etp.core.message.Message.ProxyRuntime) obj;
+      com.xiaoniucode.etp.core.message.Message.RuntimeInfo other = (com.xiaoniucode.etp.core.message.Message.RuntimeInfo) obj;
 
-      if (hasProxy() != other.hasProxy()) return false;
-      if (hasProxy()) {
-        if (!getProxy()
-            .equals(other.getProxy())) return false;
-      }
-      if (hasDomain() != other.hasDomain()) return false;
-      if (hasDomain()) {
-        if (!getDomain()
-            .equals(other.getDomain())) return false;
-      }
-      if (hasListenPort() != other.hasListenPort()) return false;
-      if (hasListenPort()) {
-        if (getListenPort()
-            != other.getListenPort()) return false;
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (!getTargetsList()
+          .equals(other.getTargetsList())) return false;
+      if (!getRemoteAddrList()
+          .equals(other.getRemoteAddrList())) return false;
+      if (hasHealthCheck() != other.hasHealthCheck()) return false;
+      if (hasHealthCheck()) {
+        if (!getHealthCheck()
+            .equals(other.getHealthCheck())) return false;
       }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
@@ -17213,61 +16415,65 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasProxy()) {
-        hash = (37 * hash) + PROXY_FIELD_NUMBER;
-        hash = (53 * hash) + getProxy().hashCode();
+      hash = (37 * hash) + PROXYID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+      if (getTargetsCount() > 0) {
+        hash = (37 * hash) + TARGETS_FIELD_NUMBER;
+        hash = (53 * hash) + getTargetsList().hashCode();
       }
-      if (hasDomain()) {
-        hash = (37 * hash) + DOMAIN_FIELD_NUMBER;
-        hash = (53 * hash) + getDomain().hashCode();
+      if (getRemoteAddrCount() > 0) {
+        hash = (37 * hash) + REMOTE_ADDR_FIELD_NUMBER;
+        hash = (53 * hash) + getRemoteAddrList().hashCode();
       }
-      if (hasListenPort()) {
-        hash = (37 * hash) + LISTEN_PORT_FIELD_NUMBER;
-        hash = (53 * hash) + getListenPort();
+      if (hasHealthCheck()) {
+        hash = (37 * hash) + HEALTH_CHECK_FIELD_NUMBER;
+        hash = (53 * hash) + getHealthCheck().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(byte[] data)
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(java.io.InputStream input)
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -17275,26 +16481,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseDelimitedFrom(java.io.InputStream input)
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseDelimitedFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime parseFrom(
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -17307,7 +16513,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.ProxyRuntime prototype) {
+    public static Builder newBuilder(com.xiaoniucode.etp.core.message.Message.RuntimeInfo prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -17323,26 +16529,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return builder;
     }
     /**
-     * Protobuf type {@code com.xiaoniucode.etp.core.message.ProxyRuntime}
+     * Protobuf type {@code com.xiaoniucode.etp.core.message.RuntimeInfo}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.ProxyRuntime)
-        com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder {
+        // @@protoc_insertion_point(builder_implements:com.xiaoniucode.etp.core.message.RuntimeInfo)
+        com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor;
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_fieldAccessorTable
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                com.xiaoniucode.etp.core.message.Message.ProxyRuntime.class, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder.class);
+                com.xiaoniucode.etp.core.message.Message.RuntimeInfo.class, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder.class);
       }
 
-      // Construct using com.xiaoniucode.etp.core.message.Message.ProxyRuntime.newBuilder()
+      // Construct using com.xiaoniucode.etp.core.message.Message.RuntimeInfo.newBuilder()
       private Builder() {
         maybeForceBuilderInitialization();
       }
@@ -17355,42 +16561,47 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage
                 .alwaysUseFieldBuilders) {
-          internalGetProxyFieldBuilder();
-          internalGetDomainFieldBuilder();
+          internalGetTargetsFieldBuilder();
+          internalGetHealthCheckFieldBuilder();
         }
       }
       @java.lang.Override
       public Builder clear() {
         super.clear();
         bitField0_ = 0;
-        proxy_ = null;
-        if (proxyBuilder_ != null) {
-          proxyBuilder_.dispose();
-          proxyBuilder_ = null;
+        proxyId_ = "";
+        name_ = "";
+        if (targetsBuilder_ == null) {
+          targets_ = java.util.Collections.emptyList();
+        } else {
+          targets_ = null;
+          targetsBuilder_.clear();
         }
-        domain_ = null;
-        if (domainBuilder_ != null) {
-          domainBuilder_.dispose();
-          domainBuilder_ = null;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        remoteAddr_ =
+            com.google.protobuf.LazyStringArrayList.emptyList();
+        healthCheck_ = null;
+        if (healthCheckBuilder_ != null) {
+          healthCheckBuilder_.dispose();
+          healthCheckBuilder_ = null;
         }
-        listenPort_ = 0;
         return this;
       }
 
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor;
+        return com.xiaoniucode.etp.core.message.Message.internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor;
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getDefaultInstanceForType() {
-        return com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance();
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getDefaultInstanceForType() {
+        return com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance();
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime build() {
-        com.xiaoniucode.etp.core.message.Message.ProxyRuntime result = buildPartial();
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo build() {
+        com.xiaoniucode.etp.core.message.Message.RuntimeInfo result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -17398,55 +16609,108 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
 
       @java.lang.Override
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime buildPartial() {
-        com.xiaoniucode.etp.core.message.Message.ProxyRuntime result = new com.xiaoniucode.etp.core.message.Message.ProxyRuntime(this);
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo buildPartial() {
+        com.xiaoniucode.etp.core.message.Message.RuntimeInfo result = new com.xiaoniucode.etp.core.message.Message.RuntimeInfo(this);
+        buildPartialRepeatedFields(result);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.ProxyRuntime result) {
+      private void buildPartialRepeatedFields(com.xiaoniucode.etp.core.message.Message.RuntimeInfo result) {
+        if (targetsBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0)) {
+            targets_ = java.util.Collections.unmodifiableList(targets_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.targets_ = targets_;
+        } else {
+          result.targets_ = targetsBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(com.xiaoniucode.etp.core.message.Message.RuntimeInfo result) {
         int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         if (((from_bitField0_ & 0x00000001) != 0)) {
-          result.proxy_ = proxyBuilder_ == null
-              ? proxy_
-              : proxyBuilder_.build();
-          to_bitField0_ |= 0x00000001;
+          result.proxyId_ = proxyId_;
         }
         if (((from_bitField0_ & 0x00000002) != 0)) {
-          result.domain_ = domainBuilder_ == null
-              ? domain_
-              : domainBuilder_.build();
-          to_bitField0_ |= 0x00000002;
+          result.name_ = name_;
         }
-        if (((from_bitField0_ & 0x00000004) != 0)) {
-          result.listenPort_ = listenPort_;
-          to_bitField0_ |= 0x00000004;
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          remoteAddr_.makeImmutable();
+          result.remoteAddr_ = remoteAddr_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.healthCheck_ = healthCheckBuilder_ == null
+              ? healthCheck_
+              : healthCheckBuilder_.build();
+          to_bitField0_ |= 0x00000001;
         }
         result.bitField0_ |= to_bitField0_;
       }
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof com.xiaoniucode.etp.core.message.Message.ProxyRuntime) {
-          return mergeFrom((com.xiaoniucode.etp.core.message.Message.ProxyRuntime)other);
+        if (other instanceof com.xiaoniucode.etp.core.message.Message.RuntimeInfo) {
+          return mergeFrom((com.xiaoniucode.etp.core.message.Message.RuntimeInfo)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.ProxyRuntime other) {
-        if (other == com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance()) return this;
-        if (other.hasProxy()) {
-          mergeProxy(other.getProxy());
+      public Builder mergeFrom(com.xiaoniucode.etp.core.message.Message.RuntimeInfo other) {
+        if (other == com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance()) return this;
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
         }
-        if (other.hasDomain()) {
-          mergeDomain(other.getDomain());
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000002;
+          onChanged();
         }
-        if (other.hasListenPort()) {
-          setListenPort(other.getListenPort());
+        if (targetsBuilder_ == null) {
+          if (!other.targets_.isEmpty()) {
+            if (targets_.isEmpty()) {
+              targets_ = other.targets_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureTargetsIsMutable();
+              targets_.addAll(other.targets_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.targets_.isEmpty()) {
+            if (targetsBuilder_.isEmpty()) {
+              targetsBuilder_.dispose();
+              targetsBuilder_ = null;
+              targets_ = other.targets_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              targetsBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   internalGetTargetsFieldBuilder() : null;
+            } else {
+              targetsBuilder_.addAllMessages(other.targets_);
+            }
+          }
+        }
+        if (!other.remoteAddr_.isEmpty()) {
+          if (remoteAddr_.isEmpty()) {
+            remoteAddr_ = other.remoteAddr_;
+            bitField0_ |= 0x00000008;
+          } else {
+            ensureRemoteAddrIsMutable();
+            remoteAddr_.addAll(other.remoteAddr_);
+          }
+          onChanged();
+        }
+        if (other.hasHealthCheck()) {
+          mergeHealthCheck(other.getHealthCheck());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -17475,24 +16739,41 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 done = true;
                 break;
               case 10: {
-                input.readMessage(
-                    internalGetProxyFieldBuilder().getBuilder(),
-                    extensionRegistry);
+                proxyId_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000001;
                 break;
               } // case 10
               case 18: {
-                input.readMessage(
-                    internalGetDomainFieldBuilder().getBuilder(),
-                    extensionRegistry);
+                name_ = input.readStringRequireUtf8();
                 bitField0_ |= 0x00000002;
                 break;
               } // case 18
-              case 24: {
-                listenPort_ = input.readUInt32();
-                bitField0_ |= 0x00000004;
+              case 26: {
+                com.xiaoniucode.etp.core.message.Message.Target m =
+                    input.readMessage(
+                        com.xiaoniucode.etp.core.message.Message.Target.parser(),
+                        extensionRegistry);
+                if (targetsBuilder_ == null) {
+                  ensureTargetsIsMutable();
+                  targets_.add(m);
+                } else {
+                  targetsBuilder_.addMessage(m);
+                }
                 break;
-              } // case 24
+              } // case 26
+              case 34: {
+                java.lang.String s = input.readStringRequireUtf8();
+                ensureRemoteAddrIsMutable();
+                remoteAddr_.add(s);
+                break;
+              } // case 34
+              case 42: {
+                input.readMessage(
+                    internalGetHealthCheckFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -17510,305 +16791,639 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       private int bitField0_;
 
-      private com.xiaoniucode.etp.core.message.Message.Proxy proxy_;
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.Proxy, com.xiaoniucode.etp.core.message.Message.Proxy.Builder, com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder> proxyBuilder_;
+      private java.lang.Object proxyId_ = "";
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       * @return Whether the proxy field is set.
+       * <code>string proxyId = 1;</code>
+       * @return The proxyId.
        */
-      public boolean hasProxy() {
-        return ((bitField0_ & 0x00000001) != 0);
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       * @return The proxy.
-       */
-      public com.xiaoniucode.etp.core.message.Message.Proxy getProxy() {
-        if (proxyBuilder_ == null) {
-          return proxy_ == null ? com.xiaoniucode.etp.core.message.Message.Proxy.getDefaultInstance() : proxy_;
+      public java.lang.String getProxyId() {
+        java.lang.Object ref = proxyId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
         } else {
-          return proxyBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
+       * <code>string proxyId = 1;</code>
+       * @return The bytes for proxyId.
        */
-      public Builder setProxy(com.xiaoniucode.etp.core.message.Message.Proxy value) {
-        if (proxyBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          proxy_ = value;
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        java.lang.Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyId_ = b;
+          return b;
         } else {
-          proxyBuilder_.setMessage(value);
+          return (com.google.protobuf.ByteString) ref;
         }
+      }
+      /**
+       * <code>string proxyId = 1;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
+       * <code>string proxyId = 1;</code>
+       * @return This builder for chaining.
        */
-      public Builder setProxy(
-          com.xiaoniucode.etp.core.message.Message.Proxy.Builder builderForValue) {
-        if (proxyBuilder_ == null) {
-          proxy_ = builderForValue.build();
-        } else {
-          proxyBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000001;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       */
-      public Builder mergeProxy(com.xiaoniucode.etp.core.message.Message.Proxy value) {
-        if (proxyBuilder_ == null) {
-          if (((bitField0_ & 0x00000001) != 0) &&
-            proxy_ != null &&
-            proxy_ != com.xiaoniucode.etp.core.message.Message.Proxy.getDefaultInstance()) {
-            getProxyBuilder().mergeFrom(value);
-          } else {
-            proxy_ = value;
-          }
-        } else {
-          proxyBuilder_.mergeFrom(value);
-        }
-        if (proxy_ != null) {
-          bitField0_ |= 0x00000001;
-          onChanged();
-        }
-        return this;
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       */
-      public Builder clearProxy() {
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
         bitField0_ = (bitField0_ & ~0x00000001);
-        proxy_ = null;
-        if (proxyBuilder_ != null) {
-          proxyBuilder_.dispose();
-          proxyBuilder_ = null;
-        }
         onChanged();
         return this;
       }
       /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
+       * <code>string proxyId = 1;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
        */
-      public com.xiaoniucode.etp.core.message.Message.Proxy.Builder getProxyBuilder() {
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
         bitField0_ |= 0x00000001;
         onChanged();
-        return internalGetProxyFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       */
-      public com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder getProxyOrBuilder() {
-        if (proxyBuilder_ != null) {
-          return proxyBuilder_.getMessageOrBuilder();
-        } else {
-          return proxy_ == null ?
-              com.xiaoniucode.etp.core.message.Message.Proxy.getDefaultInstance() : proxy_;
-        }
-      }
-      /**
-       * <code>.com.xiaoniucode.etp.core.message.Proxy proxy = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.Proxy, com.xiaoniucode.etp.core.message.Message.Proxy.Builder, com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder> 
-          internalGetProxyFieldBuilder() {
-        if (proxyBuilder_ == null) {
-          proxyBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.Proxy, com.xiaoniucode.etp.core.message.Message.Proxy.Builder, com.xiaoniucode.etp.core.message.Message.ProxyOrBuilder>(
-                  getProxy(),
-                  getParentForChildren(),
-                  isClean());
-          proxy_ = null;
-        }
-        return proxyBuilder_;
+        return this;
       }
 
-      private com.xiaoniucode.etp.core.message.Message.DomainResult domain_;
-      private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.DomainResult, com.xiaoniucode.etp.core.message.Message.DomainResult.Builder, com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder> domainBuilder_;
+      private java.lang.Object name_ = "";
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-       * @return Whether the domain field is set.
+       * <code>string name = 2;</code>
+       * @return The name.
        */
-      public boolean hasDomain() {
-        return ((bitField0_ & 0x00000002) != 0);
-      }
-      /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
-       * @return The domain.
-       */
-      public com.xiaoniucode.etp.core.message.Message.DomainResult getDomain() {
-        if (domainBuilder_ == null) {
-          return domain_ == null ? com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance() : domain_;
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
         } else {
-          return domainBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>string name = 2;</code>
+       * @return The bytes for name.
        */
-      public Builder setDomain(com.xiaoniucode.etp.core.message.Message.DomainResult value) {
-        if (domainBuilder_ == null) {
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string name = 2;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 2;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<com.xiaoniucode.etp.core.message.Message.Target> targets_ =
+        java.util.Collections.emptyList();
+      private void ensureTargetsIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          targets_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.Target>(targets_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.Target, com.xiaoniucode.etp.core.message.Message.Target.Builder, com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> targetsBuilder_;
+
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.Target> getTargetsList() {
+        if (targetsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(targets_);
+        } else {
+          return targetsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public int getTargetsCount() {
+        if (targetsBuilder_ == null) {
+          return targets_.size();
+        } else {
+          return targetsBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.Target getTargets(int index) {
+        if (targetsBuilder_ == null) {
+          return targets_.get(index);
+        } else {
+          return targetsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder setTargets(
+          int index, com.xiaoniucode.etp.core.message.Message.Target value) {
+        if (targetsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          domain_ = value;
+          ensureTargetsIsMutable();
+          targets_.set(index, value);
+          onChanged();
         } else {
-          domainBuilder_.setMessage(value);
+          targetsBuilder_.setMessage(index, value);
         }
-        bitField0_ |= 0x00000002;
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder setTargets(
+          int index, com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
+        if (targetsBuilder_ == null) {
+          ensureTargetsIsMutable();
+          targets_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          targetsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder addTargets(com.xiaoniucode.etp.core.message.Message.Target value) {
+        if (targetsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTargetsIsMutable();
+          targets_.add(value);
+          onChanged();
+        } else {
+          targetsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder addTargets(
+          int index, com.xiaoniucode.etp.core.message.Message.Target value) {
+        if (targetsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureTargetsIsMutable();
+          targets_.add(index, value);
+          onChanged();
+        } else {
+          targetsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder addTargets(
+          com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
+        if (targetsBuilder_ == null) {
+          ensureTargetsIsMutable();
+          targets_.add(builderForValue.build());
+          onChanged();
+        } else {
+          targetsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder addTargets(
+          int index, com.xiaoniucode.etp.core.message.Message.Target.Builder builderForValue) {
+        if (targetsBuilder_ == null) {
+          ensureTargetsIsMutable();
+          targets_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          targetsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder addAllTargets(
+          java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.Target> values) {
+        if (targetsBuilder_ == null) {
+          ensureTargetsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, targets_);
+          onChanged();
+        } else {
+          targetsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder clearTargets() {
+        if (targetsBuilder_ == null) {
+          targets_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          targetsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public Builder removeTargets(int index) {
+        if (targetsBuilder_ == null) {
+          ensureTargetsIsMutable();
+          targets_.remove(index);
+          onChanged();
+        } else {
+          targetsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.Target.Builder getTargetsBuilder(
+          int index) {
+        return internalGetTargetsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.TargetOrBuilder getTargetsOrBuilder(
+          int index) {
+        if (targetsBuilder_ == null) {
+          return targets_.get(index);  } else {
+          return targetsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+           getTargetsOrBuilderList() {
+        if (targetsBuilder_ != null) {
+          return targetsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(targets_);
+        }
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.Target.Builder addTargetsBuilder() {
+        return internalGetTargetsFieldBuilder().addBuilder(
+            com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public com.xiaoniucode.etp.core.message.Message.Target.Builder addTargetsBuilder(
+          int index) {
+        return internalGetTargetsFieldBuilder().addBuilder(
+            index, com.xiaoniucode.etp.core.message.Message.Target.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .com.xiaoniucode.etp.core.message.Target targets = 3;</code>
+       */
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.Target.Builder> 
+           getTargetsBuilderList() {
+        return internalGetTargetsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.Target, com.xiaoniucode.etp.core.message.Message.Target.Builder, com.xiaoniucode.etp.core.message.Message.TargetOrBuilder> 
+          internalGetTargetsFieldBuilder() {
+        if (targetsBuilder_ == null) {
+          targetsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              com.xiaoniucode.etp.core.message.Message.Target, com.xiaoniucode.etp.core.message.Message.Target.Builder, com.xiaoniucode.etp.core.message.Message.TargetOrBuilder>(
+                  targets_,
+                  ((bitField0_ & 0x00000004) != 0),
+                  getParentForChildren(),
+                  isClean());
+          targets_ = null;
+        }
+        return targetsBuilder_;
+      }
+
+      private com.google.protobuf.LazyStringArrayList remoteAddr_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
+      private void ensureRemoteAddrIsMutable() {
+        if (!remoteAddr_.isModifiable()) {
+          remoteAddr_ = new com.google.protobuf.LazyStringArrayList(remoteAddr_);
+        }
+        bitField0_ |= 0x00000008;
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @return A list containing the remoteAddr.
+       */
+      public com.google.protobuf.ProtocolStringList
+          getRemoteAddrList() {
+        remoteAddr_.makeImmutable();
+        return remoteAddr_;
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @return The count of remoteAddr.
+       */
+      public int getRemoteAddrCount() {
+        return remoteAddr_.size();
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @param index The index of the element to return.
+       * @return The remoteAddr at the given index.
+       */
+      public java.lang.String getRemoteAddr(int index) {
+        return remoteAddr_.get(index);
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @param index The index of the value to return.
+       * @return The bytes of the remoteAddr at the given index.
+       */
+      public com.google.protobuf.ByteString
+          getRemoteAddrBytes(int index) {
+        return remoteAddr_.getByteString(index);
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @param index The index to set the value at.
+       * @param value The remoteAddr to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRemoteAddr(
+          int index, java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        ensureRemoteAddrIsMutable();
+        remoteAddr_.set(index, value);
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>repeated string remote_addr = 4;</code>
+       * @param value The remoteAddr to add.
+       * @return This builder for chaining.
        */
-      public Builder setDomain(
-          com.xiaoniucode.etp.core.message.Message.DomainResult.Builder builderForValue) {
-        if (domainBuilder_ == null) {
-          domain_ = builderForValue.build();
-        } else {
-          domainBuilder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000002;
+      public Builder addRemoteAddr(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        ensureRemoteAddrIsMutable();
+        remoteAddr_.add(value);
+        bitField0_ |= 0x00000008;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>repeated string remote_addr = 4;</code>
+       * @param values The remoteAddr to add.
+       * @return This builder for chaining.
        */
-      public Builder mergeDomain(com.xiaoniucode.etp.core.message.Message.DomainResult value) {
-        if (domainBuilder_ == null) {
-          if (((bitField0_ & 0x00000002) != 0) &&
-            domain_ != null &&
-            domain_ != com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance()) {
-            getDomainBuilder().mergeFrom(value);
+      public Builder addAllRemoteAddr(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureRemoteAddrIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, remoteAddr_);
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRemoteAddr() {
+        remoteAddr_ =
+          com.google.protobuf.LazyStringArrayList.emptyList();
+        bitField0_ = (bitField0_ & ~0x00000008);;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string remote_addr = 4;</code>
+       * @param value The bytes of the remoteAddr to add.
+       * @return This builder for chaining.
+       */
+      public Builder addRemoteAddrBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        ensureRemoteAddrIsMutable();
+        remoteAddr_.add(value);
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private com.xiaoniucode.etp.core.message.Message.HealthCheck healthCheck_;
+      private com.google.protobuf.SingleFieldBuilder<
+          com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder> healthCheckBuilder_;
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+       * @return Whether the healthCheck field is set.
+       */
+      public boolean hasHealthCheck() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+       * @return The healthCheck.
+       */
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck getHealthCheck() {
+        if (healthCheckBuilder_ == null) {
+          return healthCheck_ == null ? com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
+        } else {
+          return healthCheckBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+       */
+      public Builder setHealthCheck(com.xiaoniucode.etp.core.message.Message.HealthCheck value) {
+        if (healthCheckBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          healthCheck_ = value;
+        } else {
+          healthCheckBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+       */
+      public Builder setHealthCheck(
+          com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder builderForValue) {
+        if (healthCheckBuilder_ == null) {
+          healthCheck_ = builderForValue.build();
+        } else {
+          healthCheckBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
+       */
+      public Builder mergeHealthCheck(com.xiaoniucode.etp.core.message.Message.HealthCheck value) {
+        if (healthCheckBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) != 0) &&
+            healthCheck_ != null &&
+            healthCheck_ != com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance()) {
+            getHealthCheckBuilder().mergeFrom(value);
           } else {
-            domain_ = value;
+            healthCheck_ = value;
           }
         } else {
-          domainBuilder_.mergeFrom(value);
+          healthCheckBuilder_.mergeFrom(value);
         }
-        if (domain_ != null) {
-          bitField0_ |= 0x00000002;
+        if (healthCheck_ != null) {
+          bitField0_ |= 0x00000010;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
        */
-      public Builder clearDomain() {
-        bitField0_ = (bitField0_ & ~0x00000002);
-        domain_ = null;
-        if (domainBuilder_ != null) {
-          domainBuilder_.dispose();
-          domainBuilder_ = null;
+      public Builder clearHealthCheck() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        healthCheck_ = null;
+        if (healthCheckBuilder_ != null) {
+          healthCheckBuilder_.dispose();
+          healthCheckBuilder_ = null;
         }
         onChanged();
         return this;
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.DomainResult.Builder getDomainBuilder() {
-        bitField0_ |= 0x00000002;
+      public com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder getHealthCheckBuilder() {
+        bitField0_ |= 0x00000010;
         onChanged();
-        return internalGetDomainFieldBuilder().getBuilder();
+        return internalGetHealthCheckFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder getDomainOrBuilder() {
-        if (domainBuilder_ != null) {
-          return domainBuilder_.getMessageOrBuilder();
+      public com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder() {
+        if (healthCheckBuilder_ != null) {
+          return healthCheckBuilder_.getMessageOrBuilder();
         } else {
-          return domain_ == null ?
-              com.xiaoniucode.etp.core.message.Message.DomainResult.getDefaultInstance() : domain_;
+          return healthCheck_ == null ?
+              com.xiaoniucode.etp.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
         }
       }
       /**
-       * <code>optional .com.xiaoniucode.etp.core.message.DomainResult domain = 2;</code>
+       * <code>optional .com.xiaoniucode.etp.core.message.HealthCheck health_check = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.DomainResult, com.xiaoniucode.etp.core.message.Message.DomainResult.Builder, com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder> 
-          internalGetDomainFieldBuilder() {
-        if (domainBuilder_ == null) {
-          domainBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.DomainResult, com.xiaoniucode.etp.core.message.Message.DomainResult.Builder, com.xiaoniucode.etp.core.message.Message.DomainResultOrBuilder>(
-                  getDomain(),
+          com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder> 
+          internalGetHealthCheckFieldBuilder() {
+        if (healthCheckBuilder_ == null) {
+          healthCheckBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              com.xiaoniucode.etp.core.message.Message.HealthCheck, com.xiaoniucode.etp.core.message.Message.HealthCheck.Builder, com.xiaoniucode.etp.core.message.Message.HealthCheckOrBuilder>(
+                  getHealthCheck(),
                   getParentForChildren(),
                   isClean());
-          domain_ = null;
+          healthCheck_ = null;
         }
-        return domainBuilder_;
+        return healthCheckBuilder_;
       }
 
-      private int listenPort_ ;
-      /**
-       * <code>optional uint32 listen_port = 3;</code>
-       * @return Whether the listenPort field is set.
-       */
-      @java.lang.Override
-      public boolean hasListenPort() {
-        return ((bitField0_ & 0x00000004) != 0);
-      }
-      /**
-       * <code>optional uint32 listen_port = 3;</code>
-       * @return The listenPort.
-       */
-      @java.lang.Override
-      public int getListenPort() {
-        return listenPort_;
-      }
-      /**
-       * <code>optional uint32 listen_port = 3;</code>
-       * @param value The listenPort to set.
-       * @return This builder for chaining.
-       */
-      public Builder setListenPort(int value) {
-
-        listenPort_ = value;
-        bitField0_ |= 0x00000004;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional uint32 listen_port = 3;</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearListenPort() {
-        bitField0_ = (bitField0_ & ~0x00000004);
-        listenPort_ = 0;
-        onChanged();
-        return this;
-      }
-
-      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.ProxyRuntime)
+      // @@protoc_insertion_point(builder_scope:com.xiaoniucode.etp.core.message.RuntimeInfo)
     }
 
-    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.ProxyRuntime)
-    private static final com.xiaoniucode.etp.core.message.Message.ProxyRuntime DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:com.xiaoniucode.etp.core.message.RuntimeInfo)
+    private static final com.xiaoniucode.etp.core.message.Message.RuntimeInfo DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.ProxyRuntime();
+      DEFAULT_INSTANCE = new com.xiaoniucode.etp.core.message.Message.RuntimeInfo();
     }
 
-    public static com.xiaoniucode.etp.core.message.Message.ProxyRuntime getDefaultInstance() {
+    public static com.xiaoniucode.etp.core.message.Message.RuntimeInfo getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<ProxyRuntime>
-        PARSER = new com.google.protobuf.AbstractParser<ProxyRuntime>() {
+    private static final com.google.protobuf.Parser<RuntimeInfo>
+        PARSER = new com.google.protobuf.AbstractParser<RuntimeInfo>() {
       @java.lang.Override
-      public ProxyRuntime parsePartialFrom(
+      public RuntimeInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -17827,17 +17442,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     };
 
-    public static com.google.protobuf.Parser<ProxyRuntime> parser() {
+    public static com.google.protobuf.Parser<RuntimeInfo> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<ProxyRuntime> getParserForType() {
+    public com.google.protobuf.Parser<RuntimeInfo> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getDefaultInstanceForType() {
+    public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -18588,27 +18203,27 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
-    java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> 
+    java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> 
         getItemsList();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index);
+    com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index);
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     int getItemsCount();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
-    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
         getItemsOrBuilderList();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+    com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
         int index);
 
     /**
@@ -18667,41 +18282,41 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     private int bitField0_;
     public static final int ITEMS_FIELD_NUMBER = 1;
     @SuppressWarnings("serial")
-    private java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> items_;
+    private java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> items_;
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     @java.lang.Override
-    public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> getItemsList() {
+    public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> getItemsList() {
       return items_;
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
         getItemsOrBuilderList() {
       return items_;
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     @java.lang.Override
     public int getItemsCount() {
       return items_.size();
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index) {
+    public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index) {
       return items_.get(index);
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+    public com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
         int index) {
       return items_.get(index);
     }
@@ -19084,9 +18699,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 done = true;
                 break;
               case 10: {
-                com.xiaoniucode.etp.core.message.Message.ProxyRuntime m =
+                com.xiaoniucode.etp.core.message.Message.RuntimeInfo m =
                     input.readMessage(
-                        com.xiaoniucode.etp.core.message.Message.ProxyRuntime.parser(),
+                        com.xiaoniucode.etp.core.message.Message.RuntimeInfo.parser(),
                         extensionRegistry);
                 if (itemsBuilder_ == null) {
                   ensureItemsIsMutable();
@@ -19120,22 +18735,22 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       private int bitField0_;
 
-      private java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> items_ =
+      private java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> items_ =
         java.util.Collections.emptyList();
       private void ensureItemsIsMutable() {
         if (!((bitField0_ & 0x00000001) != 0)) {
-          items_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.ProxyRuntime>(items_);
+          items_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.RuntimeInfo>(items_);
           bitField0_ |= 0x00000001;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> itemsBuilder_;
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> itemsBuilder_;
 
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> getItemsList() {
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> getItemsList() {
         if (itemsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(items_);
         } else {
@@ -19143,7 +18758,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public int getItemsCount() {
         if (itemsBuilder_ == null) {
@@ -19153,9 +18768,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index) {
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index) {
         if (itemsBuilder_ == null) {
           return items_.get(index);
         } else {
@@ -19163,10 +18778,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder setItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -19180,10 +18795,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder setItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.set(index, builderForValue.build());
@@ -19194,9 +18809,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public Builder addItems(com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+      public Builder addItems(com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -19210,10 +18825,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder addItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -19227,10 +18842,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder addItems(
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.add(builderForValue.build());
@@ -19241,10 +18856,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder addItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.add(index, builderForValue.build());
@@ -19255,10 +18870,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder addAllItems(
-          java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntime> values) {
+          java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfo> values) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -19270,7 +18885,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder clearItems() {
         if (itemsBuilder_ == null) {
@@ -19283,7 +18898,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
       public Builder removeItems(int index) {
         if (itemsBuilder_ == null) {
@@ -19296,16 +18911,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder getItemsBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder getItemsBuilder(
           int index) {
         return internalGetItemsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
           int index) {
         if (itemsBuilder_ == null) {
           return items_.get(index);  } else {
@@ -19313,9 +18928,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+      public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
            getItemsOrBuilderList() {
         if (itemsBuilder_ != null) {
           return itemsBuilder_.getMessageOrBuilderList();
@@ -19324,33 +18939,33 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder addItemsBuilder() {
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder addItemsBuilder() {
         return internalGetItemsFieldBuilder().addBuilder(
-            com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance());
+            com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder addItemsBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder addItemsBuilder(
           int index) {
         return internalGetItemsFieldBuilder().addBuilder(
-            index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance());
+            index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 1;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 1;</code>
        */
-      public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder> 
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder> 
            getItemsBuilderList() {
         return internalGetItemsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
           internalGetItemsFieldBuilder() {
         if (itemsBuilder_ == null) {
           itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder>(
+              com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder>(
                   items_,
                   ((bitField0_ & 0x00000001) != 0),
                   getParentForChildren(),
@@ -19548,27 +19163,27 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.xiaoniucode.etp.core.message.Message.ProxySyncType getProxySyncType();
 
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
-    java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> 
+    java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> 
         getItemsList();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index);
+    com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index);
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     int getItemsCount();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
-    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+    java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
         getItemsOrBuilderList();
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
-    com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+    com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
         int index);
 
     /**
@@ -19657,41 +19272,41 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
     public static final int ITEMS_FIELD_NUMBER = 2;
     @SuppressWarnings("serial")
-    private java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> items_;
+    private java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> items_;
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     @java.lang.Override
-    public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> getItemsList() {
+    public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> getItemsList() {
       return items_;
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     @java.lang.Override
-    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+    public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
         getItemsOrBuilderList() {
       return items_;
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     @java.lang.Override
     public int getItemsCount() {
       return items_.size();
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index) {
+    public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index) {
       return items_.get(index);
     }
     /**
-     * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+     * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
      */
     @java.lang.Override
-    public com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+    public com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
         int index) {
       return items_.get(index);
     }
@@ -20101,9 +19716,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 break;
               } // case 8
               case 18: {
-                com.xiaoniucode.etp.core.message.Message.ProxyRuntime m =
+                com.xiaoniucode.etp.core.message.Message.RuntimeInfo m =
                     input.readMessage(
-                        com.xiaoniucode.etp.core.message.Message.ProxyRuntime.parser(),
+                        com.xiaoniucode.etp.core.message.Message.RuntimeInfo.parser(),
                         extensionRegistry);
                 if (itemsBuilder_ == null) {
                   ensureItemsIsMutable();
@@ -20187,22 +19802,22 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
-      private java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> items_ =
+      private java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> items_ =
         java.util.Collections.emptyList();
       private void ensureItemsIsMutable() {
         if (!((bitField0_ & 0x00000002) != 0)) {
-          items_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.ProxyRuntime>(items_);
+          items_ = new java.util.ArrayList<com.xiaoniucode.etp.core.message.Message.RuntimeInfo>(items_);
           bitField0_ |= 0x00000002;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> itemsBuilder_;
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> itemsBuilder_;
 
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime> getItemsList() {
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo> getItemsList() {
         if (itemsBuilder_ == null) {
           return java.util.Collections.unmodifiableList(items_);
         } else {
@@ -20210,7 +19825,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public int getItemsCount() {
         if (itemsBuilder_ == null) {
@@ -20220,9 +19835,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime getItems(int index) {
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo getItems(int index) {
         if (itemsBuilder_ == null) {
           return items_.get(index);
         } else {
@@ -20230,10 +19845,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder setItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -20247,10 +19862,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder setItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.set(index, builderForValue.build());
@@ -20261,9 +19876,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public Builder addItems(com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+      public Builder addItems(com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -20277,10 +19892,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder addItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime value) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo value) {
         if (itemsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -20294,10 +19909,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder addItems(
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.add(builderForValue.build());
@@ -20308,10 +19923,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder addItems(
-          int index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder builderForValue) {
+          int index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder builderForValue) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           items_.add(index, builderForValue.build());
@@ -20322,10 +19937,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder addAllItems(
-          java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntime> values) {
+          java.lang.Iterable<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfo> values) {
         if (itemsBuilder_ == null) {
           ensureItemsIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
@@ -20337,7 +19952,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder clearItems() {
         if (itemsBuilder_ == null) {
@@ -20350,7 +19965,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
       public Builder removeItems(int index) {
         if (itemsBuilder_ == null) {
@@ -20363,16 +19978,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder getItemsBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder getItemsBuilder(
           int index) {
         return internalGetItemsFieldBuilder().getBuilder(index);
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder getItemsOrBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder getItemsOrBuilder(
           int index) {
         if (itemsBuilder_ == null) {
           return items_.get(index);  } else {
@@ -20380,9 +19995,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+      public java.util.List<? extends com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
            getItemsOrBuilderList() {
         if (itemsBuilder_ != null) {
           return itemsBuilder_.getMessageOrBuilderList();
@@ -20391,33 +20006,33 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder addItemsBuilder() {
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder addItemsBuilder() {
         return internalGetItemsFieldBuilder().addBuilder(
-            com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance());
+            com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder addItemsBuilder(
+      public com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder addItemsBuilder(
           int index) {
         return internalGetItemsFieldBuilder().addBuilder(
-            index, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.getDefaultInstance());
+            index, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.getDefaultInstance());
       }
       /**
-       * <code>repeated .com.xiaoniucode.etp.core.message.ProxyRuntime items = 2;</code>
+       * <code>repeated .com.xiaoniucode.etp.core.message.RuntimeInfo items = 2;</code>
        */
-      public java.util.List<com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder> 
+      public java.util.List<com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder> 
            getItemsBuilderList() {
         return internalGetItemsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilder<
-          com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder> 
+          com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder> 
           internalGetItemsFieldBuilder() {
         if (itemsBuilder_ == null) {
           itemsBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
-              com.xiaoniucode.etp.core.message.Message.ProxyRuntime, com.xiaoniucode.etp.core.message.Message.ProxyRuntime.Builder, com.xiaoniucode.etp.core.message.Message.ProxyRuntimeOrBuilder>(
+              com.xiaoniucode.etp.core.message.Message.RuntimeInfo, com.xiaoniucode.etp.core.message.Message.RuntimeInfo.Builder, com.xiaoniucode.etp.core.message.Message.RuntimeInfoOrBuilder>(
                   items_,
                   ((bitField0_ & 0x00000002) != 0),
                   getParentForChildren(),
@@ -22831,11 +22446,6 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_OpenStreamResponse_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_ServerInfo_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -22866,15 +22476,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_Target_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor;
+    internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_LoadBalance_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_DomainConfig_fieldAccessorTable;
+      internal_static_com_xiaoniucode_etp_core_message_Domain_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_SslCert_descriptor;
   private static final 
@@ -22886,20 +22491,20 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_Transport_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_com_xiaoniucode_etp_core_message_HealthCheck_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_Proxy_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_com_xiaoniucode_etp_core_message_Proxy_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor;
+    internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_DomainResult_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_fieldAccessorTable;
+      internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesRequest_descriptor;
   private static final 
@@ -22940,104 +22545,104 @@ public final class Message extends com.google.protobuf.GeneratedFile {
   static {
     java.lang.String[] descriptorData = {
       "\n\rmessage.proto\022 com.xiaoniucode.etp.cor" +
-      "e.message\"\'\n\006Status\022\014\n\004code\030\001 \001(\005\022\017\n\007mes" +
-      "sage\030\002 \001(\t\"\337\001\n\010AuthInfo\022\r\n\005token\030\001 \001(\t\022\021" +
-      "\n\004name\030\003 \001(\tH\000\210\001\001\022?\n\nagent_type\030\004 \001(\0162+." +
-      "com.xiaoniucode.etp.core.message.AgentTy" +
-      "pe\022\017\n\007version\030\005 \001(\t\022\017\n\002os\030\006 \001(\tH\001\210\001\001\022\021\n\004" +
-      "arch\030\007 \001(\tH\002\210\001\001\022\025\n\010agent_id\030\t \001(\tH\003\210\001\001B\007" +
-      "\n\005_nameB\005\n\003_osB\007\n\005_archB\013\n\t_agent_id\",\n\027" +
-      "CreateConnectionRequest\022\021\n\ttunnel_id\030\001 \001" +
-      "(\t\"g\n\030CreateConnectionResponse\022\021\n\ttunnel" +
-      "_id\030\001 \001(\t\0228\n\006status\030\002 \001(\0132(.com.xiaoniuc" +
-      "ode.etp.core.message.Status\"x\n\022OpenStrea" +
-      "mResponse\022\025\n\rconnection_id\030\001 \001(\r\022\021\n\ttunn" +
-      "el_id\030\002 \001(\t\0228\n\006status\030\003 \001(\0132(.com.xiaoni" +
-      "ucode.etp.core.message.Status\"U\n\nServerI" +
-      "nfo\022\027\n\017http_proxy_port\030\001 \001(\r\022\030\n\020https_pr" +
-      "oxy_port\030\002 \001(\r\022\024\n\014base_domains\030\003 \003(\t\"\264\001\n" +
-      "\014AuthResponse\022\020\n\010agent_id\030\001 \001(\t\022\025\n\rconne" +
-      "ction_id\030\002 \001(\r\022A\n\013server_info\030\003 \001(\0132,.co" +
-      "m.xiaoniucode.etp.core.message.ServerInf" +
-      "o\0228\n\006status\030\004 \001(\0132(.com.xiaoniucode.etp." +
-      "core.message.Status\"y\n\rAccessControl\022\017\n\007" +
-      "enabled\030\001 \001(\010\022:\n\004mode\030\002 \001(\0162,.com.xiaoni" +
-      "ucode.etp.core.message.AccessMode\022\r\n\005all" +
-      "ow\030\003 \003(\t\022\014\n\004deny\030\004 \003(\t\".\n\010HttpUser\022\020\n\010us" +
-      "ername\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\"\\\n\tBasicA" +
-      "uth\022\017\n\007enabled\030\001 \001(\010\022>\n\nhttp_users\030\002 \003(\013" +
-      "2*.com.xiaoniucode.etp.core.message.Http" +
-      "User\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n" +
-      "\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH" +
-      "\002\210\001\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_limit_ou" +
-      "t\"n\n\006Target\022\021\n\004host\030\001 \001(\tH\000\210\001\001\022\014\n\004port\030\002" +
-      " \001(\r\022\021\n\004name\030\003 \001(\tH\001\210\001\001\022\023\n\006weight\030\004 \001(\005H" +
-      "\002\210\001\001B\007\n\005_hostB\007\n\005_nameB\t\n\007_weight\"h\n\013Loa" +
-      "dBalance\022L\n\010strategy\030\001 \001(\01625.com.xiaoniu" +
-      "code.etp.core.message.LoadBalanceStrateg" +
-      "yH\000\210\001\001B\013\n\t_strategy\"e\n\014DomainConfig\022\030\n\013a" +
-      "uto_domain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030" +
-      "\002 \003(\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_doma" +
-      "in\":\n\007SslCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026" +
-      "\n\016cert_chain_pem\030\002 \001(\t\"w\n\tTransport\022\026\n\tm" +
-      "ultiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001" +
-      "\001\022\025\n\010compress\030\003 \001(\010H\002\210\001\001B\014\n\n_multiplexB\n" +
-      "\n\010_encryptB\013\n\t_compress\"\357\006\n\005Proxy\022\017\n\007pro" +
-      "xyId\030\022 \001(\t\022\014\n\004name\030\001 \001(\t\0229\n\007targets\030\002 \003(" +
-      "\0132(.com.xiaoniucode.etp.core.message.Tar" +
-      "get\022\024\n\007enabled\030\003 \001(\010H\000\210\001\001\022@\n\010protocol\030\006 " +
-      "\001(\0162..com.xiaoniucode.etp.core.message.P" +
-      "rotocolType\022\030\n\013remote_port\030\007 \001(\rH\001\210\001\001\022C\n" +
-      "\006domain\030\010 \001(\0132..com.xiaoniucode.etp.core" +
-      ".message.DomainConfigH\002\210\001\001\022L\n\016access_con" +
-      "trol\030\013 \001(\0132/.com.xiaoniucode.etp.core.me" +
-      "ssage.AccessControlH\003\210\001\001\022D\n\nbasic_auth\030\014" +
-      " \001(\0132+.com.xiaoniucode.etp.core.message." +
-      "BasicAuthH\004\210\001\001\022C\n\tbandwidth\030\r \001(\0132+.com." +
-      "xiaoniucode.etp.core.message.BandwidthH\005" +
-      "\210\001\001\022H\n\014load_balance\030\016 \001(\0132-.com.xiaoniuc" +
-      "ode.etp.core.message.LoadBalanceH\006\210\001\001\022C\n" +
-      "\ttransport\030\017 \001(\0132+.com.xiaoniucode.etp.c" +
-      "ore.message.TransportH\007\210\001\001\022\030\n\013force_http" +
-      "s\030\020 \001(\010H\010\210\001\001\022@\n\010ssl_cert\030\021 \001(\0132).com.xia" +
-      "oniucode.etp.core.message.SslCertH\t\210\001\001B\n" +
-      "\n\010_enabledB\016\n\014_remote_portB\t\n\007_domainB\021\n" +
-      "\017_access_controlB\r\n\013_basic_authB\014\n\n_band" +
-      "widthB\017\n\r_load_balanceB\014\n\n_transportB\016\n\014" +
-      "_force_httpsB\013\n\t_ssl_cert\"2\n\014DomainResul" +
-      "t\022\022\n\nbaseDomain\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\"\300\001" +
-      "\n\014ProxyRuntime\0226\n\005proxy\030\001 \001(\0132\'.com.xiao" +
-      "niucode.etp.core.message.Proxy\022C\n\006domain" +
-      "\030\002 \001(\0132..com.xiaoniucode.etp.core.messag" +
-      "e.DomainResultH\000\210\001\001\022\030\n\013listen_port\030\003 \001(\r" +
-      "H\001\210\001\001B\t\n\007_domainB\016\n\014_listen_port\"U\n\031Batc" +
-      "hCreateProxiesRequest\0228\n\007proxies\030\001 \003(\0132\'" +
-      ".com.xiaoniucode.etp.core.message.Proxy\"" +
-      "\225\001\n\032BatchCreateProxiesResponse\022=\n\005items\030" +
-      "\001 \003(\0132..com.xiaoniucode.etp.core.message" +
-      ".ProxyRuntime\0228\n\006status\030\002 \001(\0132(.com.xiao" +
-      "niucode.etp.core.message.Status\"\257\001\n\021Prox" +
-      "ySyncResponse\022H\n\017proxy_sync_type\030\001 \001(\0162/" +
-      ".com.xiaoniucode.etp.core.message.ProxyS" +
-      "yncType\022=\n\005items\030\002 \003(\0132..com.xiaoniucode" +
-      ".etp.core.message.ProxyRuntime\022\021\n\tproxy_" +
-      "ids\030\003 \003(\t\"\225\001\n\rServiceHealth\022\020\n\010proxy_id\030" +
-      "\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\r\022>\n\006sta" +
-      "tus\030\004 \001(\0162..com.xiaoniucode.etp.core.mes" +
-      "sage.HealthStatus\022\026\n\016responseTimeMs\030\005 \001(" +
-      "\004\"a\n\037BatchReportServiceHealthRequest\022>\n\005" +
-      "items\030\001 \003(\0132/.com.xiaoniucode.etp.core.m" +
-      "essage.ServiceHealth\"A\n\005Error\0228\n\006status\030" +
-      "\001 \001(\0132(.com.xiaoniucode.etp.core.message" +
-      ".Status*,\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP" +
-      "\020\001\022\t\n\005HTTPS\020\002*$\n\tAgentType\022\n\n\006BINARY\020\000\022\013" +
-      "\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004" +
-      "DENY\020\001*N\n\023LoadBalanceStrategy\022\017\n\013ROUND_R" +
-      "OBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_" +
-      "CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002U" +
-      "P\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022\010\n\004FULL\020\000" +
-      "\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003b\006proto" +
-      "3"
+      "e.message\"8\n\006Status\022\014\n\004code\030\001 \001(\005\022\024\n\007mes" +
+      "sage\030\002 \001(\tH\000\210\001\001B\n\n\010_message\"\337\001\n\010AuthInfo" +
+      "\022\r\n\005token\030\001 \001(\t\022\021\n\004name\030\003 \001(\tH\000\210\001\001\022?\n\nag" +
+      "ent_type\030\004 \001(\0162+.com.xiaoniucode.etp.cor" +
+      "e.message.AgentType\022\017\n\007version\030\005 \001(\t\022\017\n\002" +
+      "os\030\006 \001(\tH\001\210\001\001\022\021\n\004arch\030\007 \001(\tH\002\210\001\001\022\025\n\010agen" +
+      "t_id\030\t \001(\tH\003\210\001\001B\007\n\005_nameB\005\n\003_osB\007\n\005_arch" +
+      "B\013\n\t_agent_id\",\n\027CreateConnectionRequest" +
+      "\022\021\n\ttunnel_id\030\001 \001(\t\"g\n\030CreateConnectionR" +
+      "esponse\022\021\n\ttunnel_id\030\001 \001(\t\0228\n\006status\030\002 \001" +
+      "(\0132(.com.xiaoniucode.etp.core.message.St" +
+      "atus\"x\n\022OpenStreamResponse\022\025\n\rconnection" +
+      "_id\030\001 \001(\r\022\021\n\ttunnel_id\030\002 \001(\t\0228\n\006status\030\003" +
+      " \001(\0132(.com.xiaoniucode.etp.core.message." +
+      "Status\"q\n\014AuthResponse\022\020\n\010agent_id\030\001 \001(\t" +
+      "\022\025\n\rconnection_id\030\002 \001(\r\0228\n\006status\030\003 \001(\0132" +
+      "(.com.xiaoniucode.etp.core.message.Statu" +
+      "s\"y\n\rAccessControl\022\017\n\007enabled\030\001 \001(\010\022:\n\004m" +
+      "ode\030\002 \001(\0162,.com.xiaoniucode.etp.core.mes" +
+      "sage.AccessMode\022\r\n\005allow\030\003 \003(\t\022\014\n\004deny\030\004" +
+      " \003(\t\".\n\010HttpUser\022\020\n\010username\030\001 \001(\t\022\020\n\010pa" +
+      "ssword\030\002 \001(\t\"\\\n\tBasicAuth\022\017\n\007enabled\030\001 \001" +
+      "(\010\022>\n\nhttp_users\030\002 \003(\0132*.com.xiaoniucode" +
+      ".etp.core.message.HttpUser\"s\n\tBandwidth\022" +
+      "\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_in\030\002 \001(\tH\001\210" +
+      "\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006_limitB\013\n\t" +
+      "_limit_inB\014\n\n_limit_out\"`\n\006Target\022\014\n\004hos" +
+      "t\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030\003 \001(\tH\000\210\001\001" +
+      "\022\023\n\006weight\030\004 \001(\005H\001\210\001\001B\007\n\005_nameB\t\n\007_weigh" +
+      "t\"_\n\006Domain\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026\n" +
+      "\016custom_domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 \003" +
+      "(\tB\016\n\014_auto_domain\":\n\007SslCert\022\027\n\017private" +
+      "_key_pem\030\001 \001(\t\022\026\n\016cert_chain_pem\030\002 \001(\t\"w" +
+      "\n\tTransport\022\026\n\tmultiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007e" +
+      "ncrypt\030\002 \001(\010H\001\210\001\001\022\025\n\010compress\030\003 \001(\010H\002\210\001\001" +
+      "B\014\n\n_multiplexB\n\n\010_encryptB\013\n\t_compress\"" +
+      "\244\001\n\013HealthCheck\022?\n\004type\030\001 \001(\01621.com.xiao" +
+      "niucode.etp.core.message.HealthCheckType" +
+      "\022\020\n\010interval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(\005\022\022\n\nm" +
+      "ax_failed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007enabled" +
+      "\030\006 \001(\010\"\270\007\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004nam" +
+      "e\030\002 \001(\t\022@\n\010protocol\030\003 \001(\0162..com.xiaoniuc" +
+      "ode.etp.core.message.ProtocolType\022\017\n\007ena" +
+      "bled\030\004 \001(\010\0229\n\007targets\030\005 \003(\0132(.com.xiaoni" +
+      "ucode.etp.core.message.Target\022\023\n\013force_h" +
+      "ttps\030\006 \001(\010\022\030\n\013remote_port\030\007 \001(\rH\000\210\001\001\022=\n\006" +
+      "domain\030\010 \001(\0132(.com.xiaoniucode.etp.core." +
+      "message.DomainH\001\210\001\001\022L\n\016access_control\030\t " +
+      "\001(\0132/.com.xiaoniucode.etp.core.message.A" +
+      "ccessControlH\002\210\001\001\022D\n\nbasic_auth\030\n \001(\0132+." +
+      "com.xiaoniucode.etp.core.message.BasicAu" +
+      "thH\003\210\001\001\022C\n\tbandwidth\030\013 \001(\0132+.com.xiaoniu" +
+      "code.etp.core.message.BandwidthH\004\210\001\001\022Y\n\025" +
+      "load_balance_strategy\030\014 \001(\01625.com.xiaoni" +
+      "ucode.etp.core.message.LoadBalanceStrate" +
+      "gyH\005\210\001\001\022C\n\ttransport\030\r \001(\0132+.com.xiaoniu" +
+      "code.etp.core.message.TransportH\006\210\001\001\022@\n\010" +
+      "ssl_cert\030\016 \001(\0132).com.xiaoniucode.etp.cor" +
+      "e.message.SslCertH\007\210\001\001\022H\n\014health_check\030\017" +
+      " \001(\0132-.com.xiaoniucode.etp.core.message." +
+      "HealthCheckH\010\210\001\001B\016\n\014_remote_portB\t\n\007_dom" +
+      "ainB\021\n\017_access_controlB\r\n\013_basic_authB\014\n" +
+      "\n_bandwidthB\030\n\026_load_balance_strategyB\014\n" +
+      "\n_transportB\013\n\t_ssl_certB\017\n\r_health_chec" +
+      "k\"\327\001\n\013RuntimeInfo\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004na" +
+      "me\030\002 \001(\t\0229\n\007targets\030\003 \003(\0132(.com.xiaoniuc" +
+      "ode.etp.core.message.Target\022\023\n\013remote_ad" +
+      "dr\030\004 \003(\t\022H\n\014health_check\030\005 \001(\0132-.com.xia" +
+      "oniucode.etp.core.message.HealthCheckH\000\210" +
+      "\001\001B\017\n\r_health_check\"U\n\031BatchCreateProxie" +
+      "sRequest\0228\n\007proxies\030\001 \003(\0132\'.com.xiaoniuc" +
+      "ode.etp.core.message.Proxy\"\224\001\n\032BatchCrea" +
+      "teProxiesResponse\022<\n\005items\030\001 \003(\0132-.com.x" +
+      "iaoniucode.etp.core.message.RuntimeInfo\022" +
+      "8\n\006status\030\002 \001(\0132(.com.xiaoniucode.etp.co" +
+      "re.message.Status\"\256\001\n\021ProxySyncResponse\022" +
+      "H\n\017proxy_sync_type\030\001 \001(\0162/.com.xiaoniuco" +
+      "de.etp.core.message.ProxySyncType\022<\n\005ite" +
+      "ms\030\002 \003(\0132-.com.xiaoniucode.etp.core.mess" +
+      "age.RuntimeInfo\022\021\n\tproxy_ids\030\003 \003(\t\"\225\001\n\rS" +
+      "erviceHealth\022\020\n\010proxy_id\030\001 \001(\t\022\014\n\004host\030\002" +
+      " \001(\t\022\014\n\004port\030\003 \001(\r\022>\n\006status\030\004 \001(\0162..com" +
+      ".xiaoniucode.etp.core.message.HealthStat" +
+      "us\022\026\n\016responseTimeMs\030\005 \001(\004\"a\n\037BatchRepor" +
+      "tServiceHealthRequest\022>\n\005items\030\001 \003(\0132/.c" +
+      "om.xiaoniucode.etp.core.message.ServiceH" +
+      "ealth\"A\n\005Error\0228\n\006status\030\001 \001(\0132(.com.xia" +
+      "oniucode.etp.core.message.Status*,\n\014Prot" +
+      "ocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020\002*$" +
+      "\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SESSION\020\001*!\n\n" +
+      "AccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadB" +
+      "alanceStrategy\022\017\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGH" +
+      "T\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020\003*-\n\014Healt" +
+      "hStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*:" +
+      "\n\rProxySyncType\022\010\n\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006UP" +
+      "DATE\020\002\022\n\n\006DELETE\020\003*H\n\017HealthCheckType\022\031\n" +
+      "\025HEALTH_CHECK_TYPE_TCP\020\000\022\032\n\026HEALTH_CHECK" +
+      "_TYPE_HTTP\020\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -23073,122 +22678,110 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_OpenStreamResponse_descriptor,
         new java.lang.String[] { "ConnectionId", "TunnelId", "Status", });
-    internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor =
-      getDescriptor().getMessageType(5);
-    internal_static_com_xiaoniucode_etp_core_message_ServerInfo_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_ServerInfo_descriptor,
-        new java.lang.String[] { "HttpProxyPort", "HttpsProxyPort", "BaseDomains", });
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor =
-      getDescriptor().getMessageType(6);
+      getDescriptor().getMessageType(5);
     internal_static_com_xiaoniucode_etp_core_message_AuthResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AuthResponse_descriptor,
-        new java.lang.String[] { "AgentId", "ConnectionId", "ServerInfo", "Status", });
+        new java.lang.String[] { "AgentId", "ConnectionId", "Status", });
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_descriptor =
-      getDescriptor().getMessageType(7);
+      getDescriptor().getMessageType(6);
     internal_static_com_xiaoniucode_etp_core_message_AccessControl_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_AccessControl_descriptor,
         new java.lang.String[] { "Enabled", "Mode", "Allow", "Deny", });
     internal_static_com_xiaoniucode_etp_core_message_HttpUser_descriptor =
-      getDescriptor().getMessageType(8);
+      getDescriptor().getMessageType(7);
     internal_static_com_xiaoniucode_etp_core_message_HttpUser_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_HttpUser_descriptor,
         new java.lang.String[] { "Username", "Password", });
     internal_static_com_xiaoniucode_etp_core_message_BasicAuth_descriptor =
-      getDescriptor().getMessageType(9);
+      getDescriptor().getMessageType(8);
     internal_static_com_xiaoniucode_etp_core_message_BasicAuth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BasicAuth_descriptor,
         new java.lang.String[] { "Enabled", "HttpUsers", });
     internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(9);
     internal_static_com_xiaoniucode_etp_core_message_Bandwidth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Bandwidth_descriptor,
         new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
     internal_static_com_xiaoniucode_etp_core_message_Target_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(10);
     internal_static_com_xiaoniucode_etp_core_message_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Target_descriptor,
         new java.lang.String[] { "Host", "Port", "Name", "Weight", });
-    internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor =
-      getDescriptor().getMessageType(12);
-    internal_static_com_xiaoniucode_etp_core_message_LoadBalance_fieldAccessorTable = new
+    internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor =
+      getDescriptor().getMessageType(11);
+    internal_static_com_xiaoniucode_etp_core_message_Domain_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_LoadBalance_descriptor,
-        new java.lang.String[] { "Strategy", });
-    internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor =
-      getDescriptor().getMessageType(13);
-    internal_static_com_xiaoniucode_etp_core_message_DomainConfig_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_DomainConfig_descriptor,
+        internal_static_com_xiaoniucode_etp_core_message_Domain_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_com_xiaoniucode_etp_core_message_SslCert_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(12);
     internal_static_com_xiaoniucode_etp_core_message_SslCert_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_SslCert_descriptor,
         new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
     internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(13);
     internal_static_com_xiaoniucode_etp_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Transport_descriptor,
         new java.lang.String[] { "Multiplex", "Encrypt", "Compress", });
+    internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor =
+      getDescriptor().getMessageType(14);
+    internal_static_com_xiaoniucode_etp_core_message_HealthCheck_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_com_xiaoniucode_etp_core_message_HealthCheck_descriptor,
+        new java.lang.String[] { "Type", "Interval", "Timeout", "MaxFailed", "Path", "Enabled", });
     internal_static_com_xiaoniucode_etp_core_message_Proxy_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(15);
     internal_static_com_xiaoniucode_etp_core_message_Proxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Proxy_descriptor,
-        new java.lang.String[] { "ProxyId", "Name", "Targets", "Enabled", "Protocol", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalance", "Transport", "ForceHttps", "SslCert", });
-    internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor =
-      getDescriptor().getMessageType(17);
-    internal_static_com_xiaoniucode_etp_core_message_DomainResult_fieldAccessorTable = new
+        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "SslCert", "HealthCheck", });
+    internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor =
+      getDescriptor().getMessageType(16);
+    internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_DomainResult_descriptor,
-        new java.lang.String[] { "BaseDomain", "Domain", });
-    internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor =
-      getDescriptor().getMessageType(18);
-    internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_com_xiaoniucode_etp_core_message_ProxyRuntime_descriptor,
-        new java.lang.String[] { "Proxy", "Domain", "ListenPort", });
+        internal_static_com_xiaoniucode_etp_core_message_RuntimeInfo_descriptor,
+        new java.lang.String[] { "ProxyId", "Name", "Targets", "RemoteAddr", "HealthCheck", });
     internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesRequest_descriptor =
-      getDescriptor().getMessageType(19);
+      getDescriptor().getMessageType(17);
     internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesRequest_descriptor,
         new java.lang.String[] { "Proxies", });
     internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesResponse_descriptor =
-      getDescriptor().getMessageType(20);
+      getDescriptor().getMessageType(18);
     internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BatchCreateProxiesResponse_descriptor,
         new java.lang.String[] { "Items", "Status", });
     internal_static_com_xiaoniucode_etp_core_message_ProxySyncResponse_descriptor =
-      getDescriptor().getMessageType(21);
+      getDescriptor().getMessageType(19);
     internal_static_com_xiaoniucode_etp_core_message_ProxySyncResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_ProxySyncResponse_descriptor,
         new java.lang.String[] { "ProxySyncType", "Items", "ProxyIds", });
     internal_static_com_xiaoniucode_etp_core_message_ServiceHealth_descriptor =
-      getDescriptor().getMessageType(22);
+      getDescriptor().getMessageType(20);
     internal_static_com_xiaoniucode_etp_core_message_ServiceHealth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_ServiceHealth_descriptor,
         new java.lang.String[] { "ProxyId", "Host", "Port", "Status", "ResponseTimeMs", });
     internal_static_com_xiaoniucode_etp_core_message_BatchReportServiceHealthRequest_descriptor =
-      getDescriptor().getMessageType(23);
+      getDescriptor().getMessageType(21);
     internal_static_com_xiaoniucode_etp_core_message_BatchReportServiceHealthRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_BatchReportServiceHealthRequest_descriptor,
         new java.lang.String[] { "Items", });
     internal_static_com_xiaoniucode_etp_core_message_Error_descriptor =
-      getDescriptor().getMessageType(24);
+      getDescriptor().getMessageType(22);
     internal_static_com_xiaoniucode_etp_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_com_xiaoniucode_etp_core_message_Error_descriptor,

@@ -2,7 +2,7 @@ server_addr = "0.0.0.0"
 server_port = 9527
 http_proxy_port = 80
 https_proxy_port = 8443
-base_domain = "domain1.com"
+base_domains = ["domain1.com", "domain2.com"]
 
 [transport]
 # TLS
@@ -25,7 +25,8 @@ addr = "localhost"
 port = 8030
 username = "admin"
 password = "123456"
-
+cert_file=""
+key_file=""
 #公网端口分配范围
 [port_policy]
 start = 9050

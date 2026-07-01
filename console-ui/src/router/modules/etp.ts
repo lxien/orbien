@@ -41,6 +41,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
       roles: ['R_SUPER']
     }
   },
+    {
+    name: 'PortPool',
+    path: '/port-pool',
+    component: '/etp/port-pool',
+    meta: {
+      title: 'menus.etp.portPool',
+      icon: 'ri:database-2-line',
+      roles: ['R_SUPER']
+    }
+  },
   {
     name: 'Domain',
     path: '/domain',
@@ -78,6 +88,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     meta: {
       title: 'menus.etp.stats',
       icon: 'ri:bar-chart-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
+    name: 'Test',
+    path: '/test',
+    component: '/etp/test',
+    meta: {
+      title: 'Test',
+      icon: 'ri:test-tube-line',
       roles: ['R_SUPER']
     }
   }

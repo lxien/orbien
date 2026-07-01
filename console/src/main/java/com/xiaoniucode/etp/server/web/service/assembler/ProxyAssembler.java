@@ -18,7 +18,7 @@ package com.xiaoniucode.etp.server.web.service.assembler;
 
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.server.web.core.converter.ProxyModelConvert;
+import com.xiaoniucode.etp.server.web.proxy.converter.ProxyModelConvert;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,5 @@
 package com.xiaoniucode.etp.server.loadbalance;
 
-import com.xiaoniucode.etp.core.domain.LoadBalanceConfig;
 import com.xiaoniucode.etp.core.enums.LoadBalanceType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,14 +21,11 @@ public class LoadBalancerFactory {
     /**
      * 获取负载均衡器，如果为空返回一个默认的
      */
-    public LoadBalancer getLoadBalancer(LoadBalanceConfig config) {
-        LoadBalanceType strategy;
-        if (config == null || !config.hasStrategy()) {
-            strategy = LoadBalanceConfig.DEFAULT_STRATEGY;
-        } else {
-            strategy = config.getStrategy();
+    public LoadBalancer getLoadBalancer(LoadBalanceType loadBalanceType) {
+        if (loadBalanceType == null) {
+            loadBalanceType = LoadBalanceType.ROUND_ROBIN;
         }
-        return switch (strategy) {
+        return switch (loadBalanceType) {
             case RANDOM -> randomLoadBalancer;
             case LEAST_CONN -> leastConnLoadBalancer;
             case WEIGHT -> weightRoundRobinLoadBalancer;

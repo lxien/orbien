@@ -149,6 +149,7 @@ public class TomlConfigLoader implements ConfigSource {
                 Long remotePortValue = proxyTable.getLong("remote_port");
                 Boolean enableV = proxyTable.getBoolean("enabled", true);
                 Boolean forceHttpsV = proxyTable.getBoolean("force_Https", false);
+                String loadBalanceStrategy = proxyTable.getString("load_balance_strategy");
 
                 if (!StringUtils.hasText(name)) {
                     throw new IllegalArgumentException("代理名称不能为空");
@@ -156,11 +157,17 @@ public class TomlConfigLoader implements ConfigSource {
                 if (!StringUtils.hasText(protocol)) {
                     throw new IllegalArgumentException("协议类型不能为空");
                 }
-                ProtocolType protocolType = ProtocolType.getByName(protocol.trim());
+                ProtocolType protocolType = ProtocolType.fromName(protocol.trim());
                 if (protocolType == null) {
                     throw new IllegalArgumentException("无效的协议类型: " + protocol);
                 }
-
+                if (StringUtils.hasText(loadBalanceStrategy)) {
+                    LoadBalanceType loadBalanceType = LoadBalanceType.fromName(loadBalanceStrategy);
+                    if (loadBalanceType == null) {
+                        throw new IllegalArgumentException("负载均衡策略类型不支持：" + loadBalanceStrategy);
+                    }
+                    proxyConfig.setLoadBalanceType(loadBalanceType);
+                }
                 proxyConfig.setName(name.trim());
                 proxyConfig.setProtocol(protocolType);
                 proxyConfig.setForceHttps(forceHttpsV);
@@ -285,7 +292,10 @@ public class TomlConfigLoader implements ConfigSource {
                         healthCheckConfig.setEnabled(enabled);
                     }
                     String type = healthCheck.getString("type");
-                    HealthCheckType healthCheckType = HealthCheckType.fromCode(type);
+                    if (type == null) {
+                        throw new IllegalArgumentException("请指定健康检查类型：type");
+                    }
+                    HealthCheckType healthCheckType = HealthCheckType.fromName(type);
                     if (healthCheckType == null) {
                         throw new IllegalArgumentException("健康检查类型不可用：" + type);
                     }
@@ -320,18 +330,6 @@ public class TomlConfigLoader implements ConfigSource {
                         proxyConfig.setBandwidth(bandwidthConfig);
                     }
                 }
-                //负载均衡配置
-                Toml loadBalance = proxyTable.getTable("loadbalance");
-                if (loadBalance != null) {
-                    LoadBalanceConfig loadBalanceConfig = new LoadBalanceConfig();
-                    String strategy = loadBalance.getString("strategy");
-                    if (StringUtils.hasText(strategy)) {
-                        LoadBalanceType strategyType = LoadBalanceType.fromName(strategy);
-                        loadBalanceConfig.setStrategy(strategyType);
-                    }
-                    proxyConfig.setLoadBalance(loadBalanceConfig);
-                }
-
                 //自定义传输配置
                 Toml transport = proxyTable.getTable("transport");
                 TransportCustomConfig transportCustomConfig = new TransportCustomConfig();

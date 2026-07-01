@@ -33,7 +33,8 @@ public class AppServiceImpl implements AppService {
         AppConfigInfoDTO dto = new AppConfigInfoDTO();
         dto.setServerAddr(appConfig.getServerAddr());
         dto.setServerPort(appConfig.getServerPort());
-        dto.setBaseDomain(appConfig.getBaseDomain());
+        //todo test
+        dto.setBaseDomain(appConfig.getBaseDomains().stream().toList().getFirst());
         dto.setHttpProxyPort(appConfig.getHttpProxyPort());
         dto.setHttpsProxyPort(appConfig.getHttpsProxyPort());
 

@@ -1,6 +1,7 @@
 package com.xiaoniucode.etp.server.transport.tcp;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
@@ -13,8 +14,6 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
 
 /**
  * IP 访问控制检查
@@ -37,9 +36,10 @@ public class TcpIpCheckHandler extends IpCheckHandler {
         Channel visitor = ctx.channel();
         int remotePort = getListenerPort(visitor);
         String visitorIp = NetUtils.getIp(visitor);
-        Optional<ProxyConfig> opt = proxyConfigService.findByListenPort(remotePort);
-        if (opt.isPresent()) {
-            if (!doCheckAccess(visitor, opt.get())) {
+        ProxyConfigExt ext = proxyConfigService.findByListenPort(remotePort);
+        if (ext != null) {
+            ProxyConfig config = ext.getProxyConfig();
+            if (!doCheckAccess(visitor, config)) {
                 logger.debug("{} 没有访问权限", visitorIp);
                 return;
             }

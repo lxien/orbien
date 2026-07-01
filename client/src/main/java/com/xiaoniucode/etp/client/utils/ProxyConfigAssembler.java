@@ -65,6 +65,9 @@ public class ProxyConfigAssembler {
         if (config.getStatus().isOpen()) {
             proxyBuilder.setEnabled(true);
         }
+        if (config.getLoadBalanceType() != null) {
+            proxyBuilder.setLoadBalanceStrategy(toProtoType(config.getLoadBalanceType()));
+        }
 
         switch (protocol) {
             case TCP:
@@ -80,7 +83,7 @@ public class ProxyConfigAssembler {
                     Set<String> customDomains = domainInfo.getCustomDomains();
                     Boolean autoDomain = domainInfo.getAutoDomain();
                     Set<String> subDomains = domainInfo.getSubDomains();
-                    Message.DomainConfig domainReq = Message.DomainConfig.newBuilder()
+                    Message.Domain domainReq = Message.Domain.newBuilder()
                             .setAutoDomain(autoDomain)
                             .addAllCustomDomains(customDomains)
                             .addAllSubDomains(subDomains).build();
@@ -173,16 +176,6 @@ public class ProxyConfigAssembler {
             }
             proxyBuilder.setBandwidth(bw.build());
         }
-        //负载均衡
-        if (config.hasLoadBalance()) {
-            Message.LoadBalance.Builder loadBalanceBuilder = Message.LoadBalance.newBuilder();
-            if (config.getLoadBalance().hasStrategy()) {
-                Message.LoadBalanceStrategy strategy = toProtoType(config.getLoadBalance().getStrategy());
-                loadBalanceBuilder.setStrategy(strategy);
-            }
-            proxyBuilder.setLoadBalance(loadBalanceBuilder.build());
-        }
-
         return proxyBuilder.build();
     }
 
@@ -199,9 +192,5 @@ public class ProxyConfigAssembler {
             default:
                 throw new IllegalArgumentException("未知负载均衡策略: " + strategy);
         }
-    }
-
-    public static ProxyConfigExt toDomain(Message.ProxyRuntime p) {
-        return null;
     }
 }

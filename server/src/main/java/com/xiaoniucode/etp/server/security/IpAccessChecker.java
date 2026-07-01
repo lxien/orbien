@@ -29,12 +29,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IpAccessChecker {
     private final Map<String/*proxyId*/, CIDRMatcher> matcherMap = new ConcurrentHashMap<>();
 
-    public boolean checkAccess(ProxyConfig proxyConfig, String visitorIp) {
-        if (proxyConfig == null || visitorIp == null) {
+    public boolean checkAccess(String proxyId, AccessControlConfig accessControl, String visitorIp) {
+        if (proxyId == null || visitorIp == null) {
             return false;
         }
-        String proxyId = proxyConfig.getProxyId();
-        AccessControlConfig accessControl = proxyConfig.getAccessControl();
         if (accessControl == null || !accessControl.isEnabled()) {
             matcherMap.remove(proxyId);
             return true;

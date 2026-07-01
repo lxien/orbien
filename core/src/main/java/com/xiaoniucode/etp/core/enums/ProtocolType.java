@@ -46,15 +46,15 @@ public enum ProtocolType {
         return TYPE_MAP.get(type);
     }
 
-    public static ProtocolType getByName(String name) {
+    public static ProtocolType fromName(String name) {
         if (!StringUtils.hasText(name)) {
             return null;
         }
         return NAME_MAP.get(name.toLowerCase());
     }
 
-    public static ProtocolType getByName(String name, ProtocolType defaultValue) {
-        ProtocolType protocol = getByName(name);
+    public static ProtocolType fromName(String name, ProtocolType defaultValue) {
+        ProtocolType protocol = fromName(name);
         return protocol != null ? protocol : defaultValue;
     }
 
@@ -75,22 +75,22 @@ public enum ProtocolType {
     }
 
     public static boolean isHttp(String protocol) {
-        ProtocolType protocolType = getByName(protocol);
+        ProtocolType protocolType = fromName(protocol);
         return protocolType == HTTP;
     }
 
     public static boolean isHttpOrHttps(String protocol) {
-        ProtocolType protocolType = getByName(protocol);
+        ProtocolType protocolType = fromName(protocol);
         return protocolType == HTTP || protocolType == HTTPS;
     }
 
     public static boolean isHttps(String protocol) {
-        ProtocolType protocolType = getByName(protocol);
+        ProtocolType protocolType = fromName(protocol);
         return protocolType == HTTPS;
     }
 
     public static boolean isTcp(String protocol) {
-        ProtocolType protocolType = getByName(protocol);
+        ProtocolType protocolType = fromName(protocol);
         return protocolType == TCP;
     }
 

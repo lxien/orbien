@@ -36,7 +36,6 @@ public class AgentContext extends AbstractAgentContext {
     private DirectPool directPool;
     private MultiplexPool multiplexPool;
     private ControlFrameHandler controlFrameHandler;
-    private volatile Message.ServerInfo serverInfo;
     private AgentIdentity agentIdentity;
     private final AtomicInteger retryCount = new AtomicInteger(0);
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;

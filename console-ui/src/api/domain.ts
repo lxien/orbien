@@ -22,3 +22,15 @@ export function fetchGetDomainById(id: number) {
     url: `/api/domains/${id}`
   })
 }
+
+/**
+ * 获取已用域名列表（分页）
+ * @param params 搜索参数
+ * @returns 已用域名分页列表
+ */
+export function fetchGetUsedDomainListByPage(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Domain.UsedDomainDTO>>({
+    url: '/api/domains/used',
+    params
+  })
+}

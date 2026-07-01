@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: mysql
+
+
 server:
   servlet:
     context-path: /

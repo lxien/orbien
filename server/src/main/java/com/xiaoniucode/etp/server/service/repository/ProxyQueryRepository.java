@@ -18,28 +18,18 @@
 
 package com.xiaoniucode.etp.server.service.repository;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
-import com.xiaoniucode.etp.core.domain.DomainInfo;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 public interface ProxyQueryRepository {
-    Optional<ProxyConfig> findById(String proxyId);
+    ProxyConfigExt findById(String proxyId);
 
     List<Integer> findAllListenPorts();
 
-    Optional<ProxyConfig> findByAgentAndName(String agentId, String proxyName);
+    ProxyConfigExt findByAgentAndName(String agentId, String proxyName);
 
-    Optional<ProxyConfig> findByListenPort(int listenPort);
-
-    Optional<ProxyConfig> findByFullDomain(String domain);
+    ProxyConfigExt findByListenPort(int listenPort);
 
     List<ProxyConfigExt> findByAgentId(String agentId);
-
-    boolean existsByFullDomain(String fullDomain);
-
-    Set<DomainInfo> findDomainsByProxyId(String proxyId);
 }

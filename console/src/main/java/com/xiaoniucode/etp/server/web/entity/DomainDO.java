@@ -36,6 +36,9 @@ public class DomainDO {
     @Column(name = "domain", unique = true, nullable = false)
     private String domain;
 
+    @Column(name = "remark")
+    private String remark;
+
     @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;

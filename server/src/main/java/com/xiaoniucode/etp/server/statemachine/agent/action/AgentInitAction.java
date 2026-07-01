@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 初始化登陆后的客户端运行时信息
+ * todo 改造 初始化登陆后的客户端运行时信息
  */
 @Component
 public class AgentInitAction extends AgentBaseAction {
@@ -53,16 +53,19 @@ public class AgentInitAction extends AgentBaseAction {
             configs.forEach(configExt -> {
                 ProxyConfig config = configExt.getProxyConfig();
                 if (config.getStatus().isOpen()) {
-                    if (config.isHttp()) {
-                        Set<String> domains = configExt.getDomains()
-                                .stream()
-                                .map(DomainInfo::getFullDomain)
-                                .collect(Collectors.toSet());
-                        proxyManager.activate(config, domains);
-                        logger.debug("激活HTTP代理配置: {}", config.getName());
+                    if (config.isHttpOrHttps()) {
+                        Set<String> domains = configExt.getDomains().stream()
+                                .map(DomainInfo::getFullDomain).collect(Collectors.toSet());
+                        if (config.isHttp()) {
+                            proxyManager.registerHttp(config.getAgentId(), config.getProxyId(), domains);
+                            logger.debug("注册HTTP代理: {}", config.getName());
+                        } else {
+                            proxyManager.registerHttps(config.getAgentId(), config.getProxyId(), domains);
+                            logger.debug("注册HTTPS代理: {}", config.getName());
+                        }
                     } else {
                         logger.debug("激活TCP代理配置: {}", config.getName());
-                        proxyManager.activate(config);
+                        proxyManager.registerTcp(config.getAgentId(), config.getProxyId(), config.getListenPort());
                     }
                 }
             });

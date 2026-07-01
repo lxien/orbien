@@ -17,14 +17,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 @Component
 public class AgentManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(AgentManager.class);
-    /**
-     * connectionId
-     */
-    private final Map<Integer, AgentContext> connectionToContextMap = new ConcurrentHashMap<>();
-    /**
-     * agentId --> context
-     */
-    private final Map<String, AgentContext> agentToContextMap = new ConcurrentHashMap<>();
+    private final Map<Integer/*connectionId*/, AgentContext> connectionToContextMap = new ConcurrentHashMap<>();
+    private final Map<String/*agentId*/, AgentContext> agentToContextMap = new ConcurrentHashMap<>();
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Lock writeLock = rwLock.writeLock();
     @Autowired
@@ -96,4 +90,5 @@ public class AgentManager {
     public Collection<AgentContext> getAllAgentContext() {
         return agentToContextMap.values();
     }
+
 }

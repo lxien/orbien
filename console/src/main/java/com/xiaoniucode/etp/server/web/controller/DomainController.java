@@ -20,6 +20,7 @@ import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
+import com.xiaoniucode.etp.server.web.dto.domain.UsedDomainDTO;
 import com.xiaoniucode.etp.server.web.service.DomainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -35,6 +36,12 @@ public class DomainController {
     @GetMapping
     public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
         PageResult<DomainDTO> domains = domainService.findByPage(pageQuery);
+        return Ajax.success(domains);
+    }
+
+    @GetMapping("/used")
+    public Ajax findUsedByPage(@ModelAttribute PageQuery pageQuery) {
+        PageResult<UsedDomainDTO> domains = domainService.findUsedByPage(pageQuery);
         return Ajax.success(domains);
     }
 

@@ -19,6 +19,7 @@
 package com.xiaoniucode.etp.core.domain;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,18 +27,12 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class ProxyConfigExt {
     private ProxyConfig proxyConfig;
     private Set<DomainInfo> domains;
-    private Integer listenPort;
 
-    public ProxyConfigExt(ProxyConfig proxyConfig, Set<DomainInfo> domains) {
-        this.proxyConfig = proxyConfig;
-        this.domains = domains;
-    }
-
-    public ProxyConfigExt(ProxyConfig proxyConfig, Integer listenPort) {
-        this.proxyConfig = proxyConfig;
-        this.listenPort = listenPort;
+    public static ProxyConfigExt of(ProxyConfig proxyConfig,Set<DomainInfo> domains) {
+        return new ProxyConfigExt(proxyConfig,domains);
     }
 }

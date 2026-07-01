@@ -49,7 +49,6 @@ public class SslCertificateManager {
             .maximumSize(1000)
             .expireAfterAccess(1, TimeUnit.HOURS)
             .build();
-    private final Set<String/*domain*/> deployedDomains = ConcurrentHashMap.newKeySet();
     private final Map<String/*domain*/, String/*certId*/> activeCert = new ConcurrentHashMap<>();
     private volatile SslContext defaultSslContext;
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
@@ -76,6 +75,12 @@ public class SslCertificateManager {
         }
     }
 
+    public void addDeployedDomains(String certId,Set<String> domains) {
+        for (String domain : domains) {
+            activeCert.put(domain,certId);
+        }
+    }
+
     /**
      * 部署证书到域名
      *
@@ -88,8 +93,6 @@ public class SslCertificateManager {
         rwLock.writeLock().lock();
         try {
             SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
-            // 更新索引和缓存
-            deployedDomains.add(domain);
             l1Cache.put(domain, sslCtx);
             activeCert.put(domain, certId);
             logger.info("证书已部署到域名: {}", domain);
@@ -108,7 +111,6 @@ public class SslCertificateManager {
         try {
             activeCert.remove(domain);
             l1Cache.invalidate(domain);
-            deployedDomains.remove(domain);
             logger.info("域名证书已取消部署: {}", domain);
         } finally {
             rwLock.writeLock().unlock();
@@ -129,10 +131,6 @@ public class SslCertificateManager {
             if (ctx != null) {
                 logger.debug("从缓存获取证书成功: {}", domain);
                 return ctx;
-            }
-            if (!deployedDomains.contains(domain)) {
-                logger.debug("域名 {} 未部署证书，使用默认证书", domain);
-                return defaultSslContext;
             }
             ctx = loadFromFileSystem(domain);
             if (ctx != null) {

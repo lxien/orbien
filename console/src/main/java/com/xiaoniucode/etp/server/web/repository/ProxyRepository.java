@@ -27,25 +27,18 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     boolean existsByAgentIdAndNameAndIdNot(String agentId, String name, String id);
 
     @Query("""
-            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(
-                                       a, p)
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(a, p)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON a.id = p.agentId
             WHERE p.protocol = :protocolType
             ORDER BY p.updatedAt DESC
             """)
-    Page<ProxyListQueryResult> findProxiesWithAssociations(
-            @Param("protocolType") ProtocolType protocolType,
-            Pageable pageable
-    );
+    Page<ProxyListQueryResult> findProxiesWithAssociations(@Param("protocol") ProtocolType protocol, Pageable pageable);
 
     @Query("""
-            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
-                                       a, p, t,  lb,ba,ac)
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(a, p,ba,ac)
             FROM ProxyDO p
-            LEFT JOIN AgentDO a ON p.agentId = a.id
-            LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
+            LEFT JOIN AgentDO a ON p.agentId = a.id 
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
             WHERE p.id = :id
@@ -53,12 +46,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     ProxyDetailQueryResult findDetailByProxyId(@Param("id") String id);
 
     @Query("""
-            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
-                                       a, p, t,  lb,ba,ac)
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(a, p,ba,ac)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON p.agentId = a.id
-            LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
             WHERE p.listenPort = :listenPort
@@ -66,12 +56,9 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     ProxyDetailQueryResult findDetailByListenPort(@Param("listenPort") Integer listenPort);
 
     @Query("""
-            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(
-                                       a, p, t,  lb,ba,ac)
+            SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(a, p,ba,ac)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON p.agentId = a.id
-            LEFT JOIN TransportDO t ON t.proxyId = p.id
-            LEFT JOIN LoadBalanceDO lb ON lb.proxyId = p.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
             WHERE a.id=:agentId AND p.name =:name

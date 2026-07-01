@@ -1,9 +1,5 @@
 package com.xiaoniucode.etp.client.health;
 
-import com.xiaoniucode.etp.common.utils.StringUtils;
-import com.xiaoniucode.etp.core.domain.HealthCheckConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.message.TMSP;
 import com.xiaoniucode.etp.core.message.TMSPFrame;
@@ -48,31 +44,25 @@ public class HealthCheckManager {
     /**
      * 启动心跳健康检查，如果存在则先取消再启动
      *
-     * @param proxy 代理配置信息
+     * @param runtimeInfo 代理运行时信息
      */
-    public void startHealthCheck(ProxyConfig proxy) {
-        HealthCheckConfig config = proxy.getHealthCheck();
-        if (config == null || !config.isEnabled()) {
+    public void startHealthCheck(Message.RuntimeInfo runtimeInfo) {
+        Message.HealthCheck healthCheck = runtimeInfo.getHealthCheck();
+        if (!healthCheck.getEnabled()) {
             return;
         }
-
-        String proxyId = proxy.getProxyId();
-        if (!StringUtils.hasText(proxyId)) {
-            logger.debug("代理 {} 启动健康检查失败，代理ID为空", proxy.getName());
-            return;
-        }
+        String proxyId = runtimeInfo.getProxyId();
         stopHealthCheck(proxyId);
-        Runnable checkTask = () -> executeHealthCheckForProxy(proxy);
-
+        Runnable checkTask = () -> executeHealthCheckForProxy(runtimeInfo);
         ScheduledFuture<?> future = checkScheduler.scheduleAtFixedRate(
                 checkTask,
                 5,
-                config.getInterval(),
+                healthCheck.getInterval(),
                 TimeUnit.SECONDS
         );
 
         proxyTasks.put(proxyId, future);
-        logger.debug("开启代理健康检查: {} 间隔: {} s", proxy.getName(), config.getInterval());
+        logger.debug("开启代理健康检查: {} 间隔: {} s", proxyId, healthCheck.getInterval());
     }
 
     public void stopHealthCheck(String proxyId) {
@@ -83,19 +73,17 @@ public class HealthCheckManager {
         }
     }
 
-
-    private void executeHealthCheckForProxy(ProxyConfig proxy) {
-        List<Target> targets = proxy.getTargets();
-        if (targets == null || targets.isEmpty()) return;
+    private void executeHealthCheckForProxy(Message.RuntimeInfo runtimeInfo) {
+        List<Message.Target> targets = runtimeInfo.getTargetsList();
+        if (targets.isEmpty()) return;
 
         List<CompletableFuture<ServiceHealth>> futures = new ArrayList<>();
-
-        for (Target target : targets) {
+        Message.HealthCheck healthCheck = runtimeInfo.getHealthCheck();
+        for (Message.Target target : targets) {
             CompletableFuture<ServiceHealth> f = healthChecker.check(
-                    proxy.getProxyId(),
-                    proxy.getProtocol(),
+                    runtimeInfo.getProxyId(),
                     target,
-                    proxy.getHealthCheck());
+                    healthCheck);
             futures.add(f);
         }
 

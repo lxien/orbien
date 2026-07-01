@@ -5,6 +5,8 @@ import com.xiaoniucode.etp.server.config.domain.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Getter
 @Setter
 public class AppConfig implements Config {
@@ -14,7 +16,7 @@ public class AppConfig implements Config {
     private int httpsProxyPort;
     private DashboardConfig dashboard;
     private PortPolicyConfig portPolicy;
-    private String baseDomain;
+    private Set<String> baseDomains;
     private TransportConfig transportConfig;
     private AuthConfig authConfig;
 
@@ -25,7 +27,7 @@ public class AppConfig implements Config {
         this.httpsProxyPort = builder.httpsProxyPort;
         this.dashboard = builder.dashboard;
         this.portPolicy = builder.portPolicy;
-        this.baseDomain = builder.baseDomain;
+        this.baseDomains = builder.baseDomains;
         this.transportConfig = builder.transportConfig;
         this.authConfig = builder.authConfig;
     }
@@ -36,7 +38,7 @@ public class AppConfig implements Config {
         private int httpProxyPort = 80;
         private int httpsProxyPort = 443;
         private TransportConfig transportConfig = new TransportConfig();
-        private String baseDomain;
+        private Set<String> baseDomains;
         private DashboardConfig dashboard = new DashboardConfig(false);
         private PortPolicyConfig portPolicy = new PortPolicyConfig(1, 65535);
         private AuthConfig authConfig = new AuthConfig();
@@ -81,8 +83,8 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder baseDomain(String baseDomain) {
-            this.baseDomain = baseDomain;
+        public Builder baseDomain(Set<String> baseDomains) {
+            this.baseDomains = baseDomains;
             return this;
         }
 

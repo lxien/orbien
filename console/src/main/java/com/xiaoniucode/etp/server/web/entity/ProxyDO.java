@@ -87,6 +87,28 @@ public class ProxyDO {
     @Column(name = "listen_port")
     private Integer listenPort;
     /**
+     * 是否采用多路复用传输
+     */
+    @Column(name = "multiplex")
+    private Boolean multiplex;
+    /**
+     * 是否加密传输
+     */
+    @Column(name = "encrypt")
+    private Boolean encrypt;
+    /**
+     * 是否压缩传输
+     */
+    @Column(name = "compress")
+    private Boolean compress;
+
+    /**
+     * 负载均衡策略，只有目标服务端集群部署才有效
+     */
+    @Convert(converter = LoadBalanceConverter.class)
+    @Column(name = "load_balance_strategy", nullable = false)
+    private Integer loadBalanceStrategy;
+    /**
      * 部署模式
      */
     @Column(name = "deployment_mode", nullable = false)

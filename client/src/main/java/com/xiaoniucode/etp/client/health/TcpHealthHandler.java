@@ -18,7 +18,6 @@
 
 package com.xiaoniucode.etp.client.health;
 
-import com.xiaoniucode.etp.core.domain.Target;
 import com.xiaoniucode.etp.core.message.Message;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -28,9 +27,9 @@ public class TcpHealthHandler extends ChannelInboundHandlerAdapter {
     private final CompletableFuture<ServiceHealth> future;
     private final long startTime;
     private final String proxyId;
-    private final Target target;
+    private final Message.Target target;
 
-    public TcpHealthHandler(CompletableFuture<ServiceHealth> future, String proxyId, Target target, long startTime) {
+    public TcpHealthHandler(CompletableFuture<ServiceHealth> future, String proxyId, Message.Target target, long startTime) {
         this.future = future;
         this.startTime = startTime;
         this.proxyId = proxyId;

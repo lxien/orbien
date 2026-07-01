@@ -2,11 +2,13 @@ package com.xiaoniucode.etp.server.transport.http;
 
 import com.xiaoniucode.etp.core.domain.HttpUser;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
+import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.domain.BasicAuthConfig;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.utils.NettyHttpUtils;
+import com.xiaoniucode.etp.server.vhost.DomainRegistry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,14 +31,17 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
     private ProxyConfigService proxyConfigService;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private DomainRegistry domainRegistry;
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         Channel visitor = ctx.channel();
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
-        Optional<ProxyConfig> configOpt = proxyConfigService.findByDomain(domain);
-        if(configOpt.isPresent()){
-            ProxyConfig config = configOpt.get();
+        String proxyId = domainRegistry.getProxyIdByDomain(domain);
+        ProxyConfigExt ext = proxyConfigService.findById(proxyId);
+        if (ext != null) {
+            ProxyConfig config = ext.getProxyConfig();
             String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null && basicAuth.isEnabled()) {
@@ -48,7 +53,6 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                     String base64Credentials = basicAuthHeader.substring(6).trim();
                     String credentials = new String(Base64.getDecoder().decode(base64Credentials), CharsetUtil.UTF_8);
                     String[] parts = credentials.split(":", 2);
-
                     if (parts.length == 2) {
                         String username = parts[0];
                         String password = parts[1];
