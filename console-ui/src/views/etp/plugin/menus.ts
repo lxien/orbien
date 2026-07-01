@@ -16,7 +16,7 @@ const commonMenus = {
   access: { key: 'access', label: '访问控制', icon: 'ri:shield-line' },
   auth: { key: 'auth', label: '认证鉴权', icon: 'ri:key-line' },
   load: { key: 'load', label: '负载均衡', icon: 'ri:server-line' },
-  health: { key: 'health', label: '健康检查', icon: 'ri:server-line' },
+  health: { key: 'health', label: '健康检查', icon: 'ri:heart-pulse-line' },
   ssl: { key: 'ssl', label: 'SSL加密', icon: 'ri:shield-check-line' },
   trans: { key: 'trans', label: '传输安全', icon: 'ri:lock-line' },
   limit: { key: 'limit', label: '流量限制', icon: 'ri:speed-line' }

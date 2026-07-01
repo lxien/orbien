@@ -86,7 +86,7 @@
    * 获取状态类型
    */
   const getStatusType = (isOnline: boolean) => {
-    return isOnline ? 'success' : 'info'
+    return isOnline ? 'primary' : 'info'
   }
 
   /**

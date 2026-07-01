@@ -15,6 +15,7 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.service.AgentConfigService;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
@@ -22,9 +23,11 @@ import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
 import com.xiaoniucode.etp.server.web.entity.AgentDO;
+import com.xiaoniucode.etp.server.web.param.agent.AgentBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.repository.AgentRepository;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import com.xiaoniucode.etp.server.web.service.converter.AgentConvert;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +35,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -44,6 +48,8 @@ public class AgentServiceImpl implements AgentService {
     private AgentConvert agentConvert;
     @Autowired
     private AgentManager agentManager;
+    @Autowired
+    private AgentConfigService agentConfigService;
 
     @Override
     public PageResult<AgentDTO> findByPage(PageQuery pageQuery) {
@@ -84,6 +90,23 @@ public class AgentServiceImpl implements AgentService {
     public void kickout(String agentId) {
         logger.debug("强制客户端下线：{}", agentId);
         agentManager.kickout(agentId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(AgentBatchDeleteParam param) {
+        List<String> ids = param.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        ids.forEach(agentId -> {
+            if (agentManager.isOnline(agentId)) {
+                agentManager.kickout(agentId);
+            }
+        });
+        agentConfigService.evictByIds(ids);
+        agentRepository.deleteAllById(ids);
+        logger.debug("批量删除客户端成功，数量: {}", ids.size());
     }
 
     @Override

@@ -89,29 +89,26 @@
         {
           prop: 'sanDomains',
           label: '认证域名',
-          minWidth: 180,
+          minWidth: 100,
           formatter: (row: SslItem) => row.sanDomains?.join(', ') || ''
         },
         {
           prop: 'org',
           label: '证书分类',
-          minWidth: 120
         },
         {
           prop: 'issuer',
           label: '证书品牌',
-          minWidth: 100
         },
         {
           prop: 'notAfter',
           label: '到期时间',
-          minWidth: 160,
           formatter: (row: SslItem) => getExpireDays(row)
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 220,
+          width: 150,
           fixed: 'right',
           formatter: (row: SslItem) => {
             const now = new Date()

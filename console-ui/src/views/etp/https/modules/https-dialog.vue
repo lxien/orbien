@@ -38,9 +38,7 @@
         />
       </ElFormItem>
 
-      <ElFormItem label="强制HTTPS">
-        <ElSwitch v-model="formData.forceHttps" />
-      </ElFormItem>
+
 
       <ElFormItem label="内网服务" prop="localIp">
         <ElRow :gutter="20">
@@ -65,7 +63,9 @@
           </ElCol>
         </ElRow>
       </ElFormItem>
-
+      <ElFormItem label="强制HTTPS">
+        <ElSwitch v-model="formData.forceHttps" />
+      </ElFormItem>
       <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
           v-model="formData.limitTotal"

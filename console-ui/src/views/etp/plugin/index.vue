@@ -65,6 +65,7 @@
   import ClusterPage from './modules/cluster/index.vue'
   import TransportPage from './modules/transport/index.vue'
   import RateLimitPolicyPage from './modules/rate-limit-policy/index.vue'
+  import HealthCheckPage from './modules/health-check/index.vue'
   import { type ProxyConfigProtocol, getProtocolMenus } from './menus'
 
   defineOptions({ name: 'PluginDialog' })
@@ -118,6 +119,7 @@
     load: ClusterPage,
     trans: TransportPage,
     limit: RateLimitPolicyPage,
+    health: HealthCheckPage,
     ssl: SslPage
   }
 

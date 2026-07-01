@@ -3,6 +3,13 @@
     <ElCard class="art-table-card">
       <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
+        <template #left>
+          <ElSpace wrap>
+            <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple>
+              批量删除
+            </ElButton>
+          </ElSpace>
+        </template>
       </ArtTableHeader>
 
       <!-- 表格 -->
@@ -11,6 +18,7 @@
         :data="data"
         :columns="columns"
         :pagination="pagination"
+        @selection-change="handleSelectionChange"
         @pagination:size-change="handleSizeChange"
         @pagination:current-change="handleCurrentChange"
       >
@@ -26,13 +34,15 @@
   import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetAgentListByPage, fetchKickoutAgent } from '@/api/agent'
+  import { fetchGetAgentListByPage, fetchKickoutAgent, fetchDeleteBatchAgents } from '@/api/agent'
   import AgentDialog from './modules/agent-dialog.vue'
   import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
 
   defineOptions({ name: 'ClientManagement' })
 
   type ClientItem = Api.Agent.AgentDTO
+
+  const selectedRows = ref<ClientItem[]>([])
 
   // 详情弹窗状态
   const detailDialogVisible = ref(false)
@@ -45,7 +55,7 @@
    */
   const getClientStatusConfig = (isOnline: boolean) => {
     return isOnline
-      ? { type: 'success' as const, text: '在线' }
+      ? { type: 'primary' as const, text: '在线' }
       : { type: 'info' as const, text: '离线' }
   }
 
@@ -55,7 +65,6 @@
     data,
     loading,
     pagination,
-    getData,
     handleSizeChange,
     handleCurrentChange,
     refreshData
@@ -67,27 +76,27 @@
         size: 20
       },
       columnsFactory: () => [
+        { type: 'selection' },
         {
           prop: 'id',
-          label: '客户端标识',
-           width: 180
+          label: '客户端ID',
+          width: 180
         },
         {
           prop: 'name',
-          label: '客户端名称',
+          label: '名称'
         },
-
         {
           prop: 'os',
-          label: '操作系统',
+          label: '操作系统'
         },
         {
           prop: 'arch',
-          label: '系统架构',
+          label: '系统架构'
         },
         {
           prop: 'version',
-          label: '客户端版本',
+          label: '版本'
         },
         {
           prop: 'isOnline',
@@ -100,7 +109,7 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
+          width: 220,
           fixed: 'right',
           formatter: (row: ClientItem) =>
             h('div', [
@@ -111,9 +120,14 @@
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '强制下线',
+                text: '强退',
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline
+              }),
+              h(ArtButtonTable, {
+                type: 'link',
+                text: '删除',
+                onClick: () => deleteClient(row)
               })
             ])
         }
@@ -121,11 +135,38 @@
     }
   })
 
+  const handleSelectionChange = (selection: ClientItem[]): void => {
+    selectedRows.value = selection
+  }
+
+  const deleteClients = async (rows: ClientItem[], title: string, message: string) => {
+    await ElMessageBox.confirm(message, title, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'error'
+    })
+    await fetchDeleteBatchAgents(rows.map((row) => row.id))
+    ElMessage.success('删除成功')
+    refreshData()
+  }
+
+  const deleteClient = (row: ClientItem): void => {
+    deleteClients([row], '删除客户端', `确定要删除客户端「${row.name}」吗？`).catch(() => {})
+  }
+
+  const handleBatchDelete = (): void => {
+    if (selectedRows.value.length === 0) return
+    deleteClients(
+      selectedRows.value,
+      '批量删除',
+      `确定要删除选中的 ${selectedRows.value.length} 个客户端吗？`
+    ).catch(() => {})
+  }
+
   /**
    * 剔除在线客户端
    */
   const kickoutClient = (row: ClientItem): void => {
-    console.log('剔除客户端:', row)
     ElMessageBox.confirm(`确定要剔除该在线客户端吗？`, '剔除客户端', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -146,7 +187,6 @@
       detailDialogVisible.value = true
     })
   }
-
 </script>
 
 <style lang="scss" scoped></style>

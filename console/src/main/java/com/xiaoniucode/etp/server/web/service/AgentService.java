@@ -17,6 +17,8 @@ package com.xiaoniucode.etp.server.web.service;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
+import com.xiaoniucode.etp.server.web.param.agent.AgentBatchDeleteParam;
+
 import java.util.List;
 public interface AgentService {
     /**
@@ -31,5 +33,8 @@ public interface AgentService {
      * 剔除在线客户端
      */
     void kickout(String agentId);
+
+    void deleteBatch(AgentBatchDeleteParam param);
+
     List<AgentDTO> findAll();
 }

@@ -18,6 +18,7 @@
 
 package com.xiaoniucode.etp.server.web.entity;
 
+import com.xiaoniucode.etp.core.domain.HealthCheckConfig;
 import com.xiaoniucode.etp.core.enums.HealthCheckType;
 import com.xiaoniucode.etp.server.web.entity.converter.HealthCheckConverter;
 import jakarta.persistence.*;
@@ -27,8 +28,21 @@ import lombok.Data;
 @Entity
 @Table(name = "health_check")
 public class HealthCheckDO {
+
+    public static HealthCheckDO createDefault(String proxyId, HealthCheckType type) {
+        HealthCheckDO healthCheckDO = new HealthCheckDO();
+        healthCheckDO.setProxyId(proxyId);
+        healthCheckDO.setEnabled(false);
+        healthCheckDO.setType(type);
+        healthCheckDO.setInterval(HealthCheckConfig.DEFAULT_INTERVAL);
+        healthCheckDO.setTimeout(HealthCheckConfig.DEFAULT_TIMEOUT);
+        healthCheckDO.setMaxFailed(HealthCheckConfig.DEFAULT_MAX_FAILED);
+        healthCheckDO.setPath(type.isHttpCheck() ? HealthCheckConfig.DEFAULT_PATH : "/");
+        return healthCheckDO;
+    }
     @Id
     private String proxyId;
+
     @Convert(converter = HealthCheckConverter.class)
     @Column(name = "type", nullable = false)
     private HealthCheckType type;

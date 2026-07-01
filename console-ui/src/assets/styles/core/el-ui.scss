@@ -172,6 +172,17 @@ html.dark .el-card {
   }
 }
 
+// HTTP 统一成功提示：使用主题色而非默认绿色
+.el-message.el-message-primary.el-message--success {
+  .el-message__icon {
+    color: var(--el-color-primary) !important;
+  }
+
+  .el-message__content {
+    color: var(--el-color-primary);
+  }
+}
+
 // 修改 el-dropdown 样式
 .el-dropdown-menu {
   padding: 6px !important;

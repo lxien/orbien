@@ -43,3 +43,15 @@ export function fetchKickoutAgent(id: string) {
     url: `/api/agents/kickout/${id}`
   })
 }
+
+/**
+ * 批量删除客户端
+ * @param ids 客户端ID列表
+ * @returns 删除结果
+ */
+export function fetchDeleteBatchAgents(ids: string[]) {
+  return request.del({
+    url: '/api/agents',
+    data: { ids }
+  })
+}

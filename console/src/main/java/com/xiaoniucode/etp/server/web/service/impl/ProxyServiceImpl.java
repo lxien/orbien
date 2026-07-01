@@ -73,6 +73,8 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private AccessControlRuleRepository accessControlRuleRepository;
     @Autowired
+    private HealthCheckRepository healthCheckRepository;
+    @Autowired
     private MetricsService metricsService;
     @Autowired
     private ProxyConvert proxyConvert;
@@ -172,6 +174,8 @@ public class ProxyServiceImpl implements ProxyService {
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         //7.初始化BasicAuth认证
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
+        //8.初始化健康检查
+        healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.HTTP));
 
 
        // proxyConfigSyncService.syncOnCreate(ext);
@@ -400,6 +404,8 @@ public class ProxyServiceImpl implements ProxyService {
 
         //6.初始化访问控制
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        //7.初始化健康检查
+        healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
 
 //        if (proxyDO.getStatus().isOpen()) {
 //            transactionHelper.afterCommit(() ->

@@ -6,10 +6,7 @@
         <template #left>
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
-            <ElButton
-              @click="handleBatchDelete"
-              v-ripple
-              :disabled="selectedRows.length === 0"
+            <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0"
               >批量删除</ElButton
             >
           </ElSpace>

@@ -18,6 +18,7 @@ package com.xiaoniucode.etp.server.web.proxy.listener.persistence;
 
 import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.core.enums.AccessControl;
+import com.xiaoniucode.etp.core.enums.HealthCheckType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.message.Message;
 import com.xiaoniucode.etp.core.notify.EventBus;
@@ -152,7 +153,11 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         healthCheckRepository.deleteByProxyIdIn(List.of(proxyId));
         if (proxy.hasHealthCheck()) {
             healthCheckRepository.save(proxyReportConvert.toHealthCheckDO(proxy.getHealthCheck(), proxyId));
+            return;
         }
+        ProtocolType protocol = ProtocolType.fromName(proxy.getProtocol().name());
+        HealthCheckType defaultType = protocol.isHttpOrHttps() ? HealthCheckType.HTTP : HealthCheckType.TCP;
+        healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, defaultType));
     }
 
     private void persistBasicAuth(String proxyId, Message.Proxy proxy) {

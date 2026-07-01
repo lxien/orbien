@@ -168,7 +168,11 @@ export function showError(error: HttpError, showMessage: boolean = true): void {
  */
 export function showSuccess(message: string, showMessage: boolean = true): void {
   if (showMessage) {
-    ElMessage.success(message)
+    ElMessage({
+      message,
+      type: 'success',
+      customClass: 'el-message-primary'
+    })
   }
 }
 

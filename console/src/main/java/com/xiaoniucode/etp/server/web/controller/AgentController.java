@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.agent.AgentDTO;
+import com.xiaoniucode.etp.server.web.param.agent.AgentBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -54,6 +55,12 @@ public class AgentController {
     @PutMapping("/kickout/{id}")
     public Ajax kickout(@PathVariable String id) {
         agentService.kickout(id);
+        return Ajax.success();
+    }
+
+    @DeleteMapping
+    public Ajax batchDelete(@RequestBody @Validated AgentBatchDeleteParam param) {
+        agentService.deleteBatch(param);
         return Ajax.success();
     }
 }
