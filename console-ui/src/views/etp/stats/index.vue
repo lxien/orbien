@@ -31,7 +31,7 @@
   import ArtTableHeader from '@/components/core/tables/art-table-header/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetMetricsList } from '@/api/metrics'
-  import MetricsDialog from '../modules/metrics-dialog.vue'
+  import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
   import { ByteUtils } from '@/utils/format/byteFormatter'
   import { ElTag } from 'element-plus'
 

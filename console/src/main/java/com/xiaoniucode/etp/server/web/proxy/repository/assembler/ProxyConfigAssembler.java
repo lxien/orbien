@@ -76,6 +76,7 @@ public class ProxyConfigAssembler {
         } else {
             config.setAgentId(proxyDO.getAgentId());
         }
+        config.setProxyId(proxyDO.getId());
         config.setListenPort(config.getRemotePort());
 
         if (proxyDO.getLimitTotal() != null || proxyDO.getLimitIn() != null || proxyDO.getLimitOut() != null) {

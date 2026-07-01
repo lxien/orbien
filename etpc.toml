@@ -26,11 +26,11 @@ encrypt_count = 2
 [transport.multiplex]
 enabled = true
 
-[transport.tls]
-enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
-ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
+#[transport.tls]
+#enabled = true
+#cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
+#key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
+#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
 
 [[proxies]]
 name = "web1"
@@ -53,6 +53,13 @@ interval = 4
 timeout = 5
 max_failed = 3
 path = "/health"
+[[proxies]]
+name = "web1-http"
+protocol = "http"
+custom_domains = ["d.domain1.com", "ba.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 8088, weight = 10, name = "web-instance-1" }
+]
 
 [[proxies]]
 name = "tcp"

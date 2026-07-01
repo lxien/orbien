@@ -1,14 +1,6 @@
 <template>
-  <ElDialog
-    v-model="dialogVisible"
-    title="SSL 配置"
-    top="2%"
-    width="58%"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    @close="handleClose"
-  >
-    <div class="ssl-dialog-content">
+  <div class="ssl-page">
+    <div class="ssl-page-content">
       <ElTabs v-model="activeName" type="card">
         <template #add-icon>
           <ElSwitch v-model="forceHttps" />
@@ -95,7 +87,7 @@
         </ElTabPane>
       </ElTabs>
     </div>
-  </ElDialog>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -115,16 +107,12 @@
 
   type SslDeployInfoDTO = Awaited<ReturnType<typeof fetchGetSslDeployInfo>>
 
-  defineOptions({ name: 'SslDialog' })
+  defineOptions({ name: 'SslPage' })
 
-  const props = defineProps({
-    visible: { type: Boolean, default: false },
-    proxyId: { type: String, required: true }
-  })
+  const props = defineProps<{
+    proxyId: string
+  }>()
 
-  const emit = defineEmits(['update:visible', 'close'])
-
-  const dialogVisible = ref(false)
   const activeName = ref('current-cert')
   const sslStatus = ref(0)
   const forceHttps = ref(false)
@@ -191,7 +179,7 @@
                 onClick: () => handleCertDeploy(row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
                 text: '删除',
                 onClick: () => handleCertDelete(row)
               })
@@ -202,12 +190,10 @@
   })
 
   watch(
-    () => props.visible,
-    async (newVal) => {
-      dialogVisible.value = newVal
-      if (newVal && props.proxyId) {
-        await loadSslDeployInfo()
-      }
+    () => props.proxyId,
+    async (proxyId) => {
+      if (!proxyId) return
+      await loadSslDeployInfo()
     },
     { immediate: true }
   )
@@ -232,14 +218,6 @@
       certData.keyContent = ''
       certData.certContent = ''
     }
-  }
-  watch(dialogVisible, (newVal) => {
-    emit('update:visible', newVal)
-  })
-
-  const handleClose = () => {
-    dialogVisible.value = false
-    emit('close')
   }
 
   const handleCertDeploy = async (row: Api.Ssl.CertDTO) => {
@@ -341,8 +319,12 @@
 </script>
 
 <style scoped>
-  .ssl-dialog-content {
-    min-height: calc(100vh - 180px);
+  .ssl-page {
+    height: 100%;
+  }
+
+  .ssl-page-content {
+    min-height: 100%;
   }
 
   .tab-content {

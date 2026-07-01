@@ -28,7 +28,7 @@
           </ElCol>
           <ElCol :span="12">
             <ElInput v-model.number="formData.localPort" type="number" placeholder="内网端口">
-              <template #append>
+              <template #prepend>
                 <el-select v-model="formData.localPort" placeholder="常用端口" style="width: 115px">
                   <el-option label="HTTP - 80" :value="80" />
                   <el-option label="HTTPS - 443" :value="443" />

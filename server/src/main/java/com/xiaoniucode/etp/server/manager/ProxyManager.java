@@ -166,7 +166,7 @@ public class ProxyManager {
     }
 
     public void deactivate(String proxyId) {
-        if (StringUtils.hasText(proxyId)) {
+        if (!StringUtils.hasText(proxyId)) {
             throw new IllegalArgumentException("proxyId 不能为空");
         }
         writeLock.lock();

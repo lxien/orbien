@@ -6,7 +6,6 @@
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>添加端口</ElButton>
             <ElButton
-              type="danger"
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
@@ -60,7 +59,7 @@
 
   const portPoolTypeMap = {
     1: { type: 'primary' as const, text: 'TCP' },
-    2: { type: 'success' as const, text: 'UDP' }
+    2: { type: 'warning' as const, text: 'UDP' }
   }
 
   const formatPort = (row: PortPoolItem) => {
@@ -88,13 +87,11 @@
         {
           prop: 'portStart',
           label: '端口',
-          minWidth: 140,
           formatter: (row: PortPoolItem) => formatPort(row)
         },
         {
           prop: 'type',
           label: '协议',
-          width: 100,
           formatter: (row: PortPoolItem) => {
             const config = portPoolTypeMap[row.type as keyof typeof portPoolTypeMap] || {
               type: 'info' as const,
@@ -106,28 +103,27 @@
         {
           prop: 'remark',
           label: '备注',
-          minWidth: 160,
-          showOverflowTooltip: true,
           formatter: (row: PortPoolItem) => row.remark || '-'
         },
         {
           prop: 'createdAt',
-          label: '创建时间',
-          minWidth: 170
+          label: '创建时间'
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 130,
+          width: 150,
           fixed: 'right',
           formatter: (row: PortPoolItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'edit',
+                type: 'text',
+                text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
+                text: '删除',
                 onClick: () => handleDelete(row)
               })
             ])

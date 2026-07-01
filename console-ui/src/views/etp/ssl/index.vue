@@ -7,7 +7,6 @@
           <ElSpace wrap>
             <ElButton type="primary" @click="handleAdd" v-ripple>上传证书</ElButton>
             <ElButton
-              type="danger"
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
@@ -135,7 +134,7 @@
             }
             children.push(
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
                 text: '删除',
                 onClick: () => handleDelete(row)
               })

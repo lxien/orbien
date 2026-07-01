@@ -113,11 +113,13 @@ import { ElMessageBox, ElMessage } from 'element-plus'
           formatter: (row: Api.AccessToken.AccessTokenDTO) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'edit',
+                type: 'text',
+                text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
+                text: '删除',
                 onClick: () => deleteToken(row)
               })
             ])

@@ -90,16 +90,18 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 130,
+          width: 150,
           fixed: 'right',
           formatter: (row: DomainItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'edit',
+                type: 'text',
+                text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
+                text: '删除',
                 onClick: () => deleteDomain(row)
               })
             ])

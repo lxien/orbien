@@ -6,10 +6,10 @@ root_domains = ["domain1.com", "domain2.com"]
 
 [transport]
 # TLS
-[transport.tls]
-enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.key"
+#[transport.tls]
+#enabled = true
+#cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.crt"
+#key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.key"
 #ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
 #key_pass=""
 

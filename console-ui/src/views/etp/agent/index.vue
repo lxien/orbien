@@ -70,33 +70,28 @@
         {
           prop: 'id',
           label: '客户端标识',
-          width: 180
+           width: 180
         },
         {
           prop: 'name',
           label: '客户端名称',
-          minWidth: 120
         },
 
         {
           prop: 'os',
           label: '操作系统',
-          width: 100
         },
         {
           prop: 'arch',
           label: '系统架构',
-          width: 100
         },
         {
           prop: 'version',
           label: '客户端版本',
-          width: 100
         },
         {
           prop: 'isOnline',
           label: '状态',
-          width: 80,
           formatter: (row: ClientItem) => {
             const statusConfig = getClientStatusConfig(row.isOnline)
             return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
@@ -115,7 +110,7 @@
                 onClick: () => showClientDetail(row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
                 text: '强制下线',
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline

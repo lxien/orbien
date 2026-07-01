@@ -98,6 +98,7 @@ declare namespace Api.Proxy {
   interface HttpsProxyDetailDTO extends ProxyDetailDTO {
     domains: string[]
     domainType: number
+    forceHttps?: boolean
   }
 
   /** TCP 代理详情 */
@@ -167,6 +168,7 @@ declare namespace Api.Proxy {
     status: number
     domainType: number
     domains: string[] | null
+    forceHttps?: boolean
     deploymentMode: number
     targets: ProxyTargetAddParam[]
     transport: TransportSaveParam
@@ -181,6 +183,7 @@ declare namespace Api.Proxy {
     status: number
     domainType: number
     domains: string[] | null
+    forceHttps?: boolean
     deploymentMode: number
     targets: ProxyTargetAddParam[]
     bandwidth: BandwidthSaveParam | null

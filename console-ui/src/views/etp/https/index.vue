@@ -7,7 +7,6 @@
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
             <ElButton
-              type="danger"
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
@@ -37,18 +36,12 @@
         @submit="handleDialogSubmit"
       />
 
-      <!-- 访问控制弹窗 -->
-      <AccessControlDialog
-        v-model:visible="accessControlDialogVisible"
-        :proxy-id="currentAccessControlProxyId"
-        @close="handleAccessControlClose"
-      />
-
-      <!-- Basic Auth 弹窗 -->
-      <BasicAuthDialog
-        v-model:visible="basicAuthDialogVisible"
-        :proxy-id="currentBasicAuthProxyId"
-        @close="handleBasicAuthClose"
+      <!-- 扩展设置弹窗 -->
+      <PluginDialog
+        v-model:visible="pluginDialogVisible"
+        :protocol="ProtocolType.HTTPS"
+        :proxy-id="currentPluginProxyId"
+        :proxy-name="currentPluginProxyName"
       />
 
       <!-- 流量统计弹窗 -->
@@ -57,13 +50,6 @@
         :proxy-id="currentMetricsProxyId"
         :show-time-range="true"
         @close="handleMetricsClose"
-      />
-
-      <!-- SSL 配置弹窗 -->
-      <SslDialog
-        v-model:visible="sslDialogVisible"
-        :proxy-id="currentSslProxyId"
-        @close="handleSslClose"
       />
     </ElCard>
   </div>
@@ -75,11 +61,9 @@
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetHttpsProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
   import HttpsDialog from './modules/https-dialog.vue'
-  import AccessControlDialog from '../modules/access-control-dialog.vue'
-  import BasicAuthDialog from '../modules/basic-auth-dialog.vue'
-  import MetricsDialog from '../modules/metrics-dialog.vue'
-  import SslDialog from './modules/ssl-dialog.vue'
-  import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
+  import PluginDialog from '../plugin/index.vue'
+  import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
+  import { ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
   import { ProtocolType } from '@/enums/businessEnum'
 
@@ -95,27 +79,19 @@
   const dialogVisible = ref(false)
   const currentProxyData = ref<Partial<HttpsProxyItem>>({})
 
-  // 访问控制弹窗相关
-  const accessControlDialogVisible = ref(false)
-  const currentAccessControlProxyId = ref('')
-
-  // Basic Auth 弹窗相关
-  const basicAuthDialogVisible = ref(false)
-  const currentBasicAuthProxyId = ref('')
+  // 扩展设置弹窗相关
+  const pluginDialogVisible = ref(false)
+  const currentPluginProxyId = ref('')
+  const currentPluginProxyName = ref('')
 
   // 流量统计弹窗相关
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
 
-  // SSL 弹窗相关
-  const sslDialogVisible = ref(false)
-  const currentSslProxyId = ref('')
-
-  const getProxyStatusConfig = (status: number) => {
-    return status === 1
-      ? { type: 'success' as const, text: '开启' }
-      : { type: 'info' as const, text: '关闭' }
+  const handleStatusChange = (row: HttpsProxyItem, enabled: boolean) => {
+    row.status = enabled ? 1 : 0
   }
+
   const {
     columns,
     columnChecks,
@@ -142,7 +118,7 @@
         },
         {
           prop: 'domains',
-          label: '远程地址',
+          label: '外网地址',
           minWidth: 150,
           formatter: (row: HttpsProxyItem) => {
             if (!row.domains || row.domains.length === 0) {
@@ -157,7 +133,7 @@
                 return h(
                   ElTag,
                   {
-                    type: 'warning',
+                    type: 'primary',
                     style: 'cursor: pointer;',
                     onClick: () => window.open(`https://${fullDomain}`, '_blank')
                   },
@@ -169,7 +145,7 @@
         },
         {
           prop: 'targets',
-          label: '目标服务',
+          label: '内网服务',
           minWidth: 150,
           formatter: (row: HttpsProxyItem) => {
             if (!row.targets || row.targets.length === 0) {
@@ -187,27 +163,23 @@
           prop: 'status',
           label: '状态',
           width: 80,
-          formatter: (row: HttpsProxyItem) => {
-            const statusConfig = getProxyStatusConfig(row.status)
-            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
-          }
+          formatter: (row: HttpsProxyItem) =>
+            h(ElSwitch, {
+              modelValue: row.status === 1,
+              'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
+            })
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 420,
+          width: 260,
           fixed: 'right',
           formatter: (row: HttpsProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'text',
-                text: 'IP访问控制',
-                onClick: () => handleIpControl(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'text',
-                text: '鉴权认证',
-                onClick: () => handleBasicAuth(row)
+                text: '设置',
+                onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
                 type: 'text',
@@ -216,15 +188,12 @@
               }),
               h(ArtButtonTable, {
                 type: 'text',
-                text: 'SSL',
-                onClick: () => handleSsl(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'edit',
+                text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
+                text: '删除',
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -258,22 +227,10 @@
     }
   }
 
-  const handleIpControl = (proxy: HttpsProxyItem) => {
-    currentAccessControlProxyId.value = proxy.id
-    accessControlDialogVisible.value = true
-  }
-
-  const handleAccessControlClose = () => {
-    currentAccessControlProxyId.value = ''
-  }
-
-  const handleBasicAuth = (proxy: HttpsProxyItem) => {
-    currentBasicAuthProxyId.value = proxy.id
-    basicAuthDialogVisible.value = true
-  }
-
-  const handleBasicAuthClose = () => {
-    currentBasicAuthProxyId.value = ''
+  const handleSettings = (proxy: HttpsProxyItem) => {
+    currentPluginProxyId.value = proxy.id
+    currentPluginProxyName.value = proxy.name
+    pluginDialogVisible.value = true
   }
 
   const handleMetrics = (proxy: HttpsProxyItem) => {
@@ -283,15 +240,6 @@
 
   const handleMetricsClose = () => {
     currentMetricsProxyId.value = ''
-  }
-
-  const handleSsl = (proxy: HttpsProxyItem) => {
-    currentSslProxyId.value = proxy.id
-    sslDialogVisible.value = true
-  }
-
-  const handleSslClose = () => {
-    currentSslProxyId.value = ''
   }
 
   const handleBatchDelete = async () => {

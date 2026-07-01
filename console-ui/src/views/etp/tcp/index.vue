@@ -7,7 +7,6 @@
           <ElSpace wrap>
             <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
             <ElButton
-              type="danger"
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
@@ -37,11 +36,12 @@
         @submit="handleDialogSubmit"
       />
 
-      <!-- 访问控制弹窗 -->
-      <AccessControlDialog
-        v-model:visible="accessControlDialogVisible"
-        :proxy-id="currentAccessControlProxyId"
-        @close="handleAccessControlClose"
+      <!-- 扩展设置弹窗 -->
+      <PluginDialog
+        v-model:visible="pluginDialogVisible"
+        :protocol="ProtocolType.TCP"
+        :proxy-id="currentPluginProxyId"
+        :proxy-name="currentPluginProxyName"
       />
 
       <!-- 流量统计弹窗 -->
@@ -61,9 +61,9 @@
   import { useTable } from '@/hooks/core/useTable'
   import { fetchGetTcpProxyList, fetchBatchDeleteProxy } from '@/api/proxy'
   import TcpDialog from './modules/tcp-dialog.vue'
-  import AccessControlDialog from '../modules/access-control-dialog.vue'
-  import MetricsDialog from '../modules/metrics-dialog.vue'
-  import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
+  import PluginDialog from '../plugin/index.vue'
+  import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
+  import { ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
   import { ProtocolType } from '@/enums/businessEnum'
 
@@ -79,18 +79,17 @@
   const dialogVisible = ref(false)
   const currentProxyData = ref<Partial<TcpProxyItem>>({})
 
-  // 访问控制弹窗相关
-  const accessControlDialogVisible = ref(false)
-  const currentAccessControlProxyId = ref('')
+  // 扩展设置弹窗相关
+  const pluginDialogVisible = ref(false)
+  const currentPluginProxyId = ref('')
+  const currentPluginProxyName = ref('')
 
   // 流量统计弹窗相关
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
 
-  const getProxyStatusConfig = (status: number) => {
-    return status === 1
-      ? { type: 'success' as const, text: '开启' }
-      : { type: 'info' as const, text: '关闭' }
+  const handleStatusChange = (row: TcpProxyItem, enabled: boolean) => {
+    row.status = enabled ? 1 : 0
   }
 
   const {
@@ -123,7 +122,7 @@
         },
         {
           prop: 'targets',
-          label: '目标服务',
+          label: '内网服务',
           minWidth: 150,
           formatter: (row: TcpProxyItem) => {
             if (!row.targets || row.targets.length === 0) {
@@ -141,31 +140,37 @@
           prop: 'status',
           label: '状态',
           width: 80,
-          formatter: (row: TcpProxyItem) => {
-            const statusConfig = getProxyStatusConfig(row.status)
-            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
-          }
+          formatter: (row: TcpProxyItem) =>
+            h(ElSwitch, {
+              modelValue: row.status === 1,
+              'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
+            })
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 270,
+          width: 260,
           fixed: 'right',
           formatter: (row: TcpProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'text',
-                text: 'IP访问控制',
-                onClick: () => handleIpControl(row)
+                text: '设置',
+                onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
                 type: 'text',
                 text: '统计',
                 onClick: () => handleMetrics(row)
               }),
-              h(ArtButtonTable, { type: 'edit', onClick: () => showDialog('edit', row) }),
               h(ArtButtonTable, {
-                type: 'delete',
+                type: 'text',
+                text: '编辑',
+                onClick: () => showDialog('edit', row)
+              }),
+              h(ArtButtonTable, {
+                type: 'text',
+                text: '删除',
                 onClick: () => handleSingleDelete(row)
               })
             ])
@@ -238,13 +243,10 @@
     }
   }
 
-  const handleIpControl = (proxy: TcpProxyItem) => {
-    currentAccessControlProxyId.value = proxy.id
-    accessControlDialogVisible.value = true
-  }
-
-  const handleAccessControlClose = () => {
-    currentAccessControlProxyId.value = ''
+  const handleSettings = (proxy: TcpProxyItem) => {
+    currentPluginProxyId.value = proxy.id
+    currentPluginProxyName.value = proxy.name
+    pluginDialogVisible.value = true
   }
 
   const handleMetrics = (proxy: TcpProxyItem) => {

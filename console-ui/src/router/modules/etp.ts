@@ -90,15 +90,5 @@ export const penetrationRoutes: AppRouteRecord[] = [
       icon: 'ri:bar-chart-line',
       roles: ['R_SUPER']
     }
-  },
-  {
-    name: 'Test',
-    path: '/test',
-    component: '/etp/test',
-    meta: {
-      title: 'Test',
-      icon: 'ri:test-tube-line',
-      roles: ['R_SUPER']
-    }
   }
 ]
