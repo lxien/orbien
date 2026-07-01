@@ -5,7 +5,7 @@
     width="650px"
     align-center
   >
-    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px">
+    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
       <ElFormItem label="客户端" prop="agentId">
         <ElSelect
           v-model="formData.agentId"
@@ -52,7 +52,7 @@
           style="width: 200px"
         />
       </ElFormItem>
-      <ElFormItem label="带宽限流" prop="limitTotal">
+      <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
           v-model="formData.limitTotal"
           placeholder="总带宽"

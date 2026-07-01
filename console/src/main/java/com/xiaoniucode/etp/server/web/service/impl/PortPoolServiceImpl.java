@@ -1,0 +1,123 @@
+/*
+ *    Copyright 2026 xiaoniucode
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+package com.xiaoniucode.etp.server.web.service.impl;
+
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
+import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.common.message.PageResult;
+import com.xiaoniucode.etp.server.web.dto.portpool.PortPoolDTO;
+import com.xiaoniucode.etp.server.web.entity.PortPoolDO;
+import com.xiaoniucode.etp.server.web.enums.PortPoolType;
+import com.xiaoniucode.etp.server.web.param.portpool.PortPoolBatchDeleteParam;
+import com.xiaoniucode.etp.server.web.param.portpool.PortPoolCreateParam;
+import com.xiaoniucode.etp.server.web.param.portpool.PortPoolUpdateParam;
+import com.xiaoniucode.etp.server.web.repository.PortPoolRepository;
+import com.xiaoniucode.etp.server.web.service.PortPoolService;
+import com.xiaoniucode.etp.server.web.service.converter.PortPoolConvert;
+import com.xiaoniucode.etp.server.web.support.portpool.PortPoolParser;
+import com.xiaoniucode.etp.server.web.support.portpool.PortPoolParser.ParsedPort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+
+@Service
+public class PortPoolServiceImpl implements PortPoolService {
+    @Autowired
+    private PortPoolRepository portPoolRepository;
+    @Autowired
+    private PortPoolConvert portPoolConvert;
+
+    @Override
+    public PageResult<PortPoolDTO> findByPage(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<PortPoolDO> resultPage = portPoolRepository.findAll(pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+        List<PortPoolDTO> dtoList = portPoolConvert.toDTOList(resultPage.getContent());
+        return PageResult.wrap(resultPage, dtoList);
+    }
+
+    @Override
+    public PortPoolDTO getById(Long id) {
+        PortPoolDO poolDO = portPoolRepository.findById(id)
+                .orElseThrow(() -> new BizException("端口配置不存在"));
+        return portPoolConvert.toDTO(poolDO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PortPoolDTO create(PortPoolCreateParam param) {
+        PortPoolType type = PortPoolType.fromCode(param.getType());
+        ParsedPort parsedPort = PortPoolParser.parse(param.getPort());
+        validateDuplicate(type, parsedPort.portStart(), parsedPort.portEnd(), null);
+
+        PortPoolDO poolDO = new PortPoolDO();
+        applyPort(poolDO, parsedPort);
+        poolDO.setType(type);
+        poolDO.setRemark(param.getRemark());
+        PortPoolDO saved = portPoolRepository.save(poolDO);
+        return portPoolConvert.toDTO(saved);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(PortPoolUpdateParam param) {
+        PortPoolDO poolDO = portPoolRepository.findById(param.getId())
+                .orElseThrow(() -> new BizException("端口配置不存在"));
+        PortPoolType type = PortPoolType.fromCode(param.getType());
+        ParsedPort parsedPort = PortPoolParser.parse(param.getPort());
+        validateDuplicate(type, parsedPort.portStart(), parsedPort.portEnd(), param.getId());
+
+        applyPort(poolDO, parsedPort);
+        poolDO.setType(type);
+        poolDO.setRemark(param.getRemark());
+        portPoolRepository.save(poolDO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(PortPoolBatchDeleteParam param) {
+        List<Long> ids = param.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        portPoolRepository.deleteAllById(ids);
+    }
+
+    private void applyPort(PortPoolDO poolDO, ParsedPort parsedPort) {
+        poolDO.setPortStart(parsedPort.portStart());
+        poolDO.setPortEnd(parsedPort.portEnd());
+    }
+
+    private void validateDuplicate(PortPoolType type, Integer portStart, Integer portEnd, Long excludeId) {
+        boolean exists = excludeId == null
+                ? portPoolRepository.existsByTypeAndPortStartAndPortEnd(type, portStart, portEnd)
+                : portPoolRepository.existsByTypeAndPortStartAndPortEndAndIdNot(type, portStart, portEnd, excludeId);
+        if (exists) {
+            throw new BizException("该协议下相同端口配置已存在");
+        }
+    }
+}

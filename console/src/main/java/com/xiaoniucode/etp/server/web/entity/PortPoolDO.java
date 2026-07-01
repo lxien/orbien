@@ -18,15 +18,18 @@
 
 package com.xiaoniucode.etp.server.web.entity;
 
-import com.xiaoniucode.etp.server.web.entity.converter.LoadBalanceConverter;
 import com.xiaoniucode.etp.server.web.entity.converter.PortPoolTypeConverter;
 import com.xiaoniucode.etp.server.web.enums.PortPoolType;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "port_pool")
 public class PortPoolDO {

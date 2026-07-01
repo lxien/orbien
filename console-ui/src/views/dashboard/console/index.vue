@@ -8,11 +8,11 @@
         <TrafficStats />
       </ElCol>
     </ElRow>
-    <ElRow :gutter="20">
-      <ElCol :sm="24" :md="12" :lg="12">
+    <ElRow :gutter="20" class="console-stats-row">
+      <ElCol :sm="24" :md="12" :lg="12" class="console-stats-col">
         <ProxyStats />
       </ElCol>
-      <ElCol :sm="24" :md="12" :lg="12">
+      <ElCol :sm="24" :md="12" :lg="12" class="console-stats-col">
         <ServerConfig />
       </ElCol>
     </ElRow>
@@ -27,3 +27,14 @@
   import ServerConfig from './modules/server-config.vue'
   defineOptions({ name: 'Console' })
 </script>
+
+<style scoped lang="scss">
+  .console-stats-row {
+    align-items: stretch;
+  }
+
+  .console-stats-col {
+    display: flex;
+    flex-direction: column;
+  }
+</style>

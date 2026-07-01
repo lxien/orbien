@@ -21,7 +21,6 @@
             <artifactId>etp-console</artifactId>
             <version>${etp.version}</version>
         </dependency>
-
     </dependencies>
     <build>
         <plugins>

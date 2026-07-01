@@ -1,23 +1,22 @@
 <template>
   <div class="port-pool-page art-full-height">
     <ElCard class="art-table-card">
-      <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="handleAdd" v-ripple>添加端口</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加端口</ElButton>
             <ElButton
               type="danger"
               @click="handleBatchDelete"
               v-ripple
               :disabled="selectedRows.length === 0"
-              >批量删除</ElButton
             >
+              批量删除
+            </ElButton>
           </ElSpace>
         </template>
       </ArtTableHeader>
 
-      <!-- 表格 -->
       <ArtTable
         :loading="loading"
         :data="data"
@@ -27,25 +26,45 @@
         @pagination:size-change="handleSizeChange"
         @pagination:current-change="handleCurrentChange"
       />
+
+      <PortPoolDialog
+        v-model:visible="dialogVisible"
+        :type="dialogType"
+        :port-pool-id="currentPortPoolId"
+        @submit="handleDialogSubmit"
+      />
     </ElCard>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, h } from 'vue'
+  import { ref, h, nextTick } from 'vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElTag, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
+  import {
+    fetchGetPortPoolListByPage,
+    fetchDeleteBatchPortPools
+  } from '@/api/port-pool'
+  import PortPoolDialog from './modules/port-pool-dialog.vue'
+  import { DialogType } from '@/types'
 
   defineOptions({ name: 'PortPool' })
 
-  // 选中行
-  const selectedRows = ref<PortPoolItem[]>([])
+  type PortPoolItem = Api.PortPool.PortPoolDTO
 
-  // 端口池类型映射
+  const selectedRows = ref<PortPoolItem[]>([])
+  const dialogType = ref<DialogType>('add')
+  const dialogVisible = ref(false)
+  const currentPortPoolId = ref<number | undefined>()
+
   const portPoolTypeMap = {
     1: { type: 'primary' as const, text: 'TCP' },
     2: { type: 'success' as const, text: 'UDP' }
+  }
+
+  const formatPort = (row: PortPoolItem) => {
+    return row.portEnd ? `${row.portStart}-${row.portEnd}` : `${row.portStart}`
   }
 
   const {
@@ -59,8 +78,7 @@
     refreshData
   } = useTable({
     core: {
-      // 暂不请求后端，保留结构
-      apiFn: async () => ({ list: [], total: 0 }),
+      apiFn: fetchGetPortPoolListByPage,
       apiParams: {
         current: 1,
         size: 20
@@ -68,20 +86,15 @@
       columnsFactory: () => [
         { type: 'selection' },
         {
-          prop: 'id',
-          label: 'ID',
-          width: 80
-        },
-        {
           prop: 'portStart',
           label: '端口',
-          formatter: (row: PortPoolItem) => {
-            return row.portEnd ? `${row.portStart} - ${row.portEnd}` : `${row.portStart}`
-          }
+          minWidth: 140,
+          formatter: (row: PortPoolItem) => formatPort(row)
         },
         {
           prop: 'type',
           label: '协议',
+          width: 100,
           formatter: (row: PortPoolItem) => {
             const config = portPoolTypeMap[row.type as keyof typeof portPoolTypeMap] || {
               type: 'info' as const,
@@ -93,23 +106,28 @@
         {
           prop: 'remark',
           label: '备注',
-          showOverflowTooltip: true
+          minWidth: 160,
+          showOverflowTooltip: true,
+          formatter: (row: PortPoolItem) => row.remark || '-'
+        },
+        {
+          prop: 'createdAt',
+          label: '创建时间',
+          minWidth: 170
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
+          width: 130,
           fixed: 'right',
           formatter: (row: PortPoolItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
-                text: '编辑',
-                onClick: () => handleEdit(row)
+                type: 'edit',
+                onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
                 type: 'delete',
-                text: '删除',
                 onClick: () => handleDelete(row)
               })
             ])
@@ -118,70 +136,47 @@
     }
   })
 
-  /**
-   * 端口池数据项
-   */
-  interface PortPoolItem {
-    id: number
-    portStart: number
-    portEnd?: number
-    type: number
-    remark?: string
-    createdAt: string
-    updatedAt: string
-  }
-
-  /**
-   * 表格选择变化
-   */
   const handleSelectionChange = (selection: PortPoolItem[]): void => {
     selectedRows.value = selection
   }
 
-  /**
-   * 新增端口池
-   */
-  const handleAdd = (): void => {
-    console.log('新增端口池')
+  const deletePortPools = async (rows: PortPoolItem[], title: string, message: string) => {
+    await ElMessageBox.confirm(message, title, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    await fetchDeleteBatchPortPools(rows.map((row) => row.id))
+    ElMessage.success('删除成功')
+    refreshData()
   }
 
-  /**
-   * 编辑端口池
-   */
-  const handleEdit = (row: PortPoolItem) => {
-    console.log('编辑端口池:', row)
+  const handleDelete = (row: PortPoolItem): void => {
+    deletePortPools([row], '删除端口', `确定要删除端口「${formatPort(row)}」吗？`).catch(() => {})
   }
 
-  /**
-   * 批量删除端口池
-   */
-  const handleBatchDelete = async (): Promise<void> => {
+  const handleBatchDelete = (): void => {
     if (selectedRows.value.length === 0) {
-      ElMessage.warning('请选择要删除的端口池')
+      ElMessage.warning('请选择要删除的端口')
       return
     }
-
-    try {
-      await ElMessageBox.confirm('确定要删除选中的端口池吗？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-
-      ElMessage.success('删除成功')
-      refreshData()
-    } catch (error) {
-      if (error !== 'cancel') {
-        console.error('删除失败:', error)
-      }
-    }
+    deletePortPools(
+      selectedRows.value,
+      '批量删除',
+      `确定要删除选中的 ${selectedRows.value.length} 个端口配置吗？`
+    ).catch(() => {})
   }
 
-  /**
-   * 删除端口池
-   */
-  const handleDelete = (row: PortPoolItem) => {
-    console.log('删除端口池:', row)
+  const showDialog = (type: DialogType, row?: PortPoolItem): void => {
+    dialogType.value = type
+    currentPortPoolId.value = row?.id
+    nextTick(() => {
+      dialogVisible.value = true
+    })
+  }
+
+  const handleDialogSubmit = () => {
+    refreshData()
   }
 </script>
 

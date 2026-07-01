@@ -8,7 +8,7 @@
     <div v-if="loading" class="loading-state">
       <ElSkeleton :rows="5" animated />
     </div>
-    <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="120px">
+    <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
       <ElFormItem v-if="dialogType === 'edit'" label="令牌值">
         <ElInput v-model="formData.token" disabled />
       </ElFormItem>

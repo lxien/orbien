@@ -1,30 +1,19 @@
 <template>
-  <div class="app-config">
-    <div class="art-card app-config-card">
-      <div class="header">
-        <div>
-          <div class="title">服务器配置</div>
-          <div class="subtitle">ETP 服务器运行时配置</div>
+  <div class="server-config art-card h-105 p-5 mb-5 max-sm:mb-4">
+    <div class="config-header">
+      <h4>服务器配置</h4>
+    </div>
+
+    <ElSkeleton v-if="loading" :rows="4" animated class="config-body" />
+
+    <div v-else class="config-body">
+      <div v-for="item in configItems" :key="item.label" class="config-item">
+        <div class="config-icon" :class="item.iconBgClass">
+          <ArtSvgIcon :icon="item.icon" class="icon" />
         </div>
-      </div>
-
-      <ElSkeleton v-if="loading" :rows="6" animated />
-
-      <div v-else class="config-grid">
-        <div v-for="item in configItems" :key="item.label" class="config-item art-card">
-          <div class="config-icon" :class="item.iconBgClass">
-            <ArtSvgIcon :icon="item.icon" class="icon" />
-          </div>
-
-          <div class="config-content">
-            <div class="config-value">
-              {{ item.value }}
-            </div>
-
-            <div class="config-label">
-              {{ item.label }}
-            </div>
-          </div>
+        <div class="config-content">
+          <div class="config-value">{{ item.value }}</div>
+          <div class="config-label">{{ item.label }}</div>
         </div>
       </div>
     </div>
@@ -40,12 +29,10 @@
   defineOptions({ name: 'AppConfig' })
 
   const loading = ref(false)
-
   const configInfo = ref<Api.App.AppConfigInfoDTO | null>(null)
 
   const getData = async () => {
     loading.value = true
-
     try {
       configInfo.value = await fetchGetAppConfig()
     } finally {
@@ -75,20 +62,8 @@
     {
       label: 'HTTPS 代理',
       value: configInfo.value?.httpsProxyPort || '-',
-      icon: 'ri:router-line',
-      iconBgClass: 'icon-bg-orange'
-    },
-    {
-      label: '根域名',
-      value: configInfo.value?.rootDomain || '-',
-      icon: 'ri:earth-line',
-      iconBgClass: 'icon-bg-purple'
-    },
-    {
-      label: '端口范围',
-      value: `${configInfo.value?.portStart || '-'} ~ ${configInfo.value?.portEnd || '-'}`,
-      icon: 'ri:settings-3-line',
-      iconBgClass: 'icon-bg-blue'
+      icon: 'ri:shield-keyhole-line',
+      iconBgClass: 'icon-bg-teal'
     }
   ])
 
@@ -98,59 +73,52 @@
 </script>
 
 <style scoped lang="scss">
-  .app-config {
-    margin-bottom: 20px;
-  }
-
-  .app-config-card {
-    padding: 24px;
-  }
-
-  .header {
+  .server-config {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
+    flex-direction: column;
+    min-height: 0;
+  }
 
-    .title {
+  .config-header {
+    flex-shrink: 0;
+    margin-bottom: 16px;
+
+    h4 {
+      margin: 0;
       font-size: 18px;
-      font-weight: 700;
-      color: var(--title-color);
-    }
-
-    .subtitle {
-      margin-top: 4px;
-      font-size: 13px;
-      color: var(--el-text-color-secondary);
+      font-weight: 500;
+      color: var(--art-gray-900);
     }
   }
 
-  .config-grid {
+  .config-body {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    flex: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    min-height: 0;
   }
 
   .config-item {
     display: flex;
-    gap: 16px;
+    gap: 14px;
     align-items: center;
-    padding: 18px;
-    transition: all 0.2s ease;
-
-    &:hover {
-      transform: translateY(-2px);
-    }
+    min-width: 0;
+    min-height: 0;
+    padding: 14px 16px;
+    background: var(--art-gray-100);
+    border-radius: 10px;
   }
 
   .config-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
     display: flex;
+    flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
   }
 
   .icon-bg-blue {
@@ -165,12 +133,12 @@
     background: var(--el-color-warning-light-9);
   }
 
-  .icon-bg-purple {
-    background: #f0e7ff;
+  .icon-bg-teal {
+    background: var(--el-color-info-light-9);
   }
 
   .icon {
-    font-size: 24px;
+    font-size: 20px;
   }
 
   .icon-bg-blue .icon {
@@ -185,8 +153,8 @@
     color: var(--el-color-warning);
   }
 
-  .icon-bg-purple .icon {
-    color: #7c3aed;
+  .icon-bg-teal .icon {
+    color: var(--el-color-info);
   }
 
   .config-content {
@@ -209,12 +177,10 @@
   }
 
   @media (max-width: 768px) {
-    .app-config-card {
-      padding: 16px;
-    }
-
-    .config-grid {
+    .config-body {
+      flex: none;
       grid-template-columns: 1fr;
+      grid-template-rows: repeat(4, auto);
     }
   }
 </style>

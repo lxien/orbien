@@ -8,7 +8,7 @@
     <div v-if="loading" class="loading-state">
       <ElSkeleton :rows="3" animated />
     </div>
-    <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="100px">
+    <ElForm v-else ref="formRef" :model="formData" :rules="rules" label-width="100px" :show-message="false">
       <ElFormItem label="根域名" prop="domain">
         <ElInput
           v-model="formData.domain"

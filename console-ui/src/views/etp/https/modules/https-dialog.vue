@@ -5,7 +5,7 @@
     width="900px"
     align-center
   >
-    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="140px">
+    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="140px" :show-message="false">
       <ElFormItem label="客户端" prop="agentId">
         <ElSelect
           v-model="formData.agentId"
