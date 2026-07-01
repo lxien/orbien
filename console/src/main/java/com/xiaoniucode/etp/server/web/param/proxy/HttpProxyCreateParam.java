@@ -48,7 +48,7 @@ public class HttpProxyCreateParam {
     @NotNull(message = "domainType 不能为空")
     @EnumValue(enumClass = DomainType.class)
     private Integer domainType;
-    private String baseDomain;
+    private String rootDomain;
     private Set<String> domains;
     @NotNull(message = "部署模式不能为空")
     @EnumValue(enumClass = DeploymentMode.class)

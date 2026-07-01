@@ -102,7 +102,7 @@ public class ProxyController {
     }
     @GetMapping("https")
     public Ajax getHttpsProxies(@ModelAttribute PageQuery pageQuery) {
-        PageResult<HttpProxyListDTO> proxies = proxyService.findHttpProxies(pageQuery);
+        PageResult<HttpProxyListDTO> proxies = proxyService.findHttpsProxies(pageQuery);
         return Ajax.success(proxies);
     }
     @PutMapping("status/{id}")

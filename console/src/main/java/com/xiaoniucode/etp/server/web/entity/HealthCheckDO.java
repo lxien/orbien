@@ -21,7 +21,9 @@ package com.xiaoniucode.etp.server.web.entity;
 import com.xiaoniucode.etp.core.enums.HealthCheckType;
 import com.xiaoniucode.etp.server.web.entity.converter.HealthCheckConverter;
 import jakarta.persistence.*;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "health_check")
 public class HealthCheckDO {

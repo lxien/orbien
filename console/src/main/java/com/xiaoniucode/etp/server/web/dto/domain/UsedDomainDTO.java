@@ -23,7 +23,7 @@ public class UsedDomainDTO {
     private Long id;
     private String fullDomain;
     private String domain;
-    private String baseDomain;
+    private String rootDomain;
     private Integer domainType;
     private String proxyId;
     private String proxyName;

@@ -51,12 +51,12 @@ public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> 
 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
-        Set<String> baseDomains = appConfig.getBaseDomains();
-        if (CollectionUtils.isEmpty(baseDomains)) {
+        Set<String> rootDomains = appConfig.getRootDomains();
+        if (CollectionUtils.isEmpty(rootDomains)) {
             return;
         }
         // 一次性查询已存在的域名
-        Set<DomainDO> existingDomains = domainRepository.findByDomainIn(baseDomains);
+        Set<DomainDO> existingDomains = domainRepository.findByDomainIn(rootDomains);
 
         //提取已存在的域名集合
         Set<String> existingDomainNames = existingDomains.stream()
@@ -64,7 +64,7 @@ public class DomainSynchronizer implements EventListener<TunnelServerBindEvent> 
                 .collect(Collectors.toSet());
 
         // 筛选出需要新增的域名
-        List<DomainDO> newDomains = baseDomains.stream()
+        List<DomainDO> newDomains = rootDomains.stream()
                 .filter(domain -> !existingDomainNames.contains(domain))
                 .map(DomainDO::new)
                 .collect(Collectors.toList());

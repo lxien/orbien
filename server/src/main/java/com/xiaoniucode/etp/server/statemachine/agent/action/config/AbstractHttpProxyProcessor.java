@@ -91,23 +91,23 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         if (domainType.isCustomDomain()) {
             domains = domainGenerator.generateCustomDomains(domain.getCustomDomainsList());
         } else if (domainType.isAuto()) {
-            String baseDomain = randomBaseDomain();
-            if (!StringUtils.hasText(baseDomain)) {
+            String rootDomain = randomBaseDomain();
+            if (!StringUtils.hasText(rootDomain)) {
                 throw new EtpException("服务不支持自动生成域名");
             }
-            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(baseDomain);
+            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(rootDomain);
             domains = new ArrayList<>();
             domains.add(domainInfo);
         } else {
-            String baseDomain = randomBaseDomain();
-            if (!StringUtils.hasText(baseDomain)) {
+            String rootDomain = randomBaseDomain();
+            if (!StringUtils.hasText(rootDomain)) {
                 throw new EtpException("系统不支持子域名");
             }
             ProtocolStringList subDomainsList = domain.getSubDomainsList();
             if (CollectionUtils.isEmpty(subDomainsList)) {
                 throw new EtpException("至少指定一个子域名");
             }
-            domains = domainGenerator.generateSubdomains(baseDomain, subDomainsList);
+            domains = domainGenerator.generateSubdomains(rootDomain, subDomainsList);
         }
 
         String proxyId = uidGenerator.getUIDAsString();
@@ -161,9 +161,9 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
     protected abstract void doRegister(String agentId, String proxyId, Set<String> domains);
 
     private String randomBaseDomain() {
-        List<String> allBaseDomains = domainConfigService.findAllBaseDomains();
-        int index = ThreadLocalRandom.current().nextInt(allBaseDomains.size());
-        return allBaseDomains.get(index);
+        List<String> allRootDomains = domainConfigService.findAllRootDomains();
+        int index = ThreadLocalRandom.current().nextInt(allRootDomains.size());
+        return allRootDomains.get(index);
     }
 
     public DomainType getDomainType(Message.Domain domain) {

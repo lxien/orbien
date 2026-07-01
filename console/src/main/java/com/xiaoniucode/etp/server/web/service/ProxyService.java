@@ -58,4 +58,6 @@ public interface ProxyService {
     PageResult<TcpProxyListDTO> findTcpProxies(PageQuery pageQuery);
 
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
+
+    PageResult<HttpProxyListDTO> findHttpsProxies(PageQuery pageQuery);
 }

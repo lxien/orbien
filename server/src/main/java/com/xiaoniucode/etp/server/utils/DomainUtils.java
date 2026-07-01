@@ -27,20 +27,20 @@ import org.springframework.util.StringUtils;
 public class DomainUtils {
 
     /**
-     * 根据基础域名，从完整域名中提取真正的前缀部分
+     * 根据根域名，从完整域名中提取真正的前缀部分
      *
      * @param fullDomain  完整域名，例如：api.user.example.com
-     * @param baseDomain  配置的基础域名，例如：example.com
-     * @return 前缀部分（例如：api.user），如果不属于该基础域名则返回 null
-     *         如果 fullDomain 就是 baseDomain 本身，则返回空字符串 ""
+     * @param rootDomain  配置的根域名，例如：example.com
+     * @return 前缀部分（例如：api.user），如果不属于该根域名则返回 null
+     *         如果 fullDomain 就是 rootDomain 本身，则返回空字符串 ""
      */
-    public static String extractPrefix(String fullDomain, String baseDomain) {
-        if (!StringUtils.hasText(fullDomain) || !StringUtils.hasText(baseDomain)) {
+    public static String extractPrefix(String fullDomain, String rootDomain) {
+        if (!StringUtils.hasText(fullDomain) || !StringUtils.hasText(rootDomain)) {
             return null;
         }
 
         String full = fullDomain.toLowerCase().trim();
-        String base = baseDomain.toLowerCase().trim();
+        String base = rootDomain.toLowerCase().trim();
 
         // 移除末尾可能的点
         if (full.endsWith(".")) {
@@ -50,13 +50,13 @@ public class DomainUtils {
             base = base.substring(0, base.length() - 1);
         }
 
-        // 判断是否属于该基础域名
+        // 判断是否属于该根域名
         if (full.equals(base)) {
-            return "";// 基础域名本身，前缀为空
+            return "";// 根域名本身，前缀为空
         }
 
         if (!full.endsWith("." + base)) {
-            return null;// 不属于该基础域名，返回 null
+            return null;// 不属于该根域名，返回 null
         }
 
         // 提取前缀部分
@@ -64,14 +64,14 @@ public class DomainUtils {
     }
 
     /**
-     * 判断完整域名是否属于指定的基础域名
+     * 判断完整域名是否属于指定的根域名
      *
      * @param fullDomain 完整域名
-     * @param baseDomain 基础域名
-     * @return true 如果属于该基础域名
+     * @param rootDomain 根域名
+     * @return true 如果属于该根域名
      */
-    public static boolean isUnderBaseDomain(String fullDomain, String baseDomain) {
-        String prefix = extractPrefix(fullDomain, baseDomain);
+    public static boolean isUnderBaseDomain(String fullDomain, String rootDomain) {
+        String prefix = extractPrefix(fullDomain, rootDomain);
         return prefix != null;
     }
 

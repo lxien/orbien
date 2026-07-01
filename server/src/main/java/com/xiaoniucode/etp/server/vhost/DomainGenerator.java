@@ -34,20 +34,20 @@ public class DomainGenerator {
     @Autowired
     private DomainConfigService domainConfigService;
 
-    public DomainInfo generateRandomSubdomain(String baseDomain) throws DomainConflictException {
-        return generateRandomDomainPrefix(baseDomain);
+    public DomainInfo generateRandomSubdomain(String rootDomain) throws DomainConflictException {
+        return generateRandomDomainPrefix(rootDomain);
     }
 
-    private DomainInfo generateRandomDomainPrefix(String baseDomain) {
+    private DomainInfo generateRandomDomainPrefix(String rootDomain) {
         int maxRetries = 50;
         for (int i = 0; i < maxRetries; i++) {
             String prefix = generateRandomPrefix();
-            if (!domainConfigService.exists(prefix + "." + baseDomain)) {
-                return new DomainInfo(baseDomain, prefix, DomainType.AUTO);
+            if (!domainConfigService.exists(prefix + "." + rootDomain)) {
+                return new DomainInfo(rootDomain, prefix, DomainType.AUTO);
             }
         }
         String prefix = generateRandomPrefix(8);
-        return new DomainInfo(baseDomain, prefix, DomainType.AUTO);
+        return new DomainInfo(rootDomain, prefix, DomainType.AUTO);
     }
 
     private String generateRandomPrefix() {
@@ -62,13 +62,13 @@ public class DomainGenerator {
         return sb.toString();
     }
 
-    public List<DomainInfo> generateSubdomains(String baseDomain, List<String> subDomains) {
+    public List<DomainInfo> generateSubdomains(String rootDomain, List<String> subDomains) {
         List<DomainInfo> res = new ArrayList<>();
         for (String subDomain : subDomains) {
-            if (domainConfigService.exists(subDomain + "." + baseDomain)) {
-                throw new DomainConflictException("域名[" + subDomain + "." + baseDomain + "]已被占用");
+            if (domainConfigService.exists(subDomain + "." + rootDomain)) {
+                throw new DomainConflictException("域名[" + subDomain + "." + rootDomain + "]已被占用");
             }
-            res.add(new DomainInfo(baseDomain, subDomain, DomainType.SUBDOMAIN));
+            res.add(new DomainInfo(rootDomain, subDomain, DomainType.SUBDOMAIN));
         }
         return res;
     }

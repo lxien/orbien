@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class DomainDTO {
     private Integer id;
     private String domain;
+    private String remark;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime createdAt;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

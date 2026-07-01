@@ -68,10 +68,10 @@
           formatter: (row: UsedDomainItem) => row.proxyName || row.proxyId || '-'
         },
         {
-          prop: 'baseDomain',
-          label: '基础域名',
+          prop: 'rootDomain',
+          label: '根域名',
           minWidth: 160,
-          formatter: (row: UsedDomainItem) => row.baseDomain || '-'
+          formatter: (row: UsedDomainItem) => row.rootDomain || '-'
         }
       ]
     },

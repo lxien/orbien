@@ -21,6 +21,9 @@ import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
 import com.xiaoniucode.etp.server.web.dto.domain.UsedDomainDTO;
+import com.xiaoniucode.etp.server.web.param.domain.DomainBatchDeleteParam;
+import com.xiaoniucode.etp.server.web.param.domain.DomainCreateParam;
+import com.xiaoniucode.etp.server.web.param.domain.DomainUpdateParam;
 import com.xiaoniucode.etp.server.web.service.DomainService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -49,5 +52,23 @@ public class DomainController {
     public Ajax getById(@PathVariable Integer id) {
         DomainDTO domain = domainService.getById(id);
         return Ajax.success(domain);
+    }
+
+    @PostMapping
+    public Ajax create(@RequestBody @Validated DomainCreateParam param) {
+        DomainDTO domain = domainService.create(param);
+        return Ajax.success(domain);
+    }
+
+    @PutMapping
+    public Ajax update(@RequestBody @Validated DomainUpdateParam param) {
+        domainService.update(param);
+        return Ajax.success();
+    }
+
+    @DeleteMapping
+    public Ajax batchDelete(@RequestBody @Validated DomainBatchDeleteParam param) {
+        domainService.deleteBatch(param);
+        return Ajax.success();
     }
 }

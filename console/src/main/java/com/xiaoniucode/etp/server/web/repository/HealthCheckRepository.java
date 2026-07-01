@@ -14,22 +14,18 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.dto.app;
+package com.xiaoniucode.etp.server.web.repository;
 
-import lombok.Data;
+import com.xiaoniucode.etp.server.web.entity.HealthCheckDO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
+import java.util.List;
 
-/**
- * etp 代理服务 配置信息
- */
-@Data
-public class AppConfigInfoDTO implements Serializable {
-    private String serverAddr;
-    private Integer serverPort;
-    private Integer httpProxyPort;
-   private Integer httpsProxyPort;
-    private String rootDomain;
-    private Integer portStart;
-    private Integer portEnd;
+@Repository
+public interface HealthCheckRepository extends JpaRepository<HealthCheckDO, String> {
+
+    List<HealthCheckDO> findByProxyIdIn(List<String> proxyIds);
+
+    void deleteByProxyIdIn(List<String> proxyIds);
 }

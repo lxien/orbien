@@ -26,8 +26,8 @@ import java.util.List;
 public class ProxyProcessorFactory {
     private final List<ProxyProcessor> strategies;
 
-    public ProxyProcessorFactory(TcpProxyProcessor tcpStrategy, HttpProxyProcessor httpStrategy) {
-        this.strategies = List.of(tcpStrategy, httpStrategy);
+    public ProxyProcessorFactory(List<ProxyProcessor> strategies) {
+        this.strategies = strategies;
     }
 
     public ProxyProcessor getProcessor(Message.ProtocolType protocolType) {

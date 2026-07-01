@@ -2,7 +2,7 @@
   <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
     <template #left>
       <ElSpace wrap>
-        <ElButton type="primary" @click="handleAddDomain" v-ripple>添加根域名</ElButton>
+        <ElButton type="primary" @click="showDialog('add')" v-ripple>添加根域名</ElButton>
         <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple>
           批量删除
         </ElButton>
@@ -19,13 +19,23 @@
     @pagination:size-change="handleSizeChange"
     @pagination:current-change="handleCurrentChange"
   />
+
+  <DomainDialog
+    v-model:visible="dialogVisible"
+    :type="dialogType"
+    :domain-id="currentDomainId"
+    @submit="handleDialogSubmit"
+  />
 </template>
 
 <script setup lang="ts">
-  import { ref, h } from 'vue'
+  import { ref, h, nextTick } from 'vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { fetchGetDomainListByPage } from '@/api/domain'
+  import { fetchGetDomainListByPage, fetchDeleteBatchDomains } from '@/api/domain'
+  import DomainDialog from './domain-dialog.vue'
+  import { DialogType } from '@/types'
 
   defineOptions({ name: 'DomainList' })
 
@@ -34,6 +44,9 @@
   type DomainItem = Api.Domain.DomainDTO
 
   const selectedRows = ref<DomainItem[]>([])
+  const dialogType = ref<DialogType>('add')
+  const dialogVisible = ref(false)
+  const currentDomainId = ref<number | undefined>()
 
   const {
     columns,
@@ -59,12 +72,20 @@
           minWidth: 180
         },
         {
+          prop: 'remark',
+          label: '描述',
+          minWidth: 160,
+          formatter: (row: DomainItem) => row.remark || '-'
+        },
+        {
           prop: 'createdAt',
-          label: '创建时间'
+          label: '创建时间',
+          minWidth: 170
         },
         {
           prop: 'updatedAt',
-          label: '更新时间'
+          label: '更新时间',
+          minWidth: 170
         },
         {
           prop: 'operation',
@@ -73,6 +94,10 @@
           fixed: 'right',
           formatter: (row: DomainItem) =>
             h('div', [
+              h(ArtButtonTable, {
+                type: 'edit',
+                onClick: () => showDialog('edit', row)
+              }),
               h(ArtButtonTable, {
                 type: 'delete',
                 onClick: () => deleteDomain(row)
@@ -90,15 +115,39 @@
     selectedRows.value = selection
   }
 
-  const deleteDomain = (row: DomainItem): void => {
-    console.log('删除域名:', row)
+  const deleteDomains = async (rows: DomainItem[], title: string, message: string) => {
+    await ElMessageBox.confirm(message, title, {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'error'
+    })
+    await fetchDeleteBatchDomains(rows.map((row) => row.id))
+    ElMessage.success('删除成功')
+    refreshData()
   }
 
-  const handleAddDomain = (): void => {
-    console.log('添加域名')
+  const deleteDomain = (row: DomainItem): void => {
+    deleteDomains([row], '删除根域名', `确定要删除根域名「${row.domain}」吗？`).catch(() => {})
   }
 
   const handleBatchDelete = (): void => {
-    console.log('批量删除:', selectedRows.value)
+    if (selectedRows.value.length === 0) return
+    deleteDomains(
+      selectedRows.value,
+      '批量删除',
+      `确定要删除选中的 ${selectedRows.value.length} 个根域名吗？`
+    ).catch(() => {})
+  }
+
+  const showDialog = (type: DialogType, row?: DomainItem): void => {
+    dialogType.value = type
+    currentDomainId.value = row?.id
+    nextTick(() => {
+      dialogVisible.value = true
+    })
+  }
+
+  const handleDialogSubmit = () => {
+    refreshData()
   }
 </script>

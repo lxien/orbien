@@ -14,7 +14,7 @@ targets = [
 ]
 ```
 
-如果配置了基础域名（[base_domain](../../server/base_config.md)）可以自定义子域名：
+如果配置了根域名（[root_domain](../../server/base_config.md)）可以自定义子域名：
 
 ```toml
 [[proxies]]
@@ -56,7 +56,7 @@ http_proxy_port 是服务端配置的 HTTP 代理端口，默认为
 | name           | String              | -    | 代理名称，唯一标识一个代理配置            | 是  |
 | protocol       | String              | -    | 协议类型                       | 是  |
 | custom_domains | Array&lt;String&gt; | -    | 自定义域名列表，配置完整域名             | 否  |
-| sub_domains    | Array&lt;String&gt; | -    | 子域名列表，配合服务端 base_domain 使用 | 否  |
+| sub_domains    | Array&lt;String&gt; | -    | 子域名列表，配合服务端 root_domain 使用 | 否  |
 | auto_domain    | Boolean             | true | 是否自动分配子域名                  | 否  |
 | targets        | Array&lt;Object&gt; | -    | 目标服务列表，内网真实服务列表，支持单机和集群    | 是  |
 | enabled        | Boolean             | true | 是否开启代理                     | 否  |

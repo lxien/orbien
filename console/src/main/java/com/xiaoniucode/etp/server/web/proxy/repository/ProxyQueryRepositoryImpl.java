@@ -16,19 +16,21 @@
 
 package com.xiaoniucode.etp.server.web.proxy.repository;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
-import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
-import com.xiaoniucode.etp.server.web.proxy.repository.assembler.ProxyConfigAssembler;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
+import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
 import com.xiaoniucode.etp.server.web.entity.*;
+import com.xiaoniucode.etp.server.web.proxy.repository.assembler.ProxyConfigAssembler;
+import com.xiaoniucode.etp.server.web.proxy.repository.assembler.ProxyRelations;
 import com.xiaoniucode.etp.server.web.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -38,46 +40,20 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     @Autowired
     private ProxyConfigAssembler proxyConfigAssembler;
     @Autowired
-    private ProxyTargetRepository proxyTargetRepository;
+    private ProxyRelationsLoader proxyRelationsLoader;
     @Autowired
-    private ProxyDomainRepository proxyDomainRepository;
+    private AccessControlRepository accessControlRepository;
     @Autowired
-    private BasicUserRepository basicUserRepository;
-    @Autowired
-    private AccessControlRuleRepository accessControlRuleRepository;
+    private BasicAuthRepository basicAuthRepository;
 
     @Override
     public ProxyConfigExt findById(String proxyId) {
-        ProxyDetailQueryResult result = proxyRepository.findDetailByProxyId(proxyId);
-        return assembleProxyConfig(result);
-    }
-
-    private ProxyConfigExt assembleProxyConfig(ProxyDetailQueryResult result) {
-        if (result == null) {
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(proxyId);
+        if (detail == null) {
             return null;
         }
-        ProxyConfig config = proxyConfigAssembler.assembleBase(result);
-        if (config == null) {
-            return null;
-        }
-        String proxyId = config.getProxyId();
-        //访问控制
-        List<AccessControlRuleDO> accessControlRuleDOS = accessControlRuleRepository.findByProxyId(proxyId);
-        proxyConfigAssembler.assembleAccessControlRules(config, accessControlRuleDOS);
-        //服务
-        List<ProxyTargetDO> targets = proxyTargetRepository.findByProxyId(config.getProxyId());
-        proxyConfigAssembler.assembleTargets(config, targets);
-        if (config.getProtocol().isHttp()) {
-            //域名
-            List<ProxyDomainDO> domainDOs = proxyDomainRepository.findByProxyId(config.getProxyId());
-            proxyConfigAssembler.assembleDomains(config, domainDOs);
-            //鉴权认证
-            if (result.getBasicAuthDO() != null) {
-                List<BasicUserDO> basicUsers = basicUserRepository.findByProxyId(proxyId);
-                proxyConfigAssembler.assembleBasicAuthUsers(config, basicUsers);
-            }
-        }
-        return new ProxyConfigExt();
+        ProxyRelations relations = proxyRelationsLoader.loadOne(proxyId);
+        return proxyConfigAssembler.assembleExt(detail, relations);
     }
 
     @Override
@@ -87,35 +63,56 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
 
     @Override
     public ProxyConfigExt findByAgentAndName(String agentId, String proxyName) {
-        ProxyDetailQueryResult result = proxyRepository.findDetailByAgentIdAndProxyName(agentId, proxyName);
-        return assembleProxyConfig(result);
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByAgentIdAndProxyName(agentId, proxyName);
+        if (detail == null || detail.getProxyDO() == null) {
+            return null;
+        }
+        ProxyRelations relations = proxyRelationsLoader.loadOne(detail.getProxyDO().getId());
+        return proxyConfigAssembler.assembleExt(detail, relations);
     }
 
     @Override
     public ProxyConfigExt findByListenPort(int listenPort) {
-        ProxyDetailQueryResult result = proxyRepository.findDetailByListenPort(listenPort);
-        return assembleProxyConfig(result);
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByListenPort(listenPort);
+        if (detail == null || detail.getProxyDO() == null) {
+            return null;
+        }
+        ProxyRelations relations = proxyRelationsLoader.loadOne(detail.getProxyDO().getId());
+        return proxyConfigAssembler.assembleExt(detail, relations);
     }
-
 
     @Override
     public List<ProxyConfigExt> findByAgentId(String agentId) {
-        List<ProxyDO> list = proxyRepository.findByAgentId(agentId);
-        if (CollectionUtils.isEmpty(list)) {
+        List<ProxyDO> proxies = proxyRepository.findByAgentId(agentId);
+        if (CollectionUtils.isEmpty(proxies)) {
             return List.of();
         }
-        List<String> proxyIds = list.stream().map(ProxyDO::getId).toList();
-        List<ProxyDomainDO> proxyDomainDOs = proxyDomainRepository.findByProxyIdIn(proxyIds);
-        Map<String, List<ProxyDomainDO>> domainMap = proxyDomainDOs.stream()
-                .collect(Collectors.groupingBy(ProxyDomainDO::getProxyId));
-        return proxyConfigAssembler.assembleList(list).stream()
-                .map(config -> {
-                    List<ProxyDomainDO> domains = domainMap.getOrDefault(config.getProxyId(), List.of());
-                    Set<DomainInfo> domainInfos = domains.stream()
-                            .map(domainDO -> new DomainInfo(domainDO.getBaseDomain(), domainDO.getDomain(), domainDO.getDomainType()))
-                            .collect(Collectors.toSet());
-                    return new ProxyConfigExt(config, domainInfos);
+
+        List<String> proxyIds = proxies.stream().map(ProxyDO::getId).toList();
+        Map<String, ProxyRelations> relationsMap = proxyRelationsLoader.loadMany(proxyIds);
+        Map<String, AccessControlDO> accessControlMap = accessControlRepository.findAllById(proxyIds).stream()
+                .collect(Collectors.toMap(AccessControlDO::getProxyId, Function.identity()));
+        Map<String, BasicAuthDO> basicAuthMap = basicAuthRepository.findAllById(proxyIds).stream()
+                .collect(Collectors.toMap(BasicAuthDO::getProxyId, Function.identity()));
+        Map<String, ProxyListQueryResult> proxyWithAgentMap = proxyRepository.findWithAgentByIdIn(proxyIds).stream()
+                .collect(Collectors.toMap(item -> item.getProxyDO().getId(), Function.identity()));
+
+        return proxyIds.stream()
+                .map(proxyId -> {
+                    ProxyListQueryResult item = proxyWithAgentMap.get(proxyId);
+                    if (item == null) {
+                        return null;
+                    }
+                    ProxyDetailQueryResult detail = new ProxyDetailQueryResult(
+                            item.getAgentDO(),
+                            item.getProxyDO(),
+                            basicAuthMap.get(proxyId),
+                            accessControlMap.get(proxyId)
+                    );
+                    ProxyRelations relations = relationsMap.getOrDefault(proxyId, ProxyRelations.empty());
+                    return proxyConfigAssembler.assembleExt(detail, relations);
                 })
+                .filter(item -> item != null)
                 .toList();
     }
 }

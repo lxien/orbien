@@ -30,7 +30,7 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(a, p)
             FROM ProxyDO p
             LEFT JOIN AgentDO a ON a.id = p.agentId
-            WHERE p.protocol = :protocolType
+            WHERE p.protocol = :protocol
             ORDER BY p.updatedAt DESC
             """)
     Page<ProxyListQueryResult> findProxiesWithAssociations(@Param("protocol") ProtocolType protocol, Pageable pageable);
@@ -79,7 +79,7 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     @Query("""
             SELECT NEW com.xiaoniucode.etp.server.web.dto.stats.ProxyProtocolCountDTO(
                 SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
-                             SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
+                SUM(CASE WHEN p.protocol = :https THEN 1 ELSE 0 END),
                 SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END)
             )
             FROM ProxyDO p

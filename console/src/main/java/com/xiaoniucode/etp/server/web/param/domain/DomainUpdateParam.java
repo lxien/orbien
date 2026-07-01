@@ -14,22 +14,19 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.dto.app;
+package com.xiaoniucode.etp.server.web.param.domain;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.Serializable;
+@Getter
+@Setter
+public class DomainUpdateParam {
+    @NotNull(message = "id 不能为空")
+    private Integer id;
 
-/**
- * etp 代理服务 配置信息
- */
-@Data
-public class AppConfigInfoDTO implements Serializable {
-    private String serverAddr;
-    private Integer serverPort;
-    private Integer httpProxyPort;
-   private Integer httpsProxyPort;
-    private String rootDomain;
-    private Integer portStart;
-    private Integer portEnd;
+    @Size(max = 500, message = "描述长度不能超过 500")
+    private String remark;
 }

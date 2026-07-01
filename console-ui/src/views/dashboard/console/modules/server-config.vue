@@ -79,8 +79,8 @@
       iconBgClass: 'icon-bg-orange'
     },
     {
-      label: '基础域名',
-      value: configInfo.value?.baseDomain || '-',
+      label: '根域名',
+      value: configInfo.value?.rootDomain || '-',
       icon: 'ri:earth-line',
       iconBgClass: 'icon-bg-purple'
     },

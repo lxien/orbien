@@ -23,13 +23,13 @@ targets = [
 
 ## 子域名
 
-配合服务端 `base_domain` 配置使用，只需指定子域名部分，完整域名为 `子域名 + base_domain`。
+配合服务端 `root_domain` 配置使用，只需指定子域名部分，完整域名为 `子域名 + root_domain`。
 
-服务端需配置基础域名（详见 [服务端基础配置](../server/base_config.md)）：
+服务端需配置根域名（详见 [服务端基础配置](../server/base_config.md)）：
 
 ```toml
 # etps.toml（服务端配置）
-base_domain = "domain.com"
+root_domain = "domain.com"
 ```
 
 客户端配置子域名：
@@ -70,7 +70,7 @@ targets = [
 | 参数名            | 类型              | 默认值  | 描述                         | 必填 |
 |:---------------|:----------------|:-----|:---------------------------|:---|
 | custom_domains | Array\<String\> | -    | 自定义域名列表，配置完整域名             | 否  |
-| sub_domains    | Array\<String\> | -    | 子域名列表，配合服务端 base_domain 使用 | 否  |
+| sub_domains    | Array\<String\> | -    | 子域名列表，配合服务端 root_domain 使用 | 否  |
 | auto_domain    | Boolean         | true | 是否自动分配子域名                  | 否  |
 
 :::tip

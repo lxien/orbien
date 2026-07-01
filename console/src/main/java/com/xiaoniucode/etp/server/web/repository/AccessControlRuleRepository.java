@@ -16,6 +16,8 @@ public interface AccessControlRuleRepository extends JpaRepository<AccessControl
 
     List<AccessControlRuleDO> findByProxyId(String proxyId);
 
+    List<AccessControlRuleDO> findByProxyIdIn(List<String> proxyIds);
+
     boolean existsByProxyIdAndCidr(String proxyId, String cidr);
 
     boolean existsByProxyIdAndCidrAndIdNot(String proxyId, String cidr,  Long id);

@@ -27,44 +27,92 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ProxyConfigAssembler {
     @Autowired
     private ProxyModelConvert proxyModelConvert;
 
+    /**
+     * 组装完整的代理扩展配置。
+     */
+    public ProxyConfigExt assembleExt(ProxyDetailQueryResult detail, ProxyRelations relations) {
+        if (detail == null || detail.getProxyDO() == null) {
+            return null;
+        }
+        ProxyConfig config = assembleBase(detail);
+        if (config == null) {
+            return null;
+        }
+
+        assembleTransport(config, detail.getProxyDO());
+        assembleTargets(config, relations.targets());
+        assembleAccessControlRules(config, relations.accessControlRules());
+
+        if (config.isHttpOrHttps()) {
+            assembleDomains(config, relations.domains());
+            if (config.hasBasicAuth()) {
+                assembleBasicAuthUsers(config, relations.basicUsers());
+            }
+        }
+
+        assembleHealthCheck(config, relations.healthCheck());
+        return ProxyConfigExt.of(config, toDomainInfos(relations.domains()));
+    }
+
     public ProxyConfig assembleBase(ProxyDetailQueryResult result) {
-        if (result == null) {
+        if (result == null || result.getProxyDO() == null) {
             return null;
         }
         AgentDO agentDO = result.getAgentDO();
         ProxyDO proxyDO = result.getProxyDO();
 
         ProxyConfig config = proxyModelConvert.toProxyConfig(proxyDO);
-        config.setAgentId(agentDO.getId());
-        config.setAgentType(agentDO.getAgentType());
+        if (agentDO != null) {
+            config.setAgentId(agentDO.getId());
+            config.setAgentType(agentDO.getAgentType());
+        } else {
+            config.setAgentId(proxyDO.getAgentId());
+        }
         config.setListenPort(config.getRemotePort());
-
 
         if (proxyDO.getLimitTotal() != null || proxyDO.getLimitIn() != null || proxyDO.getLimitOut() != null) {
             config.setBandwidth(new BandwidthConfig(proxyDO.getLimitTotal(), proxyDO.getLimitIn(), proxyDO.getLimitOut()));
         }
 
-      //todo transport
         AccessControlDO accessControlDO = result.getAccessControlDO();
         if (accessControlDO != null) {
             config.setAccessControl(proxyModelConvert.toAccessControlConfig(accessControlDO));
         }
+
         BasicAuthDO basicAuthDO = result.getBasicAuthDO();
-        if (config.isHttp() && basicAuthDO != null) {
+        if (config.isHttpOrHttps() && basicAuthDO != null) {
             config.setBasicAuth(proxyModelConvert.toBasicAuthConfig(basicAuthDO));
         }
         return config;
     }
 
+    public void assembleTransport(ProxyConfig config, ProxyDO proxyDO) {
+        if (proxyDO == null) {
+            return;
+        }
+        if (proxyDO.getMultiplex() == null && proxyDO.getEncrypt() == null && proxyDO.getCompress() == null) {
+            return;
+        }
+        config.setTransport(TransportCustomConfig.builder()
+                .multiplex(proxyDO.getMultiplex())
+                .encrypt(proxyDO.getEncrypt())
+                .compress(proxyDO.getCompress())
+                .build());
+    }
+
     public void assembleTargets(ProxyConfig config, List<ProxyTargetDO> targets) {
-        List<Target> targetModels = proxyModelConvert.toTargetModel(targets);
-        config.addTargets(targetModels);
+        if (CollectionUtils.isEmpty(targets)) {
+            return;
+        }
+        config.addTargets(proxyModelConvert.toTargetModel(targets));
     }
 
     public void assembleDomains(ProxyConfig config, List<ProxyDomainDO> domainDOs) {
@@ -74,6 +122,9 @@ public class ProxyConfigAssembler {
         RouteConfig routeConfig = new RouteConfig();
         for (ProxyDomainDO domainDO : domainDOs) {
             DomainType domainType = domainDO.getDomainType();
+            if (domainType == null) {
+                continue;
+            }
             if (domainType.isAuto()) {
                 routeConfig.setAutoDomain(true);
             } else if (domainType.isCustomDomain()) {
@@ -85,11 +136,10 @@ public class ProxyConfigAssembler {
         config.setRouteConfig(routeConfig);
     }
 
-    public List<ProxyConfig> assembleList(List<ProxyDO> list) {
-        return proxyModelConvert.toProxyConfig(list);
-    }
-
     public void assembleBasicAuthUsers(ProxyConfig config, List<BasicUserDO> basicUsers) {
+        if (CollectionUtils.isEmpty(basicUsers)) {
+            return;
+        }
         BasicAuthConfig basicAuth = config.getBasicAuth();
         if (basicAuth != null) {
             basicAuth.addUsers(proxyModelConvert.toBasicAuthUserConfig(basicUsers));
@@ -97,7 +147,7 @@ public class ProxyConfigAssembler {
     }
 
     public void assembleAccessControlRules(ProxyConfig config, List<AccessControlRuleDO> accessControlRuleDOS) {
-        if (CollectionUtils.isEmpty(accessControlRuleDOS)) {
+        if (CollectionUtils.isEmpty(accessControlRuleDOS) || !config.hasAccessControl()) {
             return;
         }
         AccessControlConfig accessControl = config.getAccessControl();
@@ -109,5 +159,32 @@ public class ProxyConfigAssembler {
                 accessControl.addDeny(rule.getCidr());
             }
         });
+    }
+
+    public void assembleHealthCheck(ProxyConfig config, HealthCheckDO healthCheckDO) {
+        if (healthCheckDO == null) {
+            return;
+        }
+        HealthCheckConfig healthCheck = new HealthCheckConfig();
+        healthCheck.setEnabled(Boolean.TRUE.equals(healthCheckDO.getEnabled()));
+        healthCheck.setType(healthCheckDO.getType());
+        healthCheck.setInterval(healthCheckDO.getInterval());
+        healthCheck.setTimeout(healthCheckDO.getTimeout());
+        healthCheck.setMaxFailed(healthCheckDO.getMaxFailed());
+        healthCheck.setPath(healthCheckDO.getPath());
+        config.setHealthCheck(healthCheck);
+    }
+
+    public Set<DomainInfo> toDomainInfos(List<ProxyDomainDO> domainDOs) {
+        if (CollectionUtils.isEmpty(domainDOs)) {
+            return Set.of();
+        }
+        return domainDOs.stream()
+                .map(domainDO -> new DomainInfo(domainDO.getRootDomain(), domainDO.getDomain(), domainDO.getDomainType()))
+                .collect(Collectors.toSet());
+    }
+
+    public List<ProxyConfig> assembleList(List<ProxyDO> list) {
+        return proxyModelConvert.toProxyConfig(list);
     }
 }

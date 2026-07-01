@@ -15,6 +15,8 @@ public interface BasicUserRepository extends JpaRepository<BasicUserDO, Long> {
 
     List<BasicUserDO> findByProxyId(String proxyId);
 
+    List<BasicUserDO> findByProxyIdIn(List<String> proxyIds);
+
     boolean existsByProxyIdAndUsername(String proxyId,String username);
 
     /**

@@ -16,6 +16,8 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.server.service.DomainConfigService;
+import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.domain.DomainDTO;
@@ -23,6 +25,9 @@ import com.xiaoniucode.etp.server.web.dto.domain.UsedDomainDTO;
 import com.xiaoniucode.etp.server.web.entity.DomainDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDomainDO;
+import com.xiaoniucode.etp.server.web.param.domain.DomainBatchDeleteParam;
+import com.xiaoniucode.etp.server.web.param.domain.DomainCreateParam;
+import com.xiaoniucode.etp.server.web.param.domain.DomainUpdateParam;
 import com.xiaoniucode.etp.server.web.repository.DomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyDomainRepository;
 import com.xiaoniucode.etp.server.web.repository.ProxyRepository;
@@ -34,6 +39,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -50,6 +57,8 @@ public class DomainServiceImpl implements DomainService {
     private ProxyRepository proxyRepository;
     @Autowired
     private DomainConvert domainConvert;
+    @Autowired
+    private DomainConfigService domainConfigService;
 
     @Override
     public PageResult<DomainDTO> findByPage(PageQuery pageQuery) {
@@ -84,7 +93,7 @@ public class DomainServiceImpl implements DomainService {
             dto.setId(domainDO.getId());
             dto.setFullDomain(domainDO.getFullDomain());
             dto.setDomain(domainDO.getDomain());
-            dto.setBaseDomain(domainDO.getBaseDomain());
+            dto.setRootDomain(domainDO.getRootDomain());
             dto.setDomainType(domainDO.getDomainType() != null ? domainDO.getDomainType().getCode() : null);
             dto.setProxyId(domainDO.getProxyId());
             ProxyDO proxyDO = proxyMap.get(domainDO.getProxyId());
@@ -99,10 +108,42 @@ public class DomainServiceImpl implements DomainService {
 
     @Override
     public DomainDTO getById(Integer id) {
-        DomainDO domainDO = domainRepository.findById(id).orElse(null);
-        if (domainDO == null) {
-            return null;
-        }
+        DomainDO domainDO = domainRepository.findById(id)
+                .orElseThrow(() -> new BizException("域名不存在"));
         return domainConvert.toDTO(domainDO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public DomainDTO create(DomainCreateParam param) {
+        if (domainRepository.existsByDomain(param.getDomain())) {
+            throw new BizException("根域名已存在: " + param.getDomain());
+        }
+        DomainDO domainDO = new DomainDO();
+        domainDO.setDomain(param.getDomain());
+        domainDO.setRemark(param.getRemark());
+        DomainDO saved = domainRepository.save(domainDO);
+        domainConfigService.evictBaseDomains();
+        return domainConvert.toDTO(saved);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void update(DomainUpdateParam param) {
+        DomainDO domainDO = domainRepository.findById(param.getId())
+                .orElseThrow(() -> new BizException("域名不存在"));
+        domainDO.setRemark(param.getRemark());
+        domainRepository.save(domainDO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(DomainBatchDeleteParam param) {
+        List<Integer> ids = param.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        domainRepository.deleteAllById(ids);
+        domainConfigService.evictBaseDomains();
     }
 }

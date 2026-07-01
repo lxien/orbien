@@ -27,9 +27,7 @@ import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
-import com.xiaoniucode.etp.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.*;
-import com.xiaoniucode.etp.server.web.dto.transport.TransportDTO;
 import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
@@ -102,8 +100,8 @@ public class ProxyServiceImpl implements ProxyService {
     public void createHttpProxy(HttpProxyCreateParam param) {
 
         DomainType domainType = DomainType.fromCode(param.getDomainType());
-        String baseDomain=appConfig.getBaseDomains().stream().toList().getFirst();
-        if (StringUtils.hasText(baseDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
+        String rootDomain=appConfig.getRootDomains().stream().toList().getFirst();
+        if (StringUtils.hasText(rootDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
             throw new BizException("不支持改域名类型的自动生成！");
         }
         //1.基础信息
@@ -138,9 +136,9 @@ public class ProxyServiceImpl implements ProxyService {
         //5.域名
         Set<String> fullDomains = new HashSet<>();
         if (domainType.isAuto()) {
-            DomainInfo domain = domainGenerator.generateRandomSubdomain(baseDomain);
+            DomainInfo domain = domainGenerator.generateRandomSubdomain(rootDomain);
             fullDomains.add(domain.getFullDomain());
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), baseDomain, domainType));
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), rootDomain, domainType));
         } else if (domainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
@@ -156,7 +154,7 @@ public class ProxyServiceImpl implements ProxyService {
             fullDomains.addAll(domains);
         } else if (domainType.isSubdomain()) {
             Set<String> prefixes = param.getDomains();
-            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
+            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + rootDomain).toList();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
             if (!existsList.isEmpty()) {
                 String existDomains = existsList.stream()
@@ -166,7 +164,7 @@ public class ProxyServiceImpl implements ProxyService {
             }
             fullDomains.addAll(domains);
             List<ProxyDomainDO> list = prefixes.stream()
-                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, baseDomain, domainType)).toList();
+                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, rootDomain, domainType)).toList();
             proxyDomainRepository.saveAll(list);
         }
 
@@ -227,8 +225,8 @@ public class ProxyServiceImpl implements ProxyService {
         if (!(existsDomainType == requestDomainType && existsDomainType.isAuto())) {
             proxyDomainRepository.deleteByProxyId(proxyId);
         }
-        //todo String baseDomain = appConfig.getBaseDomain();
-        String baseDomain=appConfig.getBaseDomains().stream().toList().getFirst();
+        //todo String rootDomain = appConfig.getBaseDomain();
+        String rootDomain=appConfig.getRootDomains().stream().toList().getFirst();
         Set<String> fullDomains = new HashSet<>();
         //请求域名类型和存在域名相同且是自动生成域名类型的时保持不变，其他都删除后重新生成
         if (!((requestDomainType == existsDomainType) && existsDomainType.isAuto())) {
@@ -241,9 +239,9 @@ public class ProxyServiceImpl implements ProxyService {
             }
         }
         if (requestDomainType.isAuto() && !existsDomainType.isAuto()) {
-            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(baseDomain);
+            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(rootDomain);
             fullDomains.add(domainInfo.getFullDomain());
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domainInfo.getDomain(), baseDomain, requestDomainType));
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domainInfo.getDomain(), rootDomain, requestDomainType));
         } else if (requestDomainType.isCustomDomain()) {
             Set<String> domains = param.getDomains();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
@@ -257,7 +255,7 @@ public class ProxyServiceImpl implements ProxyService {
             proxyDomainRepository.saveAll(list);
         } else if (requestDomainType.isSubdomain()) {
             Set<String> prefixes = param.getDomains();
-            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + baseDomain).toList();
+            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + rootDomain).toList();
             List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
             if (!existsList.isEmpty()) {
                 String existDomains = existsList.stream()
@@ -267,7 +265,7 @@ public class ProxyServiceImpl implements ProxyService {
             }
             fullDomains.addAll(domains);
             List<ProxyDomainDO> list = prefixes.stream()
-                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, baseDomain, requestDomainType)).toList();
+                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, rootDomain, requestDomainType)).toList();
             proxyDomainRepository.saveAll(list);
         }
 //        transactionHelper.afterCommit(() ->
@@ -283,15 +281,23 @@ public class ProxyServiceImpl implements ProxyService {
      */
     @Override
     public PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery) {
+        return findHttpLikeProxies(pageQuery, ProtocolType.HTTP, appConfig.getHttpProxyPort());
+    }
+
+    @Override
+    public PageResult<HttpProxyListDTO> findHttpsProxies(PageQuery pageQuery) {
+        return findHttpLikeProxies(pageQuery, ProtocolType.HTTPS, appConfig.getHttpsProxyPort());
+    }
+
+    private PageResult<HttpProxyListDTO> findHttpLikeProxies(PageQuery pageQuery, ProtocolType protocolType, int proxyPort) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
 
-        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.HTTP, pageable);
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(protocolType, pageable);
 
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
-        int httpProxyPort = appConfig.getHttpProxyPort();
         List<ProxyListQueryResult> content = resultPage.getContent();
 
         List<String> proxyIds = content.stream()
@@ -311,14 +317,14 @@ public class ProxyServiceImpl implements ProxyService {
         for (ProxyListQueryResult r : content) {
             ProxyDO proxyDO = r.getProxyDO();
             AgentDO agentDO = r.getAgentDO();
-            HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, httpProxyPort);
+            HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, proxyPort);
 
             if (agentDO != null && agentDO.getAgentType() != null) {
                 httpDTO.setAgentType(agentDO.getAgentType().getCode());
             }
             httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
             httpDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
-            httpDTO.setHttpProxyPort(httpProxyPort);
+            httpDTO.setHttpProxyPort(proxyPort);
             res.add(httpDTO);
         }
         return PageResult.wrap(resultPage, res);

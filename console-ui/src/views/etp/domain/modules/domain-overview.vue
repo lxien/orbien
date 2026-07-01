@@ -3,7 +3,7 @@
     <div class="mb-5">
       <h4 class="m-0 text-lg font-semibold">域名资源</h4>
       <p class="m-0 mt-1 text-sm text-g-500">
-        基础域名池定义平台可用的根域名；已分配域名展示代理隧道当前占用的访问地址。
+        根域名池定义平台可用的根域名；已分配域名展示代理隧道当前占用的访问地址。
       </p>
     </div>
 
@@ -45,7 +45,7 @@
   const items = computed(() => [
     {
       key: 'pool' as DomainView,
-      label: '基础域名池',
+      label: '根域名池',
       hint: '用于子域名自动拼接的根域名',
       icon: 'ri:global-line',
       iconClass: 'text-theme',

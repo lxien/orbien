@@ -14,22 +14,23 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.dto.app;
+package com.xiaoniucode.etp.server.web.proxy.repository.assembler;
 
-import lombok.Data;
+import com.xiaoniucode.etp.server.web.entity.*;
 
-import java.io.Serializable;
+import java.util.List;
 
 /**
- * etp 代理服务 配置信息
+ * 代理关联表聚合数据，用于组装 {@link com.xiaoniucode.etp.core.domain.ProxyConfigExt}。
  */
-@Data
-public class AppConfigInfoDTO implements Serializable {
-    private String serverAddr;
-    private Integer serverPort;
-    private Integer httpProxyPort;
-   private Integer httpsProxyPort;
-    private String rootDomain;
-    private Integer portStart;
-    private Integer portEnd;
+public record ProxyRelations(
+        List<ProxyTargetDO> targets,
+        List<AccessControlRuleDO> accessControlRules,
+        List<ProxyDomainDO> domains,
+        List<BasicUserDO> basicUsers,
+        HealthCheckDO healthCheck
+) {
+    public static ProxyRelations empty() {
+        return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null);
+    }
 }

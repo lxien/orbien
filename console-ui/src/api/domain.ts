@@ -34,3 +34,39 @@ export function fetchGetUsedDomainListByPage(params: Api.Common.CommonSearchPara
     params
   })
 }
+
+/**
+ * 创建根域名
+ * @param params 创建参数
+ * @returns 创建结果
+ */
+export function fetchCreateDomain(params: Api.Domain.DomainCreateParam) {
+  return request.post<Api.Domain.DomainDTO>({
+    url: '/api/domains',
+    data: params
+  })
+}
+
+/**
+ * 更新根域名描述
+ * @param params 更新参数
+ * @returns 更新结果
+ */
+export function fetchUpdateDomain(params: Api.Domain.DomainUpdateParam) {
+  return request.put({
+    url: '/api/domains',
+    data: params
+  })
+}
+
+/**
+ * 批量删除根域名
+ * @param ids 域名ID列表
+ * @returns 删除结果
+ */
+export function fetchDeleteBatchDomains(ids: number[]) {
+  return request.del({
+    url: '/api/domains',
+    data: { ids }
+  })
+}

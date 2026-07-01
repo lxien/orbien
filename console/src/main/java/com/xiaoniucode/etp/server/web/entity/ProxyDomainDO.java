@@ -46,8 +46,8 @@ public class ProxyDomainDO {
     @Column(nullable = false)
     private String domain;
 
-    @Column(name = "base_domain")
-    private String baseDomain;
+    @Column(name = "root_domain")
+    private String rootDomain;
 
     @Column(name = "full_domain", nullable = false, unique = true)
     private String fullDomain;
@@ -58,10 +58,10 @@ public class ProxyDomainDO {
     @Column(name = "domain_type")
     private DomainType domainType;
 
-    public ProxyDomainDO(String proxyId, String domain, String baseDomain, DomainType domainType) {
+    public ProxyDomainDO(String proxyId, String domain, String rootDomain, DomainType domainType) {
         this.proxyId = proxyId;
         this.domain = domain;
-        this.baseDomain = baseDomain;
+        this.rootDomain = rootDomain;
         this.domainType = domainType;
         this.fullDomain = getFullDomain();
     }
@@ -70,6 +70,6 @@ public class ProxyDomainDO {
         if (domainType == DomainType.CUSTOM_DOMAIN) {
             return domain;
         }
-        return domain + "." + baseDomain;
+        return domain + "." + rootDomain;
     }
 }

@@ -20,7 +20,7 @@ public class RouteConfig {
      */
     private final Set<String> customDomains = new CopyOnWriteArraySet<>();
     /**
-     * 根据基础域名生成子域名
+     * 根据根域名生成子域名
      */
     private final Set<String> subDomains = new CopyOnWriteArraySet<>();
 

@@ -14,22 +14,17 @@
  *    limitations under the License.
  */
 
-package com.xiaoniucode.etp.server.web.dto.app;
+package com.xiaoniucode.etp.server.web.param.domain;
 
-import lombok.Data;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.io.Serializable;
+import java.util.List;
 
-/**
- * etp 代理服务 配置信息
- */
-@Data
-public class AppConfigInfoDTO implements Serializable {
-    private String serverAddr;
-    private Integer serverPort;
-    private Integer httpProxyPort;
-   private Integer httpsProxyPort;
-    private String rootDomain;
-    private Integer portStart;
-    private Integer portEnd;
+@Getter
+@Setter
+public class DomainBatchDeleteParam {
+    @NotEmpty(message = "ids 不能为空")
+    private List<Integer> ids;
 }

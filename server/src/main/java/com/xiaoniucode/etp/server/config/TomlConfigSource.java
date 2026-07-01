@@ -67,9 +67,9 @@ public class TomlConfigSource implements ConfigSource {
         validatePort(serverPortValue.intValue());
         builder.serverPort(serverPortValue.intValue());
 
-        List<String> baseDomains = root.getList("base_domains");
-        if (!CollectionUtils.isEmpty(baseDomains)) {
-            builder.baseDomain(new HashSet<>(baseDomains));
+        List<String> rootDomains = root.getList("root_domains");
+        if (!CollectionUtils.isEmpty(rootDomains)) {
+            builder.rootDomain(new HashSet<>(rootDomains));
         }
         Long httpProxyPort = root.getLong("http_proxy_port", 80L);
         int httpPort = httpProxyPort.intValue();

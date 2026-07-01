@@ -36,7 +36,7 @@ public class DomainConfigService {
     @Autowired
     private DomainQueryRepository domainQueryRepository;
 
-    private final Cache<String, List<String>> baseDomainCache = Caffeine.newBuilder()
+    private final Cache<String, List<String>> rootDomainCache = Caffeine.newBuilder()
             .maximumSize(1)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -50,10 +50,10 @@ public class DomainConfigService {
             .recordStats()
             .build();
 
-    public List<String> findAllBaseDomains() {
-        return baseDomainCache.get("BASE_DOMAINS", key -> {
-            logger.debug("从数据库加载基础域名列表");
-            return domainQueryRepository.findAllBaseDomains();
+    public List<String> findAllRootDomains() {
+        return rootDomainCache.get("BASE_DOMAINS", key -> {
+            logger.debug("从数据库加载根域名列表");
+            return domainQueryRepository.findAllRootDomains();
         });
     }
 
@@ -68,11 +68,11 @@ public class DomainConfigService {
     }
 
     /**
-     * 清理基础域名缓存
+     * 清理根域名缓存
      */
     public void evictBaseDomains() {
-        baseDomainCache.invalidate("BASE_DOMAINS");
-        logger.debug("已清理基础域名列表缓存");
+        rootDomainCache.invalidate("BASE_DOMAINS");
+        logger.debug("已清理根域名列表缓存");
     }
 
     /**
@@ -86,7 +86,7 @@ public class DomainConfigService {
     }
 
     public void evictAll() {
-        baseDomainCache.invalidateAll();
+        rootDomainCache.invalidateAll();
         domainExistsCache.invalidateAll();
         logger.debug("已清理所有域名缓存");
     }

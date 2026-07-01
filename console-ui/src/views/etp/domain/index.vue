@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-  import { reactive, onMounted } from 'vue'
+  import { ref, reactive, onMounted } from 'vue'
   import DomainOverview, { type DomainView } from './modules/domain-overview.vue'
   import DomainList from './modules/domain-list.vue'
   import UsedDomainList from './modules/used-domain-list.vue'

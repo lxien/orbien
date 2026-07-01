@@ -26,9 +26,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class DomainInfo {
     /**
-     * 基础域名
+     * 根域名
      */
-    private String baseDomain;
+    private String rootDomain;
     /**
      * 域名
      */
@@ -43,7 +43,7 @@ public class DomainInfo {
         if (domainType == DomainType.CUSTOM_DOMAIN) {
             return domain;
         }
-        return domain + "." + baseDomain;
+        return domain + "." + rootDomain;
     }
 
 }

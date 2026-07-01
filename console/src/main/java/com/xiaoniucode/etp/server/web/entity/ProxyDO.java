@@ -107,7 +107,7 @@ public class ProxyDO {
      */
     @Convert(converter = LoadBalanceConverter.class)
     @Column(name = "load_balance_strategy", nullable = false)
-    private Integer loadBalanceStrategy;
+    private LoadBalanceType loadBalanceStrategy;
     /**
      * 部署模式
      */

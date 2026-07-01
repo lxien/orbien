@@ -40,7 +40,7 @@ public class DomainQueryRepositoryImpl implements DomainQueryRepository {
     }
 
     @Override
-    public List<String> findAllBaseDomains() {
+    public List<String> findAllRootDomains() {
         return domainRepository.findAll().stream().map(DomainDO::getDomain).toList();
     }
 }

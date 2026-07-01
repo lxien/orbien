@@ -22,5 +22,5 @@ import java.util.List;
 
 public interface DomainQueryRepository {
     boolean existsByFullDomain(String fullDomain);
-    List<String> findAllBaseDomains();
+    List<String> findAllRootDomains();
 }
