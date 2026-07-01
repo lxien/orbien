@@ -121,12 +121,12 @@
             if (!isExpired) {
               children.push(
                 h(ArtButtonTable, {
-                  type: 'text',
+                  type: 'link',
                   text: '部署',
                   onClick: () => handleDeploy(row)
                 }),
                 h(ArtButtonTable, {
-                  type: 'text',
+                  type: 'link',
                   text: '下载',
                   onClick: () => handleDownload(row)
                 })
@@ -134,7 +134,7 @@
             }
             children.push(
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '删除',
                 onClick: () => handleDelete(row)
               })

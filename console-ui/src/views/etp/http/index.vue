@@ -171,27 +171,27 @@
         {
           prop: 'operation',
           label: '操作',
-          width: 260,
+          width: 190,
           fixed: 'right',
           formatter: (row: HttpProxyItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '设置',
                 onClick: () => handleSettings(row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '统计',
                 onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '删除',
                 onClick: () => handleSingleDelete(row)
               })

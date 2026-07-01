@@ -129,7 +129,7 @@
           formatter: (row: Api.Metrics.TrafficCountDTO) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '数据',
                 onClick: () => handleViewMetrics(row)
               })

@@ -54,10 +54,10 @@
                 >
                   保存
                 </ElButton>
-                <ElButton v-else type="text" size="small" @click="handleEditRule(scope.row)">
+                <ElButton v-else type="link" size="small" @click="handleEditRule(scope.row)">
                   编辑
                 </ElButton>
-                <ElButton size="small" @click="handleDeleteRule(scope.row.id)">
+                <ElButton type="link" size="small" @click="handleDeleteRule(scope.row.id)">
                   <template #icon>
                     <Delete />
                   </template>

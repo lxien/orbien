@@ -105,12 +105,12 @@
           formatter: (row: ClientItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '详情',
                 onClick: () => showClientDetail(row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '强制下线',
                 onClick: () => kickoutClient(row),
                 disabled: !row.isOnline

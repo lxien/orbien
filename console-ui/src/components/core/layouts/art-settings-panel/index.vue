@@ -13,11 +13,11 @@
       <!-- 系统主题色 -->
       <ColorSettings />
       <!-- 盒子样式 -->
-      <BoxStyleSettings />
+      <!--      <BoxStyleSettings />-->
       <!-- 容器宽度 -->
-      <ContainerSettings />
+      <!--      <ContainerSettings />-->
       <!-- 基础配置 -->
-      <BasicSettings />
+      <!--      <BasicSettings />-->
       <!-- 操作按钮 -->
       <SettingActions />
     </SettingDrawer>
@@ -33,9 +33,9 @@
   import MenuLayoutSettings from './widget/MenuLayoutSettings.vue'
   import MenuStyleSettings from './widget/MenuStyleSettings.vue'
   import ColorSettings from './widget/ColorSettings.vue'
-  import BoxStyleSettings from './widget/BoxStyleSettings.vue'
-  import ContainerSettings from './widget/ContainerSettings.vue'
-  import BasicSettings from './widget/BasicSettings.vue'
+  // import BoxStyleSettings from './widget/BoxStyleSettings.vue'
+  // import ContainerSettings from './widget/ContainerSettings.vue'
+  // import BasicSettings from './widget/BasicSettings.vue'
   import SettingActions from './widget/SettingActions.vue'
 
   defineOptions({ name: 'ArtSettingsPanel' })

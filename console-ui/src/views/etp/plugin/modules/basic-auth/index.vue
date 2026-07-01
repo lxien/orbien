@@ -48,10 +48,10 @@
                 >
                   保存
                 </ElButton>
-                <ElButton v-else type="text" size="small" @click="handleEditUser(scope.row)">
+                <ElButton v-else type="link" size="small" @click="handleEditUser(scope.row)">
                   编辑
                 </ElButton>
-                <ElButton size="small" @click="handleDeleteUser(scope.row.id)">
+                <ElButton type="link" size="small" @click="handleDeleteUser(scope.row.id)">
                   <template #icon>
                     <Delete />
                   </template>

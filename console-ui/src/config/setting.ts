@@ -41,7 +41,7 @@ export const SETTING_DEFAULT_CONFIG = {
   /** 菜单风格 */
   menuThemeType: MenuThemeEnum.DESIGN,
   /** 系统主题颜色 */
-  systemThemeColor: '#20a53a',
+  systemThemeColor: '#5D87FF',
   /** 是否显示菜单按钮 */
   showMenuButton: true,
   /** 是否显示快速入口 */
@@ -79,7 +79,7 @@ export const SETTING_DEFAULT_CONFIG = {
   /** 标签页样式 */
   tabStyle: 'tab-google',
   /** 自定义圆角 */
-  customRadius: '0',
+  customRadius: '0.25',
   /** 容器宽度 */
   containerWidth: ContainerWidthEnum.FULL,
   /** 节日日期 */

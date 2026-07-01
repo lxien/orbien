@@ -174,12 +174,12 @@
           formatter: (row: Api.Ssl.CertDTO) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '部署',
                 onClick: () => handleCertDeploy(row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '删除',
                 onClick: () => handleCertDelete(row)
               })

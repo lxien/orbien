@@ -3,10 +3,10 @@
   <div
     class="mt-10 flex gap-8 border-t border-[var(--default-border)] bg-[var(--art-bg-color)] pt-5"
   >
-    <ElButton type="primary" class="flex-1 !h-8" @click="handleCopyConfig">
-      {{ $t('setting.actions.copyConfig') }}
-    </ElButton>
-    <ElButton type="danger" plain class="flex-1 !h-8" @click="handleResetConfig">
+    <!--    <ElButton type="primary" class="flex-1 !h-8" @click="handleCopyConfig">-->
+    <!--      {{ $t('setting.actions.copyConfig') }}-->
+    <!--    </ElButton>-->
+    <ElButton type="primary" plain  class="flex-1 !h-8" @click="handleResetConfig">
       {{ $t('setting.actions.resetConfig') }}
     </ElButton>
   </div>

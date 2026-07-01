@@ -95,12 +95,12 @@
           formatter: (row: DomainItem) =>
             h('div', [
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '编辑',
                 onClick: () => showDialog('edit', row)
               }),
               h(ArtButtonTable, {
-                type: 'text',
+                type: 'link',
                 text: '删除',
                 onClick: () => deleteDomain(row)
               })
