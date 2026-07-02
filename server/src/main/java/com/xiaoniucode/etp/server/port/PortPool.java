@@ -10,8 +10,10 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -86,6 +88,45 @@ final class PortPool {
         lock.readLock().lock();
         try {
             return allowed.get(port) && !allocated.get(port);
+        } finally {
+            lock.readLock().unlock();
+        }
+    }
+
+    /**
+     * 推荐可用端口，仅查询不占用
+     */
+    List<Integer> suggestAvailable(int limit) {
+        lock.readLock().lock();
+        try {
+            BitSet free = freePorts();
+            if (free.isEmpty() || limit <= 0) {
+                return List.of();
+            }
+            List<Integer> result = new ArrayList<>(limit);
+            BitSet scratch = (BitSet) free.clone();
+            int attempts = Math.min(Math.max(limit * 8, limit), scratch.cardinality());
+            for (int i = 0; i < attempts && result.size() < limit; i++) {
+                int port = randomSetBit(scratch);
+                if (port <= 0) {
+                    break;
+                }
+                scratch.clear(port);
+                if (tryBind(port)) {
+                    result.add(port);
+                }
+            }
+            if (result.size() < limit) {
+                for (int port = free.nextSetBit(1); port > 0 && result.size() < limit; port = free.nextSetBit(port + 1)) {
+                    if (result.contains(port)) {
+                        continue;
+                    }
+                    if (tryBind(port)) {
+                        result.add(port);
+                    }
+                }
+            }
+            return List.copyOf(result);
         } finally {
             lock.readLock().unlock();
         }

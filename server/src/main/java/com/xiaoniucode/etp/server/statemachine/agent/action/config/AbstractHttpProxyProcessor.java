@@ -82,6 +82,7 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         ProxyConfigExt ext = proxyConfigService.findByAgentAndName(agentId, proxy.getName());
 
         if (ext != null) {
+            logger.debug("代理 {} 已存在，先删除旧的代理配置", proxy.getName());
             ProxyConfig config = ext.getProxyConfig();
             String proxyId = config.getProxyId();
             proxyManager.deactivate(proxyId);

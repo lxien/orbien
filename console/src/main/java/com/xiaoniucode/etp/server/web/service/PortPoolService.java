@@ -23,6 +23,8 @@ import com.xiaoniucode.etp.server.web.param.portpool.PortPoolBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.portpool.PortPoolCreateParam;
 import com.xiaoniucode.etp.server.web.param.portpool.PortPoolUpdateParam;
 
+import java.util.List;
+
 public interface PortPoolService {
     PageResult<PortPoolDTO> findByPage(PageQuery pageQuery);
 
@@ -33,4 +35,6 @@ public interface PortPoolService {
     void update(PortPoolUpdateParam param);
 
     void deleteBatch(PortPoolBatchDeleteParam param);
+
+    List<Integer> suggestAvailable(Integer type, Integer limit);
 }

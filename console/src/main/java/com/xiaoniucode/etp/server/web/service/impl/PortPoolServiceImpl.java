@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.core.enums.PortPoolType;
+import com.xiaoniucode.etp.server.port.PortPoolManager;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
@@ -53,6 +54,12 @@ public class PortPoolServiceImpl implements PortPoolService {
     private PortPoolSyncService portPoolSyncService;
     @Autowired
     private TransactionHelper transactionHelper;
+    @Autowired
+    private PortPoolManager portPoolManager;
+
+    private static final int SUGGEST_MIN = 1;
+    private static final int SUGGEST_MAX = 10;
+    private static final int SUGGEST_DEFAULT = 5;
 
     @Override
     public PageResult<PortPoolDTO> findByPage(PageQuery pageQuery) {
@@ -141,6 +148,19 @@ public class PortPoolServiceImpl implements PortPoolService {
     private void applyPort(PortPoolDO poolDO, ParsedPort parsedPort) {
         poolDO.setStartPort(parsedPort.startPort());
         poolDO.setEndPort(parsedPort.endPort());
+    }
+
+    @Override
+    public List<Integer> suggestAvailable(Integer type, Integer limit) {
+        PortPoolType poolType = PortPoolType.fromCode(type);
+        int size = limit == null ? SUGGEST_DEFAULT : limit;
+        if (size < SUGGEST_MIN) {
+            size = SUGGEST_MIN;
+        }
+        if (size > SUGGEST_MAX) {
+            size = SUGGEST_MAX;
+        }
+        return portPoolManager.suggestAvailable(poolType, size);
     }
 
     private void validateDuplicate(PortPoolType type, Integer startPort, Integer endPort, Long excludeId) {

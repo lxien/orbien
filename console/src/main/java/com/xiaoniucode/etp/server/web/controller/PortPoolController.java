@@ -41,6 +41,12 @@ public class PortPoolController {
         return Ajax.success(result);
     }
 
+    @GetMapping("/available")
+    public Ajax suggestAvailable(@RequestParam Integer type,
+                                 @RequestParam(required = false, defaultValue = "5") Integer limit) {
+        return Ajax.success(portPoolService.suggestAvailable(type, limit));
+    }
+
     @GetMapping("/{id}")
     public Ajax getById(@PathVariable Long id) {
         PortPoolDTO dto = portPoolService.getById(id);

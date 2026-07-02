@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,6 +36,10 @@ public class PortPoolManager {
 
     public boolean isAvailable(PortPoolType type, int port) {
         return pool(type).isAvailable(port);
+    }
+
+    public List<Integer> suggestAvailable(PortPoolType type, int limit) {
+        return pool(type).suggestAvailable(limit);
     }
 
     public void markAllocated(PortPoolType type, int port) {

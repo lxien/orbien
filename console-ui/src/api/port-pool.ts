@@ -1,6 +1,16 @@
 import request from '@/utils/http'
 
 /**
+ * 推荐可用端口（仅查询，不占用）
+ */
+export function fetchSuggestAvailablePorts(type: number, limit = 5) {
+  return request.get<number[]>({
+    url: '/api/port-pools/available',
+    params: { type, limit }
+  })
+}
+
+/**
  * 获取端口池列表（分页）
  */
 export function fetchGetPortPoolListByPage(params: Api.Common.CommonSearchParams) {

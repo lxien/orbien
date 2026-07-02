@@ -5,7 +5,13 @@
     width="650px"
     align-center
   >
-    <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
+    <ElForm
+      ref="formRef"
+      :model="formData"
+      :rules="rules"
+      label-width="120px"
+      :show-message="false"
+    >
       <ElFormItem label="客户端" prop="agentId">
         <ElSelect
           v-model="formData.agentId"
@@ -45,12 +51,32 @@
         </ElRow>
       </ElFormItem>
       <ElFormItem label="远程端口" prop="remotePort">
-        <ElInput
-          v-model.number="formData.remotePort"
-          type="number"
-          placeholder="不填自动分配"
-          style="width: 200px"
-        />
+        <div class="remote-port-field">
+          <ElInput
+            v-model.number="formData.remotePort"
+            type="number"
+            placeholder="不填自动生成"
+            class="remote-port-input"
+          />
+          <template v-if="dialogType === 'add'">
+            <template v-if="suggestedPorts.length">
+              <ElButton
+                v-for="port in suggestedPorts"
+                :key="port"
+                size="small"
+                :type="formData.remotePort === port ? 'primary' : 'default'"
+                plain
+                @click="selectSuggestedPort(port)"
+              >
+                {{ port }}
+              </ElButton>
+            </template>
+            <span v-else-if="!suggestLoading" class="port-suggestions-empty">暂无</span>
+            <ElButton link type="primary" :loading="suggestLoading" @click="loadSuggestedPorts">
+              换一批
+            </ElButton>
+          </template>
+        </div>
       </ElFormItem>
       <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
@@ -82,7 +108,8 @@
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
   import { fetchCreateTcpProxy, fetchUpdateTcpProxy, fetchGetTcpProxyById } from '@/api/proxy'
-  import { ProxyStatus } from '@/enums/etp/business'
+  import { fetchSuggestAvailablePorts } from '@/api/port-pool'
+  import { PortPoolType, ProxyStatus } from '@/enums/etp/business'
 
   defineOptions({ name: 'TcpDialog' })
 
@@ -128,6 +155,9 @@
   const dialogType = computed(() => props.type)
   const formRef = ref<FormInstance>()
   const agents = ref<Api.Agent.AgentDTO[]>([])
+  const suggestedPorts = ref<number[]>([])
+  const suggestLoading = ref(false)
+  const SUGGEST_PORT_COUNT = 4
 
   watch(
     () => props.visible,
@@ -189,6 +219,24 @@
 
   const resetFormData = () => {
     Object.assign(formData, { ...DEFAULT_FORM_DATA })
+    suggestedPorts.value = []
+  }
+
+  const loadSuggestedPorts = async () => {
+    suggestLoading.value = true
+    try {
+      suggestedPorts.value = await fetchSuggestAvailablePorts(PortPoolType.TCP, SUGGEST_PORT_COUNT)
+    } catch (error) {
+      console.error('获取可用端口失败:', error)
+      suggestedPorts.value = []
+    } finally {
+      suggestLoading.value = false
+    }
+  }
+
+  const selectSuggestedPort = (port: number) => {
+    formData.remotePort = port
+    formRef.value?.clearValidate('remotePort')
   }
 
   const initFormData = async () => {
@@ -218,7 +266,9 @@
           ...DEFAULT_FORM_DATA,
           agentId: row ? row.agentId || '' : '',
           name: row ? row.name || '' : '',
-          status: row ? row.status?.toString() || String(ProxyStatus.OPEN) : String(ProxyStatus.OPEN),
+          status: row
+            ? row.status?.toString() || String(ProxyStatus.OPEN)
+            : String(ProxyStatus.OPEN),
           remotePort: row ? row.remotePort || 0 : 0,
           localIp: row?.targets?.[0]?.host || '127.0.0.1',
           localPort: row?.targets?.[0]?.port || '',
@@ -230,6 +280,7 @@
       }
     } else {
       resetFormData()
+      await loadSuggestedPorts()
     }
   }
 
@@ -313,4 +364,23 @@
   }
 </script>
 
-<style scoped></style>
+<style scoped lang="scss">
+  .remote-port-field {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .remote-port-input {
+    width: 140px;
+    flex-shrink: 0;
+  }
+
+  .port-suggestions-empty {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap;
+  }
+</style>

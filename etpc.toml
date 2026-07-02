@@ -62,11 +62,12 @@ targets = [
 ]
 
 [[proxies]]
-name = "tcp"
+name = "tcp2"
 protocol = "tcp"
-local_ip = "localhost"
+local_ip = "127.0.0.1"
 local_port = 8089
-
+[proxies.transport]
+multiplex = true
 [proxies.health_check]
 enabled = true
 type = "tcp"

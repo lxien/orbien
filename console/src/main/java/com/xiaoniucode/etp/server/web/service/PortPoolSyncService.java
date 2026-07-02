@@ -44,7 +44,9 @@ public class PortPoolSyncService {
         logger.info("端口池已从数据库加载到内存");
     }
 
-    /** TOML 区间落库，同协议+同范围已存在则跳过 */
+    /**
+     * TOML 区间落库，同协议+同范围已存在则跳过
+     */
     private void importTomlIfAbsent() {
         PortPoolConfig config = appConfig.getPortPool();
         importIntervals(PortPoolType.TCP, config.getTcp());

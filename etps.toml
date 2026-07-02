@@ -39,6 +39,3 @@ single = 10000
 start = 9050
 end = 9099
 
-[[port_pool.udp]]
-start = 9050
-end = 9100

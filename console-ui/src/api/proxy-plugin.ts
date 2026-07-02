@@ -48,12 +48,14 @@ function buildUpdatePayload(
     name: detail.name,
     status: detail.status,
     deploymentMode: detail.deploymentMode,
-    targets: overrides.targets ?? detail.targets.map(({ host, port, weight, name }) => ({
-      host,
-      port,
-      weight,
-      name
-    })),
+    targets:
+      overrides.targets ??
+      detail.targets.map(({ host, port, weight, name }) => ({
+        host,
+        port,
+        weight,
+        name
+      })),
     loadBalance: overrides.loadBalance ?? detail.loadBalance,
     bandwidth:
       overrides.bandwidth !== undefined ? overrides.bandwidth : buildBandwidthPayload(detail),
@@ -61,7 +63,11 @@ function buildUpdatePayload(
   }
 }
 
-async function submitUpdate(protocol: ProxyConfigProtocol, detail: ProxyDetail, payload: ReturnType<typeof buildUpdatePayload>) {
+async function submitUpdate(
+  protocol: ProxyConfigProtocol,
+  detail: ProxyDetail,
+  payload: ReturnType<typeof buildUpdatePayload>
+) {
   if (protocol === ProtocolType.TCP) {
     return fetchUpdateTcpProxy({ ...payload, remotePort: detail.listenPort })
   }
