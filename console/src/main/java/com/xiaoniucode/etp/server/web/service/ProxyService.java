@@ -17,8 +17,9 @@ package com.xiaoniucode.etp.server.web.service;
 
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpsProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
@@ -35,6 +36,11 @@ public interface ProxyService {
     void createHttpProxy(HttpProxyCreateParam param);
 
     /**
+     * 创建 HTTPS 代理
+     */
+    void createHttpsProxy(HttpsProxyCreateParam param);
+
+    /**
      * 更新 TCP 代理
      */
     void updateTcpProxy(TcpProxyUpdateParam param);
@@ -45,11 +51,18 @@ public interface ProxyService {
     void updateHttpProxy(HttpProxyUpdateParam param);
 
     /**
+     * 更新 HTTPS 代理
+     */
+    void updateHttpsProxy(HttpsProxyUpdateParam param);
+
+    /**
      * 根据 ID 查询tcp代理
      */
     TcpProxyDetailDTO getTcpProxyById(String id);
 
     HttpProxyDetailDTO getHttpProxyById(String id);
+
+    HttpsProxyDetailDTO getHttpsProxyById(String id);
 
     void batchDeleteProxies(ProxyBatchDeleteParam param);
 

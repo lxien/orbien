@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.HttpsProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
@@ -53,8 +54,8 @@ public class ProxyController {
         return Ajax.success();
     }
     @PostMapping("https")
-    public Ajax createHttpsProxy(@RequestBody @Validated HttpProxyCreateParam param) {
-        proxyService.createHttpProxy(param);
+    public Ajax createHttpsProxy(@RequestBody @Validated HttpsProxyCreateParam param) {
+        proxyService.createHttpsProxy(param);
         return Ajax.success();
     }
     @PutMapping("tcp")
@@ -69,8 +70,8 @@ public class ProxyController {
         return Ajax.success();
     }
     @PutMapping("https")
-    public Ajax updateHttpsProxy(@RequestBody @Validated HttpProxyUpdateParam param) {
-        proxyService.updateHttpProxy(param);
+    public Ajax updateHttpsProxy(@RequestBody @Validated HttpsProxyUpdateParam param) {
+        proxyService.updateHttpsProxy(param);
         return Ajax.success();
     }
     @GetMapping("tcp/{id}")
@@ -86,7 +87,7 @@ public class ProxyController {
     }
     @GetMapping("https/{id}")
     public Ajax getHttpsProxyDetailById(@PathVariable String id) {
-        HttpProxyDetailDTO proxy = proxyService.getHttpProxyById(id);
+        HttpsProxyDetailDTO proxy = proxyService.getHttpsProxyById(id);
         return Ajax.success(proxy);
     }
     @GetMapping("tcp")

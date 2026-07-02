@@ -14,6 +14,20 @@ export type ProxyDetail =
   | Api.Proxy.HttpsProxyDetailDTO
   | Api.Proxy.TcpProxyDetailDTO
 
+/** 扩展设置插件使用的完整 HTTP 详情结构，待独立接口提供 */
+interface HttpPluginDetail {
+  id: string
+  name: string
+  status: number
+  domainType: number
+  domains?: string[]
+  forceHttps?: boolean
+  targets: Api.Proxy.TargetDTO[]
+  transport: Api.Proxy.TransportDTO
+  bandwidth: Api.Proxy.BandwidthDTO | null
+  loadBalance: Api.Proxy.LoadBalanceDTO | null
+}
+
 const GET_API = {
   [ProtocolType.HTTP]: fetchGetHttpProxyById,
   [ProtocolType.HTTPS]: fetchGetHttpsProxyById,
@@ -24,7 +38,15 @@ export function fetchProxyDetail(protocol: ProxyConfigProtocol, id: string) {
   return GET_API[protocol](id) as Promise<ProxyDetail>
 }
 
-function buildBandwidthPayload(detail: ProxyDetail): Api.Proxy.BandwidthSaveParam | null {
+function asHttpPluginDetail(detail: ProxyDetail): HttpPluginDetail | null {
+  if (!('targets' in detail)) {
+    return null
+  }
+  const candidate = detail as unknown as HttpPluginDetail
+  return Array.isArray(candidate.targets) ? candidate : null
+}
+
+function buildBandwidthPayload(detail: HttpPluginDetail): Api.Proxy.BandwidthSaveParam | null {
   const bandwidth = detail.bandwidth
   if (!bandwidth) return null
 
@@ -34,8 +56,8 @@ function buildBandwidthPayload(detail: ProxyDetail): Api.Proxy.BandwidthSavePara
   return { limitTotal, limitIn, limitOut, unit: 'bps' }
 }
 
-function buildUpdatePayload(
-  detail: ProxyDetail,
+function buildHttpUpdatePayload(
+  detail: HttpPluginDetail,
   overrides: Partial<{
     targets: Api.Proxy.ProxyTargetAddParam[]
     loadBalance: Api.Proxy.LoadBalanceParam | null
@@ -47,7 +69,6 @@ function buildUpdatePayload(
     id: detail.id,
     name: detail.name,
     status: detail.status,
-    deploymentMode: detail.deploymentMode,
     targets:
       overrides.targets ??
       detail.targets.map(({ host, port, weight, name }) => ({
@@ -63,18 +84,51 @@ function buildUpdatePayload(
   }
 }
 
-async function submitUpdate(
+function buildTcpUpdatePayload(
+  detail: Api.Proxy.TcpProxyDetailDTO,
+  limitTotal?: number
+): Api.Proxy.TcpProxyUpdateParam {
+  return {
+    id: detail.id,
+    name: detail.name,
+    localHost: detail.localHost,
+    localPort: detail.localPort,
+    ...(detail.remotePort != null ? { remotePort: detail.remotePort } : {}),
+    ...(limitTotal != null ? { limitTotal } : detail.limitTotal != null ? { limitTotal: detail.limitTotal } : {})
+  }
+}
+
+async function submitHttpUpdate(
   protocol: ProxyConfigProtocol,
-  detail: ProxyDetail,
-  payload: ReturnType<typeof buildUpdatePayload>
+  detail: HttpPluginDetail,
+  payload: ReturnType<typeof buildHttpUpdatePayload>
 ) {
-  if (protocol === ProtocolType.TCP) {
-    return fetchUpdateTcpProxy({ ...payload, remotePort: detail.listenPort })
+  if (protocol === ProtocolType.HTTPS) {
+    return fetchUpdateHttpsProxy({
+      id: detail.id,
+      name: detail.name,
+      domainType: detail.domainType,
+      localHost: payload.targets[0]?.host ?? '',
+      localPort: payload.targets[0]?.port ?? 0,
+      forceHttps: detail.forceHttps
+    })
   }
 
-  return protocol === ProtocolType.HTTPS
-    ? fetchUpdateHttpsProxy({ ...payload, domainType: detail.domainType, domains: detail.domains })
-    : fetchUpdateHttpProxy({ ...payload, domainType: detail.domainType, domains: detail.domains })
+  return fetchUpdateHttpProxy({
+    id: detail.id,
+    name: detail.name,
+    domainType: detail.domainType,
+    localHost: payload.targets[0]?.host ?? '',
+    localPort: payload.targets[0]?.port ?? 0,
+    limitTotal: detail.bandwidth?.limitTotal != null ? Math.round(detail.bandwidth.limitTotal / 1_000_000) : undefined
+  })
+}
+
+function rejectPluginSave(protocol: ProxyConfigProtocol, feature: string) {
+  if (protocol === ProtocolType.TCP) {
+    return Promise.reject(new Error(`TCP ${feature}暂未适配新接口`))
+  }
+  return Promise.reject(new Error(`HTTP/HTTPS ${feature}暂未适配新接口`))
 }
 
 export function saveProxyClusterConfig(
@@ -83,7 +137,15 @@ export function saveProxyClusterConfig(
   targets: Api.Proxy.ProxyTargetAddParam[],
   loadBalance: Api.Proxy.LoadBalanceParam
 ) {
-  return submitUpdate(protocol, detail, buildUpdatePayload(detail, { targets, loadBalance }))
+  const pluginDetail = asHttpPluginDetail(detail)
+  if (!pluginDetail) {
+    return rejectPluginSave(protocol, '负载均衡配置')
+  }
+  return submitHttpUpdate(
+    protocol,
+    pluginDetail,
+    buildHttpUpdatePayload(pluginDetail, { targets, loadBalance })
+  )
 }
 
 export function saveProxyTransportConfig(
@@ -91,7 +153,11 @@ export function saveProxyTransportConfig(
   detail: ProxyDetail,
   transport: Api.Proxy.TransportSaveParam
 ) {
-  return submitUpdate(protocol, detail, buildUpdatePayload(detail, { transport }))
+  const pluginDetail = asHttpPluginDetail(detail)
+  if (!pluginDetail) {
+    return rejectPluginSave(protocol, '传输配置')
+  }
+  return submitHttpUpdate(protocol, pluginDetail, buildHttpUpdatePayload(pluginDetail, { transport }))
 }
 
 export function saveProxyBandwidthConfig(
@@ -99,5 +165,18 @@ export function saveProxyBandwidthConfig(
   detail: ProxyDetail,
   bandwidth: Api.Proxy.BandwidthSaveParam
 ) {
-  return submitUpdate(protocol, detail, buildUpdatePayload(detail, { bandwidth }))
+  if (protocol === ProtocolType.TCP) {
+    const tcpDetail = detail as Api.Proxy.TcpProxyDetailDTO
+    const limitTotalMbps =
+      bandwidth.limitTotal != null && bandwidth.unit
+        ? Math.round(bandwidth.limitTotal / 1_000_000)
+        : tcpDetail.limitTotal ?? undefined
+    return fetchUpdateTcpProxy(buildTcpUpdatePayload(tcpDetail, limitTotalMbps))
+  }
+
+  const pluginDetail = asHttpPluginDetail(detail)
+  if (!pluginDetail) {
+    return rejectPluginSave(protocol, '带宽配置')
+  }
+  return submitHttpUpdate(protocol, pluginDetail, buildHttpUpdatePayload(pluginDetail, { bandwidth }))
 }

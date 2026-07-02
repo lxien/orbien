@@ -80,7 +80,6 @@ declare namespace Api.Proxy {
     name: string
     protocol: number
     agentType: number
-    deploymentMode: number
     status: number
     transport: TransportDTO
     bandwidth: BandwidthDTO | null
@@ -90,22 +89,55 @@ declare namespace Api.Proxy {
     updatedAt: string
   }
 
+  /** 子域名绑定 */
+  interface SubdomainBindingParam {
+    rootDomainId?: number
+    prefix: string
+  }
+
+  /** 子域名绑定详情 */
+  interface SubdomainBindingDTO extends SubdomainBindingParam {
+    rootDomain?: string
+  }
+
   /** HTTP 代理详情 */
-  interface HttpProxyDetailDTO extends ProxyDetailDTO {
-    domains: string[]
+  interface HttpProxyDetailDTO {
+    id: string
+    agentId: string
+    name: string
     domainType: number
+    /** 完整自定义域名，仅 domainType=CUSTOM_DOMAIN 时有值 */
+    customDomains?: string[]
+    /** 子域名绑定，仅 domainType=SUBDOMAIN 时有值 */
+    subdomainBindings?: SubdomainBindingDTO[]
+    localHost: string
+    localPort: number
+    /** 总带宽 Mbps */
+    limitTotal: number | null
+    createdAt: string
+    updatedAt: string
   }
 
   /** HTTPS 代理详情 */
-  interface HttpsProxyDetailDTO extends ProxyDetailDTO {
-    domains: string[]
-    domainType: number
+  interface HttpsProxyDetailDTO extends HttpProxyDetailDTO {
     forceHttps?: boolean
   }
 
   /** TCP 代理详情 */
-  interface TcpProxyDetailDTO extends ProxyDetailDTO {
+  interface TcpProxyDetailDTO {
+    id: string
+    agentId: string
+    name: string
+    /** 用户指定的远程端口，自动分配时为 null */
+    remotePort: number | null
+    /** 实际监听端口 */
     listenPort: number
+    localHost: string
+    localPort: number
+    /** 总带宽 Mbps */
+    limitTotal: number | null
+    createdAt: string
+    updatedAt: string
   }
 
   /** 目标地址创建/更新参数 */
@@ -139,84 +171,70 @@ declare namespace Api.Proxy {
   interface HttpProxyCreateParam {
     agentId: string
     name: string
-    status: number
     domainType: number
-    domains: string[] | null
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    transport: TransportSaveParam
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
+    subdomainBindings?: SubdomainBindingParam[]
+    customDomains?: string[]
+    localHost: string
+    localPort: number
+    limitTotal?: number
   }
 
   /** HTTP 代理更新参数 */
   interface HttpProxyUpdateParam {
     id: string
     name: string
-    status: number
     domainType: number
-    domains: string[] | null
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
-    transport: TransportSaveParam
+    subdomainBindings?: SubdomainBindingParam[]
+    customDomains?: string[]
+    localHost: string
+    localPort: number
+    limitTotal?: number
   }
 
   /** HTTPS 代理创建参数 */
   interface HttpsProxyCreateParam {
     agentId: string
     name: string
-    status: number
     domainType: number
-    domains: string[] | null
+    subdomainBindings?: SubdomainBindingParam[]
+    customDomains?: string[]
+    localHost: string
+    localPort: number
     forceHttps?: boolean
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    transport: TransportSaveParam
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
+    limitTotal?: number
   }
 
   /** HTTPS 代理更新参数 */
   interface HttpsProxyUpdateParam {
     id: string
     name: string
-    status: number
     domainType: number
-    domains: string[] | null
+    subdomainBindings?: SubdomainBindingParam[]
+    customDomains?: string[]
+    localHost: string
+    localPort: number
     forceHttps?: boolean
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
-    transport: TransportSaveParam
+    limitTotal?: number
   }
 
   /** TCP 代理创建参数 */
   interface TcpProxyCreateParam {
     agentId: string
     name: string
-    status: number
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
-    transport: TransportSaveParam
-    remotePort: number | null
+    localHost: string
+    localPort: number
+    remotePort?: number
+    limitTotal?: number
   }
 
   /** TCP 代理更新参数 */
   interface TcpProxyUpdateParam {
     id: string
     name: string
-    status: number
-    deploymentMode: number
-    targets: ProxyTargetAddParam[]
-    bandwidth: BandwidthSaveParam | null
-    loadBalance: LoadBalanceParam | null
-    transport: TransportSaveParam
-    remotePort: number
+    localHost: string
+    localPort: number
+    remotePort?: number
+    limitTotal?: number
   }
 
   /** 批量删除参数 */

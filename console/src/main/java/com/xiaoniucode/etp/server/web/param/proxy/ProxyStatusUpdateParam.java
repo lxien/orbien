@@ -14,8 +14,14 @@
  *    limitations under the License.
  */
 package com.xiaoniucode.etp.server.web.param.proxy;
-import lombok.Data;
-@Data
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ProxyStatusUpdateParam {
+    @NotNull(message = "状态不能为空")
     private Integer status;
 }

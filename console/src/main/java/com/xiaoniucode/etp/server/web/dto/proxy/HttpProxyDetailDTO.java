@@ -1,28 +1,27 @@
-/*
- *    Copyright 2026 xiaoniucode
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package com.xiaoniucode.etp.server.web.dto.proxy;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class HttpProxyDetailDTO extends ProxyDetailDTO {
-   private List<String> domains;
-   private Integer domainType;
+public class HttpProxyDetailDTO {
+    private String id;
+    private String agentId;
+    private String name;
+    private Integer domainType;
+    /** 完整自定义域名，仅 domainType=CUSTOM_DOMAIN 时有值 */
+    private List<String> customDomains;
+    /** 子域名绑定，仅 domainType=SUBDOMAIN 时有值 */
+    private List<SubdomainBindingDTO> subdomainBindings;
+    private String localHost;
+    private Integer localPort;
+    /** 总带宽 Mbps */
+    private Integer limitTotal;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private LocalDateTime updatedAt;
 }

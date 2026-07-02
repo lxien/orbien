@@ -1,6 +1,16 @@
 import request from '@/utils/http'
 
 /**
+ * 获取全部根域名列表（下拉选择用）
+ * @returns 根域名列表
+ */
+export function fetchGetDomainListAll() {
+  return request.get<Api.Domain.DomainDTO[]>({
+    url: '/api/domains/list'
+  })
+}
+
+/**
  * 获取域名列表（分页）
  * @param params 搜索参数
  * @returns 域名分页列表

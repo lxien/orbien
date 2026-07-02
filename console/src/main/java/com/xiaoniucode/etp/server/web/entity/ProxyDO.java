@@ -101,19 +101,17 @@ public class ProxyDO {
      */
     @Column(name = "compress")
     private Boolean compress;
-
+    /**
+     * 是否强制HTTPS，只有HTTPS协议有效
+     */
+    @Column(name = "force_https")
+    private Boolean forceHttps;
     /**
      * 负载均衡策略，只有目标服务端集群部署才有效
      */
     @Convert(converter = LoadBalanceConverter.class)
-    @Column(name = "load_balance_strategy", nullable = false)
+    @Column(name = "load_balance_strategy")
     private LoadBalanceType loadBalanceStrategy;
-    /**
-     * 部署模式
-     */
-    @Column(name = "deployment_mode", nullable = false)
-    @Convert(converter = DeploymentModeConverter.class)
-    private DeploymentMode deploymentMode;
     /**
      * 总带宽限制（bps）
      */

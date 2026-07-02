@@ -15,8 +15,6 @@
  */
 package com.xiaoniucode.etp.server.web.service.impl;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
-import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
 import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
@@ -30,14 +28,11 @@ import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.dto.proxy.*;
 import com.xiaoniucode.etp.server.web.entity.*;
-import com.xiaoniucode.etp.server.web.param.bandwidth.BandwidthSaveParam;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
-import com.xiaoniucode.etp.server.web.param.proxy.ProxyTargetSaveParam;
 import com.xiaoniucode.etp.server.web.proxy.service.ProxyConfigSyncService;
 import com.xiaoniucode.etp.server.web.repository.*;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
-import com.xiaoniucode.etp.server.web.service.assembler.ProxyAssembler;
 import com.xiaoniucode.etp.server.web.service.converter.*;
 import com.xiaoniucode.etp.server.web.support.tx.TransactionHelper;
 import jakarta.annotation.Resource;
@@ -61,10 +56,11 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyRepository proxyRepository;
     @Autowired
+    private DomainRepository domainRepository;
+    @Autowired
     private ProxyDomainRepository proxyDomainRepository;
     @Autowired
     private ProxyTargetRepository proxyTargetRepository;
-
     @Autowired
     private BasicAuthRepository basicAuthRepository;
     @Autowired
@@ -81,8 +77,6 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyConvert proxyConvert;
     @Autowired
     private ProxyTargetConvert proxyTargetConvert;
-    @Autowired
-    private ProxyAssembler proxyAssembler;
     @Resource
     private AppConfig appConfig;
     @Autowired
@@ -101,181 +95,84 @@ public class ProxyServiceImpl implements ProxyService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createHttpProxy(HttpProxyCreateParam param) {
+        createHttpLikeProxy(param, ProtocolType.HTTP, null);
+    }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void createHttpsProxy(HttpsProxyCreateParam param) {
+        createHttpLikeProxy(param, ProtocolType.HTTPS, param.getForceHttps());
+    }
+
+    private void createHttpLikeProxy(HttpProxyCreateParam param, ProtocolType protocol, Boolean forceHttps) {
         DomainType domainType = DomainType.fromCode(param.getDomainType());
-        String rootDomain=appConfig.getRootDomains().stream().toList().getFirst();
-        if (StringUtils.hasText(rootDomain) && (domainType.isAuto() || domainType.isSubdomain())) {
-            throw new BizException("不支持改域名类型的自动生成！");
-        }
-        //1.基础信息
+        validateHttpDomainInput(domainType, param.getSubdomainBindings(), param.getCustomDomains());
+
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("名称已经存在: " + param.getName());
         }
+
         String proxyId = uidGenerator.getUIDAsString();
-        ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
-        BandwidthSaveParam bandwidth = param.getBandwidth();
-        if (bandwidth != null) {
-            bandwidth.valid();
-            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            if (bandwidth.getLimitTotal() != null) {
-                proxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
-            }
-            if (bandwidth.getLimitIn() != null) {
-                proxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
-            }
-            if (bandwidth.getLimitOut() != null) {
-                proxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
-            }
-        }
+        ProxyDO proxyDO = buildHttpLikeProxyDO(param.getAgentId(), param.getName(), proxyId, domainType, protocol, forceHttps);
+        applyHttpLimitTotal(proxyDO, param.getLimitTotal());
         proxyRepository.save(proxyDO);
-        //2.服务
-        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
-            throw new BizException("单机模式只能配置一个服务节点");
-        }
-        proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(param.getTargets(), proxyId));
 
-        //4.传输
+        proxyTargetRepository.save(buildHttpTarget(param.getLocalHost(), param.getLocalPort(), param.getName(), proxyId));
+        saveHttpDomains(proxyId, domainType, param.getSubdomainBindings(), param.getCustomDomains(), null);
 
-        //5.域名
-        Set<String> fullDomains = new HashSet<>();
-        if (domainType.isAuto()) {
-            DomainInfo domain = domainGenerator.generateRandomSubdomain(rootDomain);
-            fullDomains.add(domain.getFullDomain());
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), rootDomain, domainType));
-        } else if (domainType.isCustomDomain()) {
-            Set<String> domains = param.getDomains();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
-            if (!existsList.isEmpty()) {
-                String existDomains = existsList.stream()
-                        .map(ProxyDomainDO::getDomain)
-                        .collect(Collectors.joining(", "));
-                throw new BizException("以下域名已被使用: " + existDomains);
-            }
-            List<ProxyDomainDO> list = domains.stream()
-                    .map(domain -> new ProxyDomainDO(proxyId, domain, null, domainType)).toList();
-            proxyDomainRepository.saveAll(list);
-            fullDomains.addAll(domains);
-        } else if (domainType.isSubdomain()) {
-            Set<String> prefixes = param.getDomains();
-            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + rootDomain).toList();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
-            if (!existsList.isEmpty()) {
-                String existDomains = existsList.stream()
-                        .map(ProxyDomainDO::getDomain)
-                        .collect(Collectors.joining(", "));
-                throw new BizException("以下子域名已被使用: " + existDomains);
-            }
-            fullDomains.addAll(domains);
-            List<ProxyDomainDO> list = prefixes.stream()
-                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, rootDomain, domainType)).toList();
-            proxyDomainRepository.saveAll(list);
-        }
-
-        //6.初始化访问控制
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
-        //7.初始化BasicAuth认证
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
-        //8.初始化健康检查
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.HTTP));
 
-
-       // proxyConfigSyncService.syncOnCreate(ext);
-
-        if (proxyDO.getStatus().isOpen()) {
-            ProxyConfig proxyConfig = proxyAssembler.toProxyConfig(proxyDO);
-            ProxyConfigExt ext = ProxyConfigExt.of(proxyConfig, null);
-
-//            transactionHelper.afterCommit(() ->
-//                    proxyManager.activate(proxyConfig));
-        }
-
-
-        logger.debug("HTTP代理创建成功：{}", proxyDO.getName());
+        logger.debug("{}代理创建成功：{}", protocol.name(), proxyDO.getName());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateHttpProxy(HttpProxyUpdateParam param) {
+        updateHttpLikeProxy(param, ProtocolType.HTTP, null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateHttpsProxy(HttpsProxyUpdateParam param) {
+        updateHttpLikeProxy(param, ProtocolType.HTTPS, param.getForceHttps());
+    }
+
+    private void updateHttpLikeProxy(HttpProxyUpdateParam param, ProtocolType protocol, Boolean forceHttps) {
         String proxyId = param.getId();
-        ProxyDO existsProxyDO = proxyRepository.findById(proxyId).orElseThrow(() -> new BizException("代理配置不存在"));
+        ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        assertHttpLikeProtocol(existsProxyDO, protocol);
+
         if (proxyRepository.existsByAgentIdAndNameAndIdNot(
                 existsProxyDO.getAgentId(), param.getName(), proxyId)) {
             throw new BizException("代理名称已经存在: " + param.getName());
         }
+
         DomainType existsDomainType = existsProxyDO.getDomainType();
         DomainType requestDomainType = DomainType.fromCode(param.getDomainType());
-        BandwidthSaveParam bandwidth = param.getBandwidth();
-        if (bandwidth != null) {
-            bandwidth.valid();
-            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            existsProxyDO.setLimitTotal(bandwidth.getLimitTotal() != null ? unit.toBps(bandwidth.getLimitTotal()) : null);
-            existsProxyDO.setLimitIn(bandwidth.getLimitIn() != null ? unit.toBps(bandwidth.getLimitIn()) : null);
-            existsProxyDO.setLimitOut(bandwidth.getLimitOut() != null ? unit.toBps(bandwidth.getLimitOut()) : null);
-        }
+        validateHttpDomainInput(requestDomainType, param.getSubdomainBindings(), param.getCustomDomains());
 
-        proxyConvert.updateDO(param, existsProxyDO);
+        existsProxyDO.setName(param.getName());
+        existsProxyDO.setDomainType(requestDomainType);
+        applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
+        if (protocol.isHttps()) {
+            existsProxyDO.setForceHttps(Boolean.TRUE.equals(forceHttps));
+        }
         proxyRepository.save(existsProxyDO);
 
-        //3.服务列表
-        if (existsProxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
-            throw new BizException("单机服务只能配置一个目标节点");
-        }
         proxyTargetRepository.deleteByProxyId(proxyId);
-        if (!CollectionUtils.isEmpty(param.getTargets())) {
-            proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(param.getTargets(), proxyId));
-        }
-        //6.传输
+        proxyTargetRepository.save(buildHttpTarget(param.getLocalHost(), param.getLocalPort(), param.getName(), proxyId));
 
-        //7.HTTP域名信息
-        if (!(existsDomainType == requestDomainType && existsDomainType.isAuto())) {
-            proxyDomainRepository.deleteByProxyId(proxyId);
-        }
-        //todo String rootDomain = appConfig.getBaseDomain();
-        String rootDomain=appConfig.getRootDomains().stream().toList().getFirst();
-        Set<String> fullDomains = new HashSet<>();
-        //请求域名类型和存在域名相同且是自动生成域名类型的时保持不变，其他都删除后重新生成
-        if (!((requestDomainType == existsDomainType) && existsDomainType.isAuto())) {
-            proxyDomainRepository.deleteByProxyId(proxyId);
+        if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
+            // 自动域名类型未变化，保留已有域名
         } else {
-            //自动类型域名且未变化
-            List<ProxyDomainDO> proxyDomainDOS = proxyDomainRepository.findByProxyId(proxyId);
-            if (!CollectionUtils.isEmpty(proxyDomainDOS)) {
-                proxyDomainDOS.forEach(domainDO -> fullDomains.add(domainDO.getFullDomain()));
-            }
+            proxyDomainRepository.deleteByProxyId(proxyId);
+            saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
-        if (requestDomainType.isAuto() && !existsDomainType.isAuto()) {
-            DomainInfo domainInfo = domainGenerator.generateRandomSubdomain(rootDomain);
-            fullDomains.add(domainInfo.getFullDomain());
-            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domainInfo.getDomain(), rootDomain, requestDomainType));
-        } else if (requestDomainType.isCustomDomain()) {
-            Set<String> domains = param.getDomains();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
-            if (!existsList.isEmpty()) {
-                String existDomains = existsList.stream().map(ProxyDomainDO::getDomain).collect(Collectors.joining(", "));
-                throw new BizException("域名已被占用: " + existDomains);
-            }
-            fullDomains.addAll(domains);
-            List<ProxyDomainDO> list = domains.stream()
-                    .map(domain -> new ProxyDomainDO(proxyId, domain, null, requestDomainType)).toList();
-            proxyDomainRepository.saveAll(list);
-        } else if (requestDomainType.isSubdomain()) {
-            Set<String> prefixes = param.getDomains();
-            List<String> domains = prefixes.stream().map(prefix -> prefix + "." + rootDomain).toList();
-            List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(domains);
-            if (!existsList.isEmpty()) {
-                String existDomains = existsList.stream()
-                        .map(ProxyDomainDO::getDomain)
-                        .collect(Collectors.joining(", "));
-                throw new BizException("域名已被占用: " + existDomains);
-            }
-            fullDomains.addAll(domains);
-            List<ProxyDomainDO> list = prefixes.stream()
-                    .map(prefix -> new ProxyDomainDO(proxyId, prefix, rootDomain, requestDomainType)).toList();
-            proxyDomainRepository.saveAll(list);
-        }
-//        transactionHelper.afterCommit(() ->
-//                proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO), fullDomains));
-        logger.debug("HTTP代理更新成功：{}", existsProxyDO.getName());
+
+        logger.debug("{}代理更新成功：{}", protocol.name(), existsProxyDO.getName());
     }
 
     /**
@@ -337,148 +234,407 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     public HttpProxyDetailDTO getHttpProxyById(String id) {
-        ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
-        AgentDO agentDO = detail.getAgentDO();
-        ProxyDO proxyDO = detail.getProxyDO();
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isHttp())
+                .orElseThrow(() -> new BizException("HTTP 代理不存在"));
+        return buildHttpDetailDTO(proxyDO);
+    }
 
-        List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
-        List<ProxyDomainDO> httpProxyDomainDOs = proxyDomainRepository.findByProxyId(id);
+    @Override
+    public HttpsProxyDetailDTO getHttpsProxyById(String id) {
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isHttps())
+                .orElseThrow(() -> new BizException("HTTPS 代理不存在"));
+        HttpsProxyDetailDTO dto = new HttpsProxyDetailDTO();
+        fillHttpDetailDTO(dto, proxyDO);
+        dto.setForceHttps(Boolean.TRUE.equals(proxyDO.getForceHttps()));
+        return dto;
+    }
 
-        HttpProxyDetailDTO httpProxyDetailDTO = proxyConvert.toHttpDetailDTO(proxyDO, agentDO.getAgentType().getCode());
+    private HttpProxyDetailDTO buildHttpDetailDTO(ProxyDO proxyDO) {
+        HttpProxyDetailDTO dto = new HttpProxyDetailDTO();
+        fillHttpDetailDTO(dto, proxyDO);
+        return dto;
+    }
 
-        List<TargetDTO> targetDTOList = proxyTargetConvert.toDTOList(proxyTargetDos);
+    private void fillHttpDetailDTO(HttpProxyDetailDTO dto, ProxyDO proxyDO) {
+        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(proxyDO.getId()).orElse(null);
+        List<ProxyDomainDO> domainRecords = proxyDomainRepository.findByProxyId(proxyDO.getId());
 
-        httpProxyDetailDTO.setTargets(targetDTOList);
-        List<String> domains = httpProxyDomainDOs.stream().map(ProxyDomainDO::getDomain).toList();
-        httpProxyDetailDTO.setDomains(domains);
-        return httpProxyDetailDTO;
+        dto.setId(proxyDO.getId());
+        dto.setAgentId(proxyDO.getAgentId());
+        dto.setName(proxyDO.getName());
+        dto.setDomainType(domainTypeToCode(proxyDO.getDomainType()));
+        fillHttpDomainFields(dto, proxyDO.getDomainType(), domainRecords);
+        if (target != null) {
+            dto.setLocalHost(target.getHost());
+            dto.setLocalPort(target.getPort());
+        }
+        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setCreatedAt(proxyDO.getCreatedAt());
+        dto.setUpdatedAt(proxyDO.getUpdatedAt());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createTcpProxy(TcpProxyCreateParam param) {
-        String proxyId = uidGenerator.getUIDAsString();
-        //1.基础信息
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
-        ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
-        Integer remotePort = param.getRemotePort();
-        if (remotePort == null || remotePort == 0) {
-            Integer acquire = portPoolManager.acquire(PortPoolType.TCP);
-            if (acquire == null) {
-                throw new BizException("没有可用远程端口号");
-            }
-            proxyDO.setRemotePort(acquire);
-            proxyDO.setListenPort(acquire);
-            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, acquire));
-        } else if (!portPoolManager.isAvailable(PortPoolType.TCP, remotePort)) {
-            throw new BizException("远程端口号不可用或被占用");
-        } else {
-            proxyDO.setListenPort(remotePort);
-            portPoolManager.reserve(PortPoolType.TCP, remotePort);
-            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, remotePort));
-        }
-        //2.带宽
-        BandwidthSaveParam bandwidth = param.getBandwidth();
-        if (bandwidth != null) {
-            bandwidth.valid();
-            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            if (bandwidth.getLimitTotal() != null) {
-                proxyDO.setLimitTotal(unit.toBps(bandwidth.getLimitTotal()));
-            }
-            if (bandwidth.getLimitIn() != null) {
-                proxyDO.setLimitIn(unit.toBps(bandwidth.getLimitIn()));
-            }
-            if (bandwidth.getLimitOut() != null) {
-                proxyDO.setLimitOut(unit.toBps(bandwidth.getLimitOut()));
-            }
-        }
+
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyDO proxyDO = buildTcpProxyDO(param.getAgentId(), param.getName(), proxyId);
+        applyTcpListenPort(proxyDO, param.getRemotePort(), null, null);
+        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
         proxyRepository.save(proxyDO);
-        //3.服务列表
-        if (proxyDO.getDeploymentMode().isStandalone() && param.getTargets().size() > 1) {
-            throw new BizException("单机服务只能配置一个目标节点");
-        }
-        List<ProxyTargetDO> proxyTargetDOList = proxyTargetConvert.toDOList(param.getTargets(), proxyId);
-        proxyTargetRepository.saveAll(proxyTargetDOList);
 
-        //5.传输
-
-        //6.初始化访问控制
+        proxyTargetRepository.save(buildTcpTarget(param, proxyId));
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
-        //7.初始化健康检查
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
-
-//        if (proxyDO.getStatus().isOpen()) {
-//            transactionHelper.afterCommit(() ->
-//                    proxyManager.activate(proxyAssembler.toProxyConfig(proxyDO)));
-//        }
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
-
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateTcpProxy(TcpProxyUpdateParam param) {
         String proxyId = param.getId();
-        ProxyDO existsProxyDO = proxyRepository.findById(proxyId).orElseThrow(() -> new BizException("代理配置不存在"));
+        ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
         if (proxyRepository.existsByAgentIdAndNameAndIdNot(
                 existsProxyDO.getAgentId(), param.getName(), proxyId)) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
         }
-        //1.基本信息
-        DeploymentMode existsDeploymentMode = existsProxyDO.getDeploymentMode();
-        DeploymentMode requestDeploymentMode = DeploymentMode.fromCode(param.getDeploymentMode());
+
         Integer existsListenPort = existsProxyDO.getListenPort();
-        Integer requestRemotePort = param.getRemotePort();
-        proxyConvert.updateDO(param, existsProxyDO);
-        if (requestRemotePort == null) {
-            existsProxyDO.setRemotePort(existsProxyDO.getListenPort());
-        } else if (!Objects.equals(existsListenPort, requestRemotePort)) {
-            if (!portPoolManager.isAvailable(PortPoolType.TCP, requestRemotePort)) {
-                throw new BizException("远程端口号不可用或被占用");
-            }
-            existsProxyDO.setRemotePort(requestRemotePort);
-            existsProxyDO.setListenPort(requestRemotePort);
-            portPoolManager.reserve(PortPoolType.TCP, requestRemotePort);
-            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, requestRemotePort));
-        }
-        BandwidthSaveParam bandwidth = param.getBandwidth();
-        if (bandwidth != null) {
-            bandwidth.valid();
-            BandwidthUnit unit = BandwidthUnit.fromCode(bandwidth.getUnit());
-            existsProxyDO.setLimitTotal(bandwidth.getLimitTotal() != null ? unit.toBps(bandwidth.getLimitTotal()) : null);
-            existsProxyDO.setLimitIn(bandwidth.getLimitIn() != null ? unit.toBps(bandwidth.getLimitIn()) : null);
-            existsProxyDO.setLimitOut(bandwidth.getLimitOut() != null ? unit.toBps(bandwidth.getLimitOut()) : null);
-        }
+        Integer existsRemotePort = existsProxyDO.getRemotePort();
+        existsProxyDO.setName(param.getName());
+        applyTcpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
+        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
         proxyRepository.save(existsProxyDO);
 
-        //3.服务
-        List<ProxyTargetSaveParam> targets = param.getTargets();
-        if (existsProxyDO.getDeploymentMode().isStandalone() && targets.size() > 1) {
-            throw new BizException("单机模式只能配置一个目标节点");
-        }
         proxyTargetRepository.deleteByProxyId(proxyId);
-        proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(targets, proxyId));
-
-        //5.传输
-        transactionHelper.afterCommit(() -> {
-           // proxyManager.reconcile(proxyAssembler.toProxyConfig(existsProxyDO));
-        });
+        proxyTargetRepository.save(buildTcpTarget(param, proxyId));
         logger.debug("TCP 代理更新成功：{}", existsProxyDO.getName());
     }
 
     @Override
     public TcpProxyDetailDTO getTcpProxyById(String id) {
-        ProxyDetailQueryResult detail = proxyRepository.findDetailByProxyId(id);
-        ProxyDO proxyDO = detail.getProxyDO();
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isTcp())
+                .orElseThrow(() -> new BizException("TCP 代理不存在"));
+        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(id).orElse(null);
 
+        TcpProxyDetailDTO dto = new TcpProxyDetailDTO();
+        dto.setId(proxyDO.getId());
+        dto.setAgentId(proxyDO.getAgentId());
+        dto.setName(proxyDO.getName());
+        dto.setRemotePort(proxyDO.getRemotePort());
+        dto.setListenPort(proxyDO.getListenPort());
+        if (target != null) {
+            dto.setLocalHost(target.getHost());
+            dto.setLocalPort(target.getPort());
+        }
+        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setCreatedAt(proxyDO.getCreatedAt());
+        dto.setUpdatedAt(proxyDO.getUpdatedAt());
+        return dto;
+    }
 
-        List<ProxyTargetDO> proxyTargetDos = proxyTargetRepository.findByProxyId(id);
-        TcpProxyDetailDTO tcpProxyDetailDTO = proxyConvert.toTcpDetailDTO(proxyDO, detail.getAgentDO().getAgentType().getCode());
+    private ProxyDO buildTcpProxyDO(String agentId, String name, String proxyId) {
+        ProxyDO proxyDO = new ProxyDO();
+        proxyDO.setId(proxyId);
+        proxyDO.setAgentId(agentId);
+        proxyDO.setName(name);
+        proxyDO.setProtocol(ProtocolType.TCP);
+        proxyDO.setStatus(ProxyStatus.OPEN);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
+        return proxyDO;
+    }
 
-        tcpProxyDetailDTO.setTargets(proxyTargetConvert.toDTOList(proxyTargetDos));
-        return tcpProxyDetailDTO;
+    private void applyTcpListenPort(ProxyDO proxyDO, Integer requestRemotePort,
+                                    Integer existsListenPort, Integer existsRemotePort) {
+        if (requestRemotePort == null || requestRemotePort == 0) {
+            if (existsListenPort != null) {
+                proxyDO.setRemotePort(existsRemotePort);
+                proxyDO.setListenPort(existsListenPort);
+                return;
+            }
+            Integer listenPort = portPoolManager.acquire(PortPoolType.TCP);
+            if (listenPort == null) {
+                throw new BizException("没有可用远程端口号");
+            }
+            proxyDO.setRemotePort(null);
+            proxyDO.setListenPort(listenPort);
+            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, listenPort));
+            return;
+        }
+
+        if (Objects.equals(existsListenPort, requestRemotePort)) {
+            proxyDO.setRemotePort(existsRemotePort);
+            proxyDO.setListenPort(existsListenPort);
+            return;
+        }
+
+        if (!portPoolManager.isAvailable(PortPoolType.TCP, requestRemotePort)) {
+            throw new BizException("远程端口号不可用或被占用");
+        }
+        if (existsListenPort != null && !Objects.equals(existsListenPort, requestRemotePort)) {
+            portPoolManager.release(PortPoolType.TCP, existsListenPort);
+        }
+        proxyDO.setRemotePort(requestRemotePort);
+        proxyDO.setListenPort(requestRemotePort);
+        portPoolManager.reserve(PortPoolType.TCP, requestRemotePort);
+        transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, requestRemotePort));
+    }
+
+    private void applyTcpLimitTotal(ProxyDO proxyDO, Integer limitTotalMbps) {
+        if (limitTotalMbps == null) {
+            proxyDO.setLimitTotal(null);
+            return;
+        }
+        proxyDO.setLimitTotal(BandwidthUnit.MBPS.toBps(limitTotalMbps));
+    }
+
+    private ProxyTargetDO buildTcpTarget(TcpProxyCreateParam param, String proxyId) {
+        ProxyTargetDO target = new ProxyTargetDO();
+        target.setProxyId(proxyId);
+        target.setHost(param.getLocalHost());
+        target.setPort(param.getLocalPort());
+        target.setName(param.getName());
+        target.setWeight(1);
+        return target;
+    }
+
+    private ProxyTargetDO buildTcpTarget(TcpProxyUpdateParam param, String proxyId) {
+        ProxyTargetDO target = new ProxyTargetDO();
+        target.setProxyId(proxyId);
+        target.setHost(param.getLocalHost());
+        target.setPort(param.getLocalPort());
+        target.setName(param.getName());
+        target.setWeight(1);
+        return target;
+    }
+
+    private Integer toMbps(Long bps) {
+        if (bps == null) {
+            return null;
+        }
+        return (int) (bps / BandwidthUnit.MBPS.getFactor());
+    }
+
+    private ProxyDO buildHttpLikeProxyDO(String agentId, String name, String proxyId, DomainType domainType,
+                                         ProtocolType protocol, Boolean forceHttps) {
+        ProxyDO proxyDO = new ProxyDO();
+        proxyDO.setId(proxyId);
+        proxyDO.setAgentId(agentId);
+        proxyDO.setName(name);
+        proxyDO.setProtocol(protocol);
+        proxyDO.setStatus(ProxyStatus.OPEN);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
+        proxyDO.setDomainType(domainType);
+        proxyDO.setMultiplex(true);
+        proxyDO.setEncrypt(false);
+        if (protocol.isHttps()) {
+            proxyDO.setForceHttps(Boolean.TRUE.equals(forceHttps));
+        }
+        return proxyDO;
+    }
+
+    private ProxyTargetDO buildHttpTarget(String localHost, Integer localPort, String name, String proxyId) {
+        ProxyTargetDO target = new ProxyTargetDO();
+        target.setProxyId(proxyId);
+        target.setHost(localHost);
+        target.setPort(localPort);
+        target.setName(name);
+        target.setWeight(1);
+        return target;
+    }
+
+    private void applyHttpLimitTotal(ProxyDO proxyDO, Integer limitTotalMbps) {
+        if (limitTotalMbps == null) {
+            proxyDO.setLimitTotal(null);
+            return;
+        }
+        proxyDO.setLimitTotal(BandwidthUnit.MBPS.toBps(limitTotalMbps));
+    }
+
+    private void assertHttpLikeProtocol(ProxyDO proxyDO, ProtocolType protocol) {
+        if (protocol.isHttp() && !proxyDO.getProtocol().isHttp()) {
+            throw new BizException("仅支持 HTTP 代理");
+        }
+        if (protocol.isHttps() && !proxyDO.getProtocol().isHttps()) {
+            throw new BizException("仅支持 HTTPS 代理");
+        }
+    }
+
+    private String resolveRootDomainForAuto() {
+        List<String> rootDomains = appConfig.getRootDomains().stream().toList();
+        if (!CollectionUtils.isEmpty(rootDomains)) {
+            return rootDomains.getFirst();
+        }
+        return domainRepository.findAll().stream()
+                .findFirst()
+                .map(DomainDO::getDomain)
+                .orElse(null);
+    }
+
+    private void validateHttpDomainInput(DomainType domainType, List<SubdomainBindingParam> subdomainBindings,
+                                         List<String> customDomains) {
+        if (domainType.isAuto()) {
+            if (!StringUtils.hasText(resolveRootDomainForAuto())) {
+                throw new BizException("未配置根域名，无法使用自动域名");
+            }
+            return;
+        }
+        if (domainType.isSubdomain()) {
+            if (CollectionUtils.isEmpty(subdomainBindings)) {
+                throw new BizException("请至少添加一条子域名配置");
+            }
+            Set<String> keys = new HashSet<>();
+            for (SubdomainBindingParam binding : subdomainBindings) {
+                if (binding == null) {
+                    continue;
+                }
+                if (binding.getRootDomainId() == null) {
+                    throw new BizException("请选择根域名");
+                }
+                if (!StringUtils.hasText(binding.getPrefix())) {
+                    throw new BizException("请填写子域名前缀");
+                }
+                String prefix = binding.getPrefix().trim();
+                String key = binding.getRootDomainId() + ":" + prefix;
+                if (!keys.add(key)) {
+                    throw new BizException("存在重复的子域名配置");
+                }
+                resolveSelectedRootDomain(binding.getRootDomainId());
+            }
+            return;
+        }
+        if (CollectionUtils.isEmpty(normalizeDomainValues(customDomains))) {
+            throw new BizException("请填写自定义域名");
+        }
+    }
+
+    private List<SubdomainBindingParam> normalizeSubdomainBindings(List<SubdomainBindingParam> bindings) {
+        if (CollectionUtils.isEmpty(bindings)) {
+            return List.of();
+        }
+        return bindings.stream()
+                .filter(Objects::nonNull)
+                .filter(binding -> StringUtils.hasText(binding.getPrefix()))
+                .map(binding -> {
+                    SubdomainBindingParam normalized = new SubdomainBindingParam();
+                    normalized.setRootDomainId(binding.getRootDomainId());
+                    normalized.setPrefix(binding.getPrefix().trim());
+                    return normalized;
+                })
+                .toList();
+    }
+
+    private List<ResolvedSubdomainBinding> resolveSubdomainBindings(List<SubdomainBindingParam> bindings) {
+        List<SubdomainBindingParam> normalized = normalizeSubdomainBindings(bindings);
+        Set<String> keys = new HashSet<>();
+        List<ResolvedSubdomainBinding> resolved = new ArrayList<>();
+        for (SubdomainBindingParam binding : normalized) {
+            String prefix = binding.getPrefix().trim();
+            String key = binding.getRootDomainId() + ":" + prefix;
+            if (!keys.add(key)) {
+                throw new BizException("存在重复的子域名配置");
+            }
+            String rootDomain = resolveSelectedRootDomain(binding.getRootDomainId());
+            resolved.add(new ResolvedSubdomainBinding(prefix, rootDomain));
+        }
+        return resolved;
+    }
+
+    private record ResolvedSubdomainBinding(String prefix, String rootDomain) {
+        String fullDomain() {
+            return prefix + "." + rootDomain;
+        }
+    }
+
+    private List<String> normalizeDomainValues(List<String> values) {
+        if (CollectionUtils.isEmpty(values)) {
+            return List.of();
+        }
+        return values.stream()
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .toList();
+    }
+
+    private String resolveSelectedRootDomain(Integer rootDomainId) {
+        if (rootDomainId == null) {
+            throw new BizException("请选择根域名");
+        }
+        return domainRepository.findById(rootDomainId)
+                .map(DomainDO::getDomain)
+                .orElseThrow(() -> new BizException("根域名不存在"));
+    }
+
+    private void saveHttpDomains(String proxyId, DomainType domainType, List<SubdomainBindingParam> subdomainBindings,
+                                 List<String> customDomains, String excludeProxyId) {
+        if (domainType.isAuto()) {
+            String rootDomain = resolveRootDomainForAuto();
+            DomainInfo domain = domainGenerator.generateRandomSubdomain(rootDomain);
+            proxyDomainRepository.save(new ProxyDomainDO(proxyId, domain.getDomain(), rootDomain, domainType));
+            return;
+        }
+        if (domainType.isSubdomain()) {
+            List<ResolvedSubdomainBinding> bindings = resolveSubdomainBindings(subdomainBindings);
+            List<String> fullDomains = bindings.stream().map(ResolvedSubdomainBinding::fullDomain).toList();
+            assertDomainsAvailable(fullDomains, excludeProxyId);
+            proxyDomainRepository.saveAll(bindings.stream()
+                    .map(binding -> new ProxyDomainDO(proxyId, binding.prefix(), binding.rootDomain(), domainType))
+                    .toList());
+            return;
+        }
+        List<String> domains = normalizeDomainValues(customDomains);
+        assertDomainsAvailable(domains, excludeProxyId);
+        proxyDomainRepository.saveAll(domains.stream()
+                .map(domain -> new ProxyDomainDO(proxyId, domain, null, domainType))
+                .toList());
+    }
+
+    private void assertDomainsAvailable(List<String> fullDomains, String excludeProxyId) {
+        List<ProxyDomainDO> existsList = proxyDomainRepository.findByFullDomainIn(fullDomains);
+        List<ProxyDomainDO> conflicts = existsList.stream()
+                .filter(item -> excludeProxyId == null || !excludeProxyId.equals(item.getProxyId()))
+                .toList();
+        if (!conflicts.isEmpty()) {
+            String existDomains = conflicts.stream()
+                    .map(ProxyDomainDO::getFullDomain)
+                    .collect(Collectors.joining(", "));
+            throw new BizException("以下域名已被使用: " + existDomains);
+        }
+    }
+
+    private void fillHttpDomainFields(HttpProxyDetailDTO dto, DomainType domainType, List<ProxyDomainDO> domainRecords) {
+        if (domainType == null || CollectionUtils.isEmpty(domainRecords)) {
+            return;
+        }
+        if (domainType.isSubdomain()) {
+            Map<String, Integer> rootDomainIdMap = domainRepository.findAll().stream()
+                    .collect(Collectors.toMap(DomainDO::getDomain, DomainDO::getId, (left, right) -> left));
+            dto.setSubdomainBindings(domainRecords.stream().map(record -> {
+                SubdomainBindingDTO binding = new SubdomainBindingDTO();
+                binding.setPrefix(record.getDomain());
+                binding.setRootDomain(record.getRootDomain());
+                if (StringUtils.hasText(record.getRootDomain())) {
+                    binding.setRootDomainId(rootDomainIdMap.get(record.getRootDomain()));
+                }
+                return binding;
+            }).toList());
+            return;
+        }
+        if (domainType.isCustomDomain()) {
+            dto.setCustomDomains(domainRecords.stream().map(ProxyDomainDO::getDomain).toList());
+        }
+    }
+
+    private Integer domainTypeToCode(DomainType domainType) {
+        return domainType != null ? domainType.getCode() : null;
     }
 
     @Override
@@ -486,20 +642,17 @@ public class ProxyServiceImpl implements ProxyService {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
 
-        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.TCP, pageable);
+        Page<ProxyDO> resultPage = proxyRepository.findByProtocolOrderByUpdatedAtDesc(ProtocolType.TCP, pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
-        List<ProxyListQueryResult> content = resultPage.getContent();
-        List<String> proxyIds = content.stream().map(ProxyListQueryResult::getProxyDO).map(ProxyDO::getId).toList();
+        List<ProxyDO> content = resultPage.getContent();
+        List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
         Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds).stream()
                 .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
         List<TcpProxyListDTO> res = new ArrayList<>();
-        for (ProxyListQueryResult r : content) {
-            ProxyDO proxyDO = r.getProxyDO();
-            AgentDO agentDO = r.getAgentDO();
+        for (ProxyDO proxyDO : content) {
             TcpProxyListDTO tcpListDTO = proxyConvert.toTcpListDTO(proxyDO);
-            tcpListDTO.setAgentType(agentDO.getAgentType().getCode());
             tcpListDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
             res.add(tcpListDTO);
         }
@@ -540,10 +693,61 @@ public class ProxyServiceImpl implements ProxyService {
     @Transactional(rollbackFor = Exception.class)
     public void setProxyStatus(String id, Integer status) {
         ProxyDO proxyDO = proxyRepository.findById(id).orElseThrow(() -> new BizException("代理配置信息不存在"));
-        if (proxyDO.getStatus().getCode().equals(status)) {
+        ProxyStatus proxyStatus = ProxyStatus.fromCode(status);
+        if (proxyStatus == null) {
+            throw new BizException("无效的代理状态");
+        }
+        if (proxyDO.getStatus() == proxyStatus) {
             return;
         }
-        proxyDO.setStatus(ProxyStatus.fromCode(status));
+        if (proxyStatus.isOpen()) {
+            validateProxyCanActivate(proxyDO);
+        }
+        proxyDO.setStatus(proxyStatus);
         proxyRepository.save(proxyDO);
+        transactionHelper.afterCommit(() -> applyRuntimeStatus(proxyDO));
+        logger.debug("代理状态更新成功：{} -> {}", proxyDO.getName(), proxyStatus.getDescription());
+    }
+
+    private void validateProxyCanActivate(ProxyDO proxyDO) {
+        if (proxyDO.getProtocol().isHttpOrHttps()) {
+            List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyId(proxyDO.getId());
+            if (CollectionUtils.isEmpty(domains)) {
+                throw new BizException("代理未配置可用域名，无法启用");
+            }
+            return;
+        }
+        if (proxyDO.getListenPort() == null) {
+            throw new BizException("代理未配置远程端口，无法启用");
+        }
+    }
+
+    private void applyRuntimeStatus(ProxyDO proxyDO) {
+        String proxyId = proxyDO.getId();
+        if (proxyDO.getStatus().isClosed()) {
+            proxyManager.deactivate(proxyId);
+            return;
+        }
+        activateProxy(proxyDO);
+    }
+
+    private void activateProxy(ProxyDO proxyDO) {
+        String agentId = proxyDO.getAgentId();
+        String proxyId = proxyDO.getId();
+        ProtocolType protocol = proxyDO.getProtocol();
+
+        if (protocol.isHttpOrHttps()) {
+            Set<String> domains = proxyDomainRepository.findByProxyId(proxyId).stream()
+                    .map(ProxyDomainDO::getFullDomain)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toSet());
+            if (protocol.isHttp()) {
+                proxyManager.registerHttp(agentId, proxyId, domains);
+            } else {
+                proxyManager.registerHttps(agentId, proxyId, domains);
+            }
+            return;
+        }
+        proxyManager.registerTcp(agentId, proxyId, proxyDO.getListenPort());
     }
 }

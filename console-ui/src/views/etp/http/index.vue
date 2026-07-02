@@ -61,6 +61,7 @@
   import PluginDialog from '../plugin/index.vue'
   import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
   import { renderTargetTags } from '../common/render-target-tag'
+  import { useProxyStatusToggle } from '../common/use-proxy-status-toggle'
   import { ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
   import { ProtocolType, ProxyStatus } from '@/enums/etp/business'
@@ -86,9 +87,7 @@
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
 
-  const handleStatusChange = (row: HttpProxyItem, enabled: boolean) => {
-    row.status = enabled ? ProxyStatus.OPEN : ProxyStatus.CLOSED
-  }
+  const { isToggling, handleStatusChange } = useProxyStatusToggle()
 
   const {
     columns,
@@ -153,6 +152,7 @@
           formatter: (row: HttpProxyItem) =>
             h(ElSwitch, {
               modelValue: row.status === ProxyStatus.OPEN,
+              loading: isToggling(row.id),
               'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
             })
         },

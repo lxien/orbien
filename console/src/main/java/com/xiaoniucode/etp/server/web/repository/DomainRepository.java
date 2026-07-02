@@ -21,10 +21,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
 public interface DomainRepository extends JpaRepository<DomainDO, Integer> {
     boolean existsByDomain(String domain);
+
+    Optional<DomainDO> findByDomain(String domain);
+
     Set<DomainDO> findByDomainIn(Collection<String> domains);
 }

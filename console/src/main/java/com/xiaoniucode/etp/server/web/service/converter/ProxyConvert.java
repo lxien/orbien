@@ -18,59 +18,22 @@ package com.xiaoniucode.etp.server.web.service.converter;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
-import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
-import com.xiaoniucode.etp.server.web.param.proxy.HttpProxyCreateParam;
-import com.xiaoniucode.etp.server.web.param.proxy.HttpProxyUpdateParam;
 import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyCreateParam;
 import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyUpdateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", imports = {ProtocolType.class, DomainType.class})
 public interface ProxyConvert {
-    @Mapping(target = "protocol", expression = "java(ProtocolType.HTTP)")
-    @Mapping(source = "proxyId", target = "id")
-    @Mapping(target = "limitTotal", ignore = true)
-    @Mapping(target = "limitIn", ignore = true)
-    @Mapping(target = "limitOut", ignore = true)
-    ProxyDO toDO(HttpProxyCreateParam request, String proxyId);
-
-    @Mapping(target = "protocol", expression = "java(ProtocolType.TCP)")
-    @Mapping(source = "proxyId", target = "id")
-    ProxyDO toDO(TcpProxyCreateParam request, String proxyId);
-
-    @Mapping(target = "id", ignore = true)
-    @Mapping(source = "param.domainType", target = "domainType", qualifiedByName = "codeToDomainType")
-    void updateDO(HttpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
-
-    @Mapping(target = "id", ignore = true)
-    void updateDO(TcpProxyUpdateParam param, @MappingTarget ProxyDO proxyDO);
-
-    @Mapping(source = "agentType", target = "agentType")
-    @Mapping(source = "proxyDO.domainType", target = "domainType", qualifiedByName = "domainTypeToCode")
-    @Mapping(source = "proxyDO.limitTotal", target = "bandwidth.limitTotal")
-    @Mapping(source = "proxyDO.limitIn", target = "bandwidth.limitIn")
-    @Mapping(source = "proxyDO.limitOut", target = "bandwidth.limitOut")
-    HttpProxyDetailDTO toHttpDetailDTO(ProxyDO proxyDO, Integer agentType);
-
-    @Mapping(source = "agentType", target = "agentType")
-    @Mapping(source = "proxyDO.limitTotal", target = "bandwidth.limitTotal")
-    @Mapping(source = "proxyDO.limitIn", target = "bandwidth.limitIn")
-    @Mapping(source = "proxyDO.limitOut", target = "bandwidth.limitOut")
-    TcpProxyDetailDTO toTcpDetailDTO(ProxyDO proxyDO, Integer agentType);
-
-    List<HttpProxyListDTO> toHttpDTOList(List<ProxyDO> proxies);
-
     TcpProxyListDTO toTcpListDTO(ProxyDO proxy);
 
     List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);

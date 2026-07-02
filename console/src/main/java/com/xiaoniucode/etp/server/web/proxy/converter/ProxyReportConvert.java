@@ -44,9 +44,6 @@ public class ProxyReportConvert {
         proxyDO.setProtocol(protocol);
         proxyDO.setStatus(proxy.getEnabled() ? ProxyStatus.OPEN : ProxyStatus.CLOSED);
         proxyDO.setSourceType(ProxySourceType.AGENT);
-
-        int targetCount = proxy.getTargetsCount();
-        proxyDO.setDeploymentMode(targetCount > 1 ? DeploymentMode.CLUSTER : DeploymentMode.STANDALONE);
         proxyDO.setLoadBalanceStrategy(toLoadBalanceType(proxy));
 
         if (protocol.isTcp()) {
@@ -66,8 +63,6 @@ public class ProxyReportConvert {
         proxyDO.setListenPort(listenPort);
         if (proxy.hasRemotePort() && proxy.getRemotePort() > 0) {
             proxyDO.setRemotePort(proxy.getRemotePort());
-        } else {
-            proxyDO.setRemotePort(listenPort);
         }
     }
 

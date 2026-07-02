@@ -35,6 +35,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             """)
     Page<ProxyListQueryResult> findProxiesWithAssociations(@Param("protocol") ProtocolType protocol, Pageable pageable);
 
+    Page<ProxyDO> findByProtocolOrderByUpdatedAtDesc(ProtocolType protocol, Pageable pageable);
+
     @Query("""
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(a, p,ba,ac)
             FROM ProxyDO p

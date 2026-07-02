@@ -19,6 +19,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 代理目标 Repository
@@ -28,6 +29,8 @@ public interface ProxyTargetRepository extends JpaRepository<ProxyTargetDO, Inte
     void deleteByProxyId(String proxyId);
 
     List<ProxyTargetDO> findByProxyId(String id);
+
+    Optional<ProxyTargetDO> findFirstByProxyIdOrderByIdAsc(String proxyId);
 
     void deleteByProxyIdIn(List<String> ids);
 

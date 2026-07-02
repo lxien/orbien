@@ -48,7 +48,6 @@ public interface ProxyModelConvert {
 
     //-----------------------------------------------ModelToDO---------------------------------------------------------
     @Mapping(target = "id", source = "proxyId")
-    @Mapping(target = "deploymentMode", expression = "java(config.getDeploymentMode())")
     ProxyDO toProxyDO(ProxyConfig config);
 
     @Mapping(target = "limitTotal", expression = "java(bandwidth.getTotalBps())")

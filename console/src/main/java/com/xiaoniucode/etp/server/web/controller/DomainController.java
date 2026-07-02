@@ -42,6 +42,11 @@ public class DomainController {
         return Ajax.success(domains);
     }
 
+    @GetMapping("/list")
+    public Ajax listAll() {
+        return Ajax.success(domainService.findAll());
+    }
+
     @GetMapping("/used")
     public Ajax findUsedByPage(@ModelAttribute PageQuery pageQuery) {
         PageResult<UsedDomainDTO> domains = domainService.findUsedByPage(pageQuery);

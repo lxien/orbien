@@ -1,24 +1,25 @@
-/*
- *    Copyright 2026 xiaoniucode
- *
- *    Licensed under the Apache License, Version 2.0 (the "License");
- *    you may not use this file except in compliance with the License.
- *    You may obtain a copy of the License at
- *
- *        http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS,
- *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *    See the License for the specific language governing permissions and
- *    limitations under the License.
- */
 package com.xiaoniucode.etp.server.web.dto.proxy;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+
+import java.time.LocalDateTime;
+
 @Data
-@EqualsAndHashCode(callSuper = true)
-public class TcpProxyDetailDTO extends ProxyDetailDTO {
+public class TcpProxyDetailDTO {
+    private String id;
+    private String agentId;
+    private String name;
+    /** 用户指定的远程端口，自动分配时为 null */
+    private Integer remotePort;
+    /** 实际监听端口 */
     private Integer listenPort;
+    private String localHost;
+    private Integer localPort;
+    /** 总带宽 Mbps */
+    private Integer limitTotal;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
+    private LocalDateTime updatedAt;
 }

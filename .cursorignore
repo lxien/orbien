@@ -1,0 +1,53 @@
+# 依赖目录
+node_modules/
+dist/
+build/
+out/
+target/
+venv/
+.env
+.env.local
+.env.production
+
+# 日志和临时文件
+*.log
+logs/
+*.tmp
+*.temp
+data/
+log/
+
+# 大文件和媒体
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.mp4
+*.mov
+*.zip
+*.tar.gz
+
+# 构建产物和缓存
+.next/
+.nuxt/
+.svelte-kit/
+.cache/
+.turbo/
+coverage/
+*.min.js
+*.bundle.js
+
+# IDE 和系统文件
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 其他常见可忽略
+.git/
+.github/
+.gitignore
+README.md
+LICENSE

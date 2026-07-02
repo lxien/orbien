@@ -32,7 +32,6 @@ public class ProxyDetailDTO implements Serializable {
     private String name;
     private Integer protocol;
     private Integer agentType;
-    private Integer deploymentMode;
     private Integer status;
     private TransportDTO transport;
     private BandwidthDTO bandwidth;

@@ -62,7 +62,7 @@
       apiFn: fetchGetDomainListByPage,
       apiParams: {
         current: 1,
-        size: 20
+        size: 10
       },
       columnsFactory: () => [
         { type: 'selection' },

@@ -24,8 +24,11 @@ import com.xiaoniucode.etp.server.web.param.domain.DomainBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.domain.DomainCreateParam;
 import com.xiaoniucode.etp.server.web.param.domain.DomainUpdateParam;
 
+import java.util.List;
+
 public interface DomainService {
     PageResult<DomainDTO> findByPage(PageQuery pageQuery);
+    List<DomainDTO> findAll();
     PageResult<UsedDomainDTO> findUsedByPage(PageQuery pageQuery);
     DomainDTO getById(Integer id);
     DomainDTO create(DomainCreateParam param);

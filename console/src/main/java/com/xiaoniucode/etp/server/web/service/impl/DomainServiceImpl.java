@@ -73,6 +73,12 @@ public class DomainServiceImpl implements DomainService {
     }
 
     @Override
+    public List<DomainDTO> findAll() {
+        List<DomainDO> domains = domainRepository.findAll(Sort.by(Sort.Direction.ASC, "domain"));
+        return domainConvert.toDTOList(domains);
+    }
+
+    @Override
     public PageResult<UsedDomainDTO> findUsedByPage(PageQuery pageQuery) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "id"));
