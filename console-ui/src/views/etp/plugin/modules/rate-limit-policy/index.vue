@@ -6,7 +6,7 @@
         <p class="section-desc">统一设置下方所有带宽字段的输入与显示单位</p>
       </div>
       <ElSelect v-model="form.bandwidthUnit" placeholder="选择单位" class="unit-select">
-        <ElOption v-for="unit in BANDWIDTH_UNITS" :key="unit" :label="unit" :value="unit" />
+        <ElOption v-for="unit in BANDWIDTH_UNIT_OPTIONS" :key="unit" :label="unit" :value="unit" />
       </ElSelect>
     </section>
 
@@ -50,18 +50,16 @@
     saveProxyBandwidthConfig,
     type ProxyDetail
   } from '@/api/proxy-plugin'
+  import {
+    BANDWIDTH_UNIT_OPTIONS,
+    BANDWIDTH_UNIT_TO_BPS,
+    BandwidthUnit
+  } from '@/enums/etp/business'
   import type { ProxyConfigProtocol } from '../../menus'
 
   defineOptions({ name: 'RateLimitPolicyPage' })
 
-  const BANDWIDTH_UNITS = ['Kbps', 'Mbps', 'Gbps'] as const
-  type BandwidthUnit = (typeof BANDWIDTH_UNITS)[number]
-
-  const UNIT_TO_BPS: Record<BandwidthUnit, number> = {
-    Kbps: 1_000,
-    Mbps: 1_000_000,
-    Gbps: 1_000_000_000
-  }
+  type BandwidthUnitOption = (typeof BANDWIDTH_UNIT_OPTIONS)[number]
 
   const LIMIT_FIELDS = [
     {
@@ -88,36 +86,36 @@
   const loading = ref(false)
   const saving = ref(false)
   const isInitializing = ref(false)
-  const form = reactive<Record<LimitKey, number | undefined> & { bandwidthUnit: BandwidthUnit }>({
+  const form = reactive<Record<LimitKey, number | undefined> & { bandwidthUnit: BandwidthUnitOption }>({
     limitIn: undefined,
     limitOut: undefined,
-    bandwidthUnit: 'Mbps'
+    bandwidthUnit: BandwidthUnit.MBPS
   })
 
   let detailSnapshot: ProxyDetail | null = null
 
-  const resolveDisplayUnit = (limitIn?: number | null, limitOut?: number | null): BandwidthUnit => {
+  const resolveDisplayUnit = (limitIn?: number | null, limitOut?: number | null): BandwidthUnitOption => {
     const bpsValues = [limitIn, limitOut].filter((v): v is number => v != null)
-    if (bpsValues.length === 0) return 'Mbps'
+    if (bpsValues.length === 0) return BandwidthUnit.MBPS
 
     const maxBps = Math.max(...bpsValues)
-    if (maxBps >= UNIT_TO_BPS.Gbps) return 'Gbps'
-    if (maxBps >= UNIT_TO_BPS.Mbps) return 'Mbps'
-    return 'Kbps'
+    if (maxBps >= BANDWIDTH_UNIT_TO_BPS[BandwidthUnit.GBPS]) return BandwidthUnit.GBPS
+    if (maxBps >= BANDWIDTH_UNIT_TO_BPS[BandwidthUnit.MBPS]) return BandwidthUnit.MBPS
+    return BandwidthUnit.KBPS
   }
 
-  const bpsToUnit = (bps: number | null | undefined, unit: BandwidthUnit) => {
+  const bpsToUnit = (bps: number | null | undefined, unit: BandwidthUnitOption) => {
     if (bps == null) return undefined
-    return Math.round(bps / UNIT_TO_BPS[unit])
+    return Math.round(bps / BANDWIDTH_UNIT_TO_BPS[unit])
   }
 
   const convertBetweenUnits = (
     value: number | undefined,
-    from: BandwidthUnit,
-    to: BandwidthUnit
+    from: BandwidthUnitOption,
+    to: BandwidthUnitOption
   ) => {
     if (value == null) return undefined
-    return Math.round((value * UNIT_TO_BPS[from]) / UNIT_TO_BPS[to])
+    return Math.round((value * BANDWIDTH_UNIT_TO_BPS[from]) / BANDWIDTH_UNIT_TO_BPS[to])
   }
 
   const fillForm = (bandwidth: Api.Proxy.BandwidthDTO | null) => {

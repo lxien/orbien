@@ -5,7 +5,7 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>新增</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加</ElButton>
             <ElButton
               @click="handleBatchDelete"
               v-ripple
@@ -63,9 +63,10 @@
   import HttpsDialog from './modules/https-dialog.vue'
   import PluginDialog from '../plugin/index.vue'
   import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
+  import { renderTargetTags } from '../common/render-target-tag'
   import { ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace } from 'element-plus'
   import { DialogType } from '@/types'
-  import { ProtocolType } from '@/enums/businessEnum'
+  import { ProtocolType, ProxyStatus } from '@/enums/etp/business'
 
   defineOptions({ name: 'HttpsPenetration' })
 
@@ -89,7 +90,7 @@
   const currentMetricsProxyId = ref('')
 
   const handleStatusChange = (row: HttpsProxyItem, enabled: boolean) => {
-    row.status = enabled ? 1 : 0
+    row.status = enabled ? ProxyStatus.OPEN : ProxyStatus.CLOSED
   }
 
   const {
@@ -147,17 +148,7 @@
           prop: 'targets',
           label: '内网服务',
           minWidth: 150,
-          formatter: (row: HttpsProxyItem) => {
-            if (!row.targets || row.targets.length === 0) {
-              return ''
-            }
-            return h(ElSpace, { direction: 'horizontal', size: 4, wrap: true }, () =>
-              row.targets.map((target) => {
-                const text = `${target.host}:${target.port}`
-                return h(ElTag, { type: 'primary' }, () => text)
-              })
-            )
-          }
+          formatter: (row: HttpsProxyItem) => renderTargetTags(row.targets)
         },
         {
           prop: 'status',
@@ -165,7 +156,7 @@
           width: 80,
           formatter: (row: HttpsProxyItem) =>
             h(ElSwitch, {
-              modelValue: row.status === 1,
+              modelValue: row.status === ProxyStatus.OPEN,
               'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
             })
         },
@@ -285,6 +276,6 @@
 
 <style lang="scss" scoped>
   :deep(.el-dialog__body) {
-    padding: 0  !important;
+    padding: 0 !important;
   }
 </style>

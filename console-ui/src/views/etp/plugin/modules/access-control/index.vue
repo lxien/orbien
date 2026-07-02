@@ -10,8 +10,8 @@
         <div class="flex items-center gap-3">
           <span class="w-20 font-medium">控制模式：</span>
           <ElRadioGroup v-model="formData.mode" @change="handleModeChange">
-            <ElRadio :label="1">白名单（只允许指定IP访问）</ElRadio>
-            <ElRadio :label="0">黑名单（禁止指定IP访问）</ElRadio>
+            <ElRadio :label="AccessControl.ALLOW">白名单（只允许指定IP访问）</ElRadio>
+            <ElRadio :label="AccessControl.DENY">黑名单（禁止指定IP访问）</ElRadio>
           </ElRadioGroup>
         </div>
       </div>
@@ -35,11 +35,11 @@
           <ElTableColumn prop="ruleType" label="规则类型" width="150">
             <template #default="scope">
               <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType">
-                <ElRadio :label="1">放行</ElRadio>
-                <ElRadio :label="0">禁止</ElRadio>
+                <ElRadio :label="AccessControl.ALLOW">放行</ElRadio>
+                <ElRadio :label="AccessControl.DENY">禁止</ElRadio>
               </ElRadioGroup>
-              <ElTag v-else :type="scope.row.ruleType === 1 ? 'success' : 'danger'">
-                {{ scope.row.ruleType === 1 ? '放行' : '禁止' }}
+              <ElTag v-else :type="scope.row.ruleType === AccessControl.ALLOW ? 'success' : 'danger'">
+                {{ scope.row.ruleType === AccessControl.ALLOW ? '放行' : '禁止' }}
               </ElTag>
             </template>
           </ElTableColumn>
@@ -89,6 +89,7 @@
     fetchUpdateAccessControlRule,
     fetchDeleteAccessControlRule
   } from '@/api/access-control'
+  import { AccessControl } from '@/enums/etp/business'
 
   defineOptions({ name: 'AccessControlPage' })
 
@@ -98,7 +99,7 @@
 
   const formData = reactive({
     enabled: false,
-    mode: 1,
+    mode: AccessControl.ALLOW,
     rules: [] as Array<{
       id: number
       proxyId: string
@@ -112,7 +113,7 @@
 
   const resetFormData = () => {
     formData.enabled = false
-    formData.mode = 1
+    formData.mode = AccessControl.ALLOW
     formData.rules = []
     editingRuleId.value = null
     editingRuleBackup.value = null
@@ -122,7 +123,7 @@
     const response = await fetchGetAccessControl(props.proxyId)
     if (response) {
       formData.enabled = response.enabled || false
-      formData.mode = response.mode !== undefined ? response.mode : 1
+      formData.mode = response.mode !== undefined ? response.mode : AccessControl.ALLOW
       formData.rules = response.rules || []
     }
   }
@@ -158,7 +159,7 @@
       id: 0,
       proxyId: props.proxyId,
       cidr: '',
-      ruleType: 1
+      ruleType: AccessControl.ALLOW
     })
     const newRule = formData.rules[formData.rules.length - 1]
     handleEditRule(newRule)

@@ -35,8 +35,12 @@
           class="w-full"
           :disabled="!isCustomMode"
         >
-          <ElOption label="TCP" :value="1" />
-          <ElOption label="UDP" :value="2" />
+          <ElOption
+            v-for="item in PORT_POOL_TYPE_OPTIONS"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
         </ElSelect>
       </ElFormItem>
       <ElFormItem label="端口" prop="port">
@@ -75,6 +79,7 @@
     fetchUpdatePortPool,
     fetchGetPortPoolById
   } from '@/api/port-pool'
+  import { PORT_POOL_TYPE_OPTIONS, PortPoolType } from '@/enums/etp/business'
   import {
     CUSTOM_PRESET_ID,
     PORT_POOL_PRESETS,
@@ -119,7 +124,7 @@
 
   const formData = reactive({
     id: undefined as number | undefined,
-    type: 1,
+    type: PortPoolType.TCP,
     port: '',
     remark: ''
   })
@@ -212,7 +217,7 @@
     if (props.type === 'add') {
       Object.assign(formData, {
         id: undefined,
-        type: 1,
+        type: PortPoolType.TCP,
         port: '',
         remark: ''
       })

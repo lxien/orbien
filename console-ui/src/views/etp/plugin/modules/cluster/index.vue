@@ -53,7 +53,7 @@
                 v-model.number="row.weight"
                 type="number"
                 placeholder="权重"
-                :disabled="loadBalanceStrategy !== '2'"
+                :disabled="loadBalanceStrategy !== LoadBalanceType.WEIGHT"
               />
             </template>
           </ElTableColumn>
@@ -82,6 +82,7 @@
   import { Plus, Delete } from '@element-plus/icons-vue'
   import { fetchProxyDetail, saveProxyClusterConfig } from '@/api/proxy-plugin'
   import type { ProxyConfigProtocol } from '../../menus'
+  import { LOAD_BALANCE_OPTIONS, LoadBalanceType } from '@/enums/etp/business'
 
   defineOptions({ name: 'ClusterPage' })
 
@@ -92,13 +93,6 @@
     name: string
   }
 
-  const LOAD_BALANCE_OPTIONS = [
-    { label: '轮询 (roundrobin)', value: '1' },
-    { label: '权重 (weight)', value: '2' },
-    { label: '随机 (random)', value: '3' },
-    { label: '最少连接 (leastconn)', value: '4' }
-  ] as const
-
   const props = defineProps<{
     proxyId: string
     protocol: ProxyConfigProtocol
@@ -106,7 +100,7 @@
 
   const loading = ref(false)
   const saving = ref(false)
-  const loadBalanceStrategy = ref('1')
+  const loadBalanceStrategy = ref<LoadBalanceType>(LoadBalanceType.ROUND_ROBIN)
   const targets = ref<TargetRow[]>([])
   let detailSnapshot: Awaited<ReturnType<typeof fetchProxyDetail>> | null = null
 
@@ -118,7 +112,7 @@
   })
 
   const normalizeWeights = () => {
-    if (loadBalanceStrategy.value === '2') return
+    if (loadBalanceStrategy.value === LoadBalanceType.WEIGHT) return
     targets.value.forEach((row) => {
       row.weight = 1
     })
@@ -129,7 +123,8 @@
     try {
       const detail = await fetchProxyDetail(props.protocol, props.proxyId)
       detailSnapshot = detail
-      loadBalanceStrategy.value = detail.loadBalance?.strategy?.toString() || '1'
+      loadBalanceStrategy.value =
+        (detail.loadBalance?.strategy as LoadBalanceType | undefined) ?? LoadBalanceType.ROUND_ROBIN
       targets.value = detail.targets?.map(toTargetRow) || []
       normalizeWeights()
     } finally {
@@ -191,7 +186,7 @@
           weight: row.weight || 1,
           name: row.name?.trim() || row.host.trim()
         })),
-        { strategy: Number(loadBalanceStrategy.value) }
+        { strategy: loadBalanceStrategy.value }
       )
       await loadData()
     } finally {

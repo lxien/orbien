@@ -16,7 +16,7 @@
 
 package com.xiaoniucode.etp.server.web.param.portpool;
 
-import com.xiaoniucode.etp.server.web.enums.PortPoolType;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
 import com.xiaoniucode.etp.server.web.support.validation.EnumValue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

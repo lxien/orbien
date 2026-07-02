@@ -19,7 +19,7 @@
 package com.xiaoniucode.etp.server.web.entity;
 
 import com.xiaoniucode.etp.server.web.entity.converter.PortPoolTypeConverter;
-import com.xiaoniucode.etp.server.web.enums.PortPoolType;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

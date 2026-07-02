@@ -16,7 +16,7 @@
  *
  */
 
-package com.xiaoniucode.etp.server.web.enums;
+package com.xiaoniucode.etp.core.enums;
 
 import lombok.Getter;
 

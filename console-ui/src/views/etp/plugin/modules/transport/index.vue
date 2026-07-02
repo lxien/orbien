@@ -10,8 +10,8 @@
         <div class="flex items-center gap-3">
           <span class="w-24 font-medium shrink-0">传输隧道</span>
           <ElRadioGroup v-model="form.tunnelType">
-            <ElRadio label="0">共享隧道</ElRadio>
-            <ElRadio label="1">独立隧道</ElRadio>
+            <ElRadio :label="String(TunnelType.MULTIPLEX)">共享隧道</ElRadio>
+            <ElRadio :label="String(TunnelType.DIRECT)">独立隧道</ElRadio>
           </ElRadioGroup>
         </div>
       </div>
@@ -23,6 +23,7 @@
   import { ref, reactive, watch } from 'vue'
   import { fetchProxyDetail } from '@/api/proxy-plugin'
   import type { ProxyConfigProtocol } from '../../menus'
+  import { TunnelType } from '@/enums/etp/business'
 
   defineOptions({ name: 'TransportPage' })
 
@@ -34,7 +35,7 @@
   const loading = ref(false)
   const form = reactive({
     encrypt: false,
-    tunnelType: '0'
+    tunnelType: String(TunnelType.MULTIPLEX)
   })
 
   const loadData = async () => {
@@ -42,7 +43,7 @@
     try {
       const detail = await fetchProxyDetail(props.protocol, props.proxyId)
       form.encrypt = detail.transport?.encrypt ?? false
-      form.tunnelType = detail.transport?.tunnelType?.toString() ?? '0'
+      form.tunnelType = detail.transport?.tunnelType?.toString() ?? String(TunnelType.MULTIPLEX)
     } finally {
       loading.value = false
     }

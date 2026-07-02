@@ -23,6 +23,8 @@ declare namespace Api.Proxy {
     port: number
     weight: number
     name: string
+    /** 健康状态：1 正常，0 异常，未返回时为未检测 */
+    healthStatus?: number
   }
 
   /** 带宽配置 */

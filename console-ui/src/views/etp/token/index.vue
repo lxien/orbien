@@ -5,7 +5,7 @@
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
-            <ElButton type="primary" @click="showDialog('add')" v-ripple>新增访问令牌</ElButton>
+            <ElButton type="primary" @click="showDialog('add')" v-ripple>添加访问令牌</ElButton>
             <ElButton @click="handleBatchDelete" :disabled="selectedRows.length === 0" v-ripple
               >批量删除</ElButton
             >

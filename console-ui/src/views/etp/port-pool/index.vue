@@ -47,6 +47,7 @@
   } from '@/api/port-pool'
   import PortPoolDialog from './modules/port-pool-dialog.vue'
   import { DialogType } from '@/types'
+  import { getPortPoolTypeLabel } from '@/enums/etp/business'
 
   defineOptions({ name: 'PortPool' })
 
@@ -56,11 +57,6 @@
   const dialogType = ref<DialogType>('add')
   const dialogVisible = ref(false)
   const currentPortPoolId = ref<number | undefined>()
-
-  const portPoolTypeMap = {
-    1: { type: 'primary' as const, text: 'TCP' },
-    2: { type: 'warning' as const, text: 'UDP' }
-  }
 
   const formatPort = (row: PortPoolItem) => {
     return row.portEnd ? `${row.portStart}-${row.portEnd}` : `${row.portStart}`
@@ -93,10 +89,7 @@
           prop: 'type',
           label: '协议',
           formatter: (row: PortPoolItem) => {
-            const config = portPoolTypeMap[row.type as keyof typeof portPoolTypeMap] || {
-              type: 'info' as const,
-              text: '未知'
-            }
+            const config = getPortPoolTypeLabel(row.type)
             return h(ElTag, { type: config.type }, () => config.text)
           }
         },

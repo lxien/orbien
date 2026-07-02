@@ -57,7 +57,7 @@
   import { ref, computed, watch, type Component } from 'vue'
   import { useSettingStore } from '@/store/modules/setting'
   import { storeToRefs } from 'pinia'
-  import { ProtocolType } from '@/enums/businessEnum'
+  import { ProtocolType } from '@/enums/etp/business'
   import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
   import AccessControlPage from './modules/access-control/index.vue'
   import BasicAuthPage from './modules/basic-auth/index.vue'

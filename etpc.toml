@@ -58,7 +58,7 @@ name = "web1-http"
 protocol = "http"
 custom_domains = ["d.domain1.com", "ba.domain1.com"]
 targets = [
-    { host = "127.0.0.1", port = 8088, weight = 10, name = "web-instance-1" }
+    { host = "127.0.0.1", port = 8084, weight = 10, name = "web-instance-1" }
 ]
 
 [[proxies]]

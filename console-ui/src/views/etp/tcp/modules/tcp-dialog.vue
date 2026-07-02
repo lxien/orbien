@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增 TCP 代理' : '编辑 TCP 代理'"
+    :title="dialogType === 'add' ? '添加 TCP 代理' : '编辑 TCP 代理'"
     width="650px"
     align-center
   >
@@ -82,6 +82,7 @@
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
   import { fetchCreateTcpProxy, fetchUpdateTcpProxy, fetchGetTcpProxyById } from '@/api/proxy'
+  import { ProxyStatus } from '@/enums/etp/business'
 
   defineOptions({ name: 'TcpDialog' })
 
@@ -200,7 +201,7 @@
           ...DEFAULT_FORM_DATA,
           agentId: proxyDetail.agentId || '',
           name: proxyDetail.name || '',
-          status: proxyDetail.status?.toString() || '1',
+          status: proxyDetail.status?.toString() || String(ProxyStatus.OPEN),
           remotePort: proxyDetail.listenPort || undefined,
           localIp: proxyDetail.targets?.[0]?.host || '127.0.0.1',
           localPort: proxyDetail.targets?.[0]?.port || '',
@@ -217,7 +218,7 @@
           ...DEFAULT_FORM_DATA,
           agentId: row ? row.agentId || '' : '',
           name: row ? row.name || '' : '',
-          status: row ? row.status?.toString() || '1' : '1',
+          status: row ? row.status?.toString() || String(ProxyStatus.OPEN) : String(ProxyStatus.OPEN),
           remotePort: row ? row.remotePort || 0 : 0,
           localIp: row?.targets?.[0]?.host || '127.0.0.1',
           localPort: row?.targets?.[0]?.port || '',

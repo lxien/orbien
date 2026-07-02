@@ -34,17 +34,14 @@
   import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
   import { ByteUtils } from '@/utils/format/byteFormatter'
   import { ElTag } from 'element-plus'
+  import { getProtocolLabel, ProtocolType } from '@/enums/etp/business'
 
   defineOptions({ name: 'Stats' })
 
   const metricsDialogVisible = ref(false)
   const currentMetricsProxyId = ref('')
 
-  const getProtocolText = (protocol?: number) => {
-    if (protocol === 2) return 'HTTP'
-    if (protocol === 1) return 'TCP'
-    return '-'
-  }
+  const getProtocolText = (protocol?: number) => getProtocolLabel(protocol)
 
   const {
     columns,
@@ -87,7 +84,7 @@
           formatter: (row: Api.Metrics.TrafficCountDTO) => {
             const text = getProtocolText(row.protocol)
             if (text === '-') return text
-            const type = row.protocol === 2 ? 'warning' : 'primary'
+            const type = row.protocol === ProtocolType.HTTP ? 'warning' : 'primary'
             return h(ElTag, { type, size: 'small' }, () => text)
           }
         },

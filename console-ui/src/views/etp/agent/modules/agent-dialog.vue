@@ -10,7 +10,7 @@
           </ElTag>
         </ElDescriptionsItem>
         <ElDescriptionsItem label="类型">{{
-          localClientData.agentType === 1 ? 'BINARY' : 'SESSION'
+          getAgentTypeLabel(localClientData.agentType)
         }}</ElDescriptionsItem>
         <ElDescriptionsItem label="操作系统">{{ localClientData.os }}</ElDescriptionsItem>
         <ElDescriptionsItem label="架构">{{ localClientData.arch }}</ElDescriptionsItem>
@@ -41,6 +41,7 @@
   import { ref, computed, watch, nextTick } from 'vue'
   import { ElTag, ElDescriptions, ElSkeleton, ElButton, ElMessage } from 'element-plus'
   import { fetchGetAgentById } from '@/api/agent'
+  import { getAgentTypeLabel } from '@/enums/etp/business'
 
   interface Props {
     visible: boolean

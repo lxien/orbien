@@ -16,12 +16,12 @@
 
 package com.xiaoniucode.etp.server.web.service.impl;
 
+import com.xiaoniucode.etp.core.enums.PortPoolType;
 import com.xiaoniucode.etp.server.web.common.exception.BizException;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.dto.portpool.PortPoolDTO;
 import com.xiaoniucode.etp.server.web.entity.PortPoolDO;
-import com.xiaoniucode.etp.server.web.enums.PortPoolType;
 import com.xiaoniucode.etp.server.web.param.portpool.PortPoolBatchDeleteParam;
 import com.xiaoniucode.etp.server.web.param.portpool.PortPoolCreateParam;
 import com.xiaoniucode.etp.server.web.param.portpool.PortPoolUpdateParam;

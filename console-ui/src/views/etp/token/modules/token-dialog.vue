@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增访问令牌' : '编辑访问令牌'"
+    :title="dialogType === 'add' ? '添加访问令牌' : '编辑访问令牌'"
     width="500px"
     align-center
   >

@@ -109,36 +109,34 @@
           </template>
         </ElDropdown>
 
-
-
         <!-- 聊天按钮 -->
-        <ArtIconButton
-          v-if="shouldShowChat"
-          icon="ri:message-3-line"
-          class="chat-button relative"
-          @click="openChat"
-        >
-          <div class="breathing-dot absolute top-2 right-2 size-1.5 !bg-success rounded-full"></div>
-        </ArtIconButton>
+        <!--        <ArtIconButton-->
+        <!--          v-if="shouldShowChat"-->
+        <!--          icon="ri:message-3-line"-->
+        <!--          class="chat-button relative"-->
+        <!--          @click="openChat"-->
+        <!--        >-->
+        <!--          <div class="breathing-dot absolute top-2 right-2 size-1.5 !bg-success rounded-full"></div>-->
+        <!--        </ArtIconButton>-->
 
         <!-- 设置按钮 -->
-        <div v-if="shouldShowSettings">
-          <ElPopover :visible="showSettingGuide" placement="bottom-start" :width="190" :offset="0">
-            <template #reference>
-              <div class="flex-cc">
-                <ArtIconButton icon="ri:settings-line" class="setting-btn" @click="openSetting" />
-              </div>
-            </template>
-            <template #default>
-              <p
-                >{{ $t('topBar.guide.title')
-                }}<span :style="{ color: systemThemeColor }"> {{ $t('topBar.guide.theme') }} </span
-                >、 <span :style="{ color: systemThemeColor }"> {{ $t('topBar.guide.menu') }} </span
-                >{{ $t('topBar.guide.description') }}
-              </p>
-            </template>
-          </ElPopover>
-        </div>
+        <!--        <div v-if="shouldShowSettings">-->
+        <!--          <ElPopover :visible="showSettingGuide" placement="bottom-start" :width="190" :offset="0">-->
+        <!--            <template #reference>-->
+        <!--              <div class="flex-cc">-->
+        <!--                <ArtIconButton icon="ri:settings-line" class="setting-btn" @click="openSetting" />-->
+        <!--              </div>-->
+        <!--            </template>-->
+        <!--            <template #default>-->
+        <!--              <p-->
+        <!--                >{{ $t('topBar.guide.title')-->
+        <!--                }}<span :style="{ color: systemThemeColor }"> {{ $t('topBar.guide.theme') }} </span-->
+        <!--                >、 <span :style="{ color: systemThemeColor }"> {{ $t('topBar.guide.menu') }} </span-->
+        <!--                >{{ $t('topBar.guide.description') }}-->
+        <!--              </p>-->
+        <!--            </template>-->
+        <!--          </ElPopover>-->
+        <!--        </div>-->
 
         <!-- 主题切换按钮 -->
         <ArtIconButton
@@ -154,8 +152,6 @@
 
     <!-- 标签页 -->
     <ArtWorkTab />
-
-
   </div>
 </template>
 
@@ -221,8 +217,7 @@
     initLanguage()
   })
 
-  onUnmounted(() => {
-  })
+  onUnmounted(() => {})
 
   /**
    * 切换全屏状态
@@ -294,8 +289,6 @@
   const openSearchDialog = (): void => {
     mittBus.emit('openSearchDialog')
   }
-
-
 
   /**
    * 打开聊天窗口
@@ -418,8 +411,6 @@
   .exit-full-screen-btn:hover :deep(.art-svg-icon) {
     animation: shrink 0.6s forwards;
   }
-
-
 
   .chat-button:hover :deep(.art-svg-icon) {
     animation: shake 0.5s ease-in-out;

@@ -14,6 +14,7 @@
 <script setup lang="ts">
   import { h } from 'vue'
   import { useTable } from '@/hooks/core/useTable'
+  import { getDomainTypeLabel } from '@/enums/etp/business'
   import { fetchGetUsedDomainListByPage } from '@/api/domain'
   import { ElTag } from 'element-plus'
 
@@ -23,12 +24,7 @@
 
   type UsedDomainItem = Api.Domain.UsedDomainDTO
 
-  const getDomainTypeTag = (domainType: number) => {
-    if (domainType === 2) {
-      return { type: 'warning' as const, text: '自定义' }
-    }
-    return { type: 'primary' as const, text: '子域名' }
-  }
+  const getDomainTypeTag = (domainType: number) => getDomainTypeLabel(domainType)
 
   const {
     columns,

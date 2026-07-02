@@ -1,4 +1,4 @@
-import { ProtocolType } from '@/enums/businessEnum'
+import { ProtocolType } from '@/enums/etp/business'
 import type { ProxyConfigProtocol } from '@/views/etp/plugin/menus'
 import {
   fetchGetHttpProxyById,

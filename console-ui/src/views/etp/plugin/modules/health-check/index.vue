@@ -21,8 +21,8 @@
             <span class="setting-hint">TCP 为端口连通性检查，HTTP 为路径请求检查</span>
           </div>
           <ElRadioGroup v-model="form.type">
-            <ElRadio :value="0">TCP</ElRadio>
-            <ElRadio :value="1">HTTP</ElRadio>
+            <ElRadio :value="HealthCheckType.TCP">TCP</ElRadio>
+            <ElRadio :value="HealthCheckType.HTTP">HTTP</ElRadio>
           </ElRadioGroup>
         </div>
 
@@ -43,7 +43,7 @@
           </div>
         </div>
 
-        <div v-if="form.type === 1" class="setting-item">
+        <div v-if="form.type === HealthCheckType.HTTP" class="setting-item">
           <div class="setting-meta">
             <span class="setting-name">检查路径</span>
             <span class="setting-hint">HTTP 健康检查请求的 URL 路径</span>
@@ -68,7 +68,7 @@
     fetchUpdateHealthCheckStatus
   } from '@/api/health-check'
   import type { ProxyConfigProtocol } from '../../menus'
-  import { ProtocolType } from '@/enums/businessEnum'
+  import { HealthCheckType, ProtocolType } from '@/enums/etp/business'
 
   defineOptions({ name: 'HealthCheckPage' })
 
@@ -106,7 +106,7 @@
 
   const form = reactive({
     enabled: false,
-    type: 0,
+    type: HealthCheckType.TCP,
     interval: 10,
     timeout: 8,
     maxFailed: 3,
@@ -114,7 +114,7 @@
   })
 
   const getDefaultType = () =>
-    props.protocol === ProtocolType.TCP ? 0 : 1
+    props.protocol === ProtocolType.TCP ? HealthCheckType.TCP : HealthCheckType.HTTP
 
   const fillForm = (data: Api.HealthCheck.HealthCheckDTO) => {
     form.enabled = data.enabled ?? false
@@ -159,7 +159,7 @@
   }
 
   const handleSave = async () => {
-    if (form.type === 1 && !form.path.trim()) {
+    if (form.type === HealthCheckType.HTTP && !form.path.trim()) {
       ElMessage.warning('请输入 HTTP 健康检查路径')
       return
     }
@@ -172,7 +172,7 @@
         interval: form.interval,
         timeout: form.timeout,
         maxFailed: form.maxFailed,
-        path: form.type === 1 ? form.path.trim() : undefined
+        path: form.type === HealthCheckType.HTTP ? form.path.trim() : undefined
       })
       await loadData()
     } finally {

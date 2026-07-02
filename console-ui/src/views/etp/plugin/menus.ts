@@ -1,7 +1,7 @@
 /**
  * 代理配置弹窗 - 协议类型与菜单配置
  */
-import { ProtocolType } from '@/enums/businessEnum'
+  import { ProtocolType } from '@/enums/etp/business'
 
 /** 弹窗支持的协议类型 */
 export type ProxyConfigProtocol = ProtocolType.TCP | ProtocolType.HTTP | ProtocolType.HTTPS

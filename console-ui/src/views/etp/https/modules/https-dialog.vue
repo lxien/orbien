@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    :title="dialogType === 'add' ? '新增 HTTPS 代理' : '编辑 HTTPS 代理'"
+    :title="dialogType === 'add' ? '添加 HTTPS 代理' : '编辑 HTTPS 代理'"
     width="650px"
     align-center
   >
@@ -23,13 +23,13 @@
 
       <ElFormItem label="域名类型" prop="domainType">
         <ElRadioGroup v-model="formData.domainType">
-          <ElRadio label="0">自动</ElRadio>
-          <ElRadio label="1">子域名</ElRadio>
-          <ElRadio label="2">自定义域名</ElRadio>
+          <ElRadio :label="String(DomainType.AUTO)">自动</ElRadio>
+          <ElRadio :label="String(DomainType.SUBDOMAIN)">子域名</ElRadio>
+          <ElRadio :label="String(DomainType.CUSTOM_DOMAIN)">自定义域名</ElRadio>
         </ElRadioGroup>
       </ElFormItem>
 
-      <ElFormItem v-show="formData.domainType !== '0'" label="域名" prop="domains">
+      <ElFormItem v-show="formData.domainType !== String(DomainType.AUTO)" label="域名" prop="domains">
         <ElInput
           v-model="formData.domains"
           type="textarea"
@@ -94,6 +94,7 @@
   import { DialogType } from '@/types'
   import { fetchGetAgentListAll } from '@/api/agent'
   import { fetchCreateHttpsProxy, fetchUpdateHttpsProxy, fetchGetHttpsProxyById } from '@/api/proxy'
+  import { DomainType, LoadBalanceType, ProxyStatus, TunnelType } from '@/enums/etp/business'
 
   defineOptions({ name: 'HttpsDialog' })
 
@@ -151,11 +152,11 @@
 
   const clusterSnapshot = ref<{ targets: TargetSnapshot[]; loadBalanceStrategy: string }>({
     targets: [],
-    loadBalanceStrategy: '1'
+    loadBalanceStrategy: String(LoadBalanceType.ROUND_ROBIN)
   })
   const transportSnapshot = ref<Api.Proxy.TransportSaveParam>({
     encrypt: false,
-    tunnelType: 0
+    tunnelType: TunnelType.MULTIPLEX
   })
   const bandwidthSnapshot = ref<{ limitIn: number | null; limitOut: number | null }>({
     limitIn: null,
@@ -165,8 +166,8 @@
   const DEFAULT_FORM_DATA: FormDataState = {
     agentId: '',
     name: '',
-    status: '1',
-    domainType: '0',
+    status: String(ProxyStatus.OPEN),
+    domainType: String(DomainType.AUTO),
     domains: '',
     localIp: '127.0.0.1',
     localPort: '',
@@ -183,7 +184,7 @@
     domains: [
       {
         validator: (_rule, value: string, callback) => {
-          if (formData.domainType !== '0' && (!value || !value.trim())) {
+          if (formData.domainType !== String(DomainType.AUTO) && (!value || !value.trim())) {
             callback(new Error('请输入域名'))
           } else {
             callback()
@@ -210,8 +211,8 @@
   })
 
   const resetSnapshots = () => {
-    clusterSnapshot.value = { targets: [], loadBalanceStrategy: '1' }
-    transportSnapshot.value = { encrypt: false, tunnelType: 0 }
+    clusterSnapshot.value = { targets: [], loadBalanceStrategy: String(LoadBalanceType.ROUND_ROBIN) }
+    transportSnapshot.value = { encrypt: false, tunnelType: TunnelType.MULTIPLEX }
     bandwidthSnapshot.value = { limitIn: null, limitOut: null }
   }
 
@@ -219,11 +220,12 @@
     const targets = detail.targets?.map(mapTarget) || []
     clusterSnapshot.value = {
       targets,
-      loadBalanceStrategy: detail.loadBalance?.strategy?.toString() || '1'
+      loadBalanceStrategy:
+        detail.loadBalance?.strategy?.toString() || String(LoadBalanceType.ROUND_ROBIN)
     }
     transportSnapshot.value = {
       encrypt: detail.transport?.encrypt ?? false,
-      tunnelType: detail.transport?.tunnelType ?? 0
+      tunnelType: detail.transport?.tunnelType ?? TunnelType.MULTIPLEX
     }
     bandwidthSnapshot.value = {
       limitIn: detail.bandwidth?.limitIn ?? null,
@@ -233,8 +235,8 @@
       ...DEFAULT_FORM_DATA,
       agentId: detail.agentId || '',
       name: detail.name || '',
-      status: detail.status?.toString() || '1',
-      domainType: detail.domainType?.toString() || '0',
+      status: detail.status?.toString() || String(ProxyStatus.OPEN),
+      domainType: detail.domainType?.toString() || String(DomainType.AUTO),
       domains: (detail.domains || []).join('\n'),
       localIp: targets[0]?.host || '127.0.0.1',
       localPort: targets[0]?.port || '',
@@ -272,13 +274,13 @@
       ElMessage.error('获取代理详情失败，请稍后重试')
       const row = props.proxyData
       const targets = row?.targets?.map((t) => mapTarget(t as Api.Proxy.TargetDTO)) || []
-      clusterSnapshot.value = { targets, loadBalanceStrategy: '1' }
+      clusterSnapshot.value = { targets, loadBalanceStrategy: String(LoadBalanceType.ROUND_ROBIN) }
       Object.assign(formData, {
         ...DEFAULT_FORM_DATA,
         agentId: row?.agentId || '',
         name: row?.name || '',
-        status: row?.status?.toString() || '1',
-        domainType: row?.domainType?.toString() || '0',
+        status: row?.status?.toString() || String(ProxyStatus.OPEN),
+        domainType: row?.domainType?.toString() || String(DomainType.AUTO),
         domains: row?.domains?.join('\n') || '',
         localIp: targets[0]?.host || '127.0.0.1',
         localPort: targets[0]?.port || ''
@@ -335,7 +337,7 @@
 
       try {
         const domains =
-          formData.domainType === '0'
+          formData.domainType === String(DomainType.AUTO)
             ? []
             : formData.domains
                 .split('\n')
