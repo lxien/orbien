@@ -15,7 +15,7 @@ public class AppConfig implements Config {
     private int httpProxyPort;
     private int httpsProxyPort;
     private DashboardConfig dashboard;
-    private PortPolicyConfig portPolicy;
+    private PortPoolConfig portPool;
     private Set<String> rootDomains;
     private TransportConfig transportConfig;
     private AuthConfig authConfig;
@@ -26,7 +26,7 @@ public class AppConfig implements Config {
         this.httpProxyPort = builder.httpProxyPort;
         this.httpsProxyPort = builder.httpsProxyPort;
         this.dashboard = builder.dashboard;
-        this.portPolicy = builder.portPolicy;
+        this.portPool = builder.portPool;
         this.rootDomains = builder.rootDomains;
         this.transportConfig = builder.transportConfig;
         this.authConfig = builder.authConfig;
@@ -40,7 +40,7 @@ public class AppConfig implements Config {
         private TransportConfig transportConfig = new TransportConfig();
         private Set<String> rootDomains;
         private DashboardConfig dashboard = new DashboardConfig(false);
-        private PortPolicyConfig portPolicy = new PortPolicyConfig(1, 65535);
+        private PortPoolConfig portPool = PortPoolConfig.empty();
         private AuthConfig authConfig = new AuthConfig();
 
         public Builder serverAddr(String serverAddr) {
@@ -63,8 +63,8 @@ public class AppConfig implements Config {
             return this;
         }
 
-        public Builder portPolicy(PortPolicyConfig portPolicy) {
-            this.portPolicy = portPolicy;
+        public Builder portPool(PortPoolConfig portPool) {
+            this.portPool = portPool;
             return this;
         }
 

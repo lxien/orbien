@@ -37,13 +37,13 @@ public class PortPoolDO {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "port_start", nullable = false)
-    private Integer portStart;
+    @Column(name = "start_port", nullable = false)
+    private Integer startPort;
     /**
      * 只有范围端口时才有值，如：8000-8100
      */
-    @Column(name = "port_end")
-    private Integer portEnd;
+    @Column(name = "end_port")
+    private Integer endPort;
 
     @Convert(converter = PortPoolTypeConverter.class)
     @Column(name = "type", nullable = false)
@@ -62,11 +62,11 @@ public class PortPoolDO {
 
     @Transient
     public boolean isRange() {
-        return portEnd != null;
+        return endPort != null;
     }
 
     @Transient
     public String getDisplayText() {
-        return isRange() ? portStart + "-" + portEnd : String.valueOf(portStart);
+        return isRange() ? startPort + "-" + endPort : String.valueOf(startPort);
     }
 }

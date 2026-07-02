@@ -32,7 +32,8 @@ import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.exceptions.PortConflictException;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
+import com.xiaoniucode.etp.server.port.PortPoolManager;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -45,7 +46,7 @@ import java.util.Objects;
 public class TcpProxyProcessor implements ProxyProcessor {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TcpProxyProcessor.class);
     @Autowired
-    private PortManager portManager;
+    private PortPoolManager portPoolManager;
     @Autowired
     private ProxyManager proxyManager;
     @Autowired
@@ -71,16 +72,16 @@ public class TcpProxyProcessor implements ProxyProcessor {
         }
         Integer listenPort;
         if (remotePort < 1) {
-            listenPort = portManager.acquire();
+            listenPort = portPoolManager.acquire(PortPoolType.TCP);
             if (listenPort == null) {
                 throw new EtpException("没有可用的端口");
             }
             logger.debug("TCP代理 {} 自动分配端口: {}", proxy.getName(), listenPort);
         } else {
-            if (!portManager.isAvailable(remotePort)) {
+            if (!portPoolManager.isAvailable(PortPoolType.TCP, remotePort)) {
                 throw new PortConflictException(remotePort);
             }
-            portManager.addPort(remotePort);
+            portPoolManager.reserve(PortPoolType.TCP, remotePort);
             listenPort = remotePort;
         }
         String proxyId = uidGenerator.getUIDAsString();

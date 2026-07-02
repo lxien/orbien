@@ -66,6 +66,7 @@ public class StaticTokenSynchronizer implements EventListener<TunnelServerBindEv
                 AccessTokenDO accessTokenDO = new AccessTokenDO();
                 accessTokenDO.setName(config.getName());
                 accessTokenDO.setToken(config.getToken());
+                accessTokenDO.setRemark("from toml");
                 accessTokenRepository.save(accessTokenDO);
             }
         } catch (Exception e) {

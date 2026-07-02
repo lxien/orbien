@@ -24,7 +24,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name = "proxy_target", indexes = {
-        @Index(name = "idx_proxy_id", columnList = "proxy_id"),
+        @Index(name = "idx_proxy_target_proxy_id", columnList = "proxy_id"),
 })
 public class ProxyTargetDO {
     /**

@@ -19,7 +19,8 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
-import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
+import com.xiaoniucode.etp.server.port.PortPoolManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
@@ -55,7 +56,7 @@ public class ProxyManager {
     @Autowired
     private PortAcceptor portAcceptor;
     @Autowired
-    private PortManager portManager;
+    private PortPoolManager portPoolManager;
     @Autowired
     private DomainRegistry domainRegistry;
     @Autowired
@@ -195,7 +196,7 @@ public class ProxyManager {
     }
 
     private void shutdownPortResources(int listenPort) {
-        portManager.release(listenPort);
+        portPoolManager.release(PortPoolType.TCP, listenPort);
         portAcceptor.stopPortListen(listenPort);
         streamManager.fireCloseByPort(listenPort);
     }

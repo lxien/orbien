@@ -75,7 +75,7 @@
           prop: 'remark',
           label: '描述',
           minWidth: 160,
-          formatter: (row: DomainItem) => row.remark || '-'
+          formatter: (row: DomainItem) => row.remark || ''
         },
         {
           prop: 'createdAt',

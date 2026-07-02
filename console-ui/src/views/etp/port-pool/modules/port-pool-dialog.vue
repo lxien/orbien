@@ -184,8 +184,8 @@
     port: [{ required: true, validator: validatePort, trigger: 'blur' }]
   }
 
-  const formatPortDisplay = (portStart: number, portEnd?: number) => {
-    return portEnd ? `${portStart}-${portEnd}` : `${portStart}`
+  const formatPortDisplay = (startPort: number, endPort?: number) => {
+    return endPort ? `${startPort}-${endPort}` : `${startPort}`
   }
 
   const applyPreset = (preset: PortPoolPreset) => {
@@ -231,7 +231,7 @@
         Object.assign(formData, {
           id: data.id,
           type: data.type,
-          port: formatPortDisplay(data.portStart, data.portEnd),
+          port: formatPortDisplay(data.startPort, data.endPort),
           remark: data.remark || ''
         })
       } catch (error) {

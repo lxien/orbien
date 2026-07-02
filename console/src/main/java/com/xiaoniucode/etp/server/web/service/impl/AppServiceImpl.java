@@ -17,7 +17,6 @@
 package com.xiaoniucode.etp.server.web.service.impl;
 
 import com.xiaoniucode.etp.server.config.AppConfig;
-import com.xiaoniucode.etp.server.config.domain.PortPolicyConfig;
 import com.xiaoniucode.etp.server.web.dto.app.AppConfigInfoDTO;
 import com.xiaoniucode.etp.server.web.service.AppService;
 import jakarta.annotation.Resource;
@@ -38,11 +37,6 @@ public class AppServiceImpl implements AppService {
         dto.setHttpProxyPort(appConfig.getHttpProxyPort());
         dto.setHttpsProxyPort(appConfig.getHttpsProxyPort());
 
-        PortPolicyConfig portPolicy = appConfig.getPortPolicy();
-        if (portPolicy != null) {
-            dto.setPortStart(portPolicy.getStart());
-            dto.setPortEnd(portPolicy.getEnd());
-        }
         return dto;
     }
 }

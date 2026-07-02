@@ -21,7 +21,5 @@ declare namespace Api.App {
     httpProxyPort: number
     httpsProxyPort: number
     baseDomain: string
-    portStart: number
-    portEnd: number
   }
 }

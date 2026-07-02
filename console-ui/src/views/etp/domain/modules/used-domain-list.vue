@@ -58,12 +58,12 @@
         {
           prop: 'proxyName',
           label: '关联代理',
-          formatter: (row: UsedDomainItem) => row.proxyName || row.proxyId || '-'
+          formatter: (row: UsedDomainItem) => row.proxyName || row.proxyId || ''
         },
         {
           prop: 'rootDomain',
           label: '根域名',
-          formatter: (row: UsedDomainItem) => row.rootDomain || '-'
+          formatter: (row: UsedDomainItem) => row.rootDomain || ''
         }
       ]
     },

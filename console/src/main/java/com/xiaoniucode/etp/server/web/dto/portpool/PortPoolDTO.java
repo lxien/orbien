@@ -24,8 +24,8 @@ import java.time.LocalDateTime;
 @Data
 public class PortPoolDTO {
     private Long id;
-    private Integer portStart;
-    private Integer portEnd;
+    private Integer startPort;
+    private Integer endPort;
     private Integer type;
     private String remark;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")

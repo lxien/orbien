@@ -1,8 +1,8 @@
 declare namespace Api.PortPool {
   interface PortPoolDTO {
     id: number
-    portStart: number
-    portEnd?: number
+    startPort: number
+    endPort?: number
     type: number
     remark?: string
     createdAt: string

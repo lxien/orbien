@@ -19,7 +19,8 @@ package com.xiaoniucode.etp.server.listener;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
-import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
+import com.xiaoniucode.etp.server.port.PortPoolManager;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -40,7 +41,7 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
     @Autowired
     private ProxyConfigService proxyConfigService;
     @Autowired
-    private PortManager portManager;
+    private PortPoolManager portPoolManager;
 
     @PostConstruct
     public void init() {
@@ -49,11 +50,11 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
-        // 端口初始化监听器，在服务器启动时加载所有已配置的端口并添加到PortManager中
-        logger.debug("初始化端口管理器，加载已配置的端口");
+        // 启动回填：已有代理 listenPort 标记为占用
+        logger.debug("回填已占用端口");
         List<Integer> allPorts = proxyConfigService.getAllListenPorts();
         for (Integer port : allPorts) {
-            portManager.addPort(port);
+            portPoolManager.markAllocated(PortPoolType.TCP, port);
         }
     }
 }

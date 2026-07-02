@@ -30,6 +30,4 @@ public class AppConfigInfoDTO implements Serializable {
     private Integer httpProxyPort;
    private Integer httpsProxyPort;
     private String rootDomain;
-    private Integer portStart;
-    private Integer portEnd;
 }

@@ -95,7 +95,7 @@ export function getProtocolLabel(protocol?: number) {
     case ProtocolType.HTTPS:
       return 'HTTPS'
     default:
-      return '-'
+      return ''
   }
 }
 

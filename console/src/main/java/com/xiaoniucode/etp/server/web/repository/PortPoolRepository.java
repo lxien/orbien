@@ -14,9 +14,9 @@ import java.util.List;
 @Repository
 public interface PortPoolRepository extends JpaRepository<PortPoolDO, Long>, JpaSpecificationExecutor<PortPoolDO> {
 
-    boolean existsByTypeAndPortStartAndPortEnd(PortPoolType type, Integer portStart, Integer portEnd);
+    boolean existsByTypeAndStartPortAndEndPort(PortPoolType type, Integer startPort, Integer endPort);
 
-    boolean existsByTypeAndPortStartAndPortEndAndIdNot(PortPoolType type, Integer portStart, Integer portEnd, Long id);
+    boolean existsByTypeAndStartPortAndEndPortAndIdNot(PortPoolType type, Integer startPort, Integer endPort, Long id);
 
     List<PortPoolDO> findByType(PortPoolType type);
 }

@@ -69,13 +69,13 @@
           prop: 'agentName',
           label: '客户端名称',
           minWidth: 100,
-          formatter: (row: Api.Metrics.TrafficCountDTO) => row.agentName || '-'
+          formatter: (row: Api.Metrics.TrafficCountDTO) => row.agentName || ''
         },
         {
           prop: 'proxyName',
           label: '代理名称',
           minWidth: 100,
-          formatter: (row: Api.Metrics.TrafficCountDTO) => row.proxyName || '-'
+          formatter: (row: Api.Metrics.TrafficCountDTO) => row.proxyName || ''
         },
         {
           prop: 'protocol',
@@ -83,7 +83,7 @@
           width: 90,
           formatter: (row: Api.Metrics.TrafficCountDTO) => {
             const text = getProtocolText(row.protocol)
-            if (text === '-') return text
+            if (!text) return ''
             const type = row.protocol === ProtocolType.HTTP ? 'warning' : 'primary'
             return h(ElTag, { type, size: 'small' }, () => text)
           }

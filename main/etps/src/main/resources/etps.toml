@@ -9,7 +9,7 @@ port = 8020
 username = "admin"
 password = "123456"
 
-#公网TCP隧道端口分配范围
-[port_policy]
+# 公网隧道端口池（每条声明一段；多段写多个 [[port_pool.*]]）
+[[port_pool.tcp]]
 start = 9050
 end = 9099

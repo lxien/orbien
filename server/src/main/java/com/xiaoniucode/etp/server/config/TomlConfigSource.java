@@ -20,6 +20,7 @@ import com.xiaoniucode.etp.common.config.ConfigSourceType;
 import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
+import com.xiaoniucode.etp.core.domain.PortInterval;
 import com.xiaoniucode.etp.core.domain.TlsConfig;
 import com.xiaoniucode.etp.server.config.domain.*;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class TomlConfigSource implements ConfigSource {
         parseRoot(builder, root);
         parseDashboard(builder, root);
         parseTransport(builder, root);
-        parsePortPolicy(builder, root);
+        parsePortPool(builder, root);
         parseAuth(builder, root);
 
         return builder.build();
@@ -125,16 +126,68 @@ public class TomlConfigSource implements ConfigSource {
         }
     }
 
-    private void parsePortPolicy(AppConfig.Builder builder, Toml root) {
-        Toml policy = root.getTable("port_policy");
-        if (policy != null) {
-            Long start = policy.getLong("start", 1L);
-            Long end = policy.getLong("end", 65535L);
-            PortPolicyConfig portPolicy = new PortPolicyConfig(
-                    start.intValue(), end.intValue()
-            );
-            builder.portPolicy(portPolicy);
+    private void parsePortPool(AppConfig.Builder builder, Toml root) {
+        List<PortInterval> tcp = parsePortPoolEntries(root, "tcp");
+        List<PortInterval> udp = parsePortPoolEntries(root, "udp");
+        builder.portPool(new PortPoolConfig(tcp, udp));
+    }
+
+    private List<PortInterval> parsePortPoolEntries(Toml root, String protocol) {
+        List<Toml> tables = resolvePortPoolTables(root, protocol);
+        if (CollectionUtils.isEmpty(tables)) {
+            return List.of();
         }
+
+        List<PortInterval> intervals = new ArrayList<>(tables.size());
+        for (int i = 0; i < tables.size(); i++) {
+            intervals.add(parsePortPoolEntry(tables.get(i), protocol, i + 1));
+        }
+        return intervals;
+    }
+
+    private List<Toml> resolvePortPoolTables(Toml root, String protocol) {
+        List<Toml> direct = root.getTables("port_pool." + protocol);
+        if (!CollectionUtils.isEmpty(direct)) {
+            return direct;
+        }
+        Toml portPool = root.getTable("port_pool");
+        if (portPool == null) {
+            return List.of();
+        }
+        List<Toml> nested = portPool.getTables(protocol);
+        return nested == null ? List.of() : nested;
+    }
+
+    private PortInterval parsePortPoolEntry(Toml table, String protocol, int index) {
+        String location = "[[port_pool." + protocol + "]] 第 " + index + " 条";
+
+        Long single = table.getLong("single");
+        Long start = table.getLong("start");
+        Long end = table.getLong("end");
+
+        boolean hasSingle = single != null;
+        boolean hasStart = start != null;
+        boolean hasEnd = end != null;
+        boolean hasRange = hasStart || hasEnd;
+
+        if (!hasSingle && !hasRange) {
+            throw new IllegalArgumentException(location + " 必须配置 single 或 start/end");
+        }
+        if (hasSingle && hasRange) {
+            throw new IllegalArgumentException(location + " single 与 start/end 不能同时配置");
+        }
+        if (hasRange && (!hasStart || !hasEnd)) {
+            throw new IllegalArgumentException(location + " start 与 end 必须成对配置");
+        }
+
+        if (hasSingle) {
+            validatePort(single.intValue());
+            return PortInterval.ofPort(single.intValue());
+        }
+
+        validatePort(start.intValue());
+        validatePort(end.intValue());
+        return new PortInterval(start.intValue(), end.intValue());
     }
 
     private void parseAuth(AppConfig.Builder builder, Toml root) {

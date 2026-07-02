@@ -29,9 +29,9 @@ public final class PortPoolParser {
     private PortPoolParser() {
     }
 
-    public record ParsedPort(int portStart, Integer portEnd) {
+    public record ParsedPort(int startPort, Integer endPort) {
         public boolean isRange() {
-            return portEnd != null;
+            return endPort != null;
         }
     }
 
@@ -43,16 +43,16 @@ public final class PortPoolParser {
         if (!matcher.matches()) {
             throw new BizException("端口格式无效，请输入单个端口或范围端口，如 8000 或 8000-9000");
         }
-        int portStart = parsePortValue(matcher.group(1));
+        int startPort = parsePortValue(matcher.group(1));
         String endText = matcher.group(2);
         if (endText == null) {
-            return new ParsedPort(portStart, null);
+            return new ParsedPort(startPort, null);
         }
-        int portEnd = parsePortValue(endText);
-        if (portEnd <= portStart) {
+        int endPort = parsePortValue(endText);
+        if (endPort <= startPort) {
             throw new BizException("范围端口结束值必须大于起始值");
         }
-        return new ParsedPort(portStart, portEnd);
+        return new ParsedPort(startPort, endPort);
     }
 
     private static int parsePortValue(String value) {

@@ -21,7 +21,8 @@ import com.xiaoniucode.etp.server.uid.UidGenerator;
 import com.xiaoniucode.etp.core.enums.*;
 import com.xiaoniucode.etp.server.config.AppConfig;
 import com.xiaoniucode.etp.server.manager.ProxyManager;
-import com.xiaoniucode.etp.server.port.PortManager;
+import com.xiaoniucode.etp.core.enums.PortPoolType;
+import com.xiaoniucode.etp.server.port.PortPoolManager;
 import com.xiaoniucode.etp.server.vhost.DomainGenerator;
 import com.xiaoniucode.etp.core.domain.DomainInfo;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
@@ -91,7 +92,7 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private ProxyManager proxyManager;
     @Autowired
-    private PortManager portManager;
+    private PortPoolManager portPoolManager;
     @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
@@ -364,18 +365,19 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyDO proxyDO = proxyConvert.toDO(param, proxyId);
         Integer remotePort = param.getRemotePort();
         if (remotePort == null || remotePort == 0) {
-            Integer acquire = portManager.acquire();
+            Integer acquire = portPoolManager.acquire(PortPoolType.TCP);
             if (acquire == null) {
                 throw new BizException("没有可用远程端口号");
             }
             proxyDO.setRemotePort(acquire);
             proxyDO.setListenPort(acquire);
-        } else if (!portManager.isAvailable(remotePort)) {
+            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, acquire));
+        } else if (!portPoolManager.isAvailable(PortPoolType.TCP, remotePort)) {
             throw new BizException("远程端口号不可用或被占用");
         } else {
             proxyDO.setListenPort(remotePort);
-            portManager.addPort(remotePort);
-            transactionHelper.afterRollback(() -> portManager.release(remotePort));
+            portPoolManager.reserve(PortPoolType.TCP, remotePort);
+            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, remotePort));
         }
         //2.带宽
         BandwidthSaveParam bandwidth = param.getBandwidth();
@@ -433,13 +435,13 @@ public class ProxyServiceImpl implements ProxyService {
         if (requestRemotePort == null) {
             existsProxyDO.setRemotePort(existsProxyDO.getListenPort());
         } else if (!Objects.equals(existsListenPort, requestRemotePort)) {
-            if (!portManager.isAvailable(requestRemotePort)) {
+            if (!portPoolManager.isAvailable(PortPoolType.TCP, requestRemotePort)) {
                 throw new BizException("远程端口号不可用或被占用");
             }
             existsProxyDO.setRemotePort(requestRemotePort);
             existsProxyDO.setListenPort(requestRemotePort);
-            portManager.addPort(requestRemotePort);
-            transactionHelper.afterRollback(() -> portManager.release(requestRemotePort));
+            portPoolManager.reserve(PortPoolType.TCP, requestRemotePort);
+            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.TCP, requestRemotePort));
         }
         BandwidthSaveParam bandwidth = param.getBandwidth();
         if (bandwidth != null) {

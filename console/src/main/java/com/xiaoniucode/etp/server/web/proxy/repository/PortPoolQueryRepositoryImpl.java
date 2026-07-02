@@ -43,6 +43,6 @@ public class PortPoolQueryRepositoryImpl implements PortPoolQueryRepository {
     }
 
     private PortInterval toInterval(PortPoolDO poolDO) {
-        return PortInterval.ofRange(poolDO.getPortStart(), poolDO.getPortEnd());
+        return PortInterval.ofRange(poolDO.getStartPort(), poolDO.getEndPort());
     }
 }

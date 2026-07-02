@@ -59,7 +59,7 @@
   const currentPortPoolId = ref<number | undefined>()
 
   const formatPort = (row: PortPoolItem) => {
-    return row.portEnd ? `${row.portStart}-${row.portEnd}` : `${row.portStart}`
+    return row.endPort ? `${row.startPort}-${row.endPort}` : `${row.startPort}`
   }
 
   const {
@@ -81,7 +81,7 @@
       columnsFactory: () => [
         { type: 'selection' },
         {
-          prop: 'portStart',
+          prop: 'startPort',
           label: '端口',
           formatter: (row: PortPoolItem) => formatPort(row)
         },
@@ -96,7 +96,7 @@
         {
           prop: 'remark',
           label: '备注',
-          formatter: (row: PortPoolItem) => row.remark || '-'
+          formatter: (row: PortPoolItem) => row.remark || ''
         },
         {
           prop: 'createdAt',
