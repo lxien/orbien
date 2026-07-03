@@ -59,3 +59,13 @@ export function fetchSaveAndDeployCert(params: Api.Ssl.CertSaveAndDeployParams) 
     data: params
   })
 }
+
+/**
+ * 更新证书自动续签开关
+ */
+export function fetchUpdateCertAutoRenew(certId: string, autoRenew: boolean) {
+  return request.put<Api.Ssl.AutoRenewResult>({
+    url: `/api/ssl-cert/${certId}/auto-renew`,
+    data: { autoRenew }
+  })
+}

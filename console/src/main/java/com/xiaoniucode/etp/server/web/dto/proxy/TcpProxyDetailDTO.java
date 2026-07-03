@@ -10,13 +10,19 @@ public class TcpProxyDetailDTO {
     private String id;
     private String agentId;
     private String name;
-    /** 用户指定的远程端口，自动分配时为 null */
+    /**
+     * 用户指定的远程端口，自动分配时为 null
+     */
     private Integer remotePort;
-    /** 实际监听端口 */
+    /**
+     * 实际监听端口
+     */
     private Integer listenPort;
     private String localHost;
     private Integer localPort;
-    /** 总带宽 Mbps */
+    /**
+     * 总带宽 Mbps
+     */
     private Integer limitTotal;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime createdAt;

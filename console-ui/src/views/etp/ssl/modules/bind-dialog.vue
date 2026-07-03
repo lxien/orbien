@@ -21,7 +21,7 @@
         <ElTableColumn prop="proxyName" label="所属代理" min-width="120" />
         <ElTableColumn label="匹配状态" width="110">
           <template #default="{ row }">
-            <ElTag :type="row.matched ? 'success' : 'danger'" size="small">
+            <ElTag :type="row.matched ? 'primary' : 'danger'" size="small">
               {{ row.matched ? '匹配' : '不匹配' }}
             </ElTag>
           </template>

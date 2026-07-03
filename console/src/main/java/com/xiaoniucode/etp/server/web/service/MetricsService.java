@@ -35,6 +35,7 @@ public interface MetricsService {
     /**
      * 删除超过指定天数的流量统计记录
      * @param days 保留天数
+     * @return 删除条数
      */
-    void deleteOldMetrics(int days);
+    int deleteOldMetrics(int days);
 }

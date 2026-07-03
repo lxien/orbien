@@ -82,6 +82,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'ScheduledJob',
+    path: '/scheduled-job',
+    component: '/etp/scheduled-job',
+    meta: {
+      title: 'menus.etp.scheduledJob',
+      icon: 'ri:time-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'Stats',
     path: '/stats',
     component: '/etp/stats',

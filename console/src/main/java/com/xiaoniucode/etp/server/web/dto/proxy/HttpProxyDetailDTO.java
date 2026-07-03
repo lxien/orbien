@@ -12,13 +12,19 @@ public class HttpProxyDetailDTO {
     private String agentId;
     private String name;
     private Integer domainType;
-    /** 完整自定义域名，仅 domainType=CUSTOM_DOMAIN 时有值 */
+    /**
+     * 完整自定义域名，仅 domainType=CUSTOM_DOMAIN 时有值
+     */
     private List<String> customDomains;
-    /** 子域名绑定，仅 domainType=SUBDOMAIN 时有值 */
+    /**
+     * 子域名绑定，仅 domainType=SUBDOMAIN 时有值
+     */
     private List<SubdomainBindingDTO> subdomainBindings;
     private String localHost;
     private Integer localPort;
-    /** 总带宽 Mbps */
+    /**
+     * 总带宽 Mbps
+     */
     private Integer limitTotal;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime createdAt;

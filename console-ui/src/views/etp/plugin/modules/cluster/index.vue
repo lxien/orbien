@@ -34,23 +34,24 @@
         <ElTable v-else :data="targets" border style="width: 100%">
           <ElTableColumn prop="name" label="服务名称" min-width="140">
             <template #default="{ row }">
-              <ElInput v-model="row.name" placeholder="可选" clearable />
+              <ElInput v-model="row.name" size="small" placeholder="可选" clearable />
             </template>
           </ElTableColumn>
           <ElTableColumn prop="host" label="主机" min-width="160">
             <template #default="{ row }">
-              <ElInput v-model="row.host" placeholder="内网地址" clearable />
+              <ElInput v-model="row.host" size="small" placeholder="内网地址" clearable />
             </template>
           </ElTableColumn>
           <ElTableColumn prop="port" label="端口" width="110">
             <template #default="{ row }">
-              <ElInput v-model.number="row.port" type="number" placeholder="1-65535" />
+              <ElInput v-model.number="row.port" size="small" type="number" placeholder="1-65535" />
             </template>
           </ElTableColumn>
           <ElTableColumn prop="weight" label="权重" width="100">
             <template #default="{ row }">
               <ElInput
                 v-model.number="row.weight"
+                size="small"
                 type="number"
                 placeholder="权重"
                 :disabled="loadBalanceStrategy !== LoadBalanceType.WEIGHT"
@@ -59,7 +60,7 @@
           </ElTableColumn>
           <ElTableColumn label="操作" width="80" align="center" fixed="right">
             <template #default="{ $index }">
-              <ElButton link @click="removeTarget($index)">
+              <ElButton link size="small" @click="removeTarget($index)">
                 <template #icon>
                   <Delete />
                 </template>

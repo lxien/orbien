@@ -254,6 +254,7 @@
       "domain": "ドメイン管理",
       "ssl": "SSL証明書",
       "token": "アクセストークン",
+      "scheduledJob": "スケジュールタスク",
       "stats": "トラフィック統計"
     },
     "exception": {

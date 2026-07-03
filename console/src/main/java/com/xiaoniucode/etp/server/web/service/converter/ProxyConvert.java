@@ -15,17 +15,11 @@
  */
 package com.xiaoniucode.etp.server.web.service.converter;
 
-import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelDetailDTO;
-import com.xiaoniucode.etp.server.web.dto.proxy.embedded.TunnelListDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
-import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyCreateParam;
-import com.xiaoniucode.etp.server.web.param.proxy.TcpProxyUpdateParam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -51,21 +45,4 @@ public interface ProxyConvert {
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
 
-
-    /*-------------------------------------ModelToDTO----------------------------------------------*/
-    @Mapping(target = "protocol", expression = "java(ProtocolType.HTTP.getCode())")
-    @Mapping(target = "bandwidth", source = "bandwidth")
-    TunnelDetailDTO.HttpProxyDTO toHttpProxyDTO(ProxyConfig config);
-
-    @Mapping(target = "protocol", expression = "java(ProtocolType.TCP.getCode())")
-    @Mapping(target = "bandwidth", source = "bandwidth")
-    TunnelDetailDTO.TcpProxyDTO toTcpProxyDTO(ProxyConfig config);
-
-    @Mapping(target = "protocol", expression = "java(ProtocolType.HTTP.getCode())")
-    @Mapping(target = "status", expression = "java(config.getStatus().getCode())")
-    TunnelListDTO.HttpTunnelListDTO toHttpDTOList(ProxyConfig config);
-
-    @Mapping(target = "status", expression = "java(config.getStatus().getCode())")
-    @Mapping(target = "protocol", expression = "java(ProtocolType.TCP.getCode())")
-    TunnelListDTO.TcpTunnelListDTO toTcpDTOList(ProxyConfig config);
 }

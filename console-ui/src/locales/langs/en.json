@@ -254,6 +254,7 @@
       "domain": "Domain",
       "ssl": "SSL Certificate",
       "token": "Token",
+      "scheduledJob": "Scheduled Jobs",
       "stats": "Statistics"
     },
     "exception": {

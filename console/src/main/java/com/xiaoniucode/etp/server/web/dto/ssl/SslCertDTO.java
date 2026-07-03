@@ -38,4 +38,7 @@ public class SslCertDTO implements Serializable {
     private LocalDate notBefore;
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate notAfter;
+    private Boolean autoRenew;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private java.time.LocalDateTime lastRenewAt;
 }

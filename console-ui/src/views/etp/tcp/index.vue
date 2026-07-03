@@ -130,6 +130,7 @@
           formatter: (row: TcpProxyItem) =>
             h(ElSwitch, {
               modelValue: row.status === ProxyStatus.OPEN,
+              size: 'small',
               loading: isToggling(row.id),
               'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
             })

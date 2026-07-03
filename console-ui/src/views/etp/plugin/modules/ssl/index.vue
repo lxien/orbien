@@ -3,7 +3,7 @@
     <div class="ssl-page-content">
       <div v-if="matrix" class="ssl-summary">
         <span>域名证书：{{ matrix.boundCount }}/{{ matrix.totalDomains }} 已配置</span>
-        <ElTag v-if="matrix.warningCount > 0" type="warning" size="small">
+        <ElTag v-if="matrix.warningCount > 0" type="danger" size="small">
           {{ matrix.warningCount }} 个异常
         </ElTag>
       </div>
@@ -107,6 +107,7 @@
     fetchRedeployBinding,
     fetchDisableAllBindingsByProxy
   } from '@/api/cert-binding'
+  import { resolveSslBindStatusTagType } from '@/utils/ui/status-tag'
 
   defineOptions({ name: 'SslPage' })
 
@@ -141,18 +142,18 @@
   }
 
   const bindStatusTag = (status?: number) => {
-    const map: Record<number, { text: string; type: 'success' | 'warning' | 'danger' | 'info' }> = {
-      1: { text: '正常', type: 'success' },
-      2: { text: '已禁用', type: 'warning' },
-      3: { text: 'SAN不匹配', type: 'danger' },
-      4: { text: '已过期', type: 'danger' },
-      5: { text: '部署失败', type: 'danger' }
+    const map: Record<number, string> = {
+      1: '正常',
+      2: '已禁用',
+      3: 'SAN不匹配',
+      4: '已过期',
+      5: '部署失败'
     }
     if (!status) {
       return h(ElTag, { type: 'info', size: 'small' }, () => '未配置')
     }
-    const item = map[status] || { text: '未知', type: 'info' }
-    return h(ElTag, { type: item.type, size: 'small' }, () => item.text)
+    const text = map[status] || '未知'
+    return h(ElTag, { type: resolveSslBindStatusTagType(status), size: 'small' }, () => text)
   }
 
   const isDomainMatchedByCert = (domain: string, cert: Api.Ssl.CertDTO) => {

@@ -84,7 +84,7 @@
           formatter: (row: Api.Metrics.TrafficCountDTO) => {
             const text = getProtocolText(row.protocol)
             if (!text) return ''
-            const type = row.protocol === ProtocolType.HTTP ? 'warning' : 'primary'
+            const type = row.protocol === ProtocolType.HTTP ? 'info' : 'primary'
             return h(ElTag, { type, size: 'small' }, () => text)
           }
         },

@@ -19,6 +19,7 @@
               <ElInput
                 v-if="editingUserId === scope.row.id"
                 v-model="scope.row.username"
+                size="small"
                 placeholder="请输入用户名"
                 style="width: 100%"
               />
@@ -30,6 +31,7 @@
               <ElInput
                 v-if="editingUserId === scope.row.id"
                 v-model="scope.row.password"
+                size="small"
                 placeholder="请输入密码"
                 type="password"
                 style="width: 100%"

@@ -1,0 +1,191 @@
+/*
+ * acme4j - Java ACME client
+ *
+ * Copyright (C) 2015 Richard "Shred" Körber
+ *   http://acme4j.shredzone.org
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
+package org.shredzone.acme4j;
+
+import static java.util.stream.Collectors.toUnmodifiableList;
+
+import java.io.Serial;
+import java.net.URL;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Optional;
+
+import org.shredzone.acme4j.challenge.Challenge;
+import org.shredzone.acme4j.exception.AcmeException;
+import org.shredzone.acme4j.exception.AcmeProtocolException;
+import org.shredzone.acme4j.toolbox.AcmeUtils;
+import org.shredzone.acme4j.toolbox.JSON.Value;
+import org.shredzone.acme4j.toolbox.JSONBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Represents an authorization request at the ACME server.
+ */
+public class Authorization extends AcmeJsonResource implements PollableResource {
+    @Serial
+    private static final long serialVersionUID = -3116928998379417741L;
+    private static final Logger LOG = LoggerFactory.getLogger(Authorization.class);
+
+    protected Authorization(Login login, URL location) {
+        super(login, location);
+    }
+
+    /**
+     * Gets the {@link Identifier} to be authorized.
+     * <p>
+     * For wildcard domain orders, the domain itself (without wildcard prefix) is returned
+     * here. To find out if this {@link Authorization} is related to a wildcard domain
+     * order, check the {@link #isWildcard()} method.
+     *
+     * @since 2.3
+     */
+    public Identifier getIdentifier() {
+        return getJSON().get("identifier").asIdentifier();
+    }
+
+    /**
+     * Gets the authorization status.
+     * <p>
+     * Possible values are: {@link Status#PENDING}, {@link Status#VALID},
+     * {@link Status#INVALID}, {@link Status#DEACTIVATED}, {@link Status#EXPIRED},
+     * {@link Status#REVOKED}.
+     */
+    @Override
+    public Status getStatus() {
+        return getJSON().get("status").asStatus();
+    }
+
+    /**
+     * Gets the expiry date of the authorization, if set by the server.
+     */
+    public Optional<Instant> getExpires() {
+        return getJSON().get("expires")
+                    .map(Value::asString)
+                    .map(AcmeUtils::parseTimestamp);
+    }
+
+    /**
+     * Returns {@code true} if this {@link Authorization} is related to a wildcard domain,
+     * {@code false} otherwise.
+     */
+    public boolean isWildcard() {
+        return getJSON().get("wildcard")
+                    .map(Value::asBoolean)
+                    .orElse(false);
+    }
+
+    /**
+     * Returns {@code true} if certificates for subdomains can be issued according to
+     * RFC9444.
+     *
+     * @since 3.3.0
+     */
+    public boolean isSubdomainAuthAllowed() {
+        return getJSON().get("subdomainAuthAllowed")
+                .map(Value::asBoolean)
+                .orElse(false);
+    }
+
+    /**
+     * Gets a list of all challenges offered by the server, in no specific order.
+     */
+    public List<Challenge> getChallenges() {
+        var login = getLogin();
+
+        return getJSON().get("challenges")
+                .asArray()
+                .stream()
+                .map(Value::asObject)
+                .map(login::createChallenge)
+                .collect(toUnmodifiableList());
+    }
+
+    /**
+     * Finds a {@link Challenge} of the given type. Responding to this {@link Challenge}
+     * is sufficient for authorization.
+     * <p>
+     * {@link Authorization#findChallenge(Class)} should be preferred, as this variant
+     * is not type safe.
+     *
+     * @param type
+     *            Challenge name (e.g. "http-01")
+     * @return {@link Challenge} matching that name, or empty if there is no such
+     *         challenge, or if the challenge alone is not sufficient for authorization.
+     * @throws ClassCastException
+     *             if the type does not match the expected Challenge class type
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends Challenge> Optional<T> findChallenge(final String type) {
+        return (Optional<T>) getChallenges().stream()
+                .filter(ch -> type.equals(ch.getType()))
+                .reduce((a, b) -> {
+                    throw new AcmeProtocolException("Found more than one challenge of type " + type);
+                });
+    }
+
+    /**
+     * Finds a {@link Challenge} of the given class type. Responding to this {@link
+     * Challenge} is sufficient for authorization.
+     *
+     * @param type
+     *         Challenge type (e.g. "Http01Challenge.class")
+     * @return {@link Challenge} of that type, or empty if there is no such
+     * challenge, or if the challenge alone is not sufficient for authorization.
+     * @since 2.8
+     */
+    public <T extends Challenge> Optional<T> findChallenge(Class<T> type) {
+        return getChallenges().stream()
+                .filter(type::isInstance)
+                .map(type::cast)
+                .reduce((a, b) -> {
+                    throw new AcmeProtocolException("Found more than one challenge of type " + type.getName());
+                });
+    }
+
+    /**
+     * Waits until the authorization is completed.
+     * <p>
+     * It is completed if it reaches either {@link Status#VALID} or
+     * {@link Status#INVALID}.
+     * <p>
+     * This method is synchronous and blocks the current thread.
+     *
+     * @param timeout
+     *         Timeout until a terminal status must have been reached
+     * @return Status that was reached
+     * @since 3.4.0
+     */
+    public Status waitForCompletion(Duration timeout)
+            throws AcmeException, InterruptedException {
+        return waitForStatus(EnumSet.of(Status.VALID, Status.INVALID), timeout);
+    }
+
+    /**
+     * Permanently deactivates the {@link Authorization}.
+     */
+    public void deactivate() throws AcmeException {
+        LOG.debug("deactivate");
+        try (var conn = getSession().connect()) {
+            var claims = new JSONBuilder();
+            claims.put("status", "deactivated");
+
+            conn.sendSignedRequest(getLocation(), claims, getLogin());
+            setJSON(conn.readJsonResponse());
+        }
+    }
+
+}

@@ -34,6 +34,8 @@ public interface SslCertConvert {
     @Mapping(target = "source", expression = "java(sslCertificate.getSource() != null ? sslCertificate.getSource().getCode() : 1)")
     @Mapping(target = "sanDomains", source = "sslCertificate.sanDomains", qualifiedByName = "stringToList")
     @Mapping(target = "boundDomainCount", source = "boundDomainCount")
+    @Mapping(target = "autoRenew", source = "sslCertificate.autoRenew")
+    @Mapping(target = "lastRenewAt", source = "sslCertificate.lastRenewAt")
     SslCertDTO toDTO(SslCertDO sslCertificate, Long boundDomainCount);
 
     default SslCertDTO toDTO(SslCertDO sslCertificate) {

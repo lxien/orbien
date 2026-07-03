@@ -28,4 +28,13 @@ public interface SslCertRepository extends JpaRepository<SslCertDO, String> {
     boolean existsByFingerprint(String fingerprint);
 
     SslCertDO findByFingerprint(String sha256Fingerprint);
+
+    @org.springframework.data.jpa.repository.Query("""
+            SELECT c FROM SslCertDO c
+            WHERE c.notAfter <= :deadline AND c.notAfter > :today
+            ORDER BY c.notAfter ASC
+            """)
+    java.util.List<SslCertDO> findRenewCandidates(
+            @org.springframework.data.repository.query.Param("deadline") java.time.LocalDate deadline,
+            @org.springframework.data.repository.query.Param("today") java.time.LocalDate today);
 }

@@ -20,6 +20,7 @@ package com.xiaoniucode.etp.server.web.controller;
 
 import com.xiaoniucode.etp.server.web.common.message.Ajax;
 import com.xiaoniucode.etp.server.web.common.message.PageQuery;
+import com.xiaoniucode.etp.server.web.param.ssl.SslCertAutoRenewParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
@@ -57,5 +58,10 @@ public class SslCertController {
     @GetMapping("download-cert/{certId}")
     public void downloadCert(@PathVariable String certId, HttpServletResponse response) {
         sslCertificateService.downloadCert(certId, response);
+    }
+
+    @PutMapping("{certId}/auto-renew")
+    public Ajax updateAutoRenew(@PathVariable String certId, @RequestBody SslCertAutoRenewParam param) {
+        return Ajax.success(sslCertificateService.updateAutoRenew(certId, Boolean.TRUE.equals(param.getAutoRenew())));
     }
 }

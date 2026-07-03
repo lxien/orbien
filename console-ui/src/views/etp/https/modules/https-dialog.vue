@@ -249,6 +249,13 @@
     }
   }
 
+  const applyDefaultAgentIfNeeded = () => {
+    if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
+      return
+    }
+    formData.agentId = agents.value[0].id
+  }
+
   const resetFormData = () => {
     Object.assign(formData, createDefaultFormData())
     refreshSubdomainBindings()
@@ -286,6 +293,7 @@
         resetSubdomainErrors()
         await Promise.all([fetchAgents(), loadRootDomains()])
         await initFormData()
+        applyDefaultAgentIfNeeded()
         refreshSubdomainBindings()
       }
     },

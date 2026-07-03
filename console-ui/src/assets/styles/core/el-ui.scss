@@ -172,8 +172,8 @@ html.dark .el-card {
   }
 }
 
-// HTTP 统一成功提示：使用主题色而非默认绿色
-.el-message.el-message-primary.el-message--success {
+// 成功提示统一使用主题色
+.el-message.el-message--success {
   .el-message__icon {
     color: var(--el-color-primary) !important;
   }

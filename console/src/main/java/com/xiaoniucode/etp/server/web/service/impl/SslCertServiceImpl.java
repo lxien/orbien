@@ -27,10 +27,12 @@ import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.utils.DateUtil;
 import com.xiaoniucode.etp.server.web.common.utils.SslParser;
 import com.xiaoniucode.etp.server.web.dto.binding.CertBindResultDTO;
+import com.xiaoniucode.etp.server.web.dto.ssl.SslCertAutoRenewResultDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
 import com.xiaoniucode.etp.server.web.entity.SslCertDO;
 import com.xiaoniucode.etp.server.web.enums.CertSource;
+import com.xiaoniucode.etp.server.web.enums.ScheduledJobCode;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
 import com.xiaoniucode.etp.server.web.param.binding.CertBindParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
@@ -39,6 +41,7 @@ import com.xiaoniucode.etp.server.web.repository.CertDomainBindingRepository;
 import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
 import com.xiaoniucode.etp.server.web.service.CertBindingService;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
+import com.xiaoniucode.etp.server.web.service.scheduled.ScheduledJobEnableSupport;
 import com.xiaoniucode.etp.server.web.service.converter.SslCertConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -75,6 +78,8 @@ public class SslCertServiceImpl implements SslCertificateService {
     private UidGenerator uidGenerator;
     @Autowired
     private CertBindingService certBindingService;
+    @Autowired
+    private ScheduledJobEnableSupport scheduledJobEnableSupport;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -133,6 +138,28 @@ public class SslCertServiceImpl implements SslCertificateService {
 
         sslCertRepository.saveAndFlush(sslCertDO);
         return sslCertConvert.toDTO(sslCertDO, 0L);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public SslCertDTO saveAcmeCert(String keyPem, String fullChainPem) {
+        SslParser.SslInfo sslInfo = SslParser.parsePem(fullChainPem);
+        if (sslInfo.hasError()) {
+            throw new BizException("证书不可用");
+        }
+        String fingerprint = sslInfo.getSha256Fingerprint();
+        SslCertDO existing = sslCertRepository.findByFingerprint(fingerprint);
+        if (existing != null) {
+            return sslCertConvert.toDTO(existing, certDomainBindingRepository.countByCertId(existing.getId()));
+        }
+
+        SslCertSaveParam param = new SslCertSaveParam(keyPem, fullChainPem);
+        SslCertDTO created = saveCert(param);
+        SslCertDO sslCertDO = sslCertRepository.findById(created.getId()).orElseThrow();
+        sslCertDO.setSource(CertSource.ACME);
+        sslCertRepository.save(sslCertDO);
+        created.setSource(CertSource.ACME.getCode());
+        return created;
     }
 
     @Override
@@ -269,5 +296,32 @@ public class SslCertServiceImpl implements SslCertificateService {
             return certBindingService.bind(bindParam);
         }
         return certBindingService.bindMatchingDomainsForProxy(certId, param.getProxyId(), true);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public SslCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew) {
+        SslCertDO sslCert = sslCertRepository.findById(certId)
+                .orElseThrow(() -> new BizException("证书不存在"));
+        if (autoRenew) {
+            if (sslCert.getSource() != CertSource.ACME) {
+                throw new BizException("仅 ACME 证书支持自动续签");
+            }
+            if (sslCert.getStatus() != SslStatus.ACTIVE) {
+                throw new BizException("证书不可用，无法开启自动续签");
+            }
+        }
+        sslCert.setAutoRenew(autoRenew);
+        sslCertRepository.save(sslCert);
+
+        boolean jobAutoEnabled = false;
+        if (autoRenew) {
+            jobAutoEnabled = scheduledJobEnableSupport.enableIfDisabled(ScheduledJobCode.ACME_RENEW.getCode());
+        }
+
+        SslCertAutoRenewResultDTO result = new SslCertAutoRenewResultDTO();
+        result.setAutoRenew(autoRenew);
+        result.setAcmeRenewJobAutoEnabled(jobAutoEnabled);
+        return result;
     }
 }

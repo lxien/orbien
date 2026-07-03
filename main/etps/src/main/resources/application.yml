@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: h2
+    active: mysql
 
 
 server:
@@ -22,3 +22,25 @@ cache:
     maximum-size: 150000
     expire-after-access: 30m
 dev: true
+
+etp:
+  acme:
+    # staging=Let's Encrypt 测试环境（推荐开发测试），production=生产环境
+    environment: staging
+    # 也可直接指定目录地址（优先级高于 environment）：
+    # directory-url: acme://letsencrypt.org/staging
+    # directory-url: acme://letsencrypt.org
+    dns-poll-interval-seconds: 15
+    dns-poll-max-attempts: 40
+  scheduled-job:
+    seed-on-startup: true
+    log-retention-days: 30
+    metrics-cleanup:
+      cron: "0 0 1 * * ?"
+      enabled: true
+    agent-cleanup:
+      cron: "0 30 2 * * ?"
+      enabled: false
+    acme-renew:
+      cron: "0 0 3 * * ?"
+      enabled: true

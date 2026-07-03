@@ -84,6 +84,15 @@ public class SslCertDO {
     @Column(name = "not_after")
     private LocalDate notAfter;
 
+    @Column(name = "auto_renew")
+    private Boolean autoRenew = false;
+
+    @Column(name = "last_renew_at")
+    private LocalDateTime lastRenewAt;
+
+    @Column(name = "renew_order_id")
+    private Long renewOrderId;
+
     /**
      * 指纹
      */

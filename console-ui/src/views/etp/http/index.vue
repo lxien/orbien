@@ -130,6 +130,7 @@
                   ElTag,
                   {
                     type: 'primary',
+                    size: 'small',
                     style: 'cursor: pointer;',
                     onClick: () => window.open(`http://${fullDomain}`, '_blank')
                   },
@@ -152,6 +153,7 @@
           formatter: (row: HttpProxyItem) =>
             h(ElSwitch, {
               modelValue: row.status === ProxyStatus.OPEN,
+              size: 'small',
               loading: isToggling(row.id),
               'onUpdate:modelValue': (enabled: boolean) => handleStatusChange(row, enabled)
             })

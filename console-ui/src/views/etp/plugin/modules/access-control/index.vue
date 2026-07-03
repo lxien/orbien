@@ -26,6 +26,7 @@
               <ElInput
                 v-if="editingRuleId === scope.row.id"
                 v-model="scope.row.cidr"
+                size="small"
                 placeholder="请输入IP地址段，例如：192.168.1.0/24"
                 style="width: 100%"
               />
@@ -34,11 +35,11 @@
           </ElTableColumn>
           <ElTableColumn prop="ruleType" label="规则类型" width="150">
             <template #default="scope">
-              <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType">
+              <ElRadioGroup v-if="editingRuleId === scope.row.id" v-model="scope.row.ruleType" size="small">
                 <ElRadio :label="AccessControl.ALLOW">放行</ElRadio>
                 <ElRadio :label="AccessControl.DENY">禁止</ElRadio>
               </ElRadioGroup>
-              <ElTag v-else :type="scope.row.ruleType === AccessControl.ALLOW ? 'success' : 'danger'">
+              <ElTag v-else size="small" :type="scope.row.ruleType === AccessControl.ALLOW ? 'primary' : 'danger'">
                 {{ scope.row.ruleType === AccessControl.ALLOW ? '放行' : '禁止' }}
               </ElTag>
             </template>

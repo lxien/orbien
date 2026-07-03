@@ -6,7 +6,7 @@ import { TargetHealthStatus } from '@/enums/etp/business'
 export type TargetHealthState = 'up' | 'down' | 'unknown'
 
 const HEALTH_DOT_COLOR: Record<TargetHealthState, string> = {
-  up: 'var(--el-color-success)',
+  up: 'var(--el-color-primary)',
   down: 'var(--el-color-danger)',
   unknown: 'var(--el-color-info)'
 }
@@ -20,7 +20,7 @@ export function resolveTargetHealthStatus(target: Api.Proxy.TargetDTO): TargetHe
 export function renderTargetTag(target: Api.Proxy.TargetDTO) {
   const text = `${target.host}:${target.port}`
   const status = resolveTargetHealthStatus(target)
-  return h(ElTag, { type: 'primary' }, () =>
+  return h(ElTag, { type: 'primary', size: 'small' }, () =>
     h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: '6px' } }, [
       h('span', {
         style: {

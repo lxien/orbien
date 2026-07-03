@@ -103,7 +103,7 @@
           label: '状态',
           formatter: (row: ClientItem) => {
             const statusConfig = getClientStatusConfig(row.isOnline)
-            return h(ElTag, { type: statusConfig.type }, () => statusConfig.text)
+            return h(ElTag, { type: statusConfig.type, size: 'small' }, () => statusConfig.text)
           }
         },
         {

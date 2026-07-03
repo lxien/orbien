@@ -298,8 +298,10 @@ public class MetricsServiceImpl implements MetricsService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteOldMetrics(int days) {
+    public int deleteOldMetrics(int days) {
         LocalDateTime cutoffTime = LocalDateTime.now().minusDays(days);
+        long count = metricsRepository.countByCreatedAtBefore(cutoffTime);
         metricsRepository.deleteByCreatedAtBefore(cutoffTime);
+        return (int) count;
     }
 }

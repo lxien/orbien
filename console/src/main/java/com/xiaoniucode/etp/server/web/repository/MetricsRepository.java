@@ -104,5 +104,7 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
     /**
      * 删除创建时间早于指定时间的流量记录
      */
+    long countByCreatedAtBefore(LocalDateTime createdAtBefore);
+
     void deleteByCreatedAtBefore(LocalDateTime createdAtBefore);
 }

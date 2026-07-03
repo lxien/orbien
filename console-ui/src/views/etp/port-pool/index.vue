@@ -90,7 +90,7 @@
           label: '协议',
           formatter: (row: PortPoolItem) => {
             const config = getPortPoolTypeLabel(row.type)
-            return h(ElTag, { type: config.type }, () => config.text)
+            return h(ElTag, { type: config.type, size: 'small' }, () => config.text)
           }
         },
         {

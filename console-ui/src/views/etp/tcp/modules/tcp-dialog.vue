@@ -220,6 +220,13 @@
     }
   }
 
+  const applyDefaultAgentIfNeeded = () => {
+    if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
+      return
+    }
+    formData.agentId = agents.value[0].id
+  }
+
   const resetSuggestState = () => {
     suggestedPorts.value = []
     selectedSuggestPort.value = null
@@ -299,6 +306,7 @@
         formRef.value?.clearValidate()
         await fetchAgents()
         await initFormData()
+        applyDefaultAgentIfNeeded()
       }
     },
     { immediate: true }

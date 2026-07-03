@@ -32,6 +32,8 @@ public interface SslCertificateService {
 
     SslCertDTO saveCert(SslCertSaveParam param);
 
+    SslCertDTO saveAcmeCert(String keyPem, String fullChainPem);
+
     PageResult<SslCertDTO> findByPage(PageQuery pageQuery);
 
     SslCertDownloadDTO getSslDownloadInfo(String certId);
@@ -47,4 +49,6 @@ public interface SslCertificateService {
     void downloadCert(String certId, HttpServletResponse response);
 
     com.xiaoniucode.etp.server.web.dto.binding.CertBindResultDTO saveAndDeployCert(SslCertSaveAndDeployParam param);
+
+    com.xiaoniucode.etp.server.web.dto.ssl.SslCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew);
 }

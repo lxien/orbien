@@ -9,6 +9,8 @@ declare namespace Api.Ssl {
     boundDomainCount?: number
     notBefore: string
     notAfter: string
+    autoRenew?: boolean
+    lastRenewAt?: string
   }
 
   interface CertSaveParams {
@@ -21,5 +23,10 @@ declare namespace Api.Ssl {
     key: string
     fullChain: string
     proxyDomainIds?: number[]
+  }
+
+  interface AutoRenewResult {
+    autoRenew: boolean
+    acmeRenewJobAutoEnabled?: boolean
   }
 }
