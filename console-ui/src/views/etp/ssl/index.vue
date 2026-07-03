@@ -76,7 +76,7 @@
     if (source === 2) {
       return h(ElTag, { type: 'primary', size: 'small' }, () => 'ACME')
     }
-    return h(ElTag, { size: 'small' }, () => '手动')
+    return h(ElTag, { type: 'warning', size: 'small' }, () => '手动')
   }
 
   const getExpireDays = (item: SslItem) => {

@@ -71,7 +71,7 @@
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
 
         <!-- ==================== 核心网络框架 ==================== -->
-        <netty.version>4.1.131.Final</netty.version>
+        <netty.version>4.2.15.Final</netty.version>
         <protobuf.version>4.33.4</protobuf.version>
 
         <!-- ==================== 日志框架 ==================== -->

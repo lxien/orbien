@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DevModeInitializer {
 
-    @Value("${dev:false}")
+    @Value("${etp.dev:false}")
     private boolean dev;
 
     @PostConstruct

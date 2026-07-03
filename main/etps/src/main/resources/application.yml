@@ -1,8 +1,6 @@
 spring:
   profiles:
-    active: mysql
-
-
+    active: h2
 server:
   servlet:
     context-path: /
@@ -21,9 +19,10 @@ cache:
     initial-capacity: 10000
     maximum-size: 150000
     expire-after-access: 30m
-dev: true
+
 
 etp:
+  dev: true
   acme:
     # staging=Let's Encrypt 测试环境（推荐开发测试），production=生产环境
     environment: staging
