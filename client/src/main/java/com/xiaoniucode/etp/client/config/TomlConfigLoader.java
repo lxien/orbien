@@ -345,6 +345,9 @@ public class TomlConfigLoader implements ConfigSource {
                     transportCustomConfig.setCompress(compress);
                     transportCustomConfig.setEncrypt(encrypt);
                 }
+                if (protocolType.isUdp()) {
+                    transportCustomConfig.setMultiplex(true);
+                }
 
                 proxyConfig.setTransport(transportCustomConfig);
             }

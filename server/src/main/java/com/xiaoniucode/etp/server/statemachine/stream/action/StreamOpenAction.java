@@ -38,9 +38,10 @@ public class StreamOpenAction extends StreamBaseAction {
         NewStreamCodec.encode(payload, target.getHost(), target.getPort());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);
 
-        frame.setMultiplexTunnel(config.isMuxTunnel());
+        frame.setMultiplexTunnel(config.isMuxTunnel() || config.isUdp());
         frame.setCompressed(context.isCompress());
         frame.setEncrypted(config.isEncrypt());
+        frame.setDatagram(config.isUdp());
 
         control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             logger.debug("打开流请求引用计数：{}", payload.refCnt());

@@ -53,9 +53,13 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             LEFT JOIN AgentDO a ON p.agentId = a.id
             LEFT JOIN BasicAuthDO ba ON ba.proxyId = p.id
             LEFT JOIN AccessControlDO ac ON ac.proxyId = p.id
-            WHERE p.listenPort = :listenPort
+            WHERE p.listenPort = :listenPort AND p.protocol = :protocol
             """)
-    ProxyDetailQueryResult findDetailByListenPort(@Param("listenPort") Integer listenPort);
+    ProxyDetailQueryResult findDetailByListenPortAndProtocol(@Param("listenPort") Integer listenPort,
+                                                             @Param("protocol") ProtocolType protocol);
+
+    @Query("SELECT p.listenPort FROM ProxyDO p WHERE p.listenPort IS NOT NULL AND p.protocol = :protocol")
+    List<Integer> findListenPortsByProtocol(@Param("protocol") ProtocolType protocol);
 
     @Query("""
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult(a, p,ba,ac)

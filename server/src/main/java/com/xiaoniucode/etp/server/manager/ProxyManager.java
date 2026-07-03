@@ -19,6 +19,7 @@ package com.xiaoniucode.etp.server.manager;
 import com.xiaoniucode.etp.server.exceptions.EtpException;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.port.PortAcceptor;
+import com.xiaoniucode.etp.server.port.UdpPortAcceptor;
 import com.xiaoniucode.etp.core.enums.PortPoolType;
 import com.xiaoniucode.etp.server.port.PortPoolManager;
 import com.xiaoniucode.etp.server.security.IpAccessChecker;
@@ -47,6 +48,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class ProxyManager {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(ProxyManager.class);
     private final Map<String/*proxyId*/, Integer/*listenPort*/> portMap = new ConcurrentHashMap<>();
+    private final Map<String/*proxyId*/, Integer/*listenPort*/> udpPortMap = new ConcurrentHashMap<>();
     private final Map<String/*agentId*/, Set<String/*proxyId*/>> agentProxyMap = new ConcurrentHashMap<>();
     private final Map<String/*proxyId*/, String/*agentId*/> proxyAgentMap = new ConcurrentHashMap<>();
     @Autowired
@@ -55,6 +57,8 @@ public class ProxyManager {
     private IpAccessChecker ipAccessChecker;
     @Autowired
     private PortAcceptor portAcceptor;
+    @Autowired
+    private UdpPortAcceptor udpPortAcceptor;
     @Autowired
     private PortPoolManager portPoolManager;
     @Autowired
@@ -78,6 +82,22 @@ public class ProxyManager {
             agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
             portMap.put(proxyId, listenPort);
             portAcceptor.bindPort(listenPort);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void registerUdp(String agentId, String proxyId, Integer listenPort) throws EtpException {
+        if (agentId == null || proxyId == null || listenPort == null) {
+            throw new IllegalArgumentException("无效输入参数");
+        }
+        logger.debug("激活 UDP 代理: {}", proxyId);
+        writeLock.lock();
+        try {
+            proxyAgentMap.put(proxyId, agentId);
+            agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
+            udpPortMap.put(proxyId, listenPort);
+            udpPortAcceptor.bindPort(listenPort);
         } finally {
             writeLock.unlock();
         }
@@ -129,7 +149,11 @@ public class ProxyManager {
         // TCP 协议
         Integer listenPort = portMap.remove(proxyId);
         if (listenPort != null) {
-            shutdownPortResources(listenPort);
+            shutdownTcpPortResources(listenPort);
+        }
+        Integer udpListenPort = udpPortMap.remove(proxyId);
+        if (udpListenPort != null) {
+            shutdownUdpPortResources(udpListenPort);
         }
         String agentId = proxyAgentMap.remove(proxyId);
         if (StringUtils.hasText(agentId)) {
@@ -195,9 +219,15 @@ public class ProxyManager {
         }
     }
 
-    private void shutdownPortResources(int listenPort) {
+    private void shutdownTcpPortResources(int listenPort) {
         portPoolManager.release(PortPoolType.TCP, listenPort);
         portAcceptor.stopPortListen(listenPort);
         streamManager.fireCloseByPort(listenPort);
+    }
+
+    private void shutdownUdpPortResources(int listenPort) {
+        portPoolManager.release(PortPoolType.UDP, listenPort);
+        udpPortAcceptor.stopPortListen(listenPort);
+        streamManager.fireCloseByUdpPort(listenPort);
     }
 }

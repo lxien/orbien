@@ -1,18 +1,21 @@
-import { ProtocolType } from '@/enums/etp/business'
+import { ProtocolType, getProtocolLabel } from '@/enums/etp/business'
 import type { ProxyConfigProtocol } from '@/views/etp/plugin/menus'
 import {
   fetchGetHttpProxyById,
   fetchGetHttpsProxyById,
   fetchGetTcpProxyById,
+  fetchGetUdpProxyById,
   fetchUpdateHttpProxy,
   fetchUpdateHttpsProxy,
-  fetchUpdateTcpProxy
+  fetchUpdateTcpProxy,
+  fetchUpdateUdpProxy
 } from './proxy'
 
 export type ProxyDetail =
   | Api.Proxy.HttpProxyDetailDTO
   | Api.Proxy.HttpsProxyDetailDTO
   | Api.Proxy.TcpProxyDetailDTO
+  | Api.Proxy.UdpProxyDetailDTO
 
 /** 扩展设置插件使用的完整 HTTP 详情结构，待独立接口提供 */
 interface HttpPluginDetail {
@@ -31,7 +34,8 @@ interface HttpPluginDetail {
 const GET_API = {
   [ProtocolType.HTTP]: fetchGetHttpProxyById,
   [ProtocolType.HTTPS]: fetchGetHttpsProxyById,
-  [ProtocolType.TCP]: fetchGetTcpProxyById
+  [ProtocolType.TCP]: fetchGetTcpProxyById,
+  [ProtocolType.UDP]: fetchGetUdpProxyById
 }
 
 export function fetchProxyDetail(protocol: ProxyConfigProtocol, id: string) {
@@ -124,9 +128,23 @@ async function submitHttpUpdate(
   })
 }
 
+function buildUdpUpdatePayload(
+  detail: Api.Proxy.UdpProxyDetailDTO,
+  limitTotal?: number
+): Api.Proxy.UdpProxyUpdateParam {
+  return {
+    id: detail.id,
+    name: detail.name,
+    localHost: detail.localHost,
+    localPort: detail.localPort,
+    ...(detail.remotePort != null ? { remotePort: detail.remotePort } : {}),
+    ...(limitTotal != null ? { limitTotal } : detail.limitTotal != null ? { limitTotal: detail.limitTotal } : {})
+  }
+}
+
 function rejectPluginSave(protocol: ProxyConfigProtocol, feature: string) {
-  if (protocol === ProtocolType.TCP) {
-    return Promise.reject(new Error(`TCP ${feature}暂未适配新接口`))
+  if (protocol === ProtocolType.TCP || protocol === ProtocolType.UDP) {
+    return Promise.reject(new Error(`${getProtocolLabel(protocol)} ${feature}暂未适配新接口`))
   }
   return Promise.reject(new Error(`HTTP/HTTPS ${feature}暂未适配新接口`))
 }
@@ -172,6 +190,15 @@ export function saveProxyBandwidthConfig(
         ? Math.round(bandwidth.limitTotal / 1_000_000)
         : tcpDetail.limitTotal ?? undefined
     return fetchUpdateTcpProxy(buildTcpUpdatePayload(tcpDetail, limitTotalMbps))
+  }
+
+  if (protocol === ProtocolType.UDP) {
+    const udpDetail = detail as Api.Proxy.UdpProxyDetailDTO
+    const limitTotalMbps =
+      bandwidth.limitTotal != null && bandwidth.unit
+        ? Math.round(bandwidth.limitTotal / 1_000_000)
+        : udpDetail.limitTotal ?? undefined
+    return fetchUpdateUdpProxy(buildUdpUpdatePayload(udpDetail, limitTotalMbps))
   }
 
   const pluginDetail = asHttpPluginDetail(detail)

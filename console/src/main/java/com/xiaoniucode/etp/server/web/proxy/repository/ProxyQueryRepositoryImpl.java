@@ -17,6 +17,7 @@
 package com.xiaoniucode.etp.server.web.proxy.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyDetailQueryResult;
 import com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult;
@@ -73,12 +74,22 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
 
     @Override
     public ProxyConfigExt findByListenPort(int listenPort) {
-        ProxyDetailQueryResult detail = proxyRepository.findDetailByListenPort(listenPort);
+        return findByListenPort(listenPort, ProtocolType.TCP);
+    }
+
+    @Override
+    public ProxyConfigExt findByListenPort(int listenPort, ProtocolType protocolType) {
+        ProxyDetailQueryResult detail = proxyRepository.findDetailByListenPortAndProtocol(listenPort, protocolType);
         if (detail == null || detail.getProxyDO() == null) {
             return null;
         }
         ProxyRelations relations = proxyRelationsLoader.loadOne(detail.getProxyDO().getId());
         return proxyConfigAssembler.assembleExt(detail, relations);
+    }
+
+    @Override
+    public List<Integer> findListenPortsByProtocol(ProtocolType protocolType) {
+        return proxyRepository.findListenPortsByProtocol(protocolType);
     }
 
     @Override

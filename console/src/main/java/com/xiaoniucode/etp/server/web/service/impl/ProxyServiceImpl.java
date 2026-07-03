@@ -302,6 +302,25 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void createUdpProxy(UdpProxyCreateParam param) {
+        if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyDO proxyDO = buildUdpProxyDO(param.getAgentId(), param.getName(), proxyId);
+        applyUdpListenPort(proxyDO, param.getRemotePort(), null, null);
+        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
+        proxyRepository.save(proxyDO);
+
+        proxyTargetRepository.save(buildUdpTarget(param, proxyId));
+        accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
+        logger.debug("UDP 代理创建成功：{}", proxyDO.getName());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateTcpProxy(TcpProxyUpdateParam param) {
         String proxyId = param.getId();
         ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
@@ -321,6 +340,32 @@ public class ProxyServiceImpl implements ProxyService {
         proxyTargetRepository.deleteByProxyId(proxyId);
         proxyTargetRepository.save(buildTcpTarget(param, proxyId));
         logger.debug("TCP 代理更新成功：{}", existsProxyDO.getName());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUdpProxy(UdpProxyUpdateParam param) {
+        String proxyId = param.getId();
+        ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        if (!existsProxyDO.getProtocol().isUdp()) {
+            throw new BizException("仅支持 UDP 代理");
+        }
+        if (proxyRepository.existsByAgentIdAndNameAndIdNot(
+                existsProxyDO.getAgentId(), param.getName(), proxyId)) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+
+        Integer existsListenPort = existsProxyDO.getListenPort();
+        Integer existsRemotePort = existsProxyDO.getRemotePort();
+        existsProxyDO.setName(param.getName());
+        applyUdpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
+        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
+        proxyRepository.save(existsProxyDO);
+
+        proxyTargetRepository.deleteByProxyId(proxyId);
+        proxyTargetRepository.save(buildUdpTarget(param, proxyId));
+        logger.debug("UDP 代理更新成功：{}", existsProxyDO.getName());
     }
 
     @Override
@@ -344,6 +389,97 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
         return dto;
+    }
+
+    @Override
+    public UdpProxyDetailDTO getUdpProxyById(String id) {
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isUdp())
+                .orElseThrow(() -> new BizException("UDP 代理不存在"));
+        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(id).orElse(null);
+
+        UdpProxyDetailDTO dto = new UdpProxyDetailDTO();
+        dto.setId(proxyDO.getId());
+        dto.setAgentId(proxyDO.getAgentId());
+        dto.setName(proxyDO.getName());
+        dto.setRemotePort(proxyDO.getRemotePort());
+        dto.setListenPort(proxyDO.getListenPort());
+        if (target != null) {
+            dto.setLocalHost(target.getHost());
+            dto.setLocalPort(target.getPort());
+        }
+        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setCreatedAt(proxyDO.getCreatedAt());
+        dto.setUpdatedAt(proxyDO.getUpdatedAt());
+        return dto;
+    }
+
+    private ProxyDO buildUdpProxyDO(String agentId, String name, String proxyId) {
+        ProxyDO proxyDO = new ProxyDO();
+        proxyDO.setId(proxyId);
+        proxyDO.setAgentId(agentId);
+        proxyDO.setName(name);
+        proxyDO.setProtocol(ProtocolType.UDP);
+        proxyDO.setStatus(ProxyStatus.OPEN);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
+        proxyDO.setMultiplex(true);
+        return proxyDO;
+    }
+
+    private void applyUdpListenPort(ProxyDO proxyDO, Integer requestRemotePort,
+                                    Integer existsListenPort, Integer existsRemotePort) {
+        if (requestRemotePort == null || requestRemotePort == 0) {
+            if (existsListenPort != null) {
+                proxyDO.setRemotePort(existsRemotePort);
+                proxyDO.setListenPort(existsListenPort);
+                return;
+            }
+            Integer listenPort = portPoolManager.acquire(PortPoolType.UDP);
+            if (listenPort == null) {
+                throw new BizException("没有可用 UDP 远程端口号");
+            }
+            proxyDO.setRemotePort(null);
+            proxyDO.setListenPort(listenPort);
+            transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.UDP, listenPort));
+            return;
+        }
+
+        if (Objects.equals(existsListenPort, requestRemotePort)) {
+            proxyDO.setRemotePort(existsRemotePort);
+            proxyDO.setListenPort(existsListenPort);
+            return;
+        }
+
+        if (!portPoolManager.isAvailable(PortPoolType.UDP, requestRemotePort)) {
+            throw new BizException("远程端口号不可用或被占用");
+        }
+        if (existsListenPort != null && !Objects.equals(existsListenPort, requestRemotePort)) {
+            portPoolManager.release(PortPoolType.UDP, existsListenPort);
+        }
+        proxyDO.setRemotePort(requestRemotePort);
+        proxyDO.setListenPort(requestRemotePort);
+        portPoolManager.reserve(PortPoolType.UDP, requestRemotePort);
+        transactionHelper.afterRollback(() -> portPoolManager.release(PortPoolType.UDP, requestRemotePort));
+    }
+
+    private ProxyTargetDO buildUdpTarget(UdpProxyCreateParam param, String proxyId) {
+        ProxyTargetDO target = new ProxyTargetDO();
+        target.setProxyId(proxyId);
+        target.setHost(param.getLocalHost());
+        target.setPort(param.getLocalPort());
+        target.setName(param.getName());
+        target.setWeight(1);
+        return target;
+    }
+
+    private ProxyTargetDO buildUdpTarget(UdpProxyUpdateParam param, String proxyId) {
+        ProxyTargetDO target = new ProxyTargetDO();
+        target.setProxyId(proxyId);
+        target.setHost(param.getLocalHost());
+        target.setPort(param.getLocalPort());
+        target.setName(param.getName());
+        target.setWeight(1);
+        return target;
     }
 
     private ProxyDO buildTcpProxyDO(String agentId, String name, String proxyId) {
@@ -665,6 +801,28 @@ public class ProxyServiceImpl implements ProxyService {
         return PageResult.wrap(resultPage, res);
     }
 
+    @Override
+    public PageResult<UdpProxyListDTO> findUdpProxies(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+
+        Page<ProxyDO> resultPage = proxyRepository.findByProtocolOrderByUpdatedAtDesc(ProtocolType.UDP, pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+        List<ProxyDO> content = resultPage.getContent();
+        List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
+        Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
+        List<UdpProxyListDTO> res = new ArrayList<>();
+        for (ProxyDO proxyDO : content) {
+            UdpProxyListDTO udpListDTO = proxyConvert.toUdpListDTO(proxyDO);
+            udpListDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
+            res.add(udpListDTO);
+        }
+        return PageResult.wrap(resultPage, res);
+    }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -755,6 +913,10 @@ public class ProxyServiceImpl implements ProxyService {
             } else {
                 proxyManager.registerHttps(agentId, proxyId, domains);
             }
+            return;
+        }
+        if (protocol.isUdp()) {
+            proxyManager.registerUdp(agentId, proxyId, proxyDO.getListenPort());
             return;
         }
         proxyManager.registerTcp(agentId, proxyId, proxyDO.getListenPort());

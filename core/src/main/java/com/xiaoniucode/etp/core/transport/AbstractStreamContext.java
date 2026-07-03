@@ -35,6 +35,7 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     protected boolean compress;
     protected boolean encrypt;
     protected boolean multiplex;
+    protected boolean datagram;
     protected AbstractAgentContext agentContext;
     protected TunnelBridge tunnelBridge;
 
@@ -75,6 +76,10 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
 
     public boolean isDirectConnection() {
         return !multiplex;
+    }
+
+    public boolean isDatagram() {
+        return datagram;
     }
 
     public void enqueue(ByteBuf byteBuf) {

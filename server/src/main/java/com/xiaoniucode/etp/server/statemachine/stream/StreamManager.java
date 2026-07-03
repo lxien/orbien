@@ -5,10 +5,11 @@ import com.xiaoniucode.etp.common.utils.StringUtils;
 import com.xiaoniucode.etp.core.domain.BandwidthConfig;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
-import com.xiaoniucode.etp.core.transport.IntSet;
 import com.xiaoniucode.etp.core.transport.PausedStreamRegistry;
+import com.xiaoniucode.etp.core.transport.UdpSessionKey;
 import com.xiaoniucode.etp.server.generator.StreamIdGenerator;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class StreamManager {
@@ -55,6 +58,21 @@ public class StreamManager {
      */
     private final Map<String, Set<Integer>> agentToStreams = new ConcurrentHashMap<>();
 
+    /**
+     * UDP 会话索引
+     */
+    private final Map<UdpSessionKey, Integer> udpSessionIndex = new ConcurrentHashMap<>();
+
+    /**
+     * UDP 会话 idle 超时任务
+     */
+    private final Map<UdpSessionKey, AtomicReference<io.netty.util.concurrent.ScheduledFuture<?>>> udpSessionTimeouts = new ConcurrentHashMap<>();
+
+    /**
+     * remotePort -> Set<streamId> (UDP)
+     */
+    private final Map<Integer, Set<Integer>> udpPortToStreams = new ConcurrentHashMap<>();
+
     @Autowired
     private StreamIdGenerator streamIdGenerator;
 
@@ -69,6 +87,66 @@ public class StreamManager {
         visitor.attr(AttributeKeys.STREAM_ID).set(streamId);
         visitors.put(streamId, streamContext);
         return streamContext;
+    }
+
+    public StreamContext createUdpStreamContext(Channel datagramChannel,
+                                                java.net.InetSocketAddress sender,
+                                                StateMachine<StreamState, StreamEvent, StreamContext> stateMachine) {
+        int streamId = streamIdGenerator.nextStreamId();
+        StreamContext streamContext = new StreamContext(streamId, stateMachine);
+        streamContext.setVisitor(datagramChannel);
+        streamContext.setVisitorAddress(sender);
+        streamContext.setSourceAddress(sender.toString());
+        visitors.put(streamId, streamContext);
+        return streamContext;
+    }
+
+    public void registerUdpSession(UdpSessionKey sessionKey, int streamId) {
+        udpSessionIndex.put(sessionKey, streamId);
+    }
+
+    public void unregisterUdpSession(UdpSessionKey sessionKey) {
+        udpSessionIndex.remove(sessionKey);
+        AtomicReference<io.netty.util.concurrent.ScheduledFuture<?>> timeoutRef = udpSessionTimeouts.remove(sessionKey);
+        if (timeoutRef != null && timeoutRef.get() != null) {
+            timeoutRef.get().cancel(false);
+        }
+    }
+
+    public Optional<StreamContext> getStreamContextByUdpSession(UdpSessionKey sessionKey) {
+        Integer streamId = udpSessionIndex.get(sessionKey);
+        if (streamId == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(visitors.get(streamId));
+    }
+
+    public void scheduleUdpSessionTimeout(UdpSessionKey sessionKey,
+                                          io.netty.channel.EventLoop eventLoop,
+                                          long timeoutSeconds) {
+        AtomicReference<io.netty.util.concurrent.ScheduledFuture<?>> timeoutRef =
+                udpSessionTimeouts.computeIfAbsent(sessionKey, key -> new AtomicReference<>());
+        io.netty.util.concurrent.ScheduledFuture<?> existing = timeoutRef.get();
+        if (existing != null) {
+            existing.cancel(false);
+        }
+        timeoutRef.set(eventLoop.schedule(() -> {
+            Integer streamId = udpSessionIndex.get(sessionKey);
+            if (streamId != null) {
+                StreamContext ctx = visitors.get(streamId);
+                if (ctx != null) {
+                    logger.debug("UDP 会话 idle 超时，关闭流 streamId={}", streamId);
+                    ctx.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                }
+            }
+        }, timeoutSeconds, TimeUnit.SECONDS));
+    }
+
+    public void touchUdpSession(UdpSessionKey sessionKey) {
+        StreamContext ctx = getStreamContextByUdpSession(sessionKey).orElse(null);
+        if (ctx != null && ctx.getVisitor() != null) {
+            scheduleUdpSessionTimeout(sessionKey, ctx.getVisitor().eventLoop(), 60);
+        }
     }
 
     public void removeStreamContext(int streamId) {
@@ -108,6 +186,26 @@ public class StreamManager {
                         portToStreams.remove(listenerPort);
                     }
                 }
+            }
+        }
+        if (protocol.isUdp()) {
+            Integer listenerPort = context.getListenerPort();
+            if (listenerPort != null) {
+                Set<Integer> portSet = udpPortToStreams.get(listenerPort);
+                if (portSet != null) {
+                    portSet.remove(streamId);
+                    if (portSet.isEmpty()) {
+                        udpPortToStreams.remove(listenerPort);
+                    }
+                }
+            }
+            if (context.getVisitorAddress() != null && listenerPort != null) {
+                unregisterUdpSession(UdpSessionKey.of(listenerPort, context.getVisitorAddress()));
+            }
+            ByteBuf pending = context.getPendingFirstPacket();
+            if (pending != null && pending.refCnt() > 0) {
+                pending.release();
+                context.setPendingFirstPacket(null);
             }
         }
 
@@ -175,6 +273,13 @@ public class StreamManager {
                         k -> ConcurrentHashMap.newKeySet()).add(streamId);
             }
         }
+        if (protocol.isUdp()) {
+            Integer listenerPort = context.getListenerPort();
+            if (listenerPort != null) {
+                udpPortToStreams.computeIfAbsent(listenerPort,
+                        k -> ConcurrentHashMap.newKeySet()).add(streamId);
+            }
+        }
         //处理客户端映射
         String agentId = context.getAgentId();
         if (StringUtils.hasText(agentId)) {
@@ -205,6 +310,10 @@ public class StreamManager {
      */
     public void fireCloseByPort(Integer remotePort) {
         fireCloseBy(portToStreams.get(remotePort));
+    }
+
+    public void fireCloseByUdpPort(Integer remotePort) {
+        fireCloseBy(udpPortToStreams.get(remotePort));
     }
 
     /**

@@ -43,7 +43,10 @@ public class TargetResolverAction extends StreamBaseAction {
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         Channel visitor = context.getVisitor();
-        visitor.config().setOption(ChannelOption.AUTO_READ, false);
+        // UDP 代理复用同一 DatagramChannel，不能关闭 AUTO_READ，否则后续包永远进不了 UdpVisitorHandler
+        if (!context.isDatagram()) {
+            visitor.config().setOption(ChannelOption.AUTO_READ, false);
+        }
         ProxyConfigExt ext = resolveProxyConfig(context);
         if (ext == null || ext.getProxyConfig().getStatus().isClosed()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
@@ -71,6 +74,10 @@ public class TargetResolverAction extends StreamBaseAction {
             }
             context.setCompress(config.isCompress());
             context.setEncrypt(config.isEncrypt());
+            if (config.isUdp()) {
+                context.setMultiplex(true);
+                context.setDatagram(true);
+            }
             context.setTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
@@ -115,9 +122,12 @@ public class TargetResolverAction extends StreamBaseAction {
             String domain = context.getVisitorDomain();
             String proxyId = domainRegistry.getProxyIdByDomain(domain);
             return proxyConfigService.findById(proxyId);
-        } else if (context.getProtocol() == ProtocolType.TCP) {
+        } else if (context.getProtocol().isTcp()) {
             int remotePort = context.getListenerPort();
-            return proxyConfigService.findByListenPort(remotePort);
+            return proxyConfigService.findByListenPort(remotePort, ProtocolType.TCP);
+        } else if (context.getProtocol().isUdp()) {
+            int remotePort = context.getListenerPort();
+            return proxyConfigService.findByListenPort(remotePort, ProtocolType.UDP);
         }
         return null;
     }

@@ -16,6 +16,7 @@ public class AttributeKeys {
     public static final AttributeKey<String> VISIT_DOMAIN = AttributeKey.valueOf("etp.visitorDomain");
     public static final AttributeKey<String> VISITOR_REAL_IP = AttributeKey.valueOf("etp.visitorRealIp");
     public static final AttributeKey<ByteBuf> HTTP_FIRST_PACKET = AttributeKey.valueOf("cachedFirstPacket");
+    public static final AttributeKey<ByteBuf> UDP_FIRST_PACKET = AttributeKey.valueOf("cachedUdpFirstPacket");
     public static final AttributeKey<ByteBuf> PENDING_READ = AttributeKey.valueOf("pending.read");
     public static final AttributeKey<ChannelType> CHANNEL_TYPE = AttributeKey.valueOf("channel.type");
 }

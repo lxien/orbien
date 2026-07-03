@@ -9,10 +9,11 @@
         </div>
         <div class="flex items-center gap-3">
           <span class="w-24 font-medium shrink-0">传输隧道</span>
-          <ElRadioGroup v-model="form.tunnelType">
+          <ElRadioGroup v-model="form.tunnelType" :disabled="isUdpProtocol">
             <ElRadio :label="String(TunnelType.MULTIPLEX)">共享隧道</ElRadio>
-            <ElRadio :label="String(TunnelType.DIRECT)">独立隧道</ElRadio>
+            <ElRadio v-if="!isUdpProtocol" :label="String(TunnelType.DIRECT)">独立隧道</ElRadio>
           </ElRadioGroup>
+          <span v-if="isUdpProtocol" class="text-sm text-gray-500">UDP 代理仅支持共享隧道</span>
         </div>
       </div>
     </div>
@@ -20,10 +21,10 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch } from 'vue'
+  import { ref, reactive, watch, computed } from 'vue'
   import { fetchProxyDetail } from '@/api/proxy-plugin'
   import type { ProxyConfigProtocol } from '../../menus'
-  import { TunnelType } from '@/enums/etp/business'
+  import { TunnelType, ProtocolType } from '@/enums/etp/business'
 
   defineOptions({ name: 'TransportPage' })
 
@@ -38,12 +39,17 @@
     tunnelType: String(TunnelType.MULTIPLEX)
   })
 
+  const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
+
   const loadData = async () => {
     loading.value = true
     try {
       const detail = await fetchProxyDetail(props.protocol, props.proxyId)
       form.encrypt = detail.transport?.encrypt ?? false
       form.tunnelType = detail.transport?.tunnelType?.toString() ?? String(TunnelType.MULTIPLEX)
+      if (props.protocol === ProtocolType.UDP) {
+        form.tunnelType = String(TunnelType.MULTIPLEX)
+      }
     } finally {
       loading.value = false
     }

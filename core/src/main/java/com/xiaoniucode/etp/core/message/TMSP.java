@@ -37,6 +37,7 @@ public class TMSP {
     public static final byte FLAG_COMPRESSED = 0x01;  // 0000 0001 加密
     public static final byte FLAG_ENCRYPTED = 0x02;   // 0000 0010 压缩
     public static final byte FLAG_MUX = 0x04;        //  0000 0100 多路复用
+    public static final byte FLAG_DATAGRAM = 0x08;   //  0000 1000 数据报(UDP)
 
     // bit 3~5 用来表示压缩算法类型（最多支持 8 种）
     public static final byte COMPRESS_NONE = 0x00;   // 0000 0000

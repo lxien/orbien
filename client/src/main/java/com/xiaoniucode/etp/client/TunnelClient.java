@@ -14,12 +14,14 @@ import com.xiaoniucode.etp.client.transport.connection.DirectPool;
 import com.xiaoniucode.etp.client.transport.connection.MultiplexPool;
 import com.xiaoniucode.etp.core.codec.TMSPCodec;
 import com.xiaoniucode.etp.core.transport.IdleCheckHandler;
+import com.xiaoniucode.etp.client.transport.UdpRealServerHandler;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.NettyEventLoopFactory;
 import com.xiaoniucode.etp.core.server.Lifecycle;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.compression.SnappyFrameDecoder;
 import io.netty.handler.codec.compression.SnappyFrameEncoder;
@@ -79,6 +81,16 @@ public final class TunnelClient implements Lifecycle {
                         p.addLast(NettyConstants.REAL_SERVER_HANDLER, new RealServerHandler());
                     }
                 });
+        Bootstrap udpServerBootstrap = new Bootstrap()
+                .group(serverWorkBootstrap)
+                .channel(NettyEventLoopFactory.datagramChannelClass())
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .handler(new ChannelInitializer<DatagramChannel>() {
+                    @Override
+                    protected void initChannel(DatagramChannel ch) {
+                        ch.pipeline().addLast(NettyConstants.UDP_REAL_SERVER_HANDLER, new UdpRealServerHandler());
+                    }
+                });
         Bootstrap controlBootstrap = new Bootstrap();
         ControlFrameHandler controlTunnelHandler = new ControlFrameHandler(agentContext);
         agentContext.setControlFrameHandler(controlTunnelHandler);
@@ -108,6 +120,7 @@ public final class TunnelClient implements Lifecycle {
         agentContext.setControlBootstrap(controlBootstrap);
         agentContext.setControlWorkerGroup(controlWorkerGroup);
         agentContext.setServerBootstrap(serverBootstrap);
+        agentContext.setUdpServerBootstrap(udpServerBootstrap);
         agentContext.setServerWorkerGroup(serverWorkBootstrap);
     }
 

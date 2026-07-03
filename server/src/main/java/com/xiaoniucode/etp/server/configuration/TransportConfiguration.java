@@ -7,6 +7,9 @@ import com.xiaoniucode.etp.server.transport.https.SslCertificateManager;
 import com.xiaoniucode.etp.server.transport.http.*;
 import com.xiaoniucode.etp.server.transport.https.HttpsProxyServer;
 import com.xiaoniucode.etp.server.transport.tcp.TcpProxyServer;
+import com.xiaoniucode.etp.server.transport.udp.UdpProxyServer;
+import com.xiaoniucode.etp.server.transport.udp.UdpIpCheckHandler;
+import com.xiaoniucode.etp.server.transport.udp.UdpVisitorHandler;
 import com.xiaoniucode.etp.server.transport.ControlFrameHandler;
 import com.xiaoniucode.etp.server.transport.tcp.TcpIpCheckHandler;
 import com.xiaoniucode.etp.server.transport.tcp.TcpVisitorHandler;
@@ -29,6 +32,11 @@ public class TransportConfiguration {
     @Bean
     public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
         return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, eventBus);
+    }
+
+    @Bean
+    public UdpProxyServer udpProxyServer(UdpVisitorHandler udpVisitorHandler, UdpIpCheckHandler udpIpCheckHandler, EventBus eventBus) {
+        return new UdpProxyServer(udpVisitorHandler, udpIpCheckHandler, eventBus);
     }
 
     @Bean

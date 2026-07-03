@@ -114,7 +114,9 @@
   })
 
   const getDefaultType = () =>
-    props.protocol === ProtocolType.TCP ? HealthCheckType.TCP : HealthCheckType.HTTP
+    props.protocol === ProtocolType.TCP || props.protocol === ProtocolType.UDP
+      ? HealthCheckType.TCP
+      : HealthCheckType.HTTP
 
   const fillForm = (data: Api.HealthCheck.HealthCheckDTO) => {
     form.enabled = data.enabled ?? false

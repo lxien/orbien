@@ -120,6 +120,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 streamContext.setCompress(frame.isCompressed());
                 streamContext.setEncrypt(frame.isEncrypted());
                 streamContext.setMultiplex(frame.isMuxTunnel());
+                streamContext.setDatagram(frame.isDatagram());
                 streamContext.setAgentContext(agentContext);
                 streamContext.fireEvent(StreamEvent.STREAM_OPEN);
                 break;

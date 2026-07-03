@@ -32,6 +32,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'UDP',
+    path: '/udp',
+    component: '/etp/udp',
+    meta: {
+      title: 'menus.etp.udp',
+      icon: 'ri:share-forward-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'Agent',
     path: '/agent',
     component: '/etp/agent',

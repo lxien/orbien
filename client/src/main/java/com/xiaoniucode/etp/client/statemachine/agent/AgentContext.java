@@ -29,6 +29,7 @@ public class AgentContext extends AbstractAgentContext {
     private SslContext tlsContext;
     private Bootstrap controlBootstrap;
     private Bootstrap serverBootstrap;
+    private Bootstrap udpServerBootstrap;
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkerGroup;
     private boolean authenticated;

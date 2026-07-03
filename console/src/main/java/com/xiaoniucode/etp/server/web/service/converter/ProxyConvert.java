@@ -19,6 +19,7 @@ import com.xiaoniucode.etp.core.enums.DomainType;
 import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.UdpProxyListDTO;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -30,7 +31,11 @@ import java.util.List;
 public interface ProxyConvert {
     TcpProxyListDTO toTcpListDTO(ProxyDO proxy);
 
+    UdpProxyListDTO toUdpListDTO(ProxyDO proxy);
+
     List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);
+
+    List<UdpProxyListDTO> toUdpDTOList(List<ProxyDO> proxies);
 
     @Named("domainTypeToCode")
     static Integer domainTypeToCode(DomainType domainType) {

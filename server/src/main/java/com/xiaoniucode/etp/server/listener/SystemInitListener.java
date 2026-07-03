@@ -16,6 +16,7 @@
 
 package com.xiaoniucode.etp.server.listener;
 
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.core.notify.EventBus;
 import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.TunnelServerBindEvent;
@@ -52,9 +53,13 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
     public void onEvent(TunnelServerBindEvent event) {
         // 启动回填：已有代理 listenPort 标记为占用
         logger.debug("回填已占用端口");
-        List<Integer> allPorts = proxyConfigService.getAllListenPorts();
-        for (Integer port : allPorts) {
+        List<Integer> tcpPorts = proxyConfigService.getListenPorts(ProtocolType.TCP);
+        for (Integer port : tcpPorts) {
             portPoolManager.markAllocated(PortPoolType.TCP, port);
+        }
+        List<Integer> udpPorts = proxyConfigService.getListenPorts(ProtocolType.UDP);
+        for (Integer port : udpPorts) {
+            portPoolManager.markAllocated(PortPoolType.UDP, port);
         }
     }
 }

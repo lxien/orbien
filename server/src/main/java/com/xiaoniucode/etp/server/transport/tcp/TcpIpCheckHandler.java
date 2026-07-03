@@ -2,6 +2,7 @@ package com.xiaoniucode.etp.server.transport.tcp;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.service.ProxyConfigService;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamManager;
 import com.xiaoniucode.etp.server.transport.IpCheckHandler;
@@ -36,7 +37,7 @@ public class TcpIpCheckHandler extends IpCheckHandler {
         Channel visitor = ctx.channel();
         int remotePort = getListenerPort(visitor);
         String visitorIp = NetUtils.getIp(visitor);
-        ProxyConfigExt ext = proxyConfigService.findByListenPort(remotePort);
+        ProxyConfigExt ext = proxyConfigService.findByListenPort(remotePort, ProtocolType.TCP);
         if (ext != null) {
             ProxyConfig config = ext.getProxyConfig();
             if (!doCheckAccess(visitor, config)) {

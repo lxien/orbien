@@ -20,6 +20,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xiaoniucode.etp.core.domain.ProxyConfig;
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 import com.xiaoniucode.etp.server.service.repository.ProxyQueryRepository;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -84,8 +85,10 @@ public class ProxyConfigService {
 
             // 端口索引
             if (config.isTcp() && config.getListenPort() != null) {
-                String portKey = "port:" + config.getListenPort();
-                proxyIdCache.invalidate(portKey);
+                proxyIdCache.invalidate(portCacheKey(ProtocolType.TCP, config.getListenPort()));
+            }
+            if (config.isUdp() && config.getListenPort() != null) {
+                proxyIdCache.invalidate(portCacheKey(ProtocolType.UDP, config.getListenPort()));
             }
         }
 
@@ -118,10 +121,16 @@ public class ProxyConfigService {
         String proxyId = config.getProxyId();
         String agentNameKey = "agent:" + config.getAgentId() + ":name:" + config.getName();
         proxyIdCache.put(agentNameKey, proxyId);
-        if (config.isTcp()) {
-            String portKey = "port:" + config.getListenPort();
-            proxyIdCache.put(portKey, proxyId);
+        if (config.isTcp() && config.getListenPort() != null) {
+            proxyIdCache.put(portCacheKey(ProtocolType.TCP, config.getListenPort()), proxyId);
         }
+        if (config.isUdp() && config.getListenPort() != null) {
+            proxyIdCache.put(portCacheKey(ProtocolType.UDP, config.getListenPort()), proxyId);
+        }
+    }
+
+    private String portCacheKey(ProtocolType protocolType, int listenPort) {
+        return "port:" + protocolType.name().toLowerCase() + ":" + listenPort;
     }
 
     public ProxyConfigExt findByAgentAndName(String agentId, String proxyName) {
@@ -149,7 +158,11 @@ public class ProxyConfigService {
     }
 
     public ProxyConfigExt findByListenPort(int listenPort) {
-        String indexKey = "port:" + listenPort;
+        return findByListenPort(listenPort, ProtocolType.TCP);
+    }
+
+    public ProxyConfigExt findByListenPort(int listenPort, ProtocolType protocolType) {
+        String indexKey = portCacheKey(protocolType, listenPort);
 
         // 先查一级缓存
         String proxyId = proxyIdCache.getIfPresent(indexKey);
@@ -158,7 +171,7 @@ public class ProxyConfigService {
         }
 
         // 一级缓存未命中，查一次数据库
-        ProxyConfigExt ext = proxyQueryRepository.findByListenPort(listenPort);
+        ProxyConfigExt ext = proxyQueryRepository.findByListenPort(listenPort, protocolType);
         if (ext == null) {
             return null;
         }
@@ -172,6 +185,10 @@ public class ProxyConfigService {
 
     public List<Integer> getAllListenPorts() {
         return proxyQueryRepository.findAllListenPorts();
+    }
+
+    public List<Integer> getListenPorts(ProtocolType protocolType) {
+        return proxyQueryRepository.findListenPortsByProtocol(protocolType);
     }
 
     public List<ProxyConfigExt> findByAgentId(String agentId) {

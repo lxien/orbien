@@ -22,6 +22,8 @@ import com.xiaoniucode.etp.server.web.dto.proxy.HttpsProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.UdpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.UdpProxyListDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 
 public interface ProxyService {
@@ -29,6 +31,8 @@ public interface ProxyService {
      * 创建 TCP 代理
      */
     void createTcpProxy(TcpProxyCreateParam param);
+
+    void createUdpProxy(UdpProxyCreateParam param);
 
     /**
      * 创建 HTTP 代理
@@ -45,6 +49,8 @@ public interface ProxyService {
      */
     void updateTcpProxy(TcpProxyUpdateParam param);
 
+    void updateUdpProxy(UdpProxyUpdateParam param);
+
     /**
      * 更新 HTTP 代理
      */
@@ -60,6 +66,8 @@ public interface ProxyService {
      */
     TcpProxyDetailDTO getTcpProxyById(String id);
 
+    UdpProxyDetailDTO getUdpProxyById(String id);
+
     HttpProxyDetailDTO getHttpProxyById(String id);
 
     HttpsProxyDetailDTO getHttpsProxyById(String id);
@@ -69,6 +77,8 @@ public interface ProxyService {
     void setProxyStatus(String id, Integer status);
 
     PageResult<TcpProxyListDTO> findTcpProxies(PageQuery pageQuery);
+
+    PageResult<UdpProxyListDTO> findUdpProxies(PageQuery pageQuery);
 
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 

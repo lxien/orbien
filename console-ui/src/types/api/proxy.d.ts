@@ -73,6 +73,11 @@ declare namespace Api.Proxy {
     listenPort: number
   }
 
+  /** UDP 代理列表 */
+  interface UdpProxyListDTO extends ProxyListDTO {
+    listenPort: number
+  }
+
   /** 代理详情基础信息 */
   interface ProxyDetailDTO {
     id: string
@@ -135,6 +140,20 @@ declare namespace Api.Proxy {
     localHost: string
     localPort: number
     /** 总带宽 Mbps */
+    limitTotal: number | null
+    createdAt: string
+    updatedAt: string
+  }
+
+  /** UDP 代理详情 */
+  interface UdpProxyDetailDTO {
+    id: string
+    agentId: string
+    name: string
+    remotePort: number | null
+    listenPort: number
+    localHost: string
+    localPort: number
     limitTotal: number | null
     createdAt: string
     updatedAt: string
@@ -229,6 +248,26 @@ declare namespace Api.Proxy {
 
   /** TCP 代理更新参数 */
   interface TcpProxyUpdateParam {
+    id: string
+    name: string
+    localHost: string
+    localPort: number
+    remotePort?: number
+    limitTotal?: number
+  }
+
+  /** UDP 代理创建参数 */
+  interface UdpProxyCreateParam {
+    agentId: string
+    name: string
+    localHost: string
+    localPort: number
+    remotePort?: number
+    limitTotal?: number
+  }
+
+  /** UDP 代理更新参数 */
+  interface UdpProxyUpdateParam {
     id: string
     name: string
     localHost: string

@@ -4,6 +4,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.*;
 import io.netty.channel.kqueue.*;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.*;
@@ -49,6 +50,16 @@ public final class NettyEventLoopFactory {
             return KQueueServerSocketChannel.class;
         } else {
             return NioServerSocketChannel.class;
+        }
+    }
+
+    public static Class<? extends DatagramChannel> datagramChannelClass() {
+        if (Epoll.isAvailable()) {
+            return EpollDatagramChannel.class;
+        } else if (KQueue.isAvailable()) {
+            return KQueueDatagramChannel.class;
+        } else {
+            return NioDatagramChannel.class;
         }
     }
 }

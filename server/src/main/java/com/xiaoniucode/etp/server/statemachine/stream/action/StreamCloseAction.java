@@ -5,6 +5,7 @@ import com.xiaoniucode.etp.core.message.TMSPFrame;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.core.transport.NettyConstants;
 import com.xiaoniucode.etp.core.transport.TunnelEntry;
+import com.xiaoniucode.etp.core.transport.UdpSessionKey;
 import com.xiaoniucode.etp.core.utils.ChannelUtils;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentInfo;
@@ -53,7 +54,12 @@ public class StreamCloseAction extends StreamBaseAction {
         if (byteBuf != null && byteBuf.refCnt() > 0) {
             byteBuf.release();
         }
-        ChannelUtils.closeOnFlush(visitor);
+        if (!context.isDatagram()) {
+            ChannelUtils.closeOnFlush(visitor);
+        } else if (context.getVisitorAddress() != null && context.getListenerPort() != null) {
+            streamManager.unregisterUdpSession(
+                   UdpSessionKey.of(context.getListenerPort(), context.getVisitorAddress()));
+        }
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
         if (tunnelEntry != null) {

@@ -133,6 +133,18 @@ public class TMSPFrame implements ReferenceCounted {
         }
     }
 
+    public boolean isDatagram() {
+        return (flags & TMSP.FLAG_DATAGRAM) != 0;
+    }
+
+    public void setDatagram(boolean datagram) {
+        if (datagram) {
+            flags |= TMSP.FLAG_DATAGRAM;
+        } else {
+            flags &= ~TMSP.FLAG_DATAGRAM;
+        }
+    }
+
     /**
      * 获取压缩算法类型
      */

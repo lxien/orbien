@@ -1,10 +1,14 @@
 /**
  * 代理配置弹窗 - 协议类型与菜单配置
  */
-  import { ProtocolType } from '@/enums/etp/business'
+import { ProtocolType } from '@/enums/etp/business'
 
 /** 弹窗支持的协议类型 */
-export type ProxyConfigProtocol = ProtocolType.TCP | ProtocolType.HTTP | ProtocolType.HTTPS
+export type ProxyConfigProtocol =
+  | ProtocolType.TCP
+  | ProtocolType.UDP
+  | ProtocolType.HTTP
+  | ProtocolType.HTTPS
 
 export interface ProxyConfigMenuItem {
   key: string
@@ -31,6 +35,12 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     commonMenus.health,
     commonMenus.limit
   ],
+  [ProtocolType.UDP]: [
+    commonMenus.access,
+    commonMenus.trans,
+    commonMenus.health,
+    commonMenus.limit
+  ],
   [ProtocolType.HTTP]: [
     commonMenus.access,
     commonMenus.auth,
@@ -53,6 +63,7 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
 /** 各协议弹窗标题 */
 export const protocolTitleMap: Record<ProxyConfigProtocol, string> = {
   [ProtocolType.TCP]: 'TCP 代理配置',
+  [ProtocolType.UDP]: 'UDP 代理配置',
   [ProtocolType.HTTP]: 'HTTP 代理配置',
   [ProtocolType.HTTPS]: 'HTTPS 代理配置'
 }

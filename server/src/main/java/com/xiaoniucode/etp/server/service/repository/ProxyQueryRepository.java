@@ -19,6 +19,7 @@
 package com.xiaoniucode.etp.server.service.repository;
 
 import com.xiaoniucode.etp.core.domain.ProxyConfigExt;
+import com.xiaoniucode.etp.core.enums.ProtocolType;
 
 import java.util.List;
 
@@ -27,9 +28,13 @@ public interface ProxyQueryRepository {
 
     List<Integer> findAllListenPorts();
 
+    List<Integer> findListenPortsByProtocol(ProtocolType protocolType);
+
     ProxyConfigExt findByAgentAndName(String agentId, String proxyName);
 
     ProxyConfigExt findByListenPort(int listenPort);
+
+    ProxyConfigExt findByListenPort(int listenPort, ProtocolType protocolType);
 
     List<ProxyConfigExt> findByAgentId(String agentId);
 }

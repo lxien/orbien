@@ -5,6 +5,7 @@ enum ProtocolType {
   TCP = 0;
   HTTP = 1;
   HTTPS = 2;
+  UDP = 3;
 }
 
 enum AgentType {

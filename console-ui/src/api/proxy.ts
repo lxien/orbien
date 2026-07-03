@@ -25,6 +25,16 @@ export function fetchGetTcpProxyList(params: Api.Common.CommonSearchParams) {
 }
 
 /**
+ * 获取 UDP 代理列表（分页）
+ */
+export function fetchGetUdpProxyList(params: Api.Common.CommonSearchParams) {
+  return request.get<Api.Common.PaginatedResponse<Api.Proxy.UdpProxyListDTO>>({
+    url: '/api/proxies/udp',
+    params
+  })
+}
+
+/**
  * 获取 HTTP 代理详情
  * @param id 代理 ID
  * @returns HTTP 代理详情
@@ -70,6 +80,15 @@ export function fetchGetTcpProxyById(id: string) {
 }
 
 /**
+ * 获取 UDP 代理详情
+ */
+export function fetchGetUdpProxyById(id: string) {
+  return request.get<Api.Proxy.UdpProxyDetailDTO>({
+    url: `/api/proxies/udp/${id}`
+  })
+}
+
+/**
  * 创建 HTTP 代理
  * @param data 创建参数
  * @returns 响应结果
@@ -109,6 +128,17 @@ export function fetchCreateTcpProxy(data: Api.Proxy.TcpProxyCreateParam) {
 }
 
 /**
+ * 创建 UDP 代理
+ */
+export function fetchCreateUdpProxy(data: Api.Proxy.UdpProxyCreateParam) {
+  return request.post({
+    url: '/api/proxies/udp',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
  * 更新 HTTP 代理
  * @param data 更新参数
  * @returns 响应结果
@@ -142,6 +172,17 @@ export function fetchUpdateHttpsProxy(data: Api.Proxy.HttpsProxyUpdateParam) {
 export function fetchUpdateTcpProxy(data: Api.Proxy.TcpProxyUpdateParam) {
   return request.put({
     url: '/api/proxies/tcp',
+    data,
+    showSuccessMessage: true
+  })
+}
+
+/**
+ * 更新 UDP 代理
+ */
+export function fetchUpdateUdpProxy(data: Api.Proxy.UdpProxyUpdateParam) {
+  return request.put({
+    url: '/api/proxies/udp',
     data,
     showSuccessMessage: true
   })

@@ -14,6 +14,7 @@ import com.xiaoniucode.etp.server.transport.bridge.TunnelBridgeFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
         TunnelBridge tunnelBridge;
-        if (context.isMultiplex()) {
+        if (context.isDatagram()) {
+            tunnelBridge = TunnelBridgeFactory.buildUdpMux(context);
+            logger.debug("UDP 共享隧道建立成功，访问目标: {}", context.getTarget());
+        } else if (context.isMultiplex()) {
             tunnelBridge = TunnelBridgeFactory.buildMux(context);
             logger.debug("共享隧道建立成功，访问目标: {}", context.getTarget());
         } else {
@@ -80,6 +84,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (context.getProtocol().isHttp()) {
             relayHttpFirstPackage(context,visitor, tunnelBridge);
         }
+        if (context.isDatagram()) {
+            relayUdpFirstPacket(context, tunnelBridge);
+        }
+        // TCP 连接按流控制读；UDP 复用 DatagramChannel，必须始终保持可读
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
     }
@@ -92,5 +100,18 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
         tunnelBridge.forwardToLocal(cached);
         visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
+    }
+
+    public void relayUdpFirstPacket(StreamContext context, TunnelBridge tunnelBridge) {
+        ByteBuf cached = context.getPendingFirstPacket();
+        if (cached != null && cached.refCnt() > 0) {
+            logger.debug("转发 UDP 第一个数据包 streamId={}", context.getStreamId());
+            try {
+                tunnelBridge.forwardToLocal(cached);
+            } finally {
+                context.setPendingFirstPacket(null);
+                ReferenceCountUtil.release(cached);
+            }
+        }
     }
 }

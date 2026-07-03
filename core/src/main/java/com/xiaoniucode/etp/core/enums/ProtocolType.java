@@ -15,7 +15,8 @@ import java.util.Map;
 public enum ProtocolType {
     TCP(1, "tcp"),
     HTTP(2, "http"),
-    HTTPS(3, "https");
+    HTTPS(3, "https"),
+    UDP(4, "udp");
     private static final Map<Integer, ProtocolType> TYPE_MAP;
     private static final Map<String, ProtocolType> NAME_MAP;
 
@@ -66,6 +67,10 @@ public enum ProtocolType {
         return protocolType == TCP;
     }
 
+    public static boolean isUdp(ProtocolType protocolType) {
+        return protocolType == UDP;
+    }
+
     public static boolean isHttp(ProtocolType protocolType) {
         return protocolType == HTTP;
     }
@@ -94,6 +99,11 @@ public enum ProtocolType {
         return protocolType == TCP;
     }
 
+    public static boolean isUdp(String protocol) {
+        ProtocolType protocolType = fromName(protocol);
+        return protocolType == UDP;
+    }
+
     public boolean isHttpOrHttps() {
         return this == HTTP || this == HTTPS;
     }
@@ -108,6 +118,12 @@ public enum ProtocolType {
 
     public boolean isTcp() {
         return this == TCP;
+    }
+    public boolean isTcpOrUdp() {
+        return this == TCP||this==UDP;
+    }
+    public boolean isUdp() {
+        return this == UDP;
     }
 
     public int getCode() {

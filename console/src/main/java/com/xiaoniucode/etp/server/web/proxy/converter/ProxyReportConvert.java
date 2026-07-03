@@ -46,8 +46,8 @@ public class ProxyReportConvert {
         proxyDO.setSourceType(ProxySourceType.AGENT);
         proxyDO.setLoadBalanceStrategy(toLoadBalanceType(proxy));
 
-        if (protocol.isTcp()) {
-            applyTcpPorts(proxyDO, proxy, event.getListenPort());
+        if (protocol.isTcpOrUdp()) {
+            applyPorts(proxyDO, proxy, event.getListenPort());
         }
 
         if (proxy.hasTransport()) {
@@ -59,7 +59,7 @@ public class ProxyReportConvert {
         return proxyDO;
     }
 
-    private void applyTcpPorts(ProxyDO proxyDO, Message.Proxy proxy, Integer listenPort) {
+    private void applyPorts(ProxyDO proxyDO, Message.Proxy proxy, Integer listenPort) {
         proxyDO.setListenPort(listenPort);
         if (proxy.hasRemotePort() && proxy.getRemotePort() > 0) {
             proxyDO.setRemotePort(proxy.getRemotePort());

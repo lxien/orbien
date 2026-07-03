@@ -23,6 +23,8 @@ import com.xiaoniucode.etp.server.web.dto.proxy.HttpsProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.HttpProxyListDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyDetailDTO;
 import com.xiaoniucode.etp.server.web.dto.proxy.TcpProxyListDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.UdpProxyDetailDTO;
+import com.xiaoniucode.etp.server.web.dto.proxy.UdpProxyListDTO;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import jakarta.validation.Valid;
@@ -48,6 +50,12 @@ public class ProxyController {
         return Ajax.success();
     }
 
+    @PostMapping("udp")
+    public Ajax createUdpProxy(@RequestBody @Validated UdpProxyCreateParam param) {
+        proxyService.createUdpProxy(param);
+        return Ajax.success();
+    }
+
     @PostMapping("http")
     public Ajax createHttpProxy(@RequestBody @Validated HttpProxyCreateParam param) {
         proxyService.createHttpProxy(param);
@@ -61,6 +69,12 @@ public class ProxyController {
     @PutMapping("tcp")
     public Ajax updateTcpProxy(@RequestBody @Validated TcpProxyUpdateParam param) {
         proxyService.updateTcpProxy(param);
+        return Ajax.success();
+    }
+
+    @PutMapping("udp")
+    public Ajax updateUdpProxy(@RequestBody @Validated UdpProxyUpdateParam param) {
+        proxyService.updateUdpProxy(param);
         return Ajax.success();
     }
 
@@ -80,6 +94,12 @@ public class ProxyController {
         return Ajax.success(proxy);
     }
 
+    @GetMapping("udp/{id}")
+    public Ajax getUdpProxyDetailById(@PathVariable String id) {
+        UdpProxyDetailDTO proxy = proxyService.getUdpProxyById(id);
+        return Ajax.success(proxy);
+    }
+
     @GetMapping("http/{id}")
     public Ajax getHttpProxyDetailById(@PathVariable String id) {
         HttpProxyDetailDTO proxy = proxyService.getHttpProxyById(id);
@@ -93,6 +113,12 @@ public class ProxyController {
     @GetMapping("tcp")
     public Ajax findTcpProxies(@ModelAttribute PageQuery pageQuery) {
         PageResult<TcpProxyListDTO> proxies = proxyService.findTcpProxies(pageQuery);
+        return Ajax.success(proxies);
+    }
+
+    @GetMapping("udp")
+    public Ajax findUdpProxies(@ModelAttribute PageQuery pageQuery) {
+        PageResult<UdpProxyListDTO> proxies = proxyService.findUdpProxies(pageQuery);
         return Ajax.success(proxies);
     }
 

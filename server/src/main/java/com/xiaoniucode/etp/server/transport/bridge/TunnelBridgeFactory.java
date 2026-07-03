@@ -3,6 +3,7 @@ package com.xiaoniucode.etp.server.transport.bridge;
 import com.xiaoniucode.etp.core.transport.TunnelBridge;
 import com.xiaoniucode.etp.server.metrics.MetricsCollector;
 import com.xiaoniucode.etp.server.statemachine.stream.StreamContext;
+import com.xiaoniucode.etp.server.transport.udp.UdpMultiplexTunnelBridge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +35,15 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildMux(StreamContext streamContext) {
         TunnelBridge bridge = new MultiplexTunnelBridge(streamContext);
+        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
+        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
+    }
+
+    /**
+     * 创建 UDP 多路复用隧道桥接
+     */
+    public static TunnelBridge buildUdpMux(StreamContext streamContext) {
+        TunnelBridge bridge = new UdpMultiplexTunnelBridge(streamContext);
         TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
         return new BackpressureTunnelBridge(tunnelBridge, streamContext);
     }

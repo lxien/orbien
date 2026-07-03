@@ -170,6 +170,13 @@ public class ProxyConfig implements Serializable {
         return ProtocolType.isTcp(protocol);
     }
 
+    /**
+     * 是否是 UDP 协议
+     */
+    public boolean isUdp() {
+        return ProtocolType.isUdp(protocol);
+    }
+
     public boolean hasRemotePort() {
         return remotePort != null;
     }

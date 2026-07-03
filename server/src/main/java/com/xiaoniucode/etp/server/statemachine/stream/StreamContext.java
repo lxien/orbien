@@ -9,6 +9,7 @@ import com.xiaoniucode.etp.core.transport.AbstractStreamContext;
 import com.xiaoniucode.etp.core.transport.AttributeKeys;
 import com.xiaoniucode.etp.server.statemachine.agent.AgentContext;
 import com.xiaoniucode.etp.server.transport.BandwidthLimiter;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -33,6 +34,8 @@ public class StreamContext extends AbstractStreamContext {
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
     private final ArrayDeque<TMSPFrame> messagesQueue = new ArrayDeque<>();
+    private InetSocketAddress visitorAddress;
+    private ByteBuf pendingFirstPacket;
 
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {
         this.streamId = streamId;

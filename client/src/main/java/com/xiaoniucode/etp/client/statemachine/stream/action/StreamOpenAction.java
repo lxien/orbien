@@ -49,6 +49,11 @@ public class StreamOpenAction extends StreamBaseAction {
             streamContext.setLocalIp(localIp);
             streamContext.setLocalPort(localPort);
 
+            if (streamContext.isDatagram()) {
+                openDatagramStream(streamContext, agentContext, control, streamId);
+                return;
+            }
+
             Bootstrap serverBootstrap = agentContext.getServerBootstrap();
             serverBootstrap.connect(localIp, localPort).addListener((ChannelFutureListener) serverFuture -> {
                 if (serverFuture.isSuccess()) {
@@ -155,5 +160,61 @@ public class StreamOpenAction extends StreamBaseAction {
 
         logger.error("重试 {} 次后仍未获取到可用连接", MAX_RETRY_COUNT);
         return null;
+    }
+
+    private void openDatagramStream(StreamContext streamContext,
+                                    AgentContext agentContext,
+                                    Channel control,
+                                    int streamId) {
+        Bootstrap udpBootstrap = agentContext.getUdpServerBootstrap();
+        udpBootstrap.bind(0).addListener((ChannelFutureListener) bindFuture -> {
+            if (!bindFuture.isSuccess()) {
+                logger.error("UDP 流打开失败 - 无法绑定本地端口，streamId={}", streamId, bindFuture.cause());
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            Channel server = bindFuture.channel();
+            server.attr(AttributeKeys.STREAM_ID).set(streamId);
+
+            TunnelEntry tunnelEntry = getOrCreateTunnel(streamContext);
+            if (tunnelEntry == null) {
+                logger.error("没有可用连接，关闭 UDP 流 {}", streamId);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            if (!control.isActive()) {
+                logger.error("控制连接不可用，关闭 UDP 流 {}", streamId);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+
+            streamContext.setServer(server);
+            streamContext.setTunnelEntry(tunnelEntry);
+
+            Integer connectionId = agentContext.getConnectionId();
+            Message.OpenStreamResponse response = Message.OpenStreamResponse.newBuilder()
+                    .setStatus(Message.Status.newBuilder().setCode(0).build())
+                    .setConnectionId(connectionId)
+                    .setTunnelId(tunnelEntry.getTunnelId())
+                    .build();
+            ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
+            TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
+            frame.setCompressed(streamContext.isCompress());
+            frame.setEncrypted(streamContext.isEncrypt());
+            frame.setMultiplexTunnel(true);
+            frame.setDatagram(true);
+            control.writeAndFlush(frame).addListener(f -> {
+                if (f.isSuccess()) {
+                    TunnelBridge tunnelBridge = TunnelBridgeFactory.buildMux(streamContext);
+                    tunnelBridge.open();
+                    streamContext.setTunnelBridge(tunnelBridge);
+                    streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                    tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
+                    logger.debug("UDP 流打开成功 - [目标地址={}，目标端口={}]", streamContext.getLocalIp(), streamContext.getLocalPort());
+                } else {
+                    streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                }
+            });
+        });
     }
 }
