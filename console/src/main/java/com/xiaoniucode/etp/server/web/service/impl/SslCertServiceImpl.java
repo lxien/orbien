@@ -26,21 +26,20 @@ import com.xiaoniucode.etp.server.web.common.message.PageQuery;
 import com.xiaoniucode.etp.server.web.common.message.PageResult;
 import com.xiaoniucode.etp.server.web.common.utils.DateUtil;
 import com.xiaoniucode.etp.server.web.common.utils.SslParser;
+import com.xiaoniucode.etp.server.web.dto.binding.CertBindResultDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDTO;
 import com.xiaoniucode.etp.server.web.dto.ssl.SslCertDownloadDTO;
-import com.xiaoniucode.etp.server.web.entity.CertDeployDO;
 import com.xiaoniucode.etp.server.web.entity.SslCertDO;
+import com.xiaoniucode.etp.server.web.enums.CertSource;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
-import com.xiaoniucode.etp.server.web.param.ssl.SslCertDeployParam;
+import com.xiaoniucode.etp.server.web.param.binding.CertBindParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveAndDeployParam;
 import com.xiaoniucode.etp.server.web.param.ssl.SslCertSaveParam;
-import com.xiaoniucode.etp.server.web.repository.CertDeployRepository;
+import com.xiaoniucode.etp.server.web.repository.CertDomainBindingRepository;
 import com.xiaoniucode.etp.server.web.repository.SslCertRepository;
-import com.xiaoniucode.etp.server.web.service.CertDeployService;
+import com.xiaoniucode.etp.server.web.service.CertBindingService;
 import com.xiaoniucode.etp.server.web.service.SslCertificateService;
 import com.xiaoniucode.etp.server.web.service.converter.SslCertConvert;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +47,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -57,7 +57,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -66,15 +68,14 @@ public class SslCertServiceImpl implements SslCertificateService {
     @Autowired
     private SslCertRepository sslCertRepository;
     @Autowired
-    private CertDeployRepository certDeployRepository;
+    private CertDomainBindingRepository certDomainBindingRepository;
     @Autowired
     private SslCertConvert sslCertConvert;
     @Autowired
     private UidGenerator uidGenerator;
     @Autowired
-    private CertDeployService certDeployService;
-    @PersistenceContext
-    private EntityManager entityManager;
+    private CertBindingService certBindingService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public SslCertDTO saveCert(SslCertSaveParam param) {
@@ -94,6 +95,7 @@ public class SslCertServiceImpl implements SslCertificateService {
         sslCertDO.setOrg(sslInfo.organization);
         sslCertDO.setSanDomains(String.join(",", sslInfo.dns));
         sslCertDO.setFingerprint(sslInfo.sha256Fingerprint);
+        sslCertDO.setSource(CertSource.MANUAL);
         LocalDate notBefore = DateUtil.toLocalDate(sslInfo.issuedAt);
         LocalDate notAfter = DateUtil.toLocalDate(sslInfo.expiresAt);
         sslCertDO.setNotBefore(notBefore);
@@ -130,7 +132,7 @@ public class SslCertServiceImpl implements SslCertificateService {
         sslCertDO.setFullChainPath(fullChainFile.getAbsolutePath());
 
         sslCertRepository.saveAndFlush(sslCertDO);
-        return sslCertConvert.toDTO(sslCertDO);
+        return sslCertConvert.toDTO(sslCertDO, 0L);
     }
 
     @Override
@@ -141,7 +143,15 @@ public class SslCertServiceImpl implements SslCertificateService {
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
-        List<SslCertDTO> dtoList = sslCertConvert.toDTOList(resultPage.getContent());
+        List<String> certIds = resultPage.getContent().stream().map(SslCertDO::getId).toList();
+        Map<String, Long> usageCountMap = certDomainBindingRepository.findByCertIdIn(certIds).stream()
+                .collect(Collectors.groupingBy(
+                        binding -> binding.getCertId(),
+                        Collectors.counting()
+                ));
+        List<SslCertDTO> dtoList = resultPage.getContent().stream()
+                .map(cert -> sslCertConvert.toDTO(cert, usageCountMap.getOrDefault(cert.getId(), 0L)))
+                .toList();
         return PageResult.wrap(resultPage, dtoList);
     }
 
@@ -179,8 +189,8 @@ public class SslCertServiceImpl implements SslCertificateService {
             return;
         }
 
-        if (certDeployRepository.existsByCertIdIn(ids)) {
-            throw new BizException("证书已被部署使用，无法删除");
+        if (certDomainBindingRepository.existsByCertIdIn(ids)) {
+            throw new BizException("证书已被域名绑定使用，无法删除");
         }
 
         List<SslCertDO> certificates = sslCertRepository.findAllById(ids);
@@ -237,31 +247,27 @@ public class SslCertServiceImpl implements SslCertificateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveAndDeployCert(SslCertSaveAndDeployParam param) {
-        String proxyId = param.getProxyId();
-        // 解析证书
+    public CertBindResultDTO saveAndDeployCert(SslCertSaveAndDeployParam param) {
         SslParser.SslInfo sslInfo = SslParser.parsePem(param.getFullChain());
         if (sslInfo.hasError()) {
             throw new BizException("证书不可用");
         }
         String sha256Fingerprint = sslInfo.getSha256Fingerprint();
-        //根据证书指纹查询证书
         SslCertDO sslCertDO = sslCertRepository.findByFingerprint(sha256Fingerprint);
-        boolean existsCerts = sslCertDO != null;
         String certId;
-        //如果证书不存在，则创建一个证书
-        if (!existsCerts) {
+        if (sslCertDO == null) {
             certId = this.saveCert(new SslCertSaveParam(param.getKey(), param.getFullChain())).getId();
         } else {
             certId = sslCertDO.getId();
         }
-        CertDeployDO certDeployDO = certDeployRepository.findByProxyId(proxyId);
 
-        if (certDeployDO != null) {
-            certDeployService.deleteDeploy(certDeployDO.getId());
-            entityManager.flush();
-            entityManager.clear();
+        if (!CollectionUtils.isEmpty(param.getProxyDomainIds())) {
+            CertBindParam bindParam = new CertBindParam();
+            bindParam.setCertId(certId);
+            bindParam.setProxyDomainIds(param.getProxyDomainIds());
+            bindParam.setOverride(true);
+            return certBindingService.bind(bindParam);
         }
-        certDeployService.deployAndOverride(new SslCertDeployParam(certId, List.of(proxyId)));
+        return certBindingService.bindMatchingDomainsForProxy(certId, param.getProxyId(), true);
     }
 }

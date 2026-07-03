@@ -99,6 +99,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
 
     List<ProxyDO> findByAgentId(String agentId);
 
+    List<ProxyDO> findByProtocol(ProtocolType protocol);
+
     @Query("""
             SELECT new com.xiaoniucode.etp.server.web.dto.proxy.ProxyListQueryResult(a, p)
             FROM ProxyDO p

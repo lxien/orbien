@@ -31,10 +31,14 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface SslCertConvert {
     @Mapping(target = "status", expression = "java(sslCertificate.getStatus().getCode())")
-    @Mapping(target = "sanDomains", source = "sanDomains", qualifiedByName = "stringToList")
-    SslCertDTO toDTO(SslCertDO sslCertificate);
+    @Mapping(target = "source", expression = "java(sslCertificate.getSource() != null ? sslCertificate.getSource().getCode() : 1)")
+    @Mapping(target = "sanDomains", source = "sslCertificate.sanDomains", qualifiedByName = "stringToList")
+    @Mapping(target = "boundDomainCount", source = "boundDomainCount")
+    SslCertDTO toDTO(SslCertDO sslCertificate, Long boundDomainCount);
 
-    List<SslCertDTO> toDTOList(List<SslCertDO> sslCertificateList);
+    default SslCertDTO toDTO(SslCertDO sslCertificate) {
+        return toDTO(sslCertificate, 0L);
+    }
 
     @Named("stringToList")
     default List<String> stringToList(String value) {

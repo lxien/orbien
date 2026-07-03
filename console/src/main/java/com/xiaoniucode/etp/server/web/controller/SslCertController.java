@@ -41,8 +41,7 @@ public class SslCertController {
     }
     @PostMapping("save-and-deploy")
     public Ajax saveAndDeploy(@RequestBody SslCertSaveAndDeployParam param) {
-        sslCertificateService.saveAndDeployCert(param);
-        return Ajax.success();
+        return Ajax.success(sslCertificateService.saveAndDeployCert(param));
     }
     @GetMapping
     public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {

@@ -41,7 +41,7 @@ public class ProxyDomainDO {
     @Column(name = "proxy_id", nullable = false)
     private String proxyId;
     /**
-     * 原始域名 子域名/自定义域名(完整域名)
+     * 原始域名 子域名前缀/自定义域名(完整域名)
      */
     @Column(nullable = false)
     private String domain;

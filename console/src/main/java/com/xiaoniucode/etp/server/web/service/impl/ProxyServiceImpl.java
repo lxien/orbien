@@ -31,6 +31,7 @@ import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.param.proxy.*;
 import com.xiaoniucode.etp.server.web.proxy.service.ProxyConfigSyncService;
 import com.xiaoniucode.etp.server.web.repository.*;
+import com.xiaoniucode.etp.server.web.service.CertBindingSyncService;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import com.xiaoniucode.etp.server.web.service.ProxyService;
 import com.xiaoniucode.etp.server.web.service.converter.*;
@@ -91,6 +92,8 @@ public class ProxyServiceImpl implements ProxyService {
     private TransactionHelper transactionHelper;
     @Autowired
     private ProxyConfigSyncService proxyConfigSyncService;
+    @Autowired
+    private CertBindingSyncService certBindingSyncService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -168,6 +171,9 @@ public class ProxyServiceImpl implements ProxyService {
         if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
             // 自动域名类型未变化，保留已有域名
         } else {
+            if (protocol.isHttps()) {
+                certBindingSyncService.removeBindingsByProxyId(proxyId);
+            }
             proxyDomainRepository.deleteByProxyId(proxyId);
             saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
@@ -674,8 +680,11 @@ public class ProxyServiceImpl implements ProxyService {
         //IP CIDR
         accessControlRepository.deleteByProxyIdIn(ids);
         accessControlRuleRepository.deleteByProxyIdIn(ids);
-        //HTTP
-        if (protocolType.isHttp()) {
+        //HTTP / HTTPS
+        if (protocolType.isHttpOrHttps()) {
+            if (protocolType.isHttps()) {
+                certBindingSyncService.removeBindingsByProxyIds(ids);
+            }
             proxyDomainRepository.deleteByProxyIdIn(ids);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);

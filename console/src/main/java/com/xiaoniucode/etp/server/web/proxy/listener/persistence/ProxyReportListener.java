@@ -27,6 +27,7 @@ import com.xiaoniucode.etp.server.event.ProxyAddEvent;
 import com.xiaoniucode.etp.server.web.entity.*;
 import com.xiaoniucode.etp.server.web.proxy.converter.ProxyReportConvert;
 import com.xiaoniucode.etp.server.web.repository.*;
+import com.xiaoniucode.etp.server.web.service.CertBindingSyncService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,8 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     private TransactionTemplate transactionTemplate;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private CertBindingSyncService certBindingSyncService;
 
     @PostConstruct
     public void init() {
@@ -178,6 +181,7 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     }
 
     private void persistDomains(String proxyId, List<DomainInfo> domains) {
+        certBindingSyncService.removeBindingsByProxyId(proxyId);
         proxyDomainRepository.deleteByProxyId(proxyId);
         if (CollectionUtils.isEmpty(domains)) {
             return;

@@ -46,5 +46,5 @@ public interface SslCertificateService {
      */
     void downloadCert(String certId, HttpServletResponse response);
 
-    void saveAndDeployCert(SslCertSaveAndDeployParam param);
+    com.xiaoniucode.etp.server.web.dto.binding.CertBindResultDTO saveAndDeployCert(SslCertSaveAndDeployParam param);
 }

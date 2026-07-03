@@ -1,22 +1,17 @@
 <template>
   <div class="ssl-page art-full-height">
     <ElCard class="art-table-card">
-      <!-- 表格头部 -->
       <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
         <template #left>
           <ElSpace wrap>
             <ElButton type="primary" @click="handleAdd" v-ripple>上传证书</ElButton>
-            <ElButton
-              @click="handleBatchDelete"
-              v-ripple
-              :disabled="selectedRows.length === 0"
-              >批量删除</ElButton
-            >
+            <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">
+              批量删除
+            </ElButton>
           </ElSpace>
         </template>
       </ArtTableHeader>
 
-      <!-- 表格 -->
       <ArtTable
         :loading="loading"
         :data="data"
@@ -25,25 +20,20 @@
         @selection-change="handleSelectionChange"
         @pagination:size-change="handleSizeChange"
         @pagination:current-change="handleCurrentChange"
-      >
-      </ArtTable>
+      />
     </ElCard>
 
     <SslDialog v-model:visible="dialogVisible" @submit="handleUploadSubmit" />
-    <DeployDialog
-      v-model:visible="deployDialogVisible"
-      :cert-id="currentCertId"
-      @submit="handleDeploySubmit"
-    />
+    <BindDialog v-model:visible="bindDialogVisible" :cert-id="currentCertId" @submit="handleBindSubmit" />
   </div>
 </template>
 
 <script setup lang="ts">
   import { ref, h } from 'vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { ElMessage, ElMessageBox, ElButton } from 'element-plus'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import SslDialog from './modules/ssl-dialog.vue'
-  import DeployDialog from './modules/deploy-dialog.vue'
+  import BindDialog from './modules/bind-dialog.vue'
   import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert } from '@/api/ssl'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { downloadBlob } from '@/utils/download'
@@ -54,7 +44,7 @@
 
   const selectedRows = ref<SslItem[]>([])
   const dialogVisible = ref(false)
-  const deployDialogVisible = ref(false)
+  const bindDialogVisible = ref(false)
   const currentCertId = ref<string | null>(null)
 
   const getExpireDays = (item: SslItem) => {
@@ -89,16 +79,22 @@
         {
           prop: 'sanDomains',
           label: '认证域名',
-          minWidth: 100,
+          minWidth: 120,
           formatter: (row: SslItem) => row.sanDomains?.join(', ') || ''
         },
         {
           prop: 'org',
-          label: '证书分类',
+          label: '证书分类'
         },
         {
           prop: 'issuer',
-          label: '证书品牌',
+          label: '证书品牌'
+        },
+        {
+          prop: 'boundDomainCount',
+          label: '使用域名数',
+          width: 100,
+          formatter: (row: SslItem) => row.boundDomainCount ?? 0
         },
         {
           prop: 'notAfter',
@@ -119,8 +115,8 @@
               children.push(
                 h(ArtButtonTable, {
                   type: 'link',
-                  text: '部署',
-                  onClick: () => handleDeploy(row)
+                  text: '绑定',
+                  onClick: () => handleBind(row)
                 }),
                 h(ArtButtonTable, {
                   type: 'link',
@@ -142,6 +138,7 @@
       ]
     }
   })
+
   const handleSelectionChange = (selection: SslItem[]): void => {
     selectedRows.value = selection
   }
@@ -154,7 +151,7 @@
     refreshData()
   }
 
-  const handleDeploySubmit = () => {
+  const handleBindSubmit = () => {
     refreshData()
   }
 
@@ -175,15 +172,13 @@
       ElMessage.success('删除成功')
       refreshData()
     } catch (error) {
-      if (error === 'cancel') {
-        return
-      }
+      if (error === 'cancel') return
     }
   }
 
-  const handleDeploy = (row: SslItem) => {
+  const handleBind = (row: SslItem) => {
     currentCertId.value = row.id || null
-    deployDialogVisible.value = true
+    bindDialogVisible.value = true
   }
 
   const handleDownload = async (row: SslItem) => {
@@ -192,7 +187,6 @@
       const fileName = `${row.sanDomains?.join('_') || 'cert'}.zip`
       downloadBlob(blob, fileName)
     } catch (error: any) {
-      console.error('下载失败:', error)
       ElMessage.error(error?.message || '下载失败')
     }
   }
@@ -208,9 +202,7 @@
       ElMessage.success('删除成功')
       refreshData()
     } catch (error) {
-      if (error === 'cancel') {
-        return
-      }
+      if (error === 'cancel') return
     }
   }
 </script>

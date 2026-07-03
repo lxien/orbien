@@ -19,6 +19,7 @@
 package com.xiaoniucode.etp.server.web.entity;
 
 import com.xiaoniucode.etp.server.web.entity.converter.SslStatusConverter;
+import com.xiaoniucode.etp.server.web.enums.CertSource;
 import com.xiaoniucode.etp.server.web.enums.SslStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -57,6 +58,12 @@ public class SslCertDO {
      */
     @Column(name = "san_domains")
     private String sanDomains;
+    /**
+     * 证书来源
+     */
+    @Column(name = "cert_source")
+    @Convert(converter = com.xiaoniucode.etp.server.web.entity.converter.CertSourceConverter.class)
+    private CertSource source;
 
     /**
      * 证书状态

@@ -1,80 +1,35 @@
 <template>
   <div class="ssl-page">
     <div class="ssl-page-content">
-      <ElTabs v-model="activeName" type="card">
-        <template #add-icon>
-          <ElSwitch v-model="forceHttps" />
-        </template>
-        <ElTabPane name="current-cert">
-          <template #label>
-            <span>
-              当前证书-[
-              <span
-                :style="{
-                  color: sslStatus === 1 ? 'var(--el-color-primary)' : 'var(--el-color-danger)'
-                }"
-              >
-                {{ sslStatus === 1 ? '已部署SSL' : '未部署SSL' }}
-              </span>
-              ]
-            </span>
-          </template>
-          <div class="tab-content">
-            <div v-if="sslDeployInfo" class="ssl-info">
-              <div class="info-column">
-                <div class="info-item">
-                  <span class="info-label">证书分类</span>
-                  <span class="info-value">{{ sslDeployInfo.org }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">认证域名</span>
-                  <span class="info-value">{{ sslDeployInfo.sanDomains?.join(', ') || '' }}</span>
-                </div>
-              </div>
-              <div class="info-column">
-                <div class="info-item">
-                  <span class="info-label">证书品牌</span>
-                  <span class="info-value">{{ sslDeployInfo.issuer }}</span>
-                </div>
-                <div class="info-item">
-                  <span class="info-label">到期时间</span>
-                  <span class="info-value">{{ formatDate(sslDeployInfo.notAfter) }}</span>
-                </div>
-              </div>
-            </div>
-            <div v-else class="ssl-info ssl-info--empty">
-              <span class="ssl-empty-text">暂未配置SSL证书</span>
-            </div>
-            <div class="form-wrapper">
-              <div class="form-item">
-                <div class="form-label">私钥(KEY)</div>
-                <ElInput v-model="certData.keyContent" type="textarea" resize="none" />
-              </div>
+      <div v-if="matrix" class="ssl-summary">
+        <span>域名证书：{{ matrix.boundCount }}/{{ matrix.totalDomains }} 已配置</span>
+        <ElTag v-if="matrix.warningCount > 0" type="warning" size="small">
+          {{ matrix.warningCount }} 个异常
+        </ElTag>
+      </div>
 
-              <div class="form-item">
-                <div class="form-label">证书(PEM格式)</div>
-                <ElInput v-model="certData.certContent" type="textarea" resize="none" />
-              </div>
+      <ElTabs v-model="activeName" type="card">
+        <ElTabPane label="域名证书" name="domain-cert">
+          <div class="tab-content">
+            <div class="toolbar">
+              <ElButton type="primary" @click="openUploadDialog">上传并绑定</ElButton>
+              <ElButton @click="handleDisableAll" :disabled="!matrix?.boundCount">全部禁用</ElButton>
             </div>
-            <div class="form-actions">
-              <ElSpace v-if="sslStatus !== 1">
-                <ElButton type="primary" @click="handleSaveAndDeploy">保存并部署证书</ElButton>
-                <ElButton v-if="sslDeployInfo" @click="handleDownloadCurrentCert"
-                  >下载证书</ElButton
-                >
-              </ElSpace>
-              <ElSpace v-else>
-                <ElButton type="primary" @click="handleSaveAndDeploy">保存</ElButton>
-                <ElButton @click="handleDownloadCurrentCert">下载证书</ElButton>
-                <ElButton @click="handleCloseSsl">关闭SSL</ElButton>
-              </ElSpace>
-            </div>
+
+            <ArtTable
+              row-key="proxyDomainId"
+              :show-table-header="false"
+              :loading="matrixLoading"
+              :data="matrix?.domains || []"
+              :columns="domainColumns"
+            />
           </div>
         </ElTabPane>
+
         <ElTabPane label="证书夹" name="cert-folder">
           <div class="cert-folder-content">
             <ArtTable
-              rowKey="id"
+              row-key="id"
               :show-table-header="false"
               :loading="certLoading"
               :data="certTableData"
@@ -87,48 +42,223 @@
         </ElTabPane>
       </ElTabs>
     </div>
+
+    <ElDialog v-model="uploadDialogVisible" title="上传并绑定证书" width="720px" align-center>
+      <div class="upload-form">
+        <div class="form-item">
+          <div class="form-label">绑定域名</div>
+          <ElSelect v-model="uploadForm.proxyDomainIds" multiple placeholder="选择要绑定的域名" style="width: 100%">
+            <ElOption
+              v-for="item in matrix?.domains || []"
+              :key="item.proxyDomainId"
+              :label="item.fullDomain"
+              :value="item.proxyDomainId"
+            />
+          </ElSelect>
+        </div>
+        <div class="form-item">
+          <div class="form-label">私钥(KEY)</div>
+          <ElInput v-model="uploadForm.keyContent" type="textarea" :rows="8" resize="none" />
+        </div>
+        <div class="form-item">
+          <div class="form-label">证书(PEM格式)</div>
+          <ElInput v-model="uploadForm.certContent" type="textarea" :rows="8" resize="none" />
+        </div>
+      </div>
+      <template #footer>
+        <ElButton @click="uploadDialogVisible = false">取消</ElButton>
+        <ElButton type="primary" :loading="uploadSubmitting" @click="handleUploadAndBind">保存并绑定</ElButton>
+      </template>
+    </ElDialog>
+
+    <ElDialog v-model="bindDialogVisible" title="绑定证书" width="520px" align-center>
+      <div v-if="currentBindDomain">
+        为域名 <strong>{{ currentBindDomain.fullDomain }}</strong> 选择证书：
+      </div>
+      <ElSelect v-model="selectedCertId" placeholder="请选择证书" style="width: 100%; margin-top: 16px">
+        <ElOption
+          v-for="cert in matchedCerts"
+          :key="cert.id"
+          :label="`${cert.sanDomains?.join(', ')} (${formatDate(cert.notAfter)})`"
+          :value="cert.id"
+        />
+      </ElSelect>
+      <template #footer>
+        <ElButton @click="bindDialogVisible = false">取消</ElButton>
+        <ElButton type="primary" :disabled="!selectedCertId" @click="confirmBindCert">确定</ElButton>
+      </template>
+    </ElDialog>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch, h } from 'vue'
+  import { ref, reactive, watch, h, computed } from 'vue'
   import { useTable } from '@/hooks/core/useTable'
-  import { ElMessage, ElMessageBox } from 'element-plus'
+  import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+  import { fetchGetCertListByPage, fetchDeleteCert, fetchSaveAndDeployCert } from '@/api/ssl'
   import {
-    fetchGetCertListByPage,
-    fetchDownloadCert,
-    fetchDeleteCert,
-    fetchSaveAndDeployCert
-  } from '@/api/ssl'
-  import { downloadBlob } from '@/utils/download'
-  import { fetchGetSslDeployInfo, fetchCloseSsl, fetchDeployCert } from '@/api/deploy'
-
-  type SslDeployInfoDTO = Awaited<ReturnType<typeof fetchGetSslDeployInfo>>
+    fetchGetProxyCertMatrix,
+    fetchBindCert,
+    fetchDisableBinding,
+    fetchEnableBinding,
+    fetchUnbindBinding,
+    fetchRedeployBinding,
+    fetchDisableAllBindingsByProxy
+  } from '@/api/cert-binding'
 
   defineOptions({ name: 'SslPage' })
 
-  const props = defineProps<{
-    proxyId: string
-  }>()
+  const props = defineProps<{ proxyId: string }>()
 
-  const activeName = ref('current-cert')
-  const sslStatus = ref(0)
-  const forceHttps = ref(false)
-  const certData = reactive({
+  const activeName = ref('domain-cert')
+  const matrixLoading = ref(false)
+  const matrix = ref<Api.CertBinding.ProxyCertMatrix | null>(null)
+
+  const uploadDialogVisible = ref(false)
+  const uploadSubmitting = ref(false)
+  const uploadForm = reactive({
+    proxyDomainIds: [] as number[],
     keyContent: '',
     certContent: ''
   })
-  const sslDeployInfo = ref<SslDeployInfoDTO | null>(null)
+
+  const bindDialogVisible = ref(false)
+  const selectedCertId = ref('')
+  const currentBindDomain = ref<Api.CertBinding.ProxyDomainCertItem | null>(null)
+  const allCerts = ref<Api.Ssl.CertDTO[]>([])
+
+  const matchedCerts = computed(() => {
+    if (!currentBindDomain.value) return []
+    const domain = currentBindDomain.value.fullDomain
+    return allCerts.value.filter((cert) => isDomainMatchedByCert(domain, cert))
+  })
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
   }
+
+  const bindStatusTag = (status?: number) => {
+    const map: Record<number, { text: string; type: 'success' | 'warning' | 'danger' | 'info' }> = {
+      1: { text: '正常', type: 'success' },
+      2: { text: '已禁用', type: 'warning' },
+      3: { text: 'SAN不匹配', type: 'danger' },
+      4: { text: '已过期', type: 'danger' },
+      5: { text: '部署失败', type: 'danger' }
+    }
+    if (!status) {
+      return h(ElTag, { type: 'info', size: 'small' }, () => '未配置')
+    }
+    const item = map[status] || { text: '未知', type: 'info' }
+    return h(ElTag, { type: item.type, size: 'small' }, () => item.text)
+  }
+
+  const isDomainMatchedByCert = (domain: string, cert: Api.Ssl.CertDTO) => {
+    const sanList = cert.sanDomains || []
+    const normalized = domain.trim().toLowerCase()
+    return sanList.some((san) => {
+      const s = san.trim().toLowerCase()
+      if (normalized === s) return true
+      if (s.startsWith('*.')) {
+        const suffix = s.substring(1)
+        return normalized.endsWith(suffix) && normalized.length > suffix.length && !normalized.slice(0, -suffix.length).includes('.')
+      }
+      return false
+    })
+  }
+
+  const domainColumns = computed(() => [
+    {
+      prop: 'fullDomain',
+      label: '域名',
+      minWidth: 160
+    },
+    {
+      prop: 'binding',
+      label: '证书 SAN',
+      minWidth: 160,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+        row.binding?.certSanDomains?.join(', ') || '-'
+    },
+    {
+      prop: 'notAfter',
+      label: '到期时间',
+      width: 120,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+        row.binding?.notAfter ? formatDate(row.binding.notAfter) : '-'
+    },
+    {
+      prop: 'status',
+      label: '状态',
+      width: 100,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) =>
+        bindStatusTag(row.binding?.bindStatus)
+    },
+    {
+      prop: 'operation',
+      label: '操作',
+      width: 220,
+      formatter: (row: Api.CertBinding.ProxyDomainCertItem) => {
+        const binding = row.binding
+        if (!binding) {
+          return h(ArtButtonTable, {
+            type: 'link',
+            text: '绑定证书',
+            onClick: () => openBindDialog(row)
+          })
+        }
+        const actions = []
+        if (binding.bindStatus === 2) {
+          actions.push(
+            h(ArtButtonTable, {
+              type: 'link',
+              text: '启用',
+              onClick: () => handleEnable(binding.bindingId)
+            })
+          )
+        } else if (binding.bindStatus === 5) {
+          actions.push(
+            h(ArtButtonTable, {
+              type: 'link',
+              text: '重试',
+              onClick: () => handleRedeploy(binding.bindingId)
+            })
+          )
+        } else if (binding.bindStatus === 1) {
+          actions.push(
+            h(ArtButtonTable, {
+              type: 'link',
+              text: '换证',
+              onClick: () => openBindDialog(row)
+            }),
+            h(ArtButtonTable, {
+              type: 'link',
+              text: '禁用',
+              onClick: () => handleDisable(binding.bindingId)
+            })
+          )
+        } else {
+          actions.push(
+            h(ArtButtonTable, {
+              type: 'link',
+              text: '换证',
+              onClick: () => openBindDialog(row)
+            })
+          )
+        }
+        actions.push(
+          h(ArtButtonTable, {
+            type: 'link',
+            text: '解绑',
+            onClick: () => handleUnbind(binding.bindingId)
+          })
+        )
+        return h('div', actions)
+      }
+    }
+  ])
 
   const {
     columns: certColumns,
@@ -136,14 +266,12 @@
     loading: certLoading,
     pagination: certPagination,
     handleSizeChange: handleCertSizeChange,
-    handleCurrentChange: handleCertCurrentChange
+    handleCurrentChange: handleCertCurrentChange,
+    getData: reloadCertList
   } = useTable({
     core: {
       apiFn: fetchGetCertListByPage,
-      apiParams: {
-        current: 1,
-        size: 10
-      },
+      apiParams: { current: 1, size: 10 },
       columnsFactory: () => [
         {
           prop: 'sanDomains',
@@ -153,30 +281,25 @@
         },
         {
           prop: 'issuer',
-          label: '证书分类',
-          minWidth: 100
-        },
-        {
-          prop: 'issuer0',
           label: '品牌',
           minWidth: 100
         },
         {
           prop: 'notAfter',
           label: '到期时间',
-          minWidth: 180,
+          minWidth: 120,
           formatter: (row: Api.Ssl.CertDTO) => formatDate(row.notAfter)
         },
         {
           prop: 'operation',
           label: '操作',
-          width: 180,
+          width: 160,
           formatter: (row: Api.Ssl.CertDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
-                text: '部署',
-                onClick: () => handleCertDeploy(row)
+                text: '绑定到本代理',
+                onClick: () => handleBindCertToProxy(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
@@ -189,132 +312,149 @@
     }
   })
 
+  const loadMatrix = async () => {
+    if (!props.proxyId) return
+    matrixLoading.value = true
+    try {
+      matrix.value = await fetchGetProxyCertMatrix(props.proxyId)
+    } finally {
+      matrixLoading.value = false
+    }
+  }
+
+  const loadAllCerts = async () => {
+    const page = await fetchGetCertListByPage({ current: 1, size: 200 })
+    allCerts.value = page.records || []
+  }
+
   watch(
     () => props.proxyId,
-    async (proxyId) => {
-      if (!proxyId) return
-      await loadSslDeployInfo()
+    async () => {
+      await Promise.all([loadMatrix(), loadAllCerts(), reloadCertList()])
     },
     { immediate: true }
   )
 
-  const loadSslDeployInfo = async () => {
+  const openUploadDialog = () => {
+    uploadForm.proxyDomainIds = (matrix.value?.domains || [])
+      .filter((item) => !item.binding)
+      .map((item) => item.proxyDomainId)
+    uploadForm.keyContent = ''
+    uploadForm.certContent = ''
+    uploadDialogVisible.value = true
+  }
+
+  const handleUploadAndBind = async () => {
+    if (!uploadForm.keyContent.trim() || !uploadForm.certContent.trim()) {
+      ElMessage.warning('请输入完整的私钥和证书')
+      return
+    }
+    if (uploadForm.proxyDomainIds.length === 0) {
+      ElMessage.warning('请选择至少一个绑定域名')
+      return
+    }
+    uploadSubmitting.value = true
     try {
-      const data = await fetchGetSslDeployInfo(props.proxyId)
-      if (data) {
-        sslDeployInfo.value = data
-        sslStatus.value = data.enabled ? 1 : 0
-        certData.keyContent = data.keyPem || ''
-        certData.certContent = data.fullChainPem || ''
+      const result = await fetchSaveAndDeployCert({
+        proxyId: props.proxyId,
+        key: uploadForm.keyContent.trim(),
+        fullChain: uploadForm.certContent.trim(),
+        proxyDomainIds: uploadForm.proxyDomainIds
+      })
+      if (result.failedCount > 0) {
+        ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
       } else {
-        sslDeployInfo.value = null
-        sslStatus.value = 0
-        certData.keyContent = ''
-        certData.certContent = ''
+        ElMessage.success('证书已保存并绑定')
       }
-    } catch {
-      sslDeployInfo.value = null
-      sslStatus.value = 0
-      certData.keyContent = ''
-      certData.certContent = ''
+      uploadDialogVisible.value = false
+      await Promise.all([loadMatrix(), reloadCertList()])
+      activeName.value = 'domain-cert'
+    } finally {
+      uploadSubmitting.value = false
     }
   }
 
-  const handleCertDeploy = async (row: Api.Ssl.CertDTO) => {
-    try {
-      const message = sslStatus.value === 1 ? '部署将覆盖原有证书，是否继续？' : '确定部署该证书？'
-      await ElMessageBox.confirm(message, '部署证书', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      await fetchDeployCert({
-        certId: row.id,
-        proxyIds: [props.proxyId]
-      })
-      ElMessage.success('证书部署成功')
-      await loadSslDeployInfo()
-      activeName.value = 'current-cert'
-    } catch (error) {
-      if (error === 'cancel') {
-        return
-      }
-    }
+  const openBindDialog = async (row: Api.CertBinding.ProxyDomainCertItem) => {
+    currentBindDomain.value = row
+    selectedCertId.value = row.binding?.certId || ''
+    await loadAllCerts()
+    bindDialogVisible.value = true
   }
 
-  const handleSaveAndDeploy = async () => {
-    if (!certData.keyContent.trim()) {
-      ElMessage.warning('请输入私钥(KEY)')
-      return
-    }
-    if (!certData.certContent.trim()) {
-      ElMessage.warning('请输入证书(PEM格式)')
-      return
-    }
-    if (sslStatus.value === 1) {
-      await ElMessageBox.confirm('保存将覆盖原有证书，是否继续？', '保存证书', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-    }
-    await fetchSaveAndDeployCert({
-      proxyId: props.proxyId,
-      key: certData.keyContent.trim(),
-      fullChain: certData.certContent.trim()
+  const confirmBindCert = async () => {
+    if (!currentBindDomain.value || !selectedCertId.value) return
+    await fetchBindCert({
+      certId: selectedCertId.value,
+      proxyDomainIds: [currentBindDomain.value.proxyDomainId],
+      override: true
     })
-    ElMessage.success('证书已保存')
-    await loadSslDeployInfo()
+    ElMessage.success('绑定成功')
+    bindDialogVisible.value = false
+    await loadMatrix()
+  }
+
+  const handleBindCertToProxy = async (cert: Api.Ssl.CertDTO) => {
+    const matchedDomainIds = (matrix.value?.domains || [])
+      .filter((item) => isDomainMatchedByCert(item.fullDomain, cert))
+      .map((item) => item.proxyDomainId)
+    if (matchedDomainIds.length === 0) {
+      ElMessage.warning('该证书 SAN 与本代理域名不匹配')
+      return
+    }
+    await ElMessageBox.confirm(`将绑定到 ${matchedDomainIds.length} 个匹配域名，是否继续？`, '绑定确认', {
+      type: 'warning'
+    })
+    const result = await fetchBindCert({
+      certId: cert.id,
+      proxyDomainIds: matchedDomainIds,
+      override: true
+    })
+    if (result.failedCount > 0) {
+      ElMessage.warning(`绑定完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`)
+    } else {
+      ElMessage.success('绑定成功')
+    }
+    await loadMatrix()
+    activeName.value = 'domain-cert'
+  }
+
+  const handleDisable = async (bindingId: number) => {
+    await fetchDisableBinding(bindingId)
+    ElMessage.success('已禁用')
+    await loadMatrix()
+  }
+
+  const handleEnable = async (bindingId: number) => {
+    await fetchEnableBinding(bindingId)
+    ElMessage.success('已启用')
+    await loadMatrix()
+  }
+
+  const handleUnbind = async (bindingId: number) => {
+    await ElMessageBox.confirm('确定解绑该域名的证书？', '解绑确认', { type: 'warning' })
+    await fetchUnbindBinding(bindingId)
+    ElMessage.success('已解绑')
+    await loadMatrix()
+  }
+
+  const handleRedeploy = async (bindingId: number) => {
+    await fetchRedeployBinding(bindingId)
+    ElMessage.success('已重新部署')
+    await loadMatrix()
+  }
+
+  const handleDisableAll = async () => {
+    await ElMessageBox.confirm('确定禁用本代理下所有域名的 SSL 证书？', '警告', { type: 'warning' })
+    await fetchDisableAllBindingsByProxy(props.proxyId)
+    ElMessage.success('已全部禁用')
+    await loadMatrix()
   }
 
   const handleCertDelete = async (row: Api.Ssl.CertDTO) => {
-    try {
-      await ElMessageBox.confirm('确定要删除该证书？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      await fetchDeleteCert([row.id])
-      ElMessage.success('删除成功')
-    } catch (error) {
-      if (error === 'cancel') {
-        return
-      }
-    }
-  }
-
-  const handleCloseSsl = async () => {
-    try {
-      await ElMessageBox.confirm('确定要关闭SSL？', '警告', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-      await fetchCloseSsl(props.proxyId)
-      ElMessage.success('SSL已关闭')
-      sslStatus.value = 0
-    } catch (error) {
-      if (error === 'cancel') {
-        return
-      }
-    }
-  }
-
-  const handleDownloadCurrentCert = async () => {
-    const certId = sslDeployInfo.value?.certId
-    if (!certId) {
-      ElMessage.warning('当前没有可下载的证书')
-      return
-    }
-
-    try {
-      const blob = await fetchDownloadCert(certId)
-      const fileName = `${sslDeployInfo.value?.sanDomains?.join('_') || 'cert'}.zip`
-      downloadBlob(blob, fileName)
-    } catch (error: any) {
-      console.error('下载失败:', error)
-      ElMessage.error(error?.message || '下载失败')
-    }
+    await ElMessageBox.confirm('确定要删除该证书？', '警告', { type: 'warning' })
+    await fetchDeleteCert([row.id])
+    ElMessage.success('删除成功')
+    await reloadCertList()
   }
 </script>
 
@@ -325,106 +465,41 @@
 
   .ssl-page-content {
     min-height: 100%;
+    padding: 0 15px;
+  }
+
+  .ssl-summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
   }
 
   .tab-content {
     display: flex;
     flex-direction: column;
-    padding: 0 15px;
-    height: 100%;
-    box-sizing: border-box;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  .toolbar {
+    display: flex;
+    gap: 8px;
   }
 
   .cert-folder-content {
-    flex: 1;
     min-height: 300px;
   }
 
-  .ssl-info {
-    background-color: var(--art-gray-200);
-    padding: 20px;
-    border-radius: 4px;
-    display: flex;
-    gap: 48px;
-    flex-shrink: 0;
-  }
-
-  .ssl-info--empty {
-    justify-content: center;
-    align-items: center;
-    min-height: 80px;
-  }
-
-  .ssl-empty-text {
-    color: var(--el-text-color-secondary);
-    font-size: 14px;
-  }
-
-  .info-column {
-    flex: 1;
+  .upload-form {
     display: flex;
     flex-direction: column;
-    gap: 14px;
-  }
-
-  .info-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .info-label {
-    font-size: 14px;
-    width: 70px;
-    flex-shrink: 0;
-    font-weight: 700;
-  }
-
-  .info-value {
-    font-size: 14px;
-    font-weight: 400;
-  }
-
-  .info-link {
-    font-size: 13px;
-    cursor: pointer;
-    color: var(--el-color-primary);
-  }
-
-  .form-wrapper {
-    display: flex;
-    gap: 30px;
-    height: 360px;
-    flex-shrink: 0;
-  }
-
-  .form-actions {
-    display: flex;
-    justify-content: flex-start;
-    padding: 8px 0;
-    flex-shrink: 0;
-  }
-
-  .form-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
+    gap: 16px;
   }
 
   .form-label {
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 8px;
-    flex-shrink: 0;
-  }
-
-  :deep(.el-textarea) {
-    flex: 1;
-  }
-
-  :deep(.el-textarea__inner) {
-    height: 100% !important;
   }
 </style>

@@ -54,7 +54,7 @@ export function fetchDownloadCert(certId: string): Promise<Blob> {
  * @param params 证书参数
  */
 export function fetchSaveAndDeployCert(params: Api.Ssl.CertSaveAndDeployParams) {
-  return request.post({
+  return request.post<Api.CertBinding.BindResult>({
     url: '/api/ssl-cert/save-and-deploy',
     data: params
   })

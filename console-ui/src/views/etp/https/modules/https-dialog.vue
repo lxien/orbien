@@ -29,7 +29,7 @@
         </ElRadioGroup>
       </ElFormItem>
 
-      <ElFormItem v-if="formData.domainType === String(DomainType.SUBDOMAIN)" label="子域名">
+      <ElFormItem v-if="formData.domainType === String(DomainType.SUBDOMAIN)">
         <SubdomainBindingRows
           v-model="formData.subdomainBindings"
           :root-domains="rootDomains"

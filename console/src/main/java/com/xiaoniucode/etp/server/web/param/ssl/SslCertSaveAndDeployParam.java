@@ -21,6 +21,8 @@ package com.xiaoniucode.etp.server.web.param.ssl;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class SslCertSaveAndDeployParam {
     @NotBlank(message = "代理ID不能为空")
@@ -31,4 +33,9 @@ public class SslCertSaveAndDeployParam {
 
     @NotBlank(message = "证书不能为空")
     private String fullChain;
+
+    /**
+     * 指定绑定的代理域名ID，为空时自动绑定 SAN 匹配的域名
+     */
+    private List<Long> proxyDomainIds;
 }

@@ -18,65 +18,55 @@
 
 package com.xiaoniucode.etp.server.web.entity;
 
+import com.xiaoniucode.etp.server.web.entity.converter.BindStatusConverter;
+import com.xiaoniucode.etp.server.web.enums.BindStatus;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-/**
- * 用于给某个HTTPS代理隧道部署SSL域名证书
- */
 @Data
 @Entity
-@Table(name = "cert_deploy")
-@NoArgsConstructor
-public class CertDeployDO {
+@Table(name = "cert_domain_binding", indexes = {
+        @Index(name = "idx_cert_binding_cert_id", columnList = "cert_id"),
+        @Index(name = "idx_cert_binding_domain", columnList = "domain")
+}, uniqueConstraints = {
+        @UniqueConstraint(name = "uk_cert_binding_proxy_domain", columnNames = "proxy_domain_id")
+})
+public class CertDomainBinding {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    /**
-     * 关联的证书ID
-     */
+
+    @Column(name = "proxy_domain_id", nullable = false)
+    private Long proxyDomainId;
+
     @Column(name = "cert_id", nullable = false)
     private String certId;
-    /**
-     * 关联的代理ID
-     */
-    @Column(name = "proxy_id", nullable = false,unique = true)
-    private String proxyId;
-    /**
-     * 是否启用
-     */
-    @Column(name = "enabled")
-    private Boolean enabled;
 
-    /**
-     * 最后部署时间
-     */
-    @Column(name = "last_deployed_at", nullable = false)
-    @UpdateTimestamp
+    @Column(name = "domain", nullable = false)
+    private String domain;
+
+    @Convert(converter = BindStatusConverter.class)
+    @Column(name = "status", nullable = false)
+    private BindStatus status;
+
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled = true;
+
+    @Column(name = "deploy_version")
+    private Integer deployVersion = 0;
+
+    @Column(name = "last_deployed_at")
     private LocalDateTime lastDeployedAt;
 
-    /**
-     * 创建时间
-     */
-    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    /**
-     * 更新时间
-     */
-    @Column(name = "updated_at", nullable = false)
     @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    public CertDeployDO(String certId, String proxyId, Boolean enabled) {
-        this.certId = certId;
-        this.proxyId = proxyId;
-        this.enabled = enabled;
-    }
 }

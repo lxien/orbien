@@ -16,6 +16,9 @@
 
 package com.xiaoniucode.etp.client.common;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 /**
  * 获取当前操作系统相关的系统信息
  *
@@ -48,6 +51,10 @@ public class OSUtils {
         return System.getProperty("os.arch");
     }
     public static String getHostName() {
-        return System.getProperty("user.name");
+        try {
+            return InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            return "unknown";
+        }
     }
 }

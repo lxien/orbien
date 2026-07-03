@@ -26,11 +26,11 @@ encrypt_count = 2
 [transport.multiplex]
 enabled = true
 
-#[transport.tls]
-#enabled = true
-#cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
-#key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
-#ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
+[transport.tls]
+enabled = true
+cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
+key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
+ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
 
 [[proxies]]
 name = "web1"
@@ -42,9 +42,9 @@ targets = [
     { host = "127.0.0.1", port = 8084, weight = 1, name = "web-instance-1" }
 ]
 force_https = true
-[proxies.ssl]
-cert_file = "cert/domains/xiaoniucode.com/fullchain.pem"
-key_file = "cert/domains/xiaoniucode.com/privkey.pem"
+#[proxies.ssl]
+#cert_file = "cert/domains/xiaoniucode.com/fullchain.pem"
+#key_file = "cert/domains/xiaoniucode.com/privkey.pem"
 
 [proxies.health_check]
 enabled = true

@@ -21,6 +21,7 @@ import com.xiaoniucode.etp.core.notify.EventListener;
 import com.xiaoniucode.etp.server.event.ProxyDeleteEvent;
 import com.xiaoniucode.etp.server.web.entity.ProxyDO;
 import com.xiaoniucode.etp.server.web.repository.*;
+import com.xiaoniucode.etp.server.web.service.CertBindingSyncService;
 import com.xiaoniucode.etp.server.web.service.MetricsService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private MetricsService metricsService;
     @Autowired
+    private CertBindingSyncService certBindingSyncService;
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @PostConstruct
@@ -95,6 +98,9 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
         healthCheckRepository.deleteByProxyIdIn(ids);
 
         if (proxyDO.getProtocol().isHttpOrHttps()) {
+            if (proxyDO.getProtocol().isHttps()) {
+                certBindingSyncService.removeBindingsByProxyId(proxyId);
+            }
             proxyDomainRepository.deleteByProxyId(proxyId);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);

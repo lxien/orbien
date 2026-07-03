@@ -15,21 +15,30 @@
  *  *    limitations under the License.
  *
  */
-package com.xiaoniucode.etp.server.web.param.ssl;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.xiaoniucode.etp.server.web.enums;
 
-import java.util.List;
+import lombok.Getter;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SslCertDeployParam {
-    @NotNull(message = "证书ID不能为空")
-    private String certId;
-    @NotNull(message = "代理ID不能为空")
-    private List<String> proxyIds;
+@Getter
+public enum CertSource {
+    MANUAL(1, "手动上传"),
+    ACME(2, "自动申请");
+
+    private final Integer code;
+    private final String description;
+
+    CertSource(Integer code, String description) {
+        this.code = code;
+        this.description = description;
+    }
+
+    public static CertSource fromCode(Integer code) {
+        for (CertSource source : values()) {
+            if (source.code.equals(code)) {
+                return source;
+            }
+        }
+        throw new IllegalArgumentException("未知证书来源: " + code);
+    }
 }

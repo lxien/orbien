@@ -5,6 +5,8 @@ declare namespace Api.Ssl {
     org: string
     sanDomains: string[]
     status: 1 | 2
+    source?: 1 | 2
+    boundDomainCount?: number
     notBefore: string
     notAfter: string
   }
@@ -18,5 +20,6 @@ declare namespace Api.Ssl {
     proxyId: string
     key: string
     fullChain: string
+    proxyDomainIds?: number[]
   }
 }

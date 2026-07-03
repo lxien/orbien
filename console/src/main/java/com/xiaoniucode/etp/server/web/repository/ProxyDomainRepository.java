@@ -12,7 +12,7 @@ import java.util.Optional;
  * 代理域名 Repository
  */
 @Repository
-public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Integer> {
+public interface ProxyDomainRepository extends JpaRepository<ProxyDomainDO, Long> {
 
     void deleteByProxyId(String proxyId);
 
