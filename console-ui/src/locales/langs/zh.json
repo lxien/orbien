@@ -245,7 +245,7 @@
     "dashboard": {
       "title": "首页"
     },
-    "etp": {
+    "orbien": {
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",

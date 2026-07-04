@@ -1,7 +1,7 @@
 import { AppRouteRecord } from '@/types/router'
 import { dashboardRoutes } from './dashboard'
 import { exceptionRoutes } from './exception'
-import { penetrationRoutes } from './etp'
+import { penetrationRoutes } from './orbien'
 import { systemRoutes } from './system'
 
 /**

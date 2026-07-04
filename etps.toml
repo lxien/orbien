@@ -6,9 +6,9 @@ root_domains = ["domain1.com", "domain2.com"]
 
 [transport.tls]
 enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/server.key"
-ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
+cert_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/server.crt"
+key_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/server.key"
+ca_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/ca.crt"
 #key_pass=""
 
 [auth]

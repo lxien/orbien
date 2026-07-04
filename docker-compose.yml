@@ -1,17 +1,17 @@
 version: "3.8"
 
 services:
-  etps-mysql:
+  orbiens-mysql:
     image: mysql:8.4
-    container_name: etps-mysql
+    container_name: orbiens-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: etps
+      MYSQL_DATABASE: orbiens
     networks:
-      - etps-net
+      - orbiens-net
     volumes:
-      - /opt/etps/mysql/data:/var/lib/mysql
+      - /opt/orbiens/mysql/data:/var/lib/mysql
     healthcheck:
       test:
         [
@@ -22,9 +22,9 @@ services:
       timeout: 5s
       retries: 20
       start_period: 60s
-  etps:
-    image: xiaoniucode/etps:0.10.0
-    container_name: etps
+  orbiens:
+    image: lxien/orbiens:0.10.0
+    container_name: orbiens
     restart: unless-stopped
     ports:
       - "8080:8080" # HTTP 隧道代理服务
@@ -34,15 +34,15 @@ services:
     environment:
       JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC"
       MYSQL_PASSWORD: 123456
-      MYSQL_HOST: etps-mysql
+      MYSQL_HOST: orbiens-mysql
       TZ: Asia/Shanghai
     volumes:
-      - /opt/etps/logs:/app/logs
+      - /opt/orbiens/logs:/app/logs
     networks:
-      - etps-net
+      - orbiens-net
     depends_on:
-      etps-mysql:
+      orbiens-mysql:
         condition: service_healthy
 networks:
-  etps-net:
+  orbiens-net:
     driver: bridge

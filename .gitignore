@@ -14,18 +14,18 @@ buildNumber.properties
 
 server/dependency-reduced-pom.xml
 client/dependency-reduced-pom.xml
-/etp-test/dependency-reduced-pom.xml
+/orbien-test/dependency-reduced-pom.xml
 /common/dependency-reduced-pom.xml
 /core/dependency-reduced-pom.xml
-etps.log
-etpc.log
+orbiens.log
+orbienc.log
 /scripts/
 .idea
 /cert/
-etp.db
-etp.iml
-etp.mv.db
-etp.trace.db
+orbien.db
+orbien.iml
+orbien.mv.db
+orbien.trace.db
 /skills
 /console-ui/cursor.md
 /data

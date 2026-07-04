@@ -2,22 +2,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.xiaoniucode</groupId>
-        <artifactId>etp</artifactId>
-        <version>0.15.0</version>
+        <groupId>io.github.lxien</groupId>
+        <artifactId>orbien</artifactId>
+        <version>0.20.0</version>
     </parent>
     <properties>
         <caffeine.version>3.2.3</caffeine.version>
         <jjwt.version>0.12.5</jjwt.version>
         <jackson.version>3.0.4</jackson.version>
     </properties>
-    <artifactId>etp-console</artifactId>
+    <artifactId>orbien-console</artifactId>
     <packaging>jar</packaging>
     <name>console</name>
     <dependencies>
         <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-server</artifactId>
+            <groupId>io.github.lxien</groupId>
+            <artifactId>orbien-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

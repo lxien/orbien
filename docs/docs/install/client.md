@@ -12,17 +12,17 @@ sidebar_position: 2
 
 | 平台               | 文件名称                                                                                                                              |
 |:-----------------|:----------------------------------------------------------------------------------------------------------------------------------|
-| Linux (x86_64)   | [etpc_v0.15.0_linux_amd64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_linux_amd64.tar.gz)   |
-| Linux (arm64)    | [etpc_v0.15.0_linux_arm64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_linux_arm64.tar.gz)   |
-| macOS (x86_64)   | [etpc_v0.15.0_darwin_amd64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_darwin_amd64.tar.gz) |
-| macOS (arm64)    | [etpc_v0.15.0_darwin_arm64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_darwin_arm64.tar.gz) |
-| Windows (x86_64) | [etpc_v0.15.0_windows_amd64.zip](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_windows_amd64.zip)     |
-| Windows (arm64)  | [etpc_v0.15.0_windows_arm64.zip](https://github.com/lxien/orbien/releases/download/v0.15.0/etpc_v0.15.0_windows_arm64.zip)     |
+| Linux (x86_64)   | [orbienc_v0.20.0_linux_amd64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_linux_amd64.tar.gz)   |
+| Linux (arm64)    | [orbienc_v0.20.0_linux_arm64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_linux_arm64.tar.gz)   |
+| macOS (x86_64)   | [orbienc_v0.20.0_darwin_amd64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_darwin_amd64.tar.gz) |
+| macOS (arm64)    | [orbienc_v0.20.0_darwin_arm64.tar.gz](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_darwin_arm64.tar.gz) |
+| Windows (x86_64) | [orbienc_v0.20.0_windows_amd64.zip](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_windows_amd64.zip)     |
+| Windows (arm64)  | [orbienc_v0.20.0_windows_arm64.zip](https://github.com/lxien/orbien/releases/download/v0.20.0/orbienc_v0.20.0_windows_arm64.zip)     |
 
 #### 1. 编辑配置文件
 
 ```toml
-#etpc.toml
+#orbienc.toml
 server_addr = "your-server-ip-or-domain"
 server_port = 9527
 [auth]
@@ -32,7 +32,7 @@ token = "your-access-token"
 #### 2. 运行客户端
 
 ```bash
-./etpc -c etpc.toml
+./orbienc -c orbienc.toml
 ```
 
 ### 方式二：源码编译

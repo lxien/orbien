@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <groupId>com.xiaoniucode</groupId>
+    <groupId>io.github.lxien</groupId>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>etp-main</artifactId>
-    <version>0.15.0</version>
+    <artifactId>orbien-main</artifactId>
+    <version>0.20.0</version>
     <packaging>pom</packaging>
-    <name>etp-main</name>
+    <name>orbien-main</name>
     <properties>
         <lombok.version>1.18.42</lombok.version>
         <shade.mainClass>custom</shade.mainClass>
         <cyclonedx-maven-plugin.version>2.8.0</cyclonedx-maven-plugin.version>
     </properties>
     <modules>
-        <module>etps</module>
-        <module>etpc</module>
+        <module>orbiens</module>
+        <module>orbienc</module>
     </modules>
     <build>
         <plugins>

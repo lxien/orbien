@@ -14,8 +14,8 @@
   <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/lxien/orbien/releases/v0.15.0">
-    <img src="https://img.shields.io/badge/orbien-0.15.0-blue?style=for-the-badge" alt="orbien:0.15.0"/>
+ <a href="https://github.com/lxien/orbien/releases/v0.20.0">
+    <img src="https://img.shields.io/badge/orbien-0.20.0-blue?style=for-the-badge" alt="orbien:0.20.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
   <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
@@ -56,7 +56,7 @@ Requirements:
 - Docker 20+
 - Linux x86_64
 
-One-command Docker startup for `etps` server:
+One-command Docker startup for `orbiens` server:
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
@@ -68,10 +68,10 @@ Management dashboard access: `http://server_ip:8020` (admin: 123456)
 
 Download the latest version from the [GitHub Releases](https://github.com/lxien/orbien/tags) page and select the binary file for your operating system.
 
-After extracting locally, edit the configuration file `etpc.toml`:
+After extracting locally, edit the configuration file `orbienc.toml`:
 
 ```toml
-server_addr = "etps server IP or domain"
+server_addr = "orbiens server IP or domain"
 [auth]
 token = "authentication token"
 ```
@@ -79,9 +79,9 @@ token = "authentication token"
 Run the client:
 
 ```shell
-./etpc -c etpc.toml # Linux / MacOS
+./orbienc -c orbienc.toml # Linux / MacOS
 
-etpc.exe -c etpc.toml # Windows
+orbienc.exe -c orbienc.toml # Windows
 ```
 
 For more usage details, please refer to the [documentation website](https://lxien.github.io/orbien/).

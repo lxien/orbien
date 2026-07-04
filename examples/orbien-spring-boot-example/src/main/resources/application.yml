@@ -1,0 +1,16 @@
+server:
+  port: 8084
+spring:
+  application:
+    name: 网关服务
+  profiles:
+    active: simple
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+logging:
+  level:
+    io.github.lxien.orbien: debug

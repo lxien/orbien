@@ -245,7 +245,7 @@
     "dashboard": {
       "title": "ホーム"
     },
-    "etp": {
+    "orbien": {
       "http": "HTTP",
       "https": "HTTPS",
       "tcp": "TCP",

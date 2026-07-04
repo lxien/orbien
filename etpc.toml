@@ -28,9 +28,9 @@ enabled = true
 
 [transport.tls]
 enabled = true
-cert_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.crt"
-key_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/client.key"
-ca_file = "/Users/xiaoniucode/Desktop/workspace/etp/cert/transport/ca.crt"
+cert_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/client.crt"
+key_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/client.key"
+ca_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/ca.crt"
 
 [[proxies]]
 name = "web1"
@@ -43,8 +43,8 @@ targets = [
 ]
 force_https = true
 #[proxies.ssl]
-#cert_file = "cert/domains/xiaoniucode.com/fullchain.pem"
-#key_file = "cert/domains/xiaoniucode.com/privkey.pem"
+#cert_file = "cert/domains/lxien.com/fullchain.pem"
+#key_file = "cert/domains/lxien.com/privkey.pem"
 
 [proxies.health_check]
 enabled = true
@@ -86,9 +86,9 @@ multiplex = true
 
 [log]
 level = "debug"
-path = "/Users/xiaoniucode/Desktop/workspace/etp/logs"
-name = "etpc.log"
-archive_pattern = "etpc.%d{yyyy-MM-dd}.log"
+path = "/Users/lxien/Desktop/workspace/orbien/logs"
+name = "orbienc.log"
+archive_pattern = "orbienc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 max_history = 1
 total_size_cap = "1MB"

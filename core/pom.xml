@@ -2,13 +2,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.xiaoniucode</groupId>
-        <artifactId>etp</artifactId>
-        <version>0.15.0</version>
+        <groupId>io.github.lxien</groupId>
+        <artifactId>orbien</artifactId>
+        <version>0.20.0</version>
     </parent>
-    <artifactId>etp-core</artifactId>
+    <artifactId>orbien-core</artifactId>
     <packaging>jar</packaging>
-    <name>etp-core</name>
+    <name>orbien-core</name>
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
@@ -31,8 +31,8 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.xiaoniucode</groupId>
-            <artifactId>etp-common</artifactId>
+            <groupId>io.github.lxien</groupId>
+            <artifactId>orbien-common</artifactId>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cola</groupId>

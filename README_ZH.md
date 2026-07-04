@@ -14,8 +14,8 @@
   <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/lxien/orbien/releases/v0.15.0">
-    <img src="https://img.shields.io/badge/orbien-0.15.0-blue?style=for-the-badge" alt="orbien:0.15.0"/>
+ <a href="https://github.com/lxien/orbien/releases/v0.20.0">
+    <img src="https://img.shields.io/badge/orbien-0.20.0-blue?style=for-the-badge" alt="orbien:0.20.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
   <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>

@@ -17,7 +17,7 @@ const config: Config = {
     // Set the production url of your site here
     url: 'https://orbien.github.io',
     baseUrl: '/orbien/',
-    organizationName: 'xiaoniucode', // Usually your GitHub org/user name.
+    organizationName: 'lxien', // Usually your GitHub org/user name.
     projectName: 'orbien', // Usually your repo name.
 
     onBrokenLinks: 'throw',
@@ -76,7 +76,7 @@ const config: Config = {
             title: '首页',
             logo: {
                 alt: 'orbien',
-                src: 'img/logo.png',
+                src: 'img/logo.webp',
             },
             items: [
                 {
@@ -87,17 +87,17 @@ const config: Config = {
                 },
                 {to: '/blog', label: '博客', position: 'right'},
                 {
-                    href: 'https://github.com/xiaoniucode/orbien/issues',
+                    href: 'https://github.com/lxien/orbien/issues',
                     label: '问题反馈',
                     position: 'right',
                 },
                 {
-                    href: 'https://github.com/xiaoniucode/orbien/discussions',
+                    href: 'https://github.com/lxien/orbien/discussions',
                     label: 'GitHub社区',
                     position: 'right',
                 },
                 {
-                    href: 'https://github.com/xiaoniucode/orbien',
+                    href: 'https://github.com/lxien/orbien',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -109,7 +109,7 @@ const config: Config = {
         },
         footer: {
             style: 'dark',
-            copyright: `Copyright © ${new Date().getFullYear()} orbien xiaoniucode.com`,
+            copyright: `Copyright © ${new Date().getFullYear()} orbien lxien.com`,
         },
         prism: {
             //设置高亮语言

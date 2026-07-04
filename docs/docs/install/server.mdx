@@ -5,14 +5,14 @@ sidebar_position: 1
 # 服务端
 
 ## 一、Docker（推荐）
-通过`Docker`可以快速部署`etps`服务端，无需手动安装`Java` 运行环境。
+通过`Docker`可以快速部署`orbiens`服务端，无需手动安装`Java` 运行环境。
 
 ### 1.1、一键安装
 
 在具备`docker`环境的`Linux`云服务器中执行如下命令：
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
 云服务器`安全组`放行如下端口：
@@ -28,53 +28,53 @@ curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/instal
 
 #### 创建 Docker 网络
 
-创建独立网络供`etps`与`MySQL`通信：
+创建独立网络供`orbiens`与`MySQL`通信：
 
 ```shell
-docker network create etps-net
+docker network create orbiens-net
 ```
 
 #### 启动MySQL
 ```shell
 docker run -d \
-  --name etps-mysql \
-  --network etps-net \
+  --name orbiens-mysql \
+  --network orbiens-net \
   --restart unless-stopped \
   -e MYSQL_ROOT_PASSWORD=123456 \
-  -e MYSQL_DATABASE=etps \
-  -v /opt/etps/mysql/data:/var/lib/mysql \
+  -e MYSQL_DATABASE=orbiens \
+  -v /opt/orbiens/mysql/data:/var/lib/mysql \
   mysql:8.4
 ```
 
 查看`MySQL`状态：
 
 ```shell
-docker logs -f etps-mysql
+docker logs -f orbiens-mysql
 ```
 
-#### 1.2.4、启动 etps
+#### 1.2.4、启动 orbiens
 ```shell
 docker run -d \
-  --name etps \
-  --network etps-net \
+  --name orbiens \
+  --network orbiens-net \
   --restart unless-stopped \
   -p 8080:8080 \
   -p 8020:8020 \
   -p 9527:9527 \
   -p 9050-9099:9050-9099 \
-  -e MYSQL_HOST=etps-mysql \
-  -e MYSQL_DATABASE=etps \
+  -e MYSQL_HOST=orbiens-mysql \
+  -e MYSQL_DATABASE=orbiens \
   -e MYSQL_PASSWORD=123456 \
   -e JAVA_OPTS="-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC" \
   -e TZ=Asia/Shanghai \
-  -v /opt/etps/logs:/app/logs \
-  xiaoniucode/etps:0.10.0
+  -v /opt/orbiens/logs:/app/logs \
+  lxien/orbiens:0.10.0
 ```
 
-查看`etps`运行日志：
+查看`orbiens`运行日志：
 
 ```shell
-docker logs -f etps
+docker logs -f orbiens
 ```
 
 

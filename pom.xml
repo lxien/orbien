@@ -7,10 +7,10 @@
         <version>4.0.5</version>
         <relativePath/>
     </parent>
-    <groupId>io.github.xiaoniucode</groupId>
-    <artifactId>etp</artifactId>
-    <version>0.15.0</version>
-    <name>etp</name>
+    <groupId>io.github.lxien</groupId>
+    <artifactId>orbien</artifactId>
+    <version>0.20.0</version>
+    <name>orbien</name>
     <dependencies>
         <dependency>
             <groupId>com.moandjiezana.toml</groupId>
@@ -22,30 +22,30 @@
         </dependency>
     </dependencies>
     <packaging>pom</packaging>
-    <url>https://github.com/xiaoniucode/etp</url>
+    <url>https://github.io.github.lxien/orbien</url>
     <description>orbien</description>
     <licenses>
         <license>
             <name>Apache License 2.0</name>
-            <url>https://github.com/xiaoniucode/etp/blob/main/LICENSE</url>
+            <url>https://github.io.github.lxien/orbien/blob/main/LICENSE</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
     <developers>
         <developer>
-            <name>xiaoniucode</name>
+            <name>lxien</name>
             <email>yuanyicode@gmail.com</email>
             <timezone>Asia/Shanghai</timezone>
         </developer>
     </developers>
     <ciManagement>
         <system>GitHub Actions</system>
-        <url>https://github.com/xiaoniucode/etp/actions</url>
+        <url>https://github.io.github.lxien/orbien/actions</url>
     </ciManagement>
     <scm>
-        <connection>scm:git:https://github.com/xiaoniucode/etp.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:xiaoniucode/etp.git</developerConnection>
-        <url>https://github.com/xiaoniucode/etp</url>
+        <connection>scm:git:https://github.io.github.lxien/orbien.git</connection>
+        <developerConnection>scm:git:ssh://git@github.io.github.lxien/orbien.git</developerConnection>
+        <url>https://github.io.github.lxien/orbien</url>
         <tag>HEAD</tag>
     </scm>
     <distributionManagement>
@@ -61,7 +61,7 @@
     <properties>
         <!-- ==================== 项目基础配置 ==================== -->
         <java.version>25</java.version>
-        <revision>0.15.0</revision>
+        <revision>0.20.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -239,23 +239,23 @@
             </dependency>
             <!--项目模块-->
             <dependency>
-                <groupId>io.github.xiaoniucode</groupId>
-                <artifactId>etp-core</artifactId>
+                <groupId>io.github.lxien</groupId>
+                <artifactId>orbien-core</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.xiaoniucode</groupId>
-                <artifactId>etp-common</artifactId>
+                <groupId>io.github.lxien</groupId>
+                <artifactId>orbien-common</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.xiaoniucode</groupId>
-                <artifactId>etp-client</artifactId>
+                <groupId>io.github.lxien</groupId>
+                <artifactId>orbien-client</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>io.github.xiaoniucode</groupId>
-                <artifactId>etp-server</artifactId>
+                <groupId>io.github.lxien</groupId>
+                <artifactId>orbien-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

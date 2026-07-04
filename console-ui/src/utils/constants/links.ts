@@ -7,16 +7,16 @@
  */
 export const WEB_LINKS = {
   // Github 主页
-  GITHUB_HOME: 'https://github.com/xiaoniucode/etp',
+  GITHUB_HOME: 'https://github.com/lxien/orbien',
 
   // 项目 Github 主页
-  GITHUB: 'https://github.com/xiaoniucode/etp',
+  GITHUB: 'https://github.com/lxien/orbien',
 
   // 个人博客
-  BLOG: 'https://github.com/xiaoniucode/etp',
+  BLOG: 'https://github.com/lxien/orbien',
 
   // 项目文档
-  DOCS: 'https://xiaoniucode.github.io/etp/',
+  DOCS: 'https://lxien.github.io/orbien/',
   // v2.6.1版本
   OldVersion: 'https://www.artd.pro/v2/',
 }

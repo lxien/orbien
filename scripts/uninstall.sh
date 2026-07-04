@@ -1,6 +1,6 @@
 #
 # /*
-#  *    Copyright 2026 xiaoniucode
+#  *    Copyright 2026 lxien
 #  *
 #  *    Licensed under the Apache License, Version 2.0 (the "License");
 #  *    you may not use this file except in compliance with the License.
@@ -18,17 +18,17 @@
 
 #!/bin/bash
 
-# 删除 etps 容器
-docker rm -f etps
+# 删除 orbiens 容器
+docker rm -f orbiens
 
 # 删除 MySQL 容器
-docker rm -f etps-mysql
+docker rm -f orbiens-mysql
 
 # 删除 Docker 网络
-docker network rm etps-net
+docker network rm orbiens-net
 
-# 删除 etps 挂载目录
-rm -rf /opt/etps
+# 删除 orbiens 挂载目录
+rm -rf /opt/orbiens
 
 # 删除悬空容器
 docker container prune -f

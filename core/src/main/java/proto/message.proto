@@ -1,5 +1,5 @@
 syntax = "proto3";
-package com.xiaoniucode.etp.core.message;
+package io.github.lxien.orbien.core.message;
 
 enum ProtocolType {
   TCP = 0;

@@ -1,5 +1,5 @@
-import { ProtocolType, getProtocolLabel } from '@/enums/etp/business'
-import type { ProxyConfigProtocol } from '@/views/etp/plugin/menus'
+import { ProtocolType, getProtocolLabel } from '@/enums/orbien/business'
+import type { ProxyConfigProtocol } from '@/views/orbien/plugin/menus'
 import {
   fetchGetHttpProxyById,
   fetchGetHttpsProxyById,

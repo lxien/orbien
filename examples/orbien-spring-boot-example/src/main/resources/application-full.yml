@@ -1,0 +1,61 @@
+orbien:
+  client:
+    enabled: true
+    server-addr: 127.0.0.1
+    server-port: 9527
+    auth:
+      token: 414083A8563774142CAC91DDB5C9A2ED
+    connection:
+      retry:
+        initial-delay: 1
+        max-delay: 20
+        max-retries: 5
+
+    transport:
+      tls:
+        enabled: true
+        cert-file: classpath:cert/client.crt
+        key-file: classpath:cert/client.key
+        ca-file: classpath:cert/ca.crt
+        key-password:
+
+    proxy:
+      protocol: HTTP
+      local-ip: 127.0.0.1
+      auto-domain: true
+      custom-domains:
+        - a.domain1.com
+        - b.domain1.com
+      sub-domains:
+        - sub1
+        - sub2
+      transport:
+        encrypt: true
+        multiplex: true
+
+      bandwidth:
+        limit-total: 2Mbps
+        limit-in: 1Mbps
+        limit-out: 1Mbps
+
+      basic-auth:
+        enabled: true
+        users:
+          - user: admin
+            pass: 123456
+          - user: guest
+            pass: 123456
+
+      access-control:
+        enabled: true
+        mode: allow
+        allow:
+          - 127.0.0.1/32        # 本机回环
+          - 192.168.31.0/24     # 家庭/办公局域网
+          - 10.10.0.0/16        # 公司内网
+          - 172.16.0.0/12       # VPN 网络
+
+
+        deny:
+          - 192.168.31.88/32    # 被封禁的测试设备
+          - 10.10.5.23/32       # 异常访问机器

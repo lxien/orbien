@@ -11,7 +11,7 @@ HTTP 协议代理支持三种域名配置方式：自定义域名、子域名、
 配置完整域名，访问时直接使用该域名。
 
 ```toml
-# etpc.toml
+# orbienc.toml
 [[proxies]]
 name = "web"
 protocol = "http"
@@ -28,14 +28,14 @@ targets = [
 服务端需配置根域名（详见 [服务端基础配置](../server/base_config.md)）：
 
 ```toml
-# etps.toml（服务端配置）
+# orbiens.toml（服务端配置）
 root_domain = "domain.com"
 ```
 
 客户端配置子域名：
 
 ```toml
-# etpc.toml
+# orbienc.toml
 [[proxies]]
 name = "web"
 protocol = "http"
@@ -55,7 +55,7 @@ targets = [
 系统随机生成子域名。
 
 ```toml
-# etpc.toml
+# orbienc.toml
 [[proxies]]
 name = "web"
 protocol = "http"

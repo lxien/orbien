@@ -1,6 +1,6 @@
 /**
  * 全局主题：青绿偏「隧道 / 链路」气质，白昼与暗黑各自一套刻度，与 Infima 变量对齐。
- * --etp-color-on-primary：主色按钮/深色渐变条上的前景色，供首页等与主题切换一致使用。
+ * --orbien-color-on-primary：主色按钮/深色渐变条上的前景色，供首页等与主题切换一致使用。
  */
 :root {
   --ifm-color-primary: #0f766e;
@@ -12,7 +12,7 @@
   --ifm-color-primary-lightest: #5eead4;
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.08);
-  --etp-color-on-primary: #ffffff;
+  --orbien-color-on-primary: #ffffff;
 }
 
 [data-theme='dark'] {
@@ -25,5 +25,5 @@
   --ifm-color-primary-lightest: #ccfbf1;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.35);
   /* 暗黑下主色偏亮，CTA 仍用偏深绿青渐变 + 浅色字，保证对比度 */
-  --etp-color-on-primary: #f8fafc;
+  --orbien-color-on-primary: #f8fafc;
 }

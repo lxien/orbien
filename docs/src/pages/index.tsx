@@ -6,7 +6,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 
-const GITHUB = 'https://github.com/xiaoniucode/etp';
+const GITHUB = 'https://github.com/lxien/orbien';
 const features: Array<{
     id: 'panel' | 'speed' | 'shield' | 'sparkle' | 'globe' | 'stack';
     title: string;
@@ -123,7 +123,7 @@ function FeatureIcon({id}: { id: (typeof features)[number]['id'] }) {
 
 export default function Home() {
     const {siteConfig} = useDocusaurusContext();
-    const logoUrl = useBaseUrl('img/logo.png');
+    const logoUrl = useBaseUrl('img/logo.webp');
 
     return (
         <Layout title={siteConfig.title} description={siteConfig.tagline}>

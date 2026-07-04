@@ -123,17 +123,17 @@ jobs:
       - name: 复制前端资源到 Spring Boot (Unix)
         if: matrix.os != 'windows-latest'
         run: |
-          mkdir -p main/etps/src/main/resources/static
-          cp -r console-ui/dist/* main/etps/src/main/resources/static/
+          mkdir -p main/orbiens/src/main/resources/static
+          cp -r console-ui/dist/* main/orbiens/src/main/resources/static/
           echo "✅ 前端资源已复制到 static 目录"
-          ls -la main/etps/src/main/resources/static/
+          ls -la main/orbiens/src/main/resources/static/
 
       - name: 复制前端资源到 Spring Boot (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path main\etps\src\main\resources\static
-          Copy-Item -Recurse -Force console-ui\dist\* main\etps\src\main\resources\static\
+          New-Item -ItemType Directory -Force -Path main\orbiens\src\main\resources\static
+          Copy-Item -Recurse -Force console-ui\dist\* main\orbiens\src\main\resources\static\
           Write-Host "✅ 前端资源已复制到 static 目录"
 
       - name: 设置 GraalVM 环境
@@ -155,10 +155,10 @@ jobs:
         run: mvn install -pl '!main' -am -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       - name: 构建服务端 JAR 包
-        run: cd main && mvn clean package -pl etps -DskipTests --no-transfer-progress
+        run: cd main && mvn clean package -pl orbiens -DskipTests --no-transfer-progress
 
       - name: 构建客户端原生镜像
-        run: cd main && mvn package native:compile -pl etpc -Pnative -DskipTests --no-transfer-progress
+        run: cd main && mvn package native:compile -pl orbienc -Pnative -DskipTests --no-transfer-progress
 
       # Linux/macOS 打包
       - name: 打包 Unix 发布文件
@@ -166,26 +166,26 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
-          ETPS_RELEASE_NAME="etps_${VERSION}_${{ matrix.artifact_suffix }}"
-          ETPC_RELEASE_NAME="etpc_${VERSION}_${{ matrix.artifact_suffix }}"
+          ORBIENS_RELEASE_NAME="orbiens_${VERSION}_${{ matrix.artifact_suffix }}"
+          orbienc_RELEASE_NAME="orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          mkdir -p "$ETPS_RELEASE_NAME/config"
-          mkdir -p "$ETPC_RELEASE_NAME"
+          mkdir -p "$ORBIENS_RELEASE_NAME/config"
+          mkdir -p "$orbienc_RELEASE_NAME"
 
           # 打包服务端
-          cp main/etps/target/etps-[0-9]*.jar "$ETPS_RELEASE_NAME/etps.jar"
-          cp "main/etps/src/main/resources/etps.toml" "$ETPS_RELEASE_NAME/etps.toml"
-          cp "main/etps/src/main/resources/application.yml" "$ETPS_RELEASE_NAME/config/application.yml"
-          cp "main/etps/src/main/resources/application-mysql.yml" "$ETPS_RELEASE_NAME/config/application-mysql.yml"
-          cp "main/etps/src/main/resources/logback-spring.xml" "$ETPS_RELEASE_NAME/config/logback-spring.xml"
+          cp main/orbiens/target/orbiens-[0-9]*.jar "$ORBIENS_RELEASE_NAME/orbiens.jar"
+          cp "main/orbiens/src/main/resources/orbiens.toml" "$ORBIENS_RELEASE_NAME/orbiens.toml"
+          cp "main/orbiens/src/main/resources/application.yml" "$ORBIENS_RELEASE_NAME/config/application.yml"
+          cp "main/orbiens/src/main/resources/application-mysql.yml" "$ORBIENS_RELEASE_NAME/config/application-mysql.yml"
+          cp "main/orbiens/src/main/resources/logback-spring.xml" "$ORBIENS_RELEASE_NAME/config/logback-spring.xml"
 
           # 打包客户端
-          cp "main/etpc/target/etpc" "$ETPC_RELEASE_NAME/etpc"
-          cp "main/etpc/src/main/resources/etpc.toml" "$ETPC_RELEASE_NAME/etpc.toml"
+          cp "main/orbienc/target/orbienc" "$ORBIENC_RELEASE_NAME/orbienc"
+          cp "main/orbienc/src/main/resources/orbienc.toml" "$ORBIENC_RELEASE_NAME/orbienc.toml"
 
-          tar -czf "$ETPS_RELEASE_NAME.tar.gz" "$ETPS_RELEASE_NAME"
-          tar -czf "$ETPC_RELEASE_NAME.tar.gz" "$ETPC_RELEASE_NAME"
-          echo "✅ Unix打包完成: $ETPS_RELEASE_NAME.tar.gz, $ETPC_RELEASE_NAME.tar.gz"
+          tar -czf "$ORBIENS_RELEASE_NAME.tar.gz" "$ORBIENS_RELEASE_NAME"
+          tar -czf "$ORBIENC_RELEASE_NAME.tar.gz" "$ORBIENC_RELEASE_NAME"
+          echo "✅ Unix打包完成: $ORBIENS_RELEASE_NAME.tar.gz, $ORBIENC_RELEASE_NAME.tar.gz"
 
       # Windows 打包
       - name: 打包 Windows 发布文件
@@ -193,38 +193,38 @@ jobs:
         shell: pwsh
         run: |
           $VERSION = "${{ github.ref_name }}"
-          $ETPS_RELEASE_NAME = "etps_${VERSION}_${{ matrix.artifact_suffix }}"
-          $ETPC_RELEASE_NAME = "etpc_${VERSION}_${{ matrix.artifact_suffix }}"
+          $ORBIENS_RELEASE_NAME = "orbiens_${VERSION}_${{ matrix.artifact_suffix }}"
+          $ORBIENC_RELEASE_NAME = "orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          New-Item -ItemType Directory -Force -Path "$ETPS_RELEASE_NAME\config"
-          New-Item -ItemType Directory -Force -Path $ETPC_RELEASE_NAME
+          New-Item -ItemType Directory -Force -Path "$ORBIENS_RELEASE_NAME\config"
+          New-Item -ItemType Directory -Force -Path $ORBIENC_RELEASE_NAME
 
           # 打包服务端
-          Copy-Item "main\etps\target\etps-[0-9]*.jar" "$ETPS_RELEASE_NAME\etps.jar"
-          Copy-Item "main\etps\src\main\resources\etps.toml" "$ETPS_RELEASE_NAME\etps.toml"
-          Copy-Item "main\etps\src\main\resources\application.yml" "$ETPS_RELEASE_NAME\config\application.yml"
-          Copy-Item "main\etps\src\main\resources\application-mysql.yml" "$ETPS_RELEASE_NAME\config\application-mysql.yml"
-          Copy-Item "main\etps\src\main\resources\logback-spring.xml" "$ETPS_RELEASE_NAME\config\logback-spring.xml"
+          Copy-Item "main\orbiens\target\orbiens-[0-9]*.jar" "$ORBIENS_RELEASE_NAME\orbiens.jar"
+          Copy-Item "main\orbiens\src\main\resources\orbiens.toml" "$ORBIENS_RELEASE_NAME\orbiens.toml"
+          Copy-Item "main\orbiens\src\main\resources\application.yml" "$ORBIENS_RELEASE_NAME\config\application.yml"
+          Copy-Item "main\orbiens\src\main\resources\application-mysql.yml" "$ORBIENS_RELEASE_NAME\config\application-mysql.yml"
+          Copy-Item "main\orbiens\src\main\resources\logback-spring.xml" "$ORBIENS_RELEASE_NAME\config\logback-spring.xml"
 
           # 打包客户端
-          Copy-Item "main\etpc\target\etpc.exe" "$ETPC_RELEASE_NAME\etpc.exe"
-          Copy-Item "main\etpc\src\main\resources\etpc.toml" "$ETPC_RELEASE_NAME\etpc.toml"
+          Copy-Item "main\orbienc\target\orbienc.exe" "$ORBIENC_RELEASE_NAME\orbienc.exe"
+          Copy-Item "main\orbienc\src\main\resources\orbienc.toml" "$ORBIENC_RELEASE_NAME\orbienc.toml"
 
-          Compress-Archive -Path "$ETPS_RELEASE_NAME\*" -DestinationPath "$ETPS_RELEASE_NAME.zip"
-          Compress-Archive -Path "$ETPC_RELEASE_NAME\*" -DestinationPath "$ETPC_RELEASE_NAME.zip"
-          Write-Host "✅ Windows打包完成: $ETPS_RELEASE_NAME.zip, $ETPC_RELEASE_NAME.zip"
-
-      - name: 上传构件
-        uses: actions/upload-artifact@v4
-        with:
-          name: etps-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
-          path: etps_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+          Compress-Archive -Path "$ORBIENS_RELEASE_NAME\*" -DestinationPath "$ORBIENS_RELEASE_NAME.zip"
+          Compress-Archive -Path "$ORBIENC_RELEASE_NAME\*" -DestinationPath "$ORBIENC_RELEASE_NAME.zip"
+          Write-Host "✅ Windows打包完成: $ORBIENS_RELEASE_NAME.zip, $ORBIENC_RELEASE_NAME.zip"
 
       - name: 上传构件
         uses: actions/upload-artifact@v4
         with:
-          name: etpc-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
-          path: etpc_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+          name: orbiens-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: orbiens_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+
+      - name: 上传构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbienc-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: orbienc_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # =============================================
   # 阶段3：构建并推送 Docker 镜像
@@ -241,17 +241,17 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 下载 Docker 镜像构建所需的 etps tar.gz
+      - name: 下载 Docker 镜像构建所需的 orbiens tar.gz
         uses: actions/download-artifact@v4
         with:
-          name: etps-linux_amd64-${{ github.ref_name }}
+          name: orbiens-linux_amd64-${{ github.ref_name }}
           path: ./
 
       - name: 创建工作目录并解压 tar.gz
         run: |
-          mkdir -p main/etps/target
-          tar -xzf etps_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
-          cp /tmp/etps_${{ github.ref_name }}_linux_amd64/etps.jar main/etps/target/etps.jar
+          mkdir -p main/orbiens/target
+          tar -xzf orbiens_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
+          cp /tmp/orbiens_${{ github.ref_name }}_linux_amd64/orbiens.jar main/orbiens/target/orbiens.jar
 
       - name: 提取版本号
         id: version
@@ -260,7 +260,7 @@ jobs:
       - name: 构建 Docker 镜像
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          docker build -t xiaoniucode/etps:latest -t xiaoniucode/etps:$VERSION .
+          docker build -t lxien/orbiens:latest -t lxien/orbiens:$VERSION .
 
       - name: 登录到 Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -268,8 +268,8 @@ jobs:
       - name: 推送 Docker 镜像
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          docker push xiaoniucode/etps:$VERSION
-          docker push xiaoniucode/etps:latest
+          docker push lxien/orbiens:$VERSION
+          docker push lxien/orbiens:latest
 
   # =============================================
   # 阶段4：统一发布阶段
@@ -287,7 +287,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-          pattern: 'etp?-*'
+          pattern: 'orbien?-*'
           merge-multiple: true
 
       - name: 读取发布信息模板

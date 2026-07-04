@@ -1,0 +1,62 @@
+/*
+ *
+ *  *    Copyright 2026 lxien
+ *  *
+ *  *    Licensed under the Apache License, Version 2.0 (the "License");
+ *  *    you may not use this file except in compliance with the License.
+ *  *    You may obtain a copy of the License at
+ *  *
+ *  *        http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  *    Unless required by applicable law or agreed to in writing, software
+ *  *    distributed under the License is distributed on an "AS IS" BASIS,
+ *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  *    See the License for the specific language governing permissions and
+ *  *    limitations under the License.
+ *
+ */
+
+package io.github.lxien.orbien.client.health;
+
+import io.github.lxien.orbien.core.message.Message;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+
+import java.util.concurrent.CompletableFuture;
+public class TcpHealthHandler extends ChannelInboundHandlerAdapter {
+    private final CompletableFuture<ServiceHealth> future;
+    private final long startTime;
+    private final String proxyId;
+    private final Message.Target target;
+
+    public TcpHealthHandler(CompletableFuture<ServiceHealth> future, String proxyId, Message.Target target, long startTime) {
+        this.future = future;
+        this.startTime = startTime;
+        this.proxyId = proxyId;
+        this.target = target;
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        ctx.close();
+        // TCP 连接成功 = UP
+        ServiceHealth health = createHealth(System.currentTimeMillis() - startTime);
+        future.complete(health);
+    }
+
+    private ServiceHealth createHealth(long responseTime) {
+        ServiceHealth.ServiceHealthBuilder health = ServiceHealth.builder();
+        health.proxyId(proxyId);
+        health.host(target.getHost());
+        health.port(target.getPort());
+        health.status(Message.HealthStatus.UP);
+        health.responseTimeMs(responseTime);
+        return health.build();
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        ctx.close();
+        future.completeExceptionally(cause);
+    }
+}

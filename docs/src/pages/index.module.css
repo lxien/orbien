@@ -1,40 +1,40 @@
 .page {
-    --etp-home-max: 1080px;
-    --etp-home-radius: 16px;
+    --orbien-home-max: 1080px;
+    --orbien-home-radius: 16px;
     /* 大区块之间：相邻 section 的「上内边距 + 下内边距」= 2×此值，故取中等略紧的 clamp */
-    --etp-home-stack-y: clamp(2.35rem, 4.25vw, 3.125rem);
-    --etp-home-gutter-x: 1.5rem;
+    --orbien-home-stack-y: clamp(2.35rem, 4.25vw, 3.125rem);
+    --orbien-home-gutter-x: 1.5rem;
     /* Hero 首屏略松，仅影响顶边 */
-    --etp-home-hero-pt: clamp(2.75rem, 6vw, 4.25rem);
-    --etp-home-border: var(--ifm-color-emphasis-200);
-    --etp-home-surface: var(--ifm-card-background-color);
-    --etp-home-grid-line: var(--ifm-color-emphasis-200);
-    --etp-home-visual-fg: var(--ifm-color-emphasis-800);
-    --etp-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 55%, var(--ifm-background-color));
-    --etp-qi-chrome-border: var(--etp-home-border);
-    --etp-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-100) 88%, var(--ifm-background-color));
-    --etp-qi-code-bg: color-mix(in srgb, #1e293b 92%, var(--ifm-color-primary-darkest) 8%);
-    --etp-qi-code-fg: #e2e8f0;
-    --etp-qi-code-dim: #94a3b8;
+    --orbien-home-hero-pt: clamp(2.75rem, 6vw, 4.25rem);
+    --orbien-home-border: var(--ifm-color-emphasis-200);
+    --orbien-home-surface: var(--ifm-card-background-color);
+    --orbien-home-grid-line: var(--ifm-color-emphasis-200);
+    --orbien-home-visual-fg: var(--ifm-color-emphasis-800);
+    --orbien-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 55%, var(--ifm-background-color));
+    --orbien-qi-chrome-border: var(--orbien-home-border);
+    --orbien-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-100) 88%, var(--ifm-background-color));
+    --orbien-qi-code-bg: color-mix(in srgb, #1e293b 92%, var(--ifm-color-primary-darkest) 8%);
+    --orbien-qi-code-fg: #e2e8f0;
+    --orbien-qi-code-dim: #94a3b8;
     background: var(--ifm-background-color);
 }
 
 [data-theme='dark'] .page {
-    --etp-home-border: var(--ifm-color-emphasis-300);
-    --etp-home-grid-line: var(--ifm-color-emphasis-400);
-    --etp-home-visual-fg: var(--ifm-color-emphasis-600);
-    --etp-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 40%, var(--ifm-background-color));
-    --etp-qi-chrome-border: var(--etp-home-border);
-    --etp-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 22%, var(--etp-qi-code-bg));
-    --etp-qi-code-bg: color-mix(in srgb, #070b12 88%, var(--ifm-color-primary-darkest) 12%);
-    --etp-qi-code-fg: #e2e8f0;
-    --etp-qi-code-dim: #8892a0;
+    --orbien-home-border: var(--ifm-color-emphasis-300);
+    --orbien-home-grid-line: var(--ifm-color-emphasis-400);
+    --orbien-home-visual-fg: var(--ifm-color-emphasis-600);
+    --orbien-qi-chrome-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 40%, var(--ifm-background-color));
+    --orbien-qi-chrome-border: var(--orbien-home-border);
+    --orbien-qi-meta-bg: color-mix(in srgb, var(--ifm-color-emphasis-200) 22%, var(--orbien-qi-code-bg));
+    --orbien-qi-code-bg: color-mix(in srgb, #070b12 88%, var(--ifm-color-primary-darkest) 12%);
+    --orbien-qi-code-fg: #e2e8f0;
+    --orbien-qi-code-dim: #8892a0;
 }
 
 /* ----- Hero ----- */
 .hero {
     position: relative;
-    padding: var(--etp-home-hero-pt) var(--etp-home-gutter-x) var(--etp-home-stack-y);
+    padding: var(--orbien-home-hero-pt) var(--orbien-home-gutter-x) var(--orbien-home-stack-y);
     overflow: hidden;
 }
 
@@ -43,7 +43,7 @@
 .heroInner {
     position: relative;
     z-index: 1;
-    max-width: var(--etp-home-max);
+    max-width: var(--orbien-home-max);
     margin: 0 auto;
     display: grid;
     grid-template-columns: minmax(0, 1.02fr) minmax(0, 0.98fr);
@@ -136,9 +136,9 @@
 }
 
 .btnGhost {
-    background: var(--etp-home-surface);
+    background: var(--orbien-home-surface);
     color: var(--ifm-font-color-base) !important;
-    border: 1px solid var(--etp-home-border);
+    border: 1px solid var(--orbien-home-border);
 }
 
 .btnGhost:hover {
@@ -153,7 +153,7 @@
 
 .heroVisual {
     position: relative;
-    border-radius: var(--etp-home-radius);
+    border-radius: var(--orbien-home-radius);
     background: transparent;
     min-height: 268px;
     overflow: hidden;
@@ -187,11 +187,11 @@
 /* ----- 功能特性 ----- */
 .featureSection {
     position: relative;
-    padding: clamp(1.1rem, 2vw, 1.5rem) var(--etp-home-gutter-x) var(--etp-home-stack-y);
+    padding: clamp(1.1rem, 2vw, 1.5rem) var(--orbien-home-gutter-x) var(--orbien-home-stack-y);
 }
 
 .featureSectionInner {
-    max-width: var(--etp-home-max);
+    max-width: var(--orbien-home-max);
     margin: 0 auto;
 }
 
@@ -207,9 +207,9 @@
 .featureCard {
     margin: 0;
     padding: 1.35rem 1.2rem 1.3rem;
-    border-radius: var(--etp-home-radius);
-    border: 1px solid var(--etp-home-border);
-    background: var(--etp-home-surface);
+    border-radius: var(--orbien-home-radius);
+    border: 1px solid var(--orbien-home-border);
+    background: var(--orbien-home-surface);
     transition: border-color 0.2s ease;
 }
 
@@ -404,13 +404,13 @@
     }
 
     .page {
-        --etp-qi-meta-bg: var(--ifm-color-emphasis-100);
-        --etp-qi-code-bg: #1e293b;
+        --orbien-qi-meta-bg: var(--ifm-color-emphasis-100);
+        --orbien-qi-code-bg: #1e293b;
     }
 
     [data-theme='dark'] .page {
-        --etp-qi-meta-bg: var(--ifm-color-emphasis-200);
-        --etp-qi-code-bg: #070b12;
+        --orbien-qi-meta-bg: var(--ifm-color-emphasis-200);
+        --orbien-qi-code-bg: #070b12;
     }
 
     .btnPrimary {
@@ -432,7 +432,7 @@
     }
 
     .qiWindow {
-        border-color: var(--etp-home-border);
+        border-color: var(--orbien-home-border);
     }
 
     .featureIconWrap {
@@ -454,6 +454,6 @@
     }
 
     [data-theme='dark'] .qiWindowMeta {
-        border-bottom: 1px solid var(--etp-home-border);
+        border-bottom: 1px solid var(--orbien-home-border);
     }
 }

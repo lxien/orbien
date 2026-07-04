@@ -1,0 +1,1111 @@
+{
+  "reflection": [
+    {
+      "type": "apple.security.AppleProvider",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.BasicConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.joran.SerializedModelConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.DateConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LevelConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LineSeparatorConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.LoggerConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.MessageConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.pattern.ThreadConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.classic.spi.LogbackServiceProvider"
+    },
+    {
+      "type": "ch.qos.logback.classic.util.DefaultJoranConfigurator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "ch.qos.logback.core.rolling.helper.DateTokenConverter",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.google.protobuf.ExtensionRegistry",
+      "methods": [
+        {
+          "name": "getEmptyRegistry",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.lmax.disruptor.AbstractSequencer"
+    },
+    {
+      "type": "com.lmax.disruptor.Value",
+      "fields": [
+        {
+          "name": "value"
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.AESCipher$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ARCFOURCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DESedeCipher",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.DHParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HKDFKeyDerivation$HKDFSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "javax.crypto.KDFParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.HmacCore$HmacSHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBEKeyFactory$PBEWithMD5AndDES",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Core$HmacSHA256AndAES_256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Parameters$General",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.PBES2Parameters$HmacSHA256AndAES_256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.github.lxien.orbien.client.TunnelClient$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.TunnelClient$2"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.ControlFrameHandler"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.ControlIdleCheckHandler"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.HeartbeatHandler"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.RealServerHandler"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.TunnelConnectionFactory$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.bridge.DirectTunnelBridge$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.IdleCheckHandler"
+    },
+    {
+      "type": "io.netty.buffer.AbstractByteBufAllocator"
+    },
+    {
+      "type": "io.netty.buffer.AbstractReferenceCountedByteBuf",
+      "fields": [
+        {
+          "name": "refCnt"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.AbstractChannelHandlerContext"
+    },
+    {
+      "type": "io.netty.channel.ChannelException",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.ChannelOutboundBuffer"
+    },
+    {
+      "type": "io.netty.channel.CombinedChannelDuplexHandler"
+    },
+    {
+      "type": "io.netty.channel.DefaultChannelConfig"
+    },
+    {
+      "type": "io.netty.channel.DefaultChannelPipeline"
+    },
+    {
+      "type": "io.netty.channel.DefaultChannelPipeline$HeadContext"
+    },
+    {
+      "type": "io.netty.channel.DefaultChannelPipeline$TailContext"
+    },
+    {
+      "type": "io.netty.channel.DefaultFileRegion",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "file"
+        },
+        {
+          "name": "transferred"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.epoll.NativeDatagramPacketArray$NativeDatagramPacket"
+    },
+    {
+      "type": "io.netty.channel.kqueue.BsdSocket",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.kqueue.KQueueEventArray",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.kqueue.KQueueEventLoop"
+    },
+    {
+      "type": "io.netty.channel.kqueue.KQueueSocketChannel",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.kqueue.KQueueStaticallyReferencedJniMethods",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.kqueue.Native",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.unix.Buffer",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.unix.DatagramSocketAddress",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "byte[]",
+            "int",
+            "int",
+            "int",
+            "io.netty.channel.unix.DatagramSocketAddress"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.unix.DomainDatagramSocketAddress",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "byte[]",
+            "int",
+            "io.netty.channel.unix.DomainDatagramSocketAddress"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.unix.ErrorsStaticallyReferencedJniMethods",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.unix.FileDescriptor",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.unix.LimitsStaticallyReferencedJniMethods",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.unix.PeerCredentials",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int",
+            "int",
+            "int[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.channel.unix.Socket",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.handler.codec.compression.SnappyFrameDecoder"
+    },
+    {
+      "type": "io.netty.handler.codec.compression.SnappyFrameEncoder"
+    },
+    {
+      "type": "io.netty.handler.ssl.SslHandler"
+    },
+    {
+      "type": "io.netty.util.AbstractReferenceCounted",
+      "fields": [
+        {
+          "name": "refCnt"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.DefaultAttributeMap"
+    },
+    {
+      "type": "io.netty.util.DefaultAttributeMap$DefaultAttribute"
+    },
+    {
+      "type": "io.netty.util.Recycler$DefaultHandle"
+    },
+    {
+      "type": "io.netty.util.ReferenceCountUtil"
+    },
+    {
+      "type": "io.netty.util.ResourceLeakDetector$DefaultResourceLeak"
+    },
+    {
+      "type": "io.netty.util.concurrent.DefaultPromise"
+    },
+    {
+      "type": "io.netty.util.concurrent.SingleThreadEventExecutor"
+    },
+    {
+      "type": "io.netty.util.internal.NativeLibraryUtil",
+      "methods": [
+        {
+          "name": "loadLibrary",
+          "parameterTypes": [
+            "java.lang.String",
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
+      "fields": [
+        {
+          "name": "producerLimit"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
+      "fields": [
+        {
+          "name": "consumerIndex"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
+      "fields": [
+        {
+          "name": "producerIndex"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueConsumerIndexField",
+      "fields": [
+        {
+          "name": "consumerIndex"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerIndexField",
+      "fields": [
+        {
+          "name": "producerIndex"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerLimitField",
+      "fields": [
+        {
+          "name": "producerLimit"
+        }
+      ]
+    },
+    {
+      "type": "java.io.FileDescriptor",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "fd"
+        }
+      ]
+    },
+    {
+      "type": "java.io.IOException",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.lang.BaseVirtualThread"
+    },
+    {
+      "type": "java.lang.Boolean",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getBoolean",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Class",
+      "methods": [
+        {
+          "name": "getModule",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Module",
+      "methods": [
+        {
+          "name": "getDescriptor",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.OutOfMemoryError",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.lang.ProcessHandle",
+      "methods": [
+        {
+          "name": "current",
+          "parameterTypes": []
+        },
+        {
+          "name": "pid",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.RuntimeException",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.lang.String",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.lang.Thread",
+      "methods": [
+        {
+          "name": "isVirtual",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.net.InetSocketAddress",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.String",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.net.PortUnreachableException",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.nio.Bits"
+    },
+    {
+      "type": "java.nio.Buffer",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "address"
+        },
+        {
+          "name": "limit"
+        },
+        {
+          "name": "position"
+        }
+      ],
+      "methods": [
+        {
+          "name": "limit",
+          "parameterTypes": []
+        },
+        {
+          "name": "position",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.ByteBuffer"
+    },
+    {
+      "type": "java.nio.DirectByteBuffer"
+    },
+    {
+      "type": "java.nio.channels.ClosedChannelException",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.nio.channels.FileChannel"
+    },
+    {
+      "type": "java.security.AlgorithmParametersSpi"
+    },
+    {
+      "type": "java.security.KeyStoreSpi"
+    },
+    {
+      "type": "java.security.interfaces.RSAPrivateKey"
+    },
+    {
+      "type": "java.security.interfaces.RSAPublicKey"
+    },
+    {
+      "type": "jdk.internal.misc.Unsafe",
+      "methods": [
+        {
+          "name": "getUnsafe",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "libcore.io.Memory"
+    },
+    {
+      "type": "org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider"
+    },
+    {
+      "type": "org.bouncycastle.jce.provider.BouncyCastleProvider"
+    },
+    {
+      "type": "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"
+    },
+    {
+      "type": "org.bouncycastle.openssl.PEMParser"
+    },
+    {
+      "type": "org.robolectric.Robolectric"
+    },
+    {
+      "type": "sun.misc.Unsafe",
+      "fields": [
+        {
+          "name": "theUnsafe"
+        }
+      ],
+      "methods": [
+        {
+          "name": "invokeCleaner",
+          "parameterTypes": [
+            "java.nio.ByteBuffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.nio.ch.FileChannelImpl",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "fd"
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA224withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.DSA$SHA256withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.NativePRNG",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.security.SecureRandomParameters"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA224",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA2$SHA256",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA384",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.SHA5$SHA512",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.X509Factory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.certpath.PKIXCertPathValidator",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.PSSParameters",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAKeyFactory$Legacy",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSAPSSSignature",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA224withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.rsa.RSASignature$SHA256withRSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.SSLContextImpl$TLSContext",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityInfoAccessExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.AuthorityKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.BasicConstraintsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CRLDistributionPointsExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.CertificatePoliciesExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.ExtendedKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.KeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.NetscapeCertTypeExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.PrivateKeyUsageExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectAlternativeNameExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.security.x509.SubjectKeyIdentifierExtension",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.Boolean",
+            "java.lang.Object"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en"
+    },
+    {
+      "type": "sun.text.resources.cldr.FormatData_en_US"
+    },
+    {
+      "type": "sun.util.resources.cldr.CalendarData"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames_en"
+    },
+    {
+      "type": "sun.util.resources.cldr.TimeZoneNames_en_US"
+    }
+  ],
+  "resources": [
+    {
+      "glob": "META-INF/native/libnetty_transport_native_kqueue_aarch_64.dylib"
+    },
+    {
+      "glob": "META-INF/native/libnetty_transport_native_kqueue_aarch_64.jnilib"
+    },
+    {
+      "glob": "META-INF/services/ch.qos.logback.classic.spi.Configurator"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.InetAddressResolverProvider"
+    },
+    {
+      "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
+    },
+    {
+      "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
+    },
+    {
+      "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
+    },
+    {
+      "glob": "META-INF/services/org.slf4j.spi.SLF4JServiceProvider"
+    },
+    {
+      "glob": "logback-test.scmo"
+    },
+    {
+      "glob": "logback-test.xml"
+    },
+    {
+      "glob": "logback.scmo"
+    },
+    {
+      "glob": "logback.xml"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/nfkc.nrm"
+    }
+  ]
+}

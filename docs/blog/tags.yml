@@ -1,4 +1,4 @@
-etp:
-  label: etp
+orbien:
+  label: orbien
   permalink: /docs
   description: etp是一个轻量级的内网穿透工具
