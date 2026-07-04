@@ -1,0 +1,49 @@
+/*
+ *
+ *  *    Copyright 2026 lxien
+ *  *
+ *  *    Licensed under the Apache License, Version 2.0 (the "License");
+ *  *    you may not use this file except in compliance with the License.
+ *  *    You may obtain a copy of the License at
+ *  *
+ *  *        http://www.apache.org/licenses/LICENSE-2.0
+ *  *
+ *  *    Unless required by applicable law or agreed to in writing, software
+ *  *    distributed under the License is distributed on an "AS IS" BASIS,
+ *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  *    See the License for the specific language governing permissions and
+ *  *    limitations under the License.
+ *
+ */
+
+package io.github.lxien.orbien.core.domain;
+
+import io.github.lxien.orbien.core.enums.DomainType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class DomainInfo {
+    /**
+     * 根域名
+     */
+    private String rootDomain;
+    /**
+     * 域名
+     */
+    private String domain;
+    /**
+     * 域名类型
+     */
+    private DomainType domainType;
+
+
+    public String getFullDomain() {
+        if (domainType == DomainType.CUSTOM_DOMAIN) {
+            return domain;
+        }
+        return domain + "." + rootDomain;
+    }
+
+}
