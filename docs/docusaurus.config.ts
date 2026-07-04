@@ -5,8 +5,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-    title: 'etp',
-    tagline: '☕ ETP 内网穿透平台',
+    title: 'Orbien',
+    tagline: '☕ Orbien 内网穿透平台',
     favicon: 'img/favicon.ico',
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -15,10 +15,10 @@ const config: Config = {
     },
 
     // Set the production url of your site here
-    url: 'https://etp.github.io',
-    baseUrl: '/etp/',
+    url: 'https://orbien.github.io',
+    baseUrl: '/orbien/',
     organizationName: 'xiaoniucode', // Usually your GitHub org/user name.
-    projectName: 'etp', // Usually your repo name.
+    projectName: 'orbien', // Usually your repo name.
 
     onBrokenLinks: 'throw',
 
@@ -75,7 +75,7 @@ const config: Config = {
         navbar: {
             title: '首页',
             logo: {
-                alt: 'etp',
+                alt: 'orbien',
                 src: 'img/logo.png',
             },
             items: [
@@ -87,17 +87,17 @@ const config: Config = {
                 },
                 {to: '/blog', label: '博客', position: 'right'},
                 {
-                    href: 'https://github.com/xiaoniucode/etp/issues',
+                    href: 'https://github.com/xiaoniucode/orbien/issues',
                     label: '问题反馈',
                     position: 'right',
                 },
                 {
-                    href: 'https://github.com/xiaoniucode/etp/discussions',
+                    href: 'https://github.com/xiaoniucode/orbien/discussions',
                     label: 'GitHub社区',
                     position: 'right',
                 },
                 {
-                    href: 'https://github.com/xiaoniucode/etp',
+                    href: 'https://github.com/xiaoniucode/orbien',
                     label: 'GitHub',
                     position: 'right',
                 },
@@ -109,7 +109,7 @@ const config: Config = {
         },
         footer: {
             style: 'dark',
-            copyright: `Copyright © ${new Date().getFullYear()} etp xiaoniucode.com`,
+            copyright: `Copyright © ${new Date().getFullYear()} orbien xiaoniucode.com`,
         },
         prism: {
             //设置高亮语言

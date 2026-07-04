@@ -4,7 +4,7 @@
     <ElDrawer v-model="isDrawerVisible" :size="isMobile ? '100%' : '480px'" :with-header="false">
       <div class="mb-5 flex-cb">
         <div>
-          <span class="text-base font-medium">etp Bot</span>
+          <span class="text-base font-medium">orbien Bot</span>
           <div class="mt-1.5 flex-c gap-1">
             <div
               class="h-2 w-2 rounded-full"
@@ -109,7 +109,7 @@
   // 常量定义
   const MOBILE_BREAKPOINT = 640
   const SCROLL_DELAY = 100
-  const BOT_NAME = 'etp Bot'
+  const BOT_NAME = 'orbien Bot'
   const USER_NAME = 'Me'
 
   // 响应式布局

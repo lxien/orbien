@@ -10,7 +10,7 @@
             src="@imgs/user/avatar.webp"
           />
           <h2 class="mt-5 text-xl font-normal">{{ userInfo.username }}</h2>
-          <p class="mt-5 text-sm">Easy Tunnel Proxy</p>
+          <p class="mt-5 text-sm">Orbien</p>
 
           <div class="w-75 mx-auto mt-7.5 text-left">
             <div class="mt-2.5">

@@ -23,7 +23,7 @@
     </dependencies>
     <packaging>pom</packaging>
     <url>https://github.com/xiaoniucode/etp</url>
-    <description>etp(Easy Tunnel Proxy)</description>
+    <description>orbien</description>
     <licenses>
         <license>
             <name>Apache License 2.0</name>

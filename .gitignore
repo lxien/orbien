@@ -29,3 +29,5 @@ etp.trace.db
 /skills
 /console-ui/cursor.md
 /data
+.cursor
+.cursorignore

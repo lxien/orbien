@@ -9,7 +9,7 @@ sidebar_position: 6
 
 :::tip 提示
 
-`etp`运行环境要求`Linux`系统中`GNU libc`版本为`2.34`及以上版本，对于CentOS-7 低版本系统并天然不支持，需要升级GNU libc库。
+`orbien`运行环境要求`Linux`系统中`GNU libc`版本为`2.34`及以上版本，对于CentOS-7 低版本系统并天然不支持，需要升级GNU libc库。
 
 :::
 

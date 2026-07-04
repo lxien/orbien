@@ -4,7 +4,7 @@ sidebar_position: 4
 
 # BasicAuth 认证（HTTP）
 
-BasicAuth 认证是一种简单的 HTTP 身份验证方式，通过在 HTTP 请求头中携带用户名和密码进行身份验证。etp 支持为每个 HTTP
+BasicAuth 认证是一种简单的 HTTP 身份验证方式，通过在 HTTP 请求头中携带用户名和密码进行身份验证。orbien 支持为每个 HTTP
 代理配置独立的 BasicAuth 认证，仅对 HTTP 协议代理生效。
 
 ## 配置示例

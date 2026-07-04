@@ -5,20 +5,20 @@
   一个高性能的内网穿透平台
 </p>
 <div align="center">
-  <a href="https://github.com/xiaoniucode/etp/stargazers">
-    <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
+  <a href="https://github.com/lxien/orbien/stargazers">
+    <img src="https://img.shields.io/github/stars/lxien/orbien?style=for-the-badge&logo=github" alt="GitHub Stars"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/forks">
-    <img src="https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Forks"/>
+  <a href="https://github.com/lxien/orbien/forks">
+    <img src="https://img.shields.io/github/forks/lxien/orbien?style=for-the-badge&logo=github" alt="GitHub Forks"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
+  <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/xiaoniucode/etp/releases/v0.15.0">
-    <img src="https://img.shields.io/badge/etp-0.15.0-blue?style=for-the-badge" alt="etp:0.15.0"/>
+ <a href="https://github.com/lxien/orbien/releases/v0.15.0">
+    <img src="https://img.shields.io/badge/orbien-0.15.0-blue?style=for-the-badge" alt="orbien:0.15.0"/>
   </a>
-<a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
-  <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
+<a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
+  <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
 </a>
 
 </div>
@@ -26,13 +26,13 @@
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
-  <a href="https://xiaoniucode.github.io/etp"><strong>文档网站</strong></a>
+  <a href="https://lxien.github.io/orbien"><strong>文档网站</strong></a>
 </div>
 
 ![dashboard.png](doc/image/dashboard.png)
 
 ## 介绍
-**etp (Easy Tunnel Proxy)** 是一个高性能的**内网穿透平台**。
+**Orbien** 是一个高性能的**内网穿透平台**。
 - 支持 TCP、HTTP 协议代理
 - 数据压缩传输，降低带宽消耗
 - TCP 多路复用流传输，单物理连接承载多个请求
@@ -56,21 +56,21 @@
 - Docker 20+
 - Linux x86_64
 
-Docker一键启动`etps`服务端:
+Docker一键启动`orbiens`服务端:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
 管理面板访问地址：`http://服务器IP:8020` (admin: 123456)
 ### 安装客户端
 
-从 [GitHub Releases](https://github.com/xiaoniucode/etp/tags)页面下载最新版本，根据您的操作系统下载对应的二进制文件。
+从 [GitHub Releases](https://github.com/lxien/orbien/tags)页面下载最新版本，根据您的操作系统下载对应的二进制文件。
 
-下载到本地解压后编辑配置文件`etpc.toml`，
+下载到本地解压后编辑配置文件`orbienc.toml`，
 
 ```toml
-server_addr = "etps所在服务IP或域名"
+server_addr = "orbiens所在服务IP或域名"
 [auth]
 token = "身份认证令牌"
 ```
@@ -78,21 +78,21 @@ token = "身份认证令牌"
 运行客户端:
 
 ```shell
-./etpc -c etpc.toml # Linux / MacOS
+./orbienc -c orbienc.toml # Linux / MacOS
 
-etpc.exe -c etpc.toml # Windows
+orbienc.exe -c orbienc.toml # Windows
 ```
 
-更多使用细节请查阅[文档网站](https://xiaoniucode.github.io/etp/)。
+更多使用细节请查阅[文档网站](https://lxien.github.io/orbien/)。
 
 ## 问题反馈
 
-反馈问题:[issues](https://github.com/xiaoniucode/etp/issues)
+反馈问题:[issues](https://github.com/lxien/orbien/issues)
 
 ## 项目趋势
 
 <p align="center">
-  <a href="https://github.com/xiaoniucode/etp/stargazers">
-    <img src="https://api.star-history.com/svg?repos=xiaoniucode/etp&type=Date" alt="Star History">
+  <a href="https://github.com/lxien/orbien/stargazers">
+    <img src="https://api.star-history.com/svg?repos=lxien/orbien&type=Date" alt="Star History">
   </a>
 </p>

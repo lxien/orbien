@@ -5,20 +5,20 @@
   A high-performance intranet penetration platform
 </p>
 <div align="center">
-  <a href="https://github.com/xiaoniucode/etp/stargazers">
-    <img src="https://img.shields.io/github/stars/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Stars"/>
+  <a href="https://github.com/lxien/orbien/stargazers">
+    <img src="https://img.shields.io/github/stars/lxien/orbien?style=for-the-badge&logo=github" alt="GitHub Stars"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/forks">
-    <img src="https://img.shields.io/github/forks/xiaoniucode/etp?style=for-the-badge&logo=github" alt="GitHub Forks"/>
+  <a href="https://github.com/lxien/orbien/forks">
+    <img src="https://img.shields.io/github/forks/lxien/orbien?style=for-the-badge&logo=github" alt="GitHub Forks"/>
   </a>
-  <a href="https://github.com/xiaoniucode/etp/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/xiaoniucode/etp?style=for-the-badge" alt="License"/>
+  <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/xiaoniucode/etp/releases/v0.15.0">
-    <img src="https://img.shields.io/badge/etp-0.15.0-blue?style=for-the-badge" alt="etp:0.15.0"/>
+ <a href="https://github.com/lxien/orbien/releases/v0.15.0">
+    <img src="https://img.shields.io/badge/orbien-0.15.0-blue?style=for-the-badge" alt="orbien:0.15.0"/>
   </a>
-<a href="https://somsubhra.github.io/github-release-stats/?username=xiaoniucode&repository=etp">
-  <img src="https://img.shields.io/github/downloads/xiaoniucode/etp/total?style=for-the-badge" alt="Downloads"/>
+<a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
+  <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
 </a>
 
 </div>
@@ -26,13 +26,13 @@
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
   <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
-  <a href="https://xiaoniucode.github.io/etp"><strong>Documentation</strong></a>
+  <a href="https://lxien.github.io/orbien"><strong>Documentation</strong></a>
 </div>
 
 ![dashboard.png](doc/image/dashboard.png)
 
 ## Introduction
-**etp (Easy Tunnel Proxy)** is a high-performance **intranet penetration platform**.
+**Orbien**  is a high-performance **intranet penetration platform**.
 - Support for TCP and HTTP protocol proxying
 - Data compression transmission, reducing bandwidth consumption
 - TCP multiplexing stream transmission, multiple requests over single physical connection
@@ -59,14 +59,14 @@ Requirements:
 One-command Docker startup for `etps` server:
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/xiaoniucode/etp/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
 Management dashboard access: `http://server_ip:8020` (admin: 123456)
 
 ### Client Installation
 
-Download the latest version from the [GitHub Releases](https://github.com/xiaoniucode/etp/tags) page and select the binary file for your operating system.
+Download the latest version from the [GitHub Releases](https://github.com/lxien/orbien/tags) page and select the binary file for your operating system.
 
 After extracting locally, edit the configuration file `etpc.toml`:
 
@@ -84,16 +84,16 @@ Run the client:
 etpc.exe -c etpc.toml # Windows
 ```
 
-For more usage details, please refer to the [documentation website](https://xiaoniucode.github.io/etp/).
+For more usage details, please refer to the [documentation website](https://lxien.github.io/orbien/).
 
 ## Feedback
 
-Report issues: [issues](https://github.com/xiaoniucode/etp/issues)
+Report issues: [issues](https://github.com/lxien/orbien/issues)
 
 ## Project Trends
 
 <p align="center">
-  <a href="https://github.com/xiaoniucode/etp/stargazers">
-    <img src="https://api.star-history.com/svg?repos=xiaoniucode/etp&type=Date" alt="Star History">
+  <a href="https://github.com/lxien/orbien/stargazers">
+    <img src="https://api.star-history.com/svg?repos=lxien/orbien&type=Date" alt="Star History">
   </a>
 </p>

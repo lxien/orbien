@@ -131,7 +131,7 @@ export default function Home() {
                 <section className={styles.hero}>
                     <div className={styles.heroInner}>
                         <div className={styles.heroCopy}>
-                            <p className={styles.heroEyebrow}>Easy Tunnel Proxy · etp</p>
+                            <p className={styles.heroEyebrow}>Orbien</p>
                             <h1 className={styles.heroTitle}>{siteConfig.tagline}</h1>
                             <p className={styles.heroLead}>
                                 面向开发和运维的一站式解决方案。TCP/HTTP多协议代理支持，反向代理、TLS传输加密、压缩、负载均衡、精细限流、访问控制、安全认证、
