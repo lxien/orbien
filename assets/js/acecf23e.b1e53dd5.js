@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdocusaurus_classic_typescript=globalThis.webpackChunkdocusaurus_classic_typescript||[]).push([[1903],{1912(s){s.exports=JSON.parse('{"blogBasePath":"/orbien/blog","blogTitle":"Blog","authorsListPath":"/orbien/blog/authors"}')}}]);

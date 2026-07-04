@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="rss.xsl"?>
 <rss version="2.0">
     <channel>
-        <title>etp Blog</title>
-        <link>https://etp.github.io/etp/blog</link>
-        <description>etp Blog</description>
+        <title>Orbien Blog</title>
+        <link>https://orbien.github.io/orbien/blog</link>
+        <description>Orbien Blog</description>
         <lastBuildDate>Wed, 03 Dec 2025 10:55:20 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>zh-Hans</language>
         <item>
             <title><![CDATA[版本历史]]></title>
-            <link>https://etp.github.io/etp/blog/index</link>
-            <guid>https://etp.github.io/etp/blog/index</guid>
+            <link>https://orbien.github.io/orbien/blog/index</link>
+            <guid>https://orbien.github.io/orbien/blog/index</guid>
             <pubDate>Wed, 03 Dec 2025 10:55:20 GMT</pubDate>
         </item>
     </channel>

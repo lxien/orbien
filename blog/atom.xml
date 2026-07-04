@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://etp.github.io/etp/blog</id>
-    <title>etp Blog</title>
+    <id>https://orbien.github.io/orbien/blog</id>
+    <title>Orbien Blog</title>
     <updated>2025-12-03T10:55:20.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://etp.github.io/etp/blog"/>
-    <subtitle>etp Blog</subtitle>
-    <icon>https://etp.github.io/etp/img/favicon.ico</icon>
+    <link rel="alternate" href="https://orbien.github.io/orbien/blog"/>
+    <subtitle>Orbien Blog</subtitle>
+    <icon>https://orbien.github.io/orbien/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[版本历史]]></title>
-        <id>https://etp.github.io/etp/blog/index</id>
-        <link href="https://etp.github.io/etp/blog/index"/>
+        <id>https://orbien.github.io/orbien/blog/index</id>
+        <link href="https://orbien.github.io/orbien/blog/index"/>
         <updated>2025-12-03T10:55:20.000Z</updated>
     </entry>
 </feed>

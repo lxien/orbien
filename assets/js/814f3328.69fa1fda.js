@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkdocusaurus_classic_typescript=globalThis.webpackChunkdocusaurus_classic_typescript||[]).push([[7472],{5513(s){s.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"\u7248\u672c\u5386\u53f2","permalink":"/orbien/blog/index","unlisted":false,"date":"2025-12-03T10:55:20.000Z"}]}')}}]);
