@@ -24,6 +24,7 @@ import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
 import io.github.lxien.orbien.core.enums.LoadBalanceType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -179,6 +180,10 @@ public class ProxyConfigAssembler {
                 bw.setLimitOut(bandwidth.getLimitOut());
             }
             proxyBuilder.setBandwidth(bw.build());
+        }
+        Message.HealthCheck healthCheck = RuntimeInfoSupport.toHealthCheckProto(config.getHealthCheck());
+        if (healthCheck != null) {
+            proxyBuilder.setHealthCheck(healthCheck);
         }
         return proxyBuilder.build();
     }

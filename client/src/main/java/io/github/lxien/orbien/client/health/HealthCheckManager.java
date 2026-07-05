@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.client.health;
 
+import io.github.lxien.orbien.client.manager.ProxyManagerHolder;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
@@ -47,13 +48,18 @@ public class HealthCheckManager {
      * @param runtimeInfo 代理运行时信息
      */
     public void startHealthCheck(Message.RuntimeInfo runtimeInfo) {
-        Message.HealthCheck healthCheck = runtimeInfo.getHealthCheck();
-        if (!healthCheck.getEnabled()) {
-            return;
-        }
         String proxyId = runtimeInfo.getProxyId();
         stopHealthCheck(proxyId);
-        Runnable checkTask = () -> executeHealthCheckForProxy(runtimeInfo);
+        if (!runtimeInfo.hasHealthCheck() || !runtimeInfo.getHealthCheck().getEnabled()) {
+            return;
+        }
+        Message.HealthCheck healthCheck = runtimeInfo.getHealthCheck();
+        Runnable checkTask = () -> {
+            Message.RuntimeInfo current = ProxyManagerHolder.get().get(proxyId);
+            if (current != null) {
+                executeHealthCheckForProxy(current);
+            }
+        };
         ScheduledFuture<?> future = checkScheduler.scheduleAtFixedRate(
                 checkTask,
                 5,
@@ -71,17 +77,32 @@ public class HealthCheckManager {
             future.cancel(true);
             logger.debug("停止代理健康检查: {}", proxyId);
         }
+        purgePendingReports(proxyId);
+    }
+
+    private void purgePendingReports(String proxyId) {
+        pendingReports.removeIf(item -> proxyId.equals(item.getProxyId()));
+    }
+
+    private boolean isHealthCheckActive(String proxyId) {
+        return proxyTasks.containsKey(proxyId);
     }
 
     private void executeHealthCheckForProxy(Message.RuntimeInfo runtimeInfo) {
+        String proxyId = runtimeInfo.getProxyId();
+        if (!isHealthCheckActive(proxyId)) {
+            return;
+        }
         List<Message.Target> targets = runtimeInfo.getTargetsList();
-        if (targets.isEmpty()) return;
+        if (targets.isEmpty()) {
+            return;
+        }
 
         List<CompletableFuture<ServiceHealth>> futures = new ArrayList<>();
         Message.HealthCheck healthCheck = runtimeInfo.getHealthCheck();
         for (Message.Target target : targets) {
             CompletableFuture<ServiceHealth> f = healthChecker.check(
-                    runtimeInfo.getProxyId(),
+                    proxyId,
                     target,
                     healthCheck);
             futures.add(f);
@@ -89,6 +110,9 @@ public class HealthCheckManager {
 
         CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
                 .thenRun(() -> {
+                    if (!isHealthCheckActive(proxyId)) {
+                        return;
+                    }
                     List<ServiceHealth> results = new ArrayList<>();
                     for (CompletableFuture<ServiceHealth> f : futures) {
                         try {
@@ -106,10 +130,17 @@ public class HealthCheckManager {
     }
 
     private void reportHealthBatch() {
-        if (pendingReports.isEmpty()) return;
-        List<ServiceHealth> toReport = new ArrayList<>(pendingReports);
-        logger.debug("上报服务健康状态个数：{}", toReport.size());
+        if (pendingReports.isEmpty()) {
+            return;
+        }
+        List<ServiceHealth> toReport = pendingReports.stream()
+                .filter(item -> isHealthCheckActive(item.getProxyId()))
+                .toList();
         pendingReports.clear();
+        if (toReport.isEmpty()) {
+            return;
+        }
+        logger.debug("上报服务健康状态个数：{}", toReport.size());
         List<Message.ServiceHealth> list = toReport.stream().map(serviceHealth -> {
             return Message.ServiceHealth.newBuilder()
                     .setProxyId(serviceHealth.getProxyId())

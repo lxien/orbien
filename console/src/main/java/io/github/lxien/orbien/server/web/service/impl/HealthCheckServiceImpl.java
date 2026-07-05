@@ -23,8 +23,10 @@ import io.github.lxien.orbien.server.web.param.healthcheck.HealthCheckSaveParam;
 import io.github.lxien.orbien.server.web.param.healthcheck.HealthCheckStatusUpdateParam;
 import io.github.lxien.orbien.server.web.repository.HealthCheckRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyRepository;
+import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.service.HealthCheckService;
 import io.github.lxien.orbien.server.web.service.converter.HealthCheckConvert;
+import io.github.lxien.orbien.server.web.support.tx.TransactionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,10 @@ public class HealthCheckServiceImpl implements HealthCheckService {
     private ProxyRepository proxyRepository;
     @Autowired
     private HealthCheckConvert healthCheckConvert;
+    @Autowired
+    private ProxyRuntimeSyncService proxyRuntimeSyncService;
+    @Autowired
+    private TransactionHelper transactionHelper;
 
     @Override
     public HealthCheckDTO getByProxyId(String proxyId) {
@@ -63,6 +69,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
         healthCheckConvert.updateDO(healthCheckDO, param);
         healthCheckDO.setPath(type.isHttpCheck() ? param.getPath() : "/");
         healthCheckRepository.save(healthCheckDO);
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(param.getProxyId()));
     }
 
     @Override
@@ -73,6 +80,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
                 .orElseThrow(() -> new BizException("健康检查配置不存在"));
         healthCheckDO.setEnabled(param.getEnabled());
         healthCheckRepository.save(healthCheckDO);
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(param.getProxyId()));
     }
 
     private void ensureProxyExists(String proxyId) {

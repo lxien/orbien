@@ -38,4 +38,8 @@ public class TargetDTO {
      * 目标名称
      */
     private String name;
+    /**
+     * 健康状态：0=DOWN, 1=UP，未上报时为 null
+     */
+    private Integer healthStatus;
 }

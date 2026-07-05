@@ -30,6 +30,31 @@ public class HealthManager {
         targetHealth.put(key, status);
     }
 
+    public Message.HealthStatus getHealthStatus(String proxyId, String host, Integer port) {
+        Objects.requireNonNull(proxyId, "proxyId不能为空");
+        Objects.requireNonNull(host, "host不能为空");
+        Objects.requireNonNull(port, "port不能为空");
+
+        ConcurrentHashMap<String, Message.HealthStatus> targetHealth = healthStore.get(proxyId);
+        if (targetHealth == null) {
+            return null;
+        }
+        return targetHealth.get(buildTargetKey(host, port));
+    }
+
+    /**
+     * 将 proto 健康状态映射为数值：UP=1, DOWN=0。
+     */
+    public Integer toTargetHealthCode(Message.HealthStatus status) {
+        if (status == Message.HealthStatus.UP) {
+            return 1;
+        }
+        if (status == Message.HealthStatus.DOWN) {
+            return 0;
+        }
+        return null;
+    }
+
     public List<Target> getAvailableTargets(String proxyId, List<Target> targets) {
         Objects.requireNonNull(proxyId, "proxyId不能为空");
         Objects.requireNonNull(targets, "targets不能为空");

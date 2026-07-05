@@ -1,10 +1,19 @@
 package io.github.lxien.orbien.core.message.support;
 
+import io.github.lxien.orbien.core.domain.DomainInfo;
+import io.github.lxien.orbien.core.domain.HealthCheckConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
+import io.github.lxien.orbien.core.domain.Target;
 import io.github.lxien.orbien.core.domain.TransportCustomConfig;
+import io.github.lxien.orbien.core.enums.HealthCheckType;
+import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 服务端向客户端推送的运行时配置（{@link Message.RuntimeInfo}）构建与解析辅助类。
@@ -74,5 +83,107 @@ public final class RuntimeInfoSupport {
             return resolveDataProtocol(globalDefault, runtimeInfo.getTransport());
         }
         return globalDefault != null ? globalDefault : TransportProtocol.TCP;
+    }
+
+    public static Message.HealthCheck toHealthCheckProto(HealthCheckConfig config) {
+        if (config == null) {
+            return null;
+        }
+        Message.HealthCheck.Builder builder = Message.HealthCheck.newBuilder()
+                .setEnabled(config.isEnabled());
+        if (config.getType() != null) {
+            builder.setType(toProtoHealthCheckType(config.getType()));
+        }
+        if (config.getInterval() != null) {
+            builder.setInterval(config.getInterval());
+        }
+        if (config.getTimeout() != null) {
+            builder.setTimeout(config.getTimeout());
+        }
+        if (config.getMaxFailed() != null) {
+            builder.setMaxFailed(config.getMaxFailed());
+        }
+        if (config.getPath() != null) {
+            builder.setPath(config.getPath());
+        }
+        return builder.build();
+    }
+
+    public static Message.HealthCheckType toProtoHealthCheckType(HealthCheckType type) {
+        return switch (type) {
+            case TCP -> Message.HealthCheckType.HEALTH_CHECK_TYPE_TCP;
+            case HTTP -> Message.HealthCheckType.HEALTH_CHECK_TYPE_HTTP;
+        };
+    }
+
+    public static Message.RuntimeInfo buildRuntimeInfo(ProxyConfig config, Collection<String> remoteAddrs) {
+        List<Message.Target> targetList = config.getTargets().stream()
+                .map(RuntimeInfoSupport::toTargetProto)
+                .toList();
+
+        Message.RuntimeInfo.Builder builder = Message.RuntimeInfo.newBuilder()
+                .setProxyId(config.getProxyId())
+                .setName(config.getName())
+                .addAllTargets(targetList);
+
+        if (remoteAddrs != null && !remoteAddrs.isEmpty()) {
+            builder.addAllRemoteAddr(remoteAddrs);
+        }
+
+        Message.HealthCheck healthCheck = toHealthCheckProto(config.getHealthCheck());
+        if (healthCheck != null) {
+            builder.setHealthCheck(healthCheck);
+        }
+
+        applyTransport(builder, config);
+        return builder.build();
+    }
+
+    public static List<String> buildRemoteAddrs(Set<DomainInfo> domains,
+                                                ProtocolType protocolType,
+                                                int httpProxyPort,
+                                                int httpsProxyPort) {
+        if (domains == null || domains.isEmpty()) {
+            return List.of();
+        }
+        return domains.stream()
+                .map(domain -> buildRemoteAddr(domain.getFullDomain(), protocolType, httpProxyPort, httpsProxyPort))
+                .toList();
+    }
+
+    public static String buildRemoteAddr(String domain,
+                                         ProtocolType protocolType,
+                                         int httpProxyPort,
+                                         int httpsProxyPort) {
+        String prefix;
+        String port;
+        switch (protocolType) {
+            case HTTP -> {
+                prefix = "http://";
+                port = httpProxyPort == 80 ? "" : ":" + httpProxyPort;
+            }
+            case HTTPS -> {
+                prefix = "https://";
+                port = httpsProxyPort == 443 ? "" : ":" + httpsProxyPort;
+            }
+            default -> {
+                prefix = "";
+                port = "";
+            }
+        }
+        return prefix + domain + port;
+    }
+
+    private static Message.Target toTargetProto(Target target) {
+        Message.Target.Builder builder = Message.Target.newBuilder()
+                .setHost(target.getHost())
+                .setPort(target.getPort());
+        if (target.getName() != null) {
+            builder.setName(target.getName());
+        }
+        if (target.getWeight() != null) {
+            builder.setWeight(target.getWeight());
+        }
+        return builder.build();
     }
 }

@@ -18,11 +18,7 @@
 
 package io.github.lxien.orbien.server.statemachine.agent.action;
 
-import io.github.lxien.orbien.core.domain.DomainInfo;
-import io.github.lxien.orbien.core.domain.HealthCheckConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
-import io.github.lxien.orbien.core.enums.HealthCheckType;
-import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.core.message.TMSP;
@@ -44,7 +40,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * 将代理配置信息同步给在线客户端
@@ -67,39 +62,12 @@ public class ProxyConfigSyncAction extends AgentBaseAction {
         }
         List<Message.RuntimeInfo> list = proxies.stream().map(p -> {
             ProxyConfig config = p.getProxyConfig();
-            Set<DomainInfo> domains = p.getDomains();
-
-            List<Message.Target> targetList = config.getTargets().stream().map(t ->
-                    Message.Target.newBuilder()
-                            .setHost(t.getHost())
-                            .setPort(t.getPort())
-                            .setName(t.getName())
-                            .setWeight(t.getWeight())
-                            .build()).toList();
-
-            Message.RuntimeInfo.Builder runtimeInfoBuilder = Message.RuntimeInfo.newBuilder()
-                    .setProxyId(config.getProxyId())
-                    .setName(config.getName())
-                    .addAllTargets(targetList);
-
-            List<String> remoteAdders = domains.stream()
-                    .map(d -> buildAddress(d.getFullDomain(), config.getProtocol())).toList();
-            runtimeInfoBuilder.addAllRemoteAddr(remoteAdders);
-
-            HealthCheckConfig healthCheckConfig = config.getHealthCheck();
-            if (healthCheckConfig != null && healthCheckConfig.isEnabled()) {
-                Message.HealthCheck healthCheck = Message.HealthCheck.newBuilder()
-                        .setType(convertHealthCheckType(healthCheckConfig.getType()))
-                        .setInterval(healthCheckConfig.getInterval())
-                        .setTimeout(healthCheckConfig.getTimeout())
-                        .setMaxFailed(healthCheckConfig.getMaxFailed())
-                        .setPath(healthCheckConfig.getPath())
-                        .setEnabled(healthCheckConfig.isEnabled())
-                        .build();
-                runtimeInfoBuilder.setHealthCheck(healthCheck);
-            }
-            RuntimeInfoSupport.applyTransport(runtimeInfoBuilder, config);
-            return runtimeInfoBuilder.build();
+            List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
+                    p.getDomains(),
+                    config.getProtocol(),
+                    appConfig.getHttpProxyPort(),
+                    appConfig.getHttpsProxyPort());
+            return RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
         }).toList();
         Message.ProxySyncResponse.Builder builder = Message.ProxySyncResponse.newBuilder();
         builder.setProxySyncType(Message.ProxySyncType.FULL);
@@ -111,33 +79,4 @@ public class ProxyConfigSyncAction extends AgentBaseAction {
         control.writeAndFlush(frame);
     }
 
-    private Message.HealthCheckType convertHealthCheckType(HealthCheckType type) {
-        return switch (type) {
-            case TCP -> Message.HealthCheckType.HEALTH_CHECK_TYPE_TCP;
-            case HTTP -> Message.HealthCheckType.HEALTH_CHECK_TYPE_HTTP;
-        };
-    }
-
-    private String buildAddress(String domain, ProtocolType protocolType) {
-        String prefix;
-        String port;
-
-        switch (protocolType) {
-            case HTTP:
-                prefix = "http://";
-                int httpPort = appConfig.getHttpProxyPort();
-                port = httpPort == 80 ? "" : ":" + httpPort;
-                break;
-            case HTTPS:
-                prefix = "https://";
-                int httpsPort = appConfig.getHttpsProxyPort();
-                port = httpsPort == 443 ? "" : ":" + httpsPort;
-                break;
-            default:
-                prefix = "";
-                port = "";
-        }
-
-        return prefix + domain + port;
-    }
 }

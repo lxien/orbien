@@ -38,6 +38,7 @@ import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
 import io.github.lxien.orbien.server.web.service.ProxyService;
+import io.github.lxien.orbien.server.web.service.support.TargetHealthEnricher;
 import io.github.lxien.orbien.server.web.service.converter.*;
 import io.github.lxien.orbien.server.web.service.converter.ProxyConvert;
 import io.github.lxien.orbien.server.web.service.converter.ProxyTargetConvert;
@@ -100,6 +101,8 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyConfigSyncService proxyConfigSyncService;
     @Autowired
     private CertBindingSyncService certBindingSyncService;
+    @Autowired
+    private TargetHealthEnricher targetHealthEnricher;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -227,6 +230,7 @@ public class ProxyServiceImpl implements ProxyService {
         Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds)
                 .stream()
                 .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
+        Map<String, List<TargetDTO>> targetDtoMap = new HashMap<>();
         List<HttpProxyListDTO> res = new ArrayList<>();
         for (ProxyListQueryResult r : content) {
             ProxyDO proxyDO = r.getProxyDO();
@@ -237,10 +241,14 @@ public class ProxyServiceImpl implements ProxyService {
                 httpDTO.setAgentType(agentDO.getAgentType().getCode());
             }
             httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
-            httpDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
+            List<TargetDTO> targets = proxyTargetConvert.toDTOList(
+                    targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            targetDtoMap.put(proxyDO.getId(), targets);
+            httpDTO.setTargets(targets);
             httpDTO.setHttpProxyPort(proxyPort);
             res.add(httpDTO);
         }
+        targetHealthEnricher.enrichBatch(targetDtoMap);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -798,12 +806,17 @@ public class ProxyServiceImpl implements ProxyService {
         List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
         Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds).stream()
                 .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
+        Map<String, List<TargetDTO>> targetDtoMap = new HashMap<>();
         List<TcpProxyListDTO> res = new ArrayList<>();
         for (ProxyDO proxyDO : content) {
             TcpProxyListDTO tcpListDTO = proxyConvert.toTcpListDTO(proxyDO);
-            tcpListDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
+            List<TargetDTO> targets = proxyTargetConvert.toDTOList(
+                    targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            targetDtoMap.put(proxyDO.getId(), targets);
+            tcpListDTO.setTargets(targets);
             res.add(tcpListDTO);
         }
+        targetHealthEnricher.enrichBatch(targetDtoMap);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -820,12 +833,17 @@ public class ProxyServiceImpl implements ProxyService {
         List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
         Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds).stream()
                 .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
+        Map<String, List<TargetDTO>> targetDtoMap = new HashMap<>();
         List<UdpProxyListDTO> res = new ArrayList<>();
         for (ProxyDO proxyDO : content) {
             UdpProxyListDTO udpListDTO = proxyConvert.toUdpListDTO(proxyDO);
-            udpListDTO.setTargets(proxyTargetConvert.toDTOList(targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList())));
+            List<TargetDTO> targets = proxyTargetConvert.toDTOList(
+                    targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            targetDtoMap.put(proxyDO.getId(), targets);
+            udpListDTO.setTargets(targets);
             res.add(udpListDTO);
         }
+        targetHealthEnricher.enrichBatch(targetDtoMap);
         return PageResult.wrap(resultPage, res);
     }
 
