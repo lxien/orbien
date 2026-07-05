@@ -26,5 +26,6 @@ public class ProxyReportRespAction extends AgentBaseAction {
         for (Message.RuntimeInfo p : itemsList) {
             proxyManager.add(p);
         }
+        context.fireEvent(AgentEvent.CREATE_CONN_POOL);
     }
 }

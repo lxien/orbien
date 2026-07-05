@@ -33,7 +33,6 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
@@ -92,24 +91,33 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             //配置同步
             case TMSP.MSG_CONFIG_SYNC: {
+                if (frame.getPayload() != null) {
+                    Message.ProxySyncResponse syncResponse = ProtobufUtil.parseFrom(
+                            frame.getPayload(), Message.ProxySyncResponse.parser());
+                    agentContext.setVariable(ContextConstants.PROXY_SYNC_RESP, syncResponse);
+                }
                 agentContext.fireEvent(AgentEvent.PROXY_CONFIG_SYNC);
                 break;
-
             }
             //********************Tunnel***********************//
             case TMSP.MSG_CONNECTION_CREATE_RESP: {
                 ByteBuf payload = frame.getPayload();
                 Message.CreateConnectionResponse resp = ProtobufUtil.parseFrom(payload, Message.CreateConnectionResponse.parser());
                 String tunnelId = resp.getTunnelId();
+                io.github.lxien.orbien.core.enums.TransportProtocol protocol =
+                        ctx.channel().attr(io.github.lxien.orbien.core.transport.AttributeKeys.TRANSPORT_PROTOCOL).get();
+                logger.debug("[传输] 收到隧道创建响应 tunnelId={} protocol={} channelClass={} encrypt={} multiplex={}",
+                        tunnelId, protocol != null ? protocol.getName() : "unknown",
+                        ctx.channel().getClass().getSimpleName(), frame.isEncrypted(), frame.isMuxTunnel());
                 agentContext.getControl().eventLoop().execute(() -> {
                     agentContext.setVariable(ContextConstants.TUNNEL_ID, tunnelId);
                     agentContext.setVariable(ContextConstants.COMPRESS, frame.isCompressed());
                     agentContext.setVariable(ContextConstants.ENCRYPT, frame.isEncrypted());
                     agentContext.setVariable(ContextConstants.MULTIPLEX, frame.isMuxTunnel());
+                    agentContext.setVariable(ContextConstants.TRANSPORT_PROTOCOL, protocol);
                     agentContext.setVariable(ContextConstants.CREATE_CONN_RESP, resp);
                     agentContext.fireEvent(AgentEvent.CREATE_CONN_POOL_RESP);
                 });
-
                 break;
             }
 
@@ -128,6 +136,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_STREAM_DATA: {
                 int streamId = frame.getStreamId();
+                io.github.lxien.orbien.core.enums.TransportProtocol protocol =
+                        ctx.channel().attr(io.github.lxien.orbien.core.transport.AttributeKeys.TRANSPORT_PROTOCOL).get();
+                logger.debug("[传输] 收到远程流数据 streamId={} protocol={} bytes={} channelClass={}",
+                        streamId, protocol != null ? protocol.getName() : "unknown",
+                        frame.getPayload() != null ? frame.getPayload().readableBytes() : 0,
+                        ctx.channel().getClass().getSimpleName());
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
                     if (streamContext.getState() == StreamState.OPENED) {
                         streamContext.forwardToLocal(frame.getPayload());
@@ -153,14 +167,20 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         });
                 break;
             }
-            //恢复流
+            //恢复流 / 独立隧道透传就绪
             case TMSP.MSG_STREAM_RESUME: {
                 int streamId = frame.getStreamId();
-                logger.debug("收到来自远程恢复流 {} 消息", streamId);
-                StreamManager.getStreamContext(streamId)
-                        .ifPresent(streamContext -> {
-                            streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
-                        });
+                StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
+                    if (streamContext.getState() == StreamState.OPENING
+                            && streamContext.isDirectConnection()
+                            && !streamContext.isDatagram()
+                            && streamContext.getTunnelBridge() != null) {
+                        completeDirectPassthroughOpen(streamContext);
+                    } else {
+                        logger.debug("收到来自远程恢复流 {} 消息", streamId);
+                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
+                    }
+                });
                 break;
             }
         }
@@ -196,6 +216,39 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         logger.error(cause.getMessage(), cause);
     }
 
+    private void completeDirectPassthroughOpen(StreamContext streamContext) {
+        int streamId = streamContext.getStreamId();
+        logger.debug("收到服务端透传就绪信号，切换客户端独立隧道 streamId={}", streamId);
+        streamContext.getTunnelBridge().openAsync().addListener(openFuture -> {
+            if (!openFuture.isSuccess()) {
+                logger.error("客户端独立隧道切换透传失败 streamId={}", streamId, openFuture.cause());
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            if (streamContext.getState() != StreamState.OPENING) {
+                logger.debug("流 {} 已不在 OPENING 状态，跳过透传完成", streamId);
+                return;
+            }
+            ackDirectPassthroughToServer(streamContext);
+            streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+            Channel server = streamContext.getServer();
+            Channel tunnel = streamContext.getTunnelEntry().getChannel();
+            tunnel.config().setOption(ChannelOption.AUTO_READ, true);
+            if (server != null && server.isActive()) {
+                server.config().setOption(ChannelOption.AUTO_READ, true);
+                server.read();
+            }
+            logger.debug("独立隧道透传就绪，开始读取内网服务 streamId={}", streamId);
+        });
+    }
+
+    private void ackDirectPassthroughToServer(StreamContext streamContext) {
+        int streamId = streamContext.getStreamId();
+        logger.debug("通知服务端客户端透传就绪 streamId={}", streamId);
+        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_RESUME);
+        streamContext.getControl().writeAndFlush(frame);
+    }
+
     private boolean isNetworkException(Throwable cause) {
         if (cause instanceof IOException) {
             return true;
@@ -229,13 +282,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     if (streamContextOpt.isPresent()) {
                         StreamContext streamContext = streamContextOpt.get();
                         Channel server = streamContext.getServer();
-                        if (server != null) {
-                            ctx.executor().schedule(() -> {
-                                server.config().setOption(ChannelOption.AUTO_READ, true);
-                                server.read();
-                                StreamManager.removePausedStream(tunnel, streamId);
-                            }, 5, TimeUnit.MILLISECONDS);
+                        if (server != null && server.isActive()) {
+                            server.config().setOption(ChannelOption.AUTO_READ, true);
+                            server.read();
                         }
+                        StreamManager.removePausedStream(tunnel, streamId);
                     }
                 });
             }

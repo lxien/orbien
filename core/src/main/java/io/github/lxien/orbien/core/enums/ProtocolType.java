@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * 支持的协议类型
  *
- * @author liuxin
+ * @author lxien
  */
 public enum ProtocolType {
     TCP(1, "tcp"),

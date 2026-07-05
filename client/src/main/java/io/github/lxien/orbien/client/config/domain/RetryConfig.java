@@ -6,7 +6,7 @@ import lombok.Setter;
 /**
  * 重试配置
  *
- * @author liuxin
+ * @author lxien
  */
 @Getter
 @Setter

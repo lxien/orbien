@@ -1,11 +1,15 @@
 package io.github.lxien.orbien.core.transport;
 
+import lombok.Getter;
+
 import java.net.InetSocketAddress;
 import java.util.Objects;
 
 /**
  * UDP 会话索引键：监听端口 + 访问者地址
+ * @author lxien
  */
+@Getter
 public final class UdpSessionKey {
     private final int listenPort;
     private final String host;
@@ -19,18 +23,6 @@ public final class UdpSessionKey {
 
     public static UdpSessionKey of(int listenPort, InetSocketAddress address) {
         return new UdpSessionKey(listenPort, address.getAddress().getHostAddress(), address.getPort());
-    }
-
-    public int getListenPort() {
-        return listenPort;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
     }
 
     @Override

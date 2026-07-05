@@ -126,6 +126,12 @@ public class AgentStateMachineBuilder {
                     .to(AgentState.DISCONNECTED)
                     .on(AgentEvent.DISCONNECT)
                     .perform(disconnectedAction);
+            // 认证过程中断开，同样触发重连
+            builder.externalTransition()
+                    .from(AgentState.CONNECTING)
+                    .to(AgentState.DISCONNECTED)
+                    .on(AgentEvent.DISCONNECT)
+                    .perform(disconnectedAction);
             // 连接断开，尝试重连
             builder.externalTransitions()
                     .fromAmong(AgentState.DISCONNECTED)

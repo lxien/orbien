@@ -1,7 +1,10 @@
 package io.github.lxien.orbien.server.statemachine.stream.action;
 
+import io.github.lxien.orbien.core.message.TMSP;
+import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
+import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
@@ -44,20 +47,35 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         String agentId = agentInfo.getAgentId();
         TunnelEntry tunnelEntry;
         if (context.isMultiplex()) {
-            tunnelEntry = multiplexConnectionPool.acquire(agentId, context.isEncrypt());
+            tunnelEntry = multiplexConnectionPool.acquire(agentId, context.getTransportProtocol(), context.isEncrypt());
         } else {
             tunnelEntry = directConnectionPool.borrow(agentId, tunnelId, context.isEncrypt());
         }
         if (tunnelEntry == null) {
-            logger.warn("连接池没有可用连接，关闭流");
+            logger.warn("[传输] 连接池无可用隧道 streamId={} agentId={} protocol={} encrypt={} multiplex={}",
+                    context.getStreamId(), agentId, context.getTransportProtocol().getName(),
+                    context.isEncrypt(), context.isMultiplex());
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        if (!tunnelEntry.isActive()){
-            logger.warn("连接不可用 {} 关闭流",tunnelEntry.getTunnelId());
+        if (!tunnelEntry.isActive()) {
+            logger.warn("[传输] 隧道不可用 streamId={} tunnelId={} protocol={} channelClass={} channelActive={}",
+                    context.getStreamId(), tunnelEntry.getTunnelId(),
+                    tunnelEntry.getProtocol() != null ? tunnelEntry.getProtocol().getName() : "unknown",
+                    tunnelEntry.getChannel().getClass().getSimpleName(),
+                    tunnelEntry.getChannel().isActive());
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
+        if (!context.isMultiplex() && DirectTunnelLifecycle.isPassthroughActive(tunnelEntry.getChannel())) {
+            logger.warn("[传输] 独立隧道仍处于透传模式，无法复用 streamId={} tunnelId={}",
+                    context.getStreamId(), tunnelEntry.getTunnelId());
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            return;
+        }
+        logger.debug("[传输] 流 {} 分配隧道 tunnelId={} protocol={} encrypt={} multiplex={}",
+                context.getStreamId(), tunnelEntry.getTunnelId(),
+                context.getTransportProtocol().getName(), context.isEncrypt(), context.isMultiplex());
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
         TunnelBridge tunnelBridge;
@@ -71,36 +89,117 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             tunnelBridge = TunnelBridgeFactory.buildDirect(context);
             logger.debug("独立隧道建立成功，隧道ID: {}", tunnelEntry.getTunnelId());
         }
-        tunnelBridge.open();
-        context.setTunnelBridge(tunnelBridge);
 
         StreamManager streamManager = context.getStreamManager();
-        //初始化索引映射关系
-        streamManager.initStreamIndexes(context);
-        //负载均衡 最少连接数
-        leastConnHooks.onStreamOpened(context);
-        //增加连接数量，用于监控统计
-        metricsCollector.onChannelActive(context.getProxyId(),agentInfo.getAgentType());
-        //如果是 HTTP协议需要发送首次建立建立的时候读取到的第一个包
+        tunnelBridge.openAsync().addListener(future -> {
+            if (!future.isSuccess()) {
+                logger.error("隧道桥接打开失败 streamId={} multiplex={}",
+                        context.getStreamId(), context.isMultiplex(), future.cause());
+                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            StreamState state = context.getState();
+            if (state == StreamState.CLOSED || state == StreamState.FAILED) {
+                logger.debug("流 {} 已在透传切换期间关闭，跳过后续打开步骤", context.getStreamId());
+                return;
+            }
+            context.setTunnelBridge(tunnelBridge);
+            streamManager.initStreamIndexes(context);
+            leastConnHooks.onStreamOpened(context);
+            metricsCollector.onChannelActive(context.getProxyId(), agentInfo.getAgentType());
+            if (context.isDatagram()) {
+                relayUdpFirstPacket(context, tunnelBridge);
+            }
+            if (context.isDirectConnection() && !context.isDatagram()) {
+                context.markAwaitingClientPassthroughAck();
+                notifyDirectPassthroughReady(context);
+                logger.debug("流 {} 服务端透传就绪，等待客户端确认后再开启访问者读取", context.getStreamId());
+            } else {
+                enableVisitorReading(context, visitor, tunnelBridge);
+            }
+        });
+    }
+
+    /**
+     * 客户端确认透传就绪后，开启 visitor 读取（及 HTTP 首包转发）
+     */
+    public void onClientPassthroughReady(StreamContext context) {
+        if (!context.compareAndClearAwaitingClientPassthroughAck()) {
+            return;
+        }
+        StreamState state = context.getState();
+        if (state == StreamState.CLOSED || state == StreamState.FAILED) {
+            logger.debug("流 {} 已关闭，忽略客户端透传确认", context.getStreamId());
+            return;
+        }
+        Channel visitor = context.getVisitor();
+        TunnelBridge tunnelBridge = context.getTunnelBridge();
+        if (visitor == null || tunnelBridge == null) {
+            logger.warn("流 {} 缺少 visitor 或 tunnelBridge，无法完成透传握手", context.getStreamId());
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            return;
+        }
+        enableVisitorReading(context, visitor, tunnelBridge);
+        logger.debug("流 {} 客户端透传就绪，开启访问者读取", context.getStreamId());
+    }
+
+    private void enableVisitorReading(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
         if (context.getProtocol().isHttp()) {
-            relayHttpFirstPackage(context,visitor, tunnelBridge);
+            relayHttpFirstPackage(context, visitor, tunnelBridge);
+            flushPendingUploads(context, tunnelBridge);
         }
-        if (context.isDatagram()) {
-            relayUdpFirstPacket(context, tunnelBridge);
-        }
-        // TCP 连接按流控制读；UDP 复用 DatagramChannel，必须始终保持可读
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
+        visitor.read();
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
     }
 
     /**
      * 发送HTTP 协议首次缓存的第一个数据包
      */
-    public void relayHttpFirstPackage(StreamContext context,Channel visitor, TunnelBridge tunnelBridge) {
-        logger.debug("转发HTTP第一个数据包");
+    public void relayHttpFirstPackage(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
         ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
-        tunnelBridge.forwardToLocal(cached);
-        visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
+        if (cached == null || !cached.isReadable()) {
+            logger.debug("[HTTP] 无首个数据包可转发 streamId={} cachedNull={}",
+                    context.getStreamId(), cached == null);
+            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
+            if (cached != null) {
+                ReferenceCountUtil.release(cached);
+            }
+            return;
+        }
+        logger.debug("[HTTP] 转发首个数据包 streamId={} bytes={} protocol={}",
+                context.getStreamId(), cached.readableBytes(),
+                context.getTransportProtocol() != null ? context.getTransportProtocol().getName() : "unknown");
+        try {
+            tunnelBridge.forwardToLocal(cached);
+        } finally {
+            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
+            ReferenceCountUtil.release(cached);
+        }
+    }
+
+    /**
+     * 流打开前到达的上传 body 分片（OPENING 状态缓存）
+     */
+    private void flushPendingUploads(StreamContext context, TunnelBridge tunnelBridge) {
+        ByteBuf pending;
+        while ((pending = context.pollPending()) != null) {
+            try {
+                if (pending.isReadable()) {
+                    logger.debug("[HTTP] 转发打开期间缓存的数据 streamId={} bytes={}",
+                            context.getStreamId(), pending.readableBytes());
+                    tunnelBridge.forwardToLocal(pending);
+                }
+            } finally {
+                ReferenceCountUtil.release(pending);
+            }
+        }
+    }
+
+    private void notifyDirectPassthroughReady(StreamContext context) {
+        logger.debug("通知客户端独立隧道透传就绪 streamId={}", context.getStreamId());
+        TMSPFrame frame = new TMSPFrame(context.getStreamId(), TMSP.MSG_STREAM_RESUME);
+        context.getControl().writeAndFlush(frame);
     }
 
     public void relayUdpFirstPacket(StreamContext context, TunnelBridge tunnelBridge) {

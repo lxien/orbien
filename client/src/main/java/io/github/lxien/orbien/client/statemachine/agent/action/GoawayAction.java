@@ -35,8 +35,7 @@ public class GoawayAction extends AgentBaseAction {
                     });
         }
         //关闭连接池所有数据连接
-        agentContext.getMultiplexPool().closeAll();
-        agentContext.getDirectPool().closeAll();
+        agentContext.getPoolManager().closeAll();
         //关闭控制连接
         ChannelUtils.closeOnFlush(control);
         //停止客户端进程

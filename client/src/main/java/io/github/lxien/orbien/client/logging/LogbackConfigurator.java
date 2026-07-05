@@ -36,7 +36,7 @@ import java.io.File;
 /**
  * Logback 日志配置管理器
  *
- * @author liuxin
+ * @author lxien
  */
 public class LogbackConfigurator {
 

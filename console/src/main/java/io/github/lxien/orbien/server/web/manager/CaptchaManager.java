@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 验证码管理 - 使用 Caffeine 缓存
  *
- * @author liuxin
+ * @author lxien
  */
 @Component
 public class CaptchaManager {

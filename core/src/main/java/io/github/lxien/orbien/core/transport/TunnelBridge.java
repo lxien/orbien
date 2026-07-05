@@ -17,9 +17,14 @@
 package io.github.lxien.orbien.core.transport;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.concurrent.Future;
 
 public interface TunnelBridge {
-    void open();
+
+    /**
+     * 异步打开桥接。独立隧道在隧道 EventLoop 上切换 pipeline 后完成；多路复用立即完成。
+     */
+    Future<Void> openAsync();
 
     void forwardToLocal(ByteBuf payload);
 

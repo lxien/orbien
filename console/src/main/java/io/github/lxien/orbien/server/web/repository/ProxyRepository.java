@@ -84,16 +84,18 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
 
     @Query("""
             SELECT NEW io.github.lxien.orbien.server.web.dto.stats.ProxyProtocolCountDTO(
-                SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END),
-                SUM(CASE WHEN p.protocol = :https THEN 1 ELSE 0 END),
-                SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END)
+                COALESCE(SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN p.protocol = :https THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN p.protocol = :udp THEN 1 ELSE 0 END), 0)
             )
             FROM ProxyDO p
             """)
-    ProxyProtocolCountDTO countHttpAndTcp(
+    ProxyProtocolCountDTO countProxyProtocolStats(
             @Param("http") ProtocolType http,
             @Param("https") ProtocolType https,
-            @Param("tcp") ProtocolType tcp
+            @Param("tcp") ProtocolType tcp,
+            @Param("udp") ProtocolType udp
     );
 
     void deleteByIdIn(List<String> ids);

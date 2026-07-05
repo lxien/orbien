@@ -24,6 +24,7 @@ import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.enums.HealthCheckType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
@@ -97,6 +98,7 @@ public class ProxyConfigSyncAction extends AgentBaseAction {
                         .build();
                 runtimeInfoBuilder.setHealthCheck(healthCheck);
             }
+            RuntimeInfoSupport.applyTransport(runtimeInfoBuilder, config);
             return runtimeInfoBuilder.build();
         }).toList();
         Message.ProxySyncResponse.Builder builder = Message.ProxySyncResponse.newBuilder();

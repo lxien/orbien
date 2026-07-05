@@ -3,6 +3,9 @@ package io.github.lxien.orbien.server.statemachine.stream.action;
 import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.enums.LoadBalanceType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
+import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.loadbalance.LoadBalancer;
 import io.github.lxien.orbien.server.loadbalance.LoadBalancerFactory;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
@@ -19,6 +22,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -74,8 +78,17 @@ public class TargetResolverAction extends StreamBaseAction {
             }
             context.setCompress(config.isCompress());
             context.setEncrypt(config.isEncrypt());
+            //传输协议
+            TransportProtocol transportProtocol = config.getTransportProtocol(TransportProtocol.TCP);
+            context.setTransportProtocol(transportProtocol);
+            context.setMultiplex(TransportEndpointResolver.normalizeMultiplex(
+                    transportProtocol, config.isMuxTunnelFor(transportProtocol)));
+
+            logger.debug("[传输] 流 {} 代理={} 数据隧道传输协议={} encrypt={} multiplex={}",
+                    context.getStreamId(), config.getName(), transportProtocol.getName(),
+                    config.isEncrypt(), context.isMultiplex());
+
             if (config.isUdp()) {
-                context.setMultiplex(true);
                 context.setDatagram(true);
             }
             context.setTarget(selectedTarget);

@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.server.transport.http;
 
+import io.github.lxien.orbien.core.transport.VisitorAddressResolver;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.CompositeByteBuf;
@@ -10,7 +11,6 @@ import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 
 public class HeaderInjectDecoder extends ByteToMessageDecoder {
@@ -31,6 +31,7 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         }
         if (headerEndIndex > MAX_HEADER_SIZE) {
             logger.debug("[HTTP] HTTP请求头{}字节超过限制{}字节，关闭流", headerEndIndex, MAX_HEADER_SIZE);
+            in.skipBytes(in.readableBytes());
             ChannelUtils.closeOnFlush(ctx.channel());
             return;
         }
@@ -41,6 +42,7 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
 
         if (!isHttpRequest(headerContent)) {
             in.resetReaderIndex();
+            out.add(in.retain());
             ctx.pipeline().remove(this);
             return;
         }
@@ -50,6 +52,8 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         if (visitorIp == null || visitorIp.isEmpty()) {
             logger.warn("[HTTP] 客户端IP为空，跳过X-Forwarded-For注入");
             in.resetReaderIndex();
+            out.add(in.retain());
+            ctx.pipeline().remove(this);
             return;
         }
 
@@ -72,12 +76,11 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         out.add(compositeBuf);
 
         logger.debug("[HTTP] X-Forwarded-For注入完成，客户端IP={}", visitorIp);
+        // 首包处理完成后移除，后续 upload body 分片直接透传
+        ctx.pipeline().remove(this);
     }
     protected String getVisitorIp(Channel visitor) {
-        if (visitor.remoteAddress() instanceof InetSocketAddress addr) {
-            return addr.getAddress().getHostAddress();
-        }
-        return visitor.remoteAddress().toString();
+        return VisitorAddressResolver.resolveIp(visitor);
     }
     /**
      * 查找HTTP header的结束位置（\r\n\r\n）

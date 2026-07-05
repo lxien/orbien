@@ -11,6 +11,14 @@ public interface NettyConstants {
     String TCP_VISITOR_HANDLER = "tcpVisitorHandler";
     String UDP_VISITOR_HANDLER = "udpVisitorHandler";
     String HTTP_VISITOR_HANDLER = "httpVisitorHandler";
+    String HAPROXY_DETECT_HANDLER = "haproxyDetectHandler";
+    String HAPROXY_DECODER = "haproxyDecoder";
+    String HAPROXY_ADDRESS_HANDLER = "haproxyAddressHandler";
     String DIRECT_TUNNEL_BRIDGE_HANDLER = "directTunnelBridgeBandler";
+    String WEBSOCKET_HANDLER = "webSocketHandler";
+    String WEBSOCKET_FRAME_CODEC = "webSocketFrameCodec";
+    String SNAPPY_ENCODER = "snappyEncoder";
+    String SNAPPY_DECODER = "snappyDecoder";
+    String DOWNLOAD_RATE_LIMIT_HANDLER = "downloadRateLimitHandler";
 
 }

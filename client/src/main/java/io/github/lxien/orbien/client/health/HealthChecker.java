@@ -19,21 +19,20 @@
 package io.github.lxien.orbien.client.health;
 
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 
 import java.util.concurrent.CompletableFuture;
 
 public class HealthChecker {
-    private final EventLoopGroup group = new NioEventLoopGroup(1);
+    private final EventLoopGroup group = NettyEventLoopFactory.eventLoopGroup(1);
 
     public CompletableFuture<ServiceHealth> check(String proxyId, Message.Target target, Message.HealthCheck healthCheck) {
         long startTime = System.currentTimeMillis();
@@ -41,7 +40,7 @@ public class HealthChecker {
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(group)
-                .channel(NioSocketChannel.class)
+                .channel(NettyEventLoopFactory.socketChannelClass())
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, healthCheck.getTimeout() * 1000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override

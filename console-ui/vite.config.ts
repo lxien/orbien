@@ -32,7 +32,9 @@ export default ({ mode }: { mode: string }) => {
           changeOrigin: true
         }
       },
-      host: true
+      host: true,
+      allowedHosts: [
+      ]
     },
     // 路径别名
     resolve: {

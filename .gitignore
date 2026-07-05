@@ -31,3 +31,4 @@ orbien.trace.db
 /data
 .cursor
 .cursorignore
+/local-docs

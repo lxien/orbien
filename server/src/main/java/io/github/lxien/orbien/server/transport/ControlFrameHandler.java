@@ -21,12 +21,16 @@ import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.ChannelType;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.agent.command.ConnectionCreateCmd;
+import io.github.lxien.orbien.server.statemachine.agent.action.CreateConnectionAction;
+import io.github.lxien.orbien.server.statemachine.stream.action.StreamOpenResponseAction;
 import io.github.lxien.orbien.server.statemachine.stream.*;
+import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
 import io.github.lxien.orbien.server.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -38,7 +42,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 控制隧道消息处理器
@@ -57,6 +60,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     @Autowired
     @Qualifier("agentStateMachine")
     private StateMachine<AgentState, AgentEvent, AgentContext> agentStateMachine;
+    @Autowired
+    private CreateConnectionAction createConnectionAction;
+    @Autowired
+    private MultiplexConnectionPool multiplexConnectionPool;
+    @Autowired
+    private StreamOpenResponseAction streamOpenResponseAction;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
@@ -76,6 +85,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     ByteBuf payload = frame.getPayload();
                     Message.AuthInfo authInfo = ProtobufUtil.parseFrom(payload, Message.AuthInfo.parser());
                     ctx.channel().attr(AttributeKeys.CHANNEL_TYPE).set(ChannelType.CONTROL);
+                    TransportProtocol transportProtocol = ctx.channel().attr(AttributeKeys.TRANSPORT_PROTOCOL).get();
+                    logger.debug("[传输] 控制连接认证 protocol={} agentId={}",
+                            transportProtocol != null ? transportProtocol.getName() : "unknown",
+                            authInfo.getAgentId());
                     String agentId = authInfo.getAgentId();
                     Optional<AgentContext> contextOpt = agentManager.getAgentContext(ctx.channel());
                     if (contextOpt.isPresent()) {
@@ -108,14 +121,18 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 }
 
                 case TMSP.MSG_CONNECTION_CREATE -> {
-                    logger.debug("收到连接池创建消息");
+                    TransportProtocol tunnelProtocol = ctx.channel().attr(AttributeKeys.TRANSPORT_PROTOCOL).get();
+                    logger.debug("[传输] 收到数据隧道注册 protocol={} encrypt={} multiplex={} channelClass={}",
+                            tunnelProtocol != null ? tunnelProtocol.getName() : "unknown",
+                            frame.isEncrypted(), frame.isMuxTunnel(), ctx.channel().getClass().getSimpleName());
                     Optional<AgentContext> ag = agentManager.getAgentContext(frame.getStreamId());
                     if (ag.isPresent()) {
                         AgentContext agentContext = ag.get();
                         Channel control = agentContext.getControl();
                         Channel tunnel = ctx.channel();
                         if (control == tunnel) {
-                            logger.error("控制隧道和消息来源与数据隧道相同，消息异常，关闭连接");
+                            logger.error("[传输] 控制隧道与数据隧道相同，关闭连接 connectionId={}",
+                                    frame.getStreamId());
                             ChannelUtils.closeOnFlush(ctx.channel());
                             return;
                         }
@@ -123,12 +140,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                                 Message.CreateConnectionRequest.parser());
                         ConnectionCreateCmd cmd = new ConnectionCreateCmd(tunnel, frame.isEncrypted(),
                                 frame.isMuxTunnel(), req.getTunnelId());
-
-                        control.eventLoop().execute(() -> {
-                            agentContext.setVariable(AgentConstants.TUNNEL_CREATE_CMD, cmd);
-                            agentContext.fireEvent(AgentEvent.CREATE_TUNNEL);
-                        });
+                        logger.debug("[传输] 同步注册数据隧道 agentId={} tunnelId={}",
+                                agentContext.getAgentInfo().getAgentId(), req.getTunnelId());
+                        createConnectionAction.registerTunnelImmediately(agentContext, cmd);
                     } else {
+                        logger.warn("[传输] 未找到 agent connectionId={}，关闭数据隧道", frame.getStreamId());
                         ChannelUtils.closeOnFlush(ctx.channel());
                     }
                 }
@@ -163,6 +179,11 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 }
                 case TMSP.MSG_STREAM_DATA -> {
                     int streamId = frame.getStreamId();
+                    TransportProtocol tunnelProtocol = ctx.channel().attr(AttributeKeys.TRANSPORT_PROTOCOL).get();
+                    logger.debug("[传输] 收到隧道流数据 streamId={} protocol={} bytes={} channelClass={}",
+                            streamId, tunnelProtocol != null ? tunnelProtocol.getName() : "unknown",
+                            frame.getPayload() != null ? frame.getPayload().readableBytes() : 0,
+                            ctx.channel().getClass().getSimpleName());
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext != null && streamContext.getState() == StreamState.OPENED) {
                         streamContext.forwardToRemote(frame.getPayload());
@@ -185,12 +206,15 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         streamContext.fireEvent(StreamEvent.STREAM_REMOTE_PAUSE);
                     }
                 }
-                //恢复流
+                //恢复流 / 独立隧道客户端透传确认
                 case TMSP.MSG_STREAM_RESUME -> {
                     int streamId = frame.getStreamId();
-                    logger.debug("收到来自远程恢复流 {} 消息", streamId);
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    if (streamContext != null) {
+                    if (streamContext != null && streamContext.isAwaitingClientPassthroughAck()) {
+                        logger.debug("收到客户端独立隧道透传确认 streamId={}", streamId);
+                        streamOpenResponseAction.onClientPassthroughReady(streamContext);
+                    } else if (streamContext != null) {
+                        logger.debug("收到来自远程恢复流 {} 消息", streamId);
                         streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
                     }
                 }
@@ -233,10 +257,19 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 agentContext.fireEvent(AgentEvent.DISCONNECT);
             });
         } else if (channelType == ChannelType.TUNNEL) {
-            logger.error("数据连接断开");
-            //todo 需要处理数据连接断开 清理连接池连接
-            //
+            logger.warn("[传输] 数据隧道断开 channelClass={}", channel.getClass().getSimpleName());
+            multiplexConnectionPool.removeByChannel(channel);
+            streamManager.closeStreamsByTunnel(channel);
         }
+    }
+
+    private void handleTunnelFailure(Channel channel, Throwable cause) {
+        if (getChannelType(channel) != ChannelType.TUNNEL) {
+            return;
+        }
+        logger.warn("[传输] 数据隧道异常 channelClass={}", channel.getClass().getSimpleName(), cause);
+        multiplexConnectionPool.removeByChannel(channel);
+        streamManager.closeStreamsByTunnel(channel);
     }
 
     @Override
@@ -249,8 +282,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 //...
             });
         } else if (channelType == ChannelType.TUNNEL) {
-            logger.error("数据连接异常");
-            //todo 数据连接异常
+            handleTunnelFailure(channel, cause);
         }
     }
 
@@ -258,25 +290,19 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelWritabilityChanged(ChannelHandlerContext ctx) {
         Channel channel = ctx.channel();
         if (getChannelType(channel) == ChannelType.TUNNEL) {
-            boolean writable = channel.isWritable();
-            logger.warn("数据隧道可写性变化：{}", writable);
-            if (writable) {
-                //数据隧道恢复可写，恢复暂停的访问者读取
+            if (channel.isWritable()) {
                 Set<Integer> pausedStreamIds = streamManager.getPausedStreamIds(channel);
-                logger.debug("获取到 {} 条暂停流数量", pausedStreamIds.size());
                 if (!pausedStreamIds.isEmpty()) {
-                    logger.debug("恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                    logger.debug("[背压] 隧道恢复可写，恢复 {} 个访客读取", pausedStreamIds.size());
                     pausedStreamIds.forEach(streamId -> {
                         StreamContext streamContext = streamManager.getStreamContext(streamId);
                         if (streamContext != null) {
                             Channel visitor = streamContext.getVisitor();
-                            if (visitor != null) {
-                                ctx.executor().schedule(() -> {
-                                    visitor.config().setOption(ChannelOption.AUTO_READ, true);
-                                    visitor.read();
-                                    streamManager.removePausedStream(channel, streamId);
-                                }, 5, TimeUnit.MILLISECONDS);//延迟5ms，避免隧道在临界状态下来回切换，防止"乒乓效应"
+                            if (visitor != null && visitor.isActive()) {
+                                visitor.config().setOption(ChannelOption.AUTO_READ, true);
+                                visitor.read();
                             }
+                            streamManager.removePausedStream(channel, streamId);
                         }
                     });
                 }

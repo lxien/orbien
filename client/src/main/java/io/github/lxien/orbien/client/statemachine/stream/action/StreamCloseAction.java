@@ -5,14 +5,16 @@ import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.client.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.client.statemachine.stream.StreamState;
-import io.github.lxien.orbien.client.transport.connection.DirectPool;
+import io.github.lxien.orbien.client.transport.ControlFrameHandler;
+import io.github.lxien.orbien.client.transport.connection.TransportPoolManager;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
+import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -28,13 +30,29 @@ public class StreamCloseAction extends StreamBaseAction {
         TunnelEntry tunnelEntry = context.getTunnelEntry();
         if (tunnelEntry != null && tunnelEntry.getTunnelType().isDirect()) {
             AgentContext agentContext = (AgentContext) context.getAgentContext();
-            DirectPool directPool = agentContext.getDirectPool();
-            directPool.release(tunnelEntry);
-
+            TransportPoolManager poolManager = agentContext.getPoolManager();
             Channel tunnel = tunnelEntry.getChannel();
-            ChannelPipeline tunnelPipeline = tunnel.pipeline();
-            if (tunnelPipeline.get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER) != null) {
-                tunnelPipeline.remove(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            ControlFrameHandler controlFrameHandler = agentContext.getControlFrameHandler();
+            Runnable release = () -> poolManager.releaseDirect(tunnelEntry);
+            if (DirectTunnelLifecycle.isPassthroughActive(tunnel)) {
+                DirectTunnelLifecycle.restoreControlStack(tunnel, pipeline -> {
+                    if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
+                        pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
+                    }
+                    if (pipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) == null && controlFrameHandler != null) {
+                        pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
+                    }
+                }).addListener(f -> {
+                    if (!f.isSuccess()) {
+                        logger.warn("恢复独立隧道控制栈失败 tunnelId={}，关闭隧道", tunnelEntry.getTunnelId(), f.cause());
+                        ChannelUtils.closeOnFlush(tunnel);
+                        poolManager.removeDirect(tunnelEntry.getTunnelId());
+                    } else {
+                        release.run();
+                    }
+                });
+            } else {
+                release.run();
             }
         }
         ChannelUtils.closeOnFlush(server);

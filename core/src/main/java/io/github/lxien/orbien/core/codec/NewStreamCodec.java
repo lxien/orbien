@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.core.codec;
 
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,19 +8,17 @@ import lombok.Setter;
 
 public class NewStreamCodec {
 
-
-    public static void encode(ByteBuf buffer, String localIp, int localPort) {
+    public static void encode(ByteBuf buffer, String localIp, int localPort, TransportProtocol protocol) {
         buffer.writeInt(ipToInt(localIp));
-
         buffer.writeShort(localPort);
+        buffer.writeByte(protocol.toWire());
     }
 
     public static NewStreamInfo decode(ByteBuf buffer) {
         int ipInt = buffer.readInt();
         String localIp = intToIp(ipInt);
         int localPort = buffer.readUnsignedShort();
-
-        return new NewStreamInfo(localIp, localPort);
+        return new NewStreamInfo(localIp, localPort, TransportProtocol.fromWire(buffer.readByte()));
     }
 
     private static int ipToInt(String ip) {
@@ -44,5 +43,6 @@ public class NewStreamCodec {
     public static class NewStreamInfo {
         private final String localIp;
         private final int localPort;
+        private final TransportProtocol transportProtocol;
     }
 }

@@ -168,7 +168,7 @@
     customDomains: '',
     localHost: '127.0.0.1',
     localPort: undefined,
-    forceHttps: false,
+    forceHttps: true,
     limitTotal: 1
   })
 

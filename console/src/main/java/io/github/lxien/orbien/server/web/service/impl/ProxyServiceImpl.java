@@ -167,7 +167,7 @@ public class ProxyServiceImpl implements ProxyService {
         existsProxyDO.setDomainType(requestDomainType);
         applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
         if (protocol.isHttps()) {
-            existsProxyDO.setForceHttps(Boolean.TRUE.equals(forceHttps));
+            existsProxyDO.setForceHttps(forceHttps == null || Boolean.TRUE.equals(forceHttps));
         }
         proxyRepository.save(existsProxyDO);
 
@@ -259,7 +259,7 @@ public class ProxyServiceImpl implements ProxyService {
                 .orElseThrow(() -> new BizException("HTTPS 代理不存在"));
         HttpsProxyDetailDTO dto = new HttpsProxyDetailDTO();
         fillHttpDetailDTO(dto, proxyDO);
-        dto.setForceHttps(Boolean.TRUE.equals(proxyDO.getForceHttps()));
+        dto.setForceHttps(proxyDO.getForceHttps() == null || Boolean.TRUE.equals(proxyDO.getForceHttps()));
         return dto;
     }
 
@@ -583,7 +583,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyDO.setMultiplex(true);
         proxyDO.setEncrypt(false);
         if (protocol.isHttps()) {
-            proxyDO.setForceHttps(Boolean.TRUE.equals(forceHttps));
+            proxyDO.setForceHttps(forceHttps == null || Boolean.TRUE.equals(forceHttps));
         }
         return proxyDO;
     }

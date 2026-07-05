@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="doc/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
+  <img src="doc/logo-text.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
   A high-performance intranet penetration platform

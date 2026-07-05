@@ -62,10 +62,15 @@ public class TlsHelper {
             }
         }
 
-        return sslContextBuilder.keyManager(
-                StringUtils.hasText(tlsConfig.getCertFile()) ? new FileInputStream(tlsConfig.getCertFile()) : null,
-                StringUtils.hasText(tlsConfig.getKeyFile()) ? new FileInputStream(tlsConfig.getKeyFile()) : null
-        ).build();
+        if (tlsConfig.mTLSEnabled() && !StringUtils.hasText(tlsConfig.getCertFile())) {
+            throw new IllegalStateException("双向 TLS 已启用（配置了 ca_file），必须同时配置 cert_file 和 key_file");
+        }
+
+        if (StringUtils.hasText(tlsConfig.getCertFile()) && StringUtils.hasText(tlsConfig.getKeyFile())) {
+            sslContextBuilder.keyManager(new File(tlsConfig.getCertFile()), new File(tlsConfig.getKeyFile()));
+        }
+
+        return sslContextBuilder.build();
     }
 
 

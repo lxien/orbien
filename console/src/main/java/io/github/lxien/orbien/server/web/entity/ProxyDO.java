@@ -104,6 +104,12 @@ public class ProxyDO {
     @Column(name = "compress")
     private Boolean compress;
     /**
+     * 数据隧道传输协议
+     */
+    @Column(name = "transport_protocol")
+    @Convert(converter = TransportProtocolConverter.class)
+    private TransportProtocol transportProtocol;
+    /**
      * 是否强制HTTPS，只有HTTPS协议有效
      */
     @Column(name = "force_https")

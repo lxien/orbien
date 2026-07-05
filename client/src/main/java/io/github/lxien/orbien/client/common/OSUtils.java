@@ -22,7 +22,7 @@ import java.net.UnknownHostException;
 /**
  * 获取当前操作系统相关的系统信息
  *
- * @author liuxin
+ * @author lxien
  */
 public class OSUtils {
 

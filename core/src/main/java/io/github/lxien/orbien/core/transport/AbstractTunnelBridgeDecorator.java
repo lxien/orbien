@@ -17,6 +17,7 @@
 package io.github.lxien.orbien.core.transport;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.util.concurrent.Future;
 
 public abstract class AbstractTunnelBridgeDecorator implements TunnelBridge {
     protected final TunnelBridge delegate;
@@ -26,8 +27,8 @@ public abstract class AbstractTunnelBridgeDecorator implements TunnelBridge {
     }
 
     @Override
-    public void open() {
-        delegate.open();
+    public Future<Void> openAsync() {
+        return delegate.openAsync();
     }
 
     @Override

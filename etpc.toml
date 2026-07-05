@@ -20,75 +20,177 @@ encrypt = true
 
 [connection.pool.direct]
 plain_count = 1
-encrypt_count = 2
+encrypt_count = 1
 
+# 控制连接走 TCP；各代理可在 [proxies.transport] 单独指定数据隧道协议
 [transport]
+protocol = "tcp"
+
 [transport.multiplex]
 enabled = true
 
-[transport.tls]
+[transport.tcp]
+port = 9527
+
+[transport.tcp.tls]
 enabled = true
-cert_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/client.crt"
-key_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/client.key"
-ca_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/ca.crt"
+cert_file = "cert/transport/client.crt"
+key_file = "cert/transport/client.key"
+ca_file = "cert/transport/ca.crt"
+
+[transport.websocket]
+port = 9528
+path = "/tunnel"
+
+[transport.websocket.tls]
+enabled = true
+cert_file = "cert/transport/client.crt"
+key_file = "cert/transport/client.key"
+ca_file = "cert/transport/ca.crt"
+
+[transport.quic]
+port = 9529
+
+[transport.quic.tls]
+enabled = true
+cert_file = "cert/transport/client.crt"
+key_file = "cert/transport/client.key"
+ca_file = "cert/transport/ca.crt"
 
 [[proxies]]
-name = "web1"
+name = "http-tcp"
+protocol = "http"
+custom_domains = ["33.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-tcp" }
+]
+[proxies.transport]
+protocol = "tcp"
+multiplex =false
+encrypt = false
+compress = false
+
+[[proxies]]
+name = "tcp-tcp"
+protocol = "tcp"
+targets = [
+    { host = "127.0.0.1", port = 3306, weight = 1, name = "backend-tcp" }
+]
+[proxies.transport]
+protocol = "tcp"
+multiplex =false
+encrypt = false
+compress = false
+
+
+# ② HTTP + WebSocket
+[[proxies]]
+name = "http-websocket"
+protocol = "http"
+custom_domains = ["34.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-ws" }
+]
+
+[proxies.transport]
+protocol = "websocket"
+multiplex = true
+encrypt = true
+compress = true
+
+# ③ HTTP + QUIC（QUIC Phase1 仅支持 multiplex）
+[[proxies]]
+name = "http-quic"
+protocol = "http"
+custom_domains = ["35.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-quic" }
+]
+
+[proxies.transport]
+protocol = "quic"
+multiplex = true
+encrypt = true
+compress = true
+[[proxies]]
+name = "http-quic2"
+protocol = "http"
+custom_domains = ["36.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+]
+
+[proxies.transport]
+protocol = "websocket"
+multiplex = true
+encrypt = true
+compress = true
+
+[[proxies]]
+name = "http-tcp2"
+protocol = "http"
+custom_domains = ["37.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+]
+
+[proxies.transport]
+protocol = "tcp"
+multiplex = true
+encrypt = true
+compress = true
+
+[[proxies]]
+name = "http-websockt2"
+protocol = "http"
+custom_domains = ["38.domain1.com"]
+targets = [
+    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+]
+
+[proxies.transport]
+protocol = "websocket"
+multiplex = true
+encrypt = true
+compress = true
+##############################################################################################################
+# 可选：HTTPS / TCP / UDP 回归用例（数据隧道均走 TCP）
+##############################################################################################################
+
+[[proxies]]
+name = "web-https"
 protocol = "https"
 custom_domains = ["a.domain1.com", "b.domain1.com"]
 targets = [
-    { port = 8084 },
-    { host = "127.0.0.1", port = 8088, weight = 10, name = "web-instance-1" },
-    { host = "127.0.0.1", port = 8084, weight = 1, name = "web-instance-1" }
+    { host = "127.0.0.1", port = 8084, weight = 1, name = "web-https-backend" }
 ]
 force_https = true
-#[proxies.ssl]
-#cert_file = "cert/domains/lxien.com/fullchain.pem"
-#key_file = "cert/domains/lxien.com/privkey.pem"
-
-[proxies.health_check]
-enabled = true
-type = "http"
-interval = 4
-timeout = 5
-max_failed = 3
-path = "/health"
-[[proxies]]
-name = "web1-http"
-protocol = "http"
-custom_domains = ["d.domain1.com", "ba.domain1.com"]
-targets = [
-    { host = "127.0.0.1", port = 8084, weight = 10, name = "web-instance-1" }
-]
 
 [[proxies]]
-name = "tcp2"
+name = "tcp-proxy"
 protocol = "tcp"
 local_ip = "127.0.0.1"
-local_port = 8089
+local_port = 8084
+remote_port=9080
+
 [proxies.transport]
 multiplex = true
-[proxies.health_check]
-enabled = true
-type = "tcp"
-interval = 8
-timeout = 5
-max_failed = 3
 
 [[proxies]]
-name = "udp1"
+name = "udp-proxy"
 protocol = "udp"
 local_ip = "127.0.0.1"
 local_port = 9999
 remote_port = 9060
+
 [proxies.transport]
 multiplex = true
 
 [log]
 level = "debug"
-path = "/Users/lxien/Desktop/workspace/orbien/logs"
+path = "logs"
 name = "orbienc.log"
 archive_pattern = "orbienc.%d{yyyy-MM-dd}.log"
 log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
-max_history = 1
-total_size_cap = "1MB"
+max_history = 7
+total_size_cap = "50MB"

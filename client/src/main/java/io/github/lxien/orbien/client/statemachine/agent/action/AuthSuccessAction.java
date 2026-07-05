@@ -1,7 +1,6 @@
 package io.github.lxien.orbien.client.statemachine.agent.action;
 
 import io.github.lxien.orbien.client.config.AppConfig;
-import io.github.lxien.orbien.client.config.ConfigUtils;
 import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.client.statemachine.agent.AgentState;
@@ -30,13 +29,17 @@ public class AuthSuccessAction extends AgentBaseAction {
 
     private void handleLocalProxyPush(AgentContext context) {
         logger.debug("推送本地配置到服务端");
-        AppConfig config = ConfigUtils.getConfig();
+        AppConfig config = context.getConfig();
         List<ProxyConfig> proxies = config.getProxies();
         Channel control = context.getControl();
 
         Message.BatchCreateProxiesRequest.Builder builder = Message.BatchCreateProxiesRequest.newBuilder();
         List<Message.Proxy> messages = proxies.stream().map(ProxyConfigAssembler::toProto).toList();
         builder.addAllProxies(messages);
+
+        logger.info("推送本地代理配置到服务端，共 {} 条: {}",
+                messages.size(),
+                messages.stream().map(Message.Proxy::getName).toList());
 
         ByteBuf buf = ProtobufUtil.toByteBuf(builder.build(), control.alloc());
         TMSPFrame tmspFrame = new TMSPFrame(0, TMSP.MSG_PROXY_REPORT_REQ, buf);

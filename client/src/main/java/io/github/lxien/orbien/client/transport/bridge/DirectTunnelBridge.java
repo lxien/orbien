@@ -2,12 +2,11 @@ package io.github.lxien.orbien.client.transport.bridge;
 
 import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
-import io.github.lxien.orbien.core.transport.*;
-import io.github.lxien.orbien.core.transport.NettyConstants;
-import io.github.lxien.orbien.core.transport.PipelineConfigure;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
+import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.util.concurrent.Future;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -16,18 +15,13 @@ public class DirectTunnelBridge implements TunnelBridge {
     private final StreamContext streamContext;
     private final Channel tunnel;
     private final Channel server;
+    private final ChannelHandler bridgeHandler;
 
     public DirectTunnelBridge(StreamContext streamContext) {
         this.streamContext = streamContext;
         this.tunnel = streamContext.getTunnelEntry().getChannel();
         this.server = streamContext.getServer();
-    }
-
-    @Override
-    public void open() {
-        ChannelPipeline pipeline = tunnel.pipeline();
-        PipelineConfigure.removeControlHandler(tunnel);
-        pipeline.addLast(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER,new SimpleChannelInboundHandler<ByteBuf>() {
+        this.bridgeHandler = new SimpleChannelInboundHandler<ByteBuf>() {
             @Override
             protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) {
                 streamContext.forwardToLocal(msg);
@@ -35,19 +29,24 @@ public class DirectTunnelBridge implements TunnelBridge {
 
             @Override
             public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-                logger.debug("隧道可写状态发生变化：{}", ctx.channel().isWritable());
-                Channel tunnel = ctx.channel();
-                boolean writable = tunnel.isWritable();
-                if (writable) {
+                if (ctx.channel().isWritable() && server.isActive()) {
                     server.config().setOption(ChannelOption.AUTO_READ, true);
+                    server.read();
                 }
                 ctx.fireChannelWritabilityChanged();
             }
+
             @Override
             public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-                logger.error("独立隧道传输发生异常",cause);
+                logger.error("独立隧道传输发生异常 streamId={}", streamContext.getStreamId(), cause);
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
-        });
+        };
+    }
+
+    @Override
+    public Future<Void> openAsync() {
+        return DirectTunnelLifecycle.enablePassthrough(tunnel, bridgeHandler);
     }
 
     @Override
@@ -57,12 +56,8 @@ public class DirectTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        server.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
-            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
-            if (f.isSuccess()) {
-                logger.debug("数据成功转发给真实服务成功");
-            } else {
-                logger.debug("数据转发给真实服务失败",f.cause());
+        writeOnLoop(server, payload.retain(), success -> {
+            if (!success) {
                 streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
@@ -75,13 +70,23 @@ public class DirectTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        tunnel.writeAndFlush(payload.retain()).addListener((ChannelFutureListener) f -> {
-            logger.debug("流 {} 引用计数为：{}", streamContext.getStreamId(), payload.refCnt());
-            if (f.isSuccess()) {
-                logger.debug("数据成功转发到远程成功");
-            } else {
-                logger.debug("数据转发到远程失败",f.cause());
+        writeOnLoop(tunnel, payload.retain(), success -> {
+            if (!success) {
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
+    }
+
+    private void writeOnLoop(Channel channel, ByteBuf payload, java.util.function.Consumer<Boolean> listener) {
+        int bytes = payload.readableBytes();
+        Runnable writeTask = () -> channel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+            if (f.isSuccess()) {
+                logger.debug("流 {} 数据转发成功 bytes={}", streamContext.getStreamId(), bytes);
+            } else {
+                logger.warn("流 {} 数据转发失败", streamContext.getStreamId(), f.cause());
+            }
+            listener.accept(f.isSuccess());
+        });
+        DirectTunnelLifecycle.runOnTunnelLoop(channel, writeTask);
     }
 }

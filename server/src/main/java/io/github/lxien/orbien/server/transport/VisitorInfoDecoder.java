@@ -78,6 +78,8 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
             visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
         }
+        // handler 移除前必须把 cumulation 交给下游，否则 ByteBuf 泄漏
+        out.add(in.retain());
         ctx.pipeline().remove(this);
     }
 

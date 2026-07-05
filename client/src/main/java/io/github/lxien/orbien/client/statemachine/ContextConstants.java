@@ -28,5 +28,6 @@ public interface ContextConstants {
     String COMPRESS = "compress";
     String ENCRYPT = "encrypt";
     String MULTIPLEX = "multiplex";
+    String TRANSPORT_PROTOCOL = "transport_protocol";
     String PROXY_SYNC_RESP = "Proxy_Sync_Resp";
 }

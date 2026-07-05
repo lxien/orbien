@@ -49,19 +49,23 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
             StreamContext streamContext = contextOpt.get();
+            if (!streamContext.canAcceptVisitorData()) {
+                return;
+            }
             TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
             if (tunnelEntry == null) {
-                logger.error("隧道连接不存在，关闭流：", streamContext.getStreamId());
+                logger.error("隧道连接不存在，关闭流：streamId={}", streamContext.getStreamId());
                 streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                return;
+            }
+            if (streamContext.getTunnelBridge() == null) {
                 return;
             }
             Channel tunnel = tunnelEntry.getChannel();
             if (!tunnel.isWritable()) {
                 logger.debug("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
                 visitor.config().setOption(ChannelOption.AUTO_READ, false);
-                if (tunnelEntry.getTunnelType().isMultiplex()){
-                    streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
-                }
+                streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
             }
             logger.debug("[TCP] 流 {} 引用计数为：{}", streamContext.getStreamId(), msg.refCnt());
             streamContext.forwardToLocal(msg);
@@ -84,19 +88,5 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireChannelInactive();
-    }
-
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-        Channel visitor = ctx.channel();
-        logger.warn("访问流可写性发生变化：{}", visitor.isWritable());
-        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            if (!visitor.isWritable()) {
-                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_PAUSE);
-            } else {
-                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_RESUME);
-            }
-        });
-        ctx.fireChannelWritabilityChanged();
     }
 }

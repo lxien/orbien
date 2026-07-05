@@ -58,6 +58,9 @@ public class ProxyReportConvert {
         if (proxy.hasBandwidth()) {
             applyBandwidth(proxyDO, proxy.getBandwidth());
         }
+        if (protocol.isHttps()) {
+            proxyDO.setForceHttps(proxy.getForceHttps());
+        }
         return proxyDO;
     }
 
@@ -77,6 +80,13 @@ public class ProxyReportConvert {
         }
         if (transport.hasCompress()) {
             proxyDO.setCompress(transport.getCompress());
+        }
+        if (transport.hasProtocol()) {
+            TransportProtocol protocol = TransportProtocol.fromName(transport.getProtocol());
+            if (protocol == null) {
+                throw new IllegalArgumentException("不支持的传输协议: " + transport.getProtocol());
+            }
+            proxyDO.setTransportProtocol(protocol);
         }
     }
 

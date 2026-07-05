@@ -16,6 +16,7 @@
 package io.github.lxien.orbien.core.transport;
 
 import io.github.lxien.orbien.core.enums.TunnelType;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Setter
 public class TunnelEntry {
     private String tunnelId;
+    private TransportProtocol protocol;
     private boolean active;
     private TunnelType tunnelType;
     private boolean encrypt;
@@ -31,7 +33,16 @@ public class TunnelEntry {
     private NettyBatchWriteQueue writeQueue;
 
     public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, TunnelType tunnelType, NettyBatchWriteQueue writeQueue) {
+        this(tunnelId, TransportProtocol.TCP, encrypt, channel, tunnelType, writeQueue);
+    }
+
+    public TunnelEntry(String tunnelId, TransportProtocol protocol, boolean encrypt, Channel channel, TunnelType tunnelType) {
+        this(tunnelId, protocol, encrypt, channel, tunnelType, null);
+    }
+
+    public TunnelEntry(String tunnelId, TransportProtocol protocol, boolean encrypt, Channel channel, TunnelType tunnelType, NettyBatchWriteQueue writeQueue) {
         this.tunnelId = tunnelId;
+        this.protocol = protocol;
         this.channel = channel;
         this.encrypt = encrypt;
         this.tunnelType = tunnelType;
@@ -39,7 +50,7 @@ public class TunnelEntry {
     }
 
     public TunnelEntry(String tunnelId, boolean encrypt, Channel channel, TunnelType tunnelType) {
-        this(tunnelId, encrypt, channel, tunnelType, null);
+        this(tunnelId, TransportProtocol.TCP, encrypt, channel, tunnelType, null);
     }
 
     public boolean isActive() {

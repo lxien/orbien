@@ -3,7 +3,7 @@ package io.github.lxien.orbien.common.utils;
 /**
  * 字符串相关工具函数
  *
- * @author liuxin
+ * @author lxien
  */
 public abstract class StringUtils {
     public static boolean hasLength(CharSequence str) {

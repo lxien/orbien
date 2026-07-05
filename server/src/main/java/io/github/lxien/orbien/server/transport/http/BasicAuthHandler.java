@@ -12,6 +12,7 @@ import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import io.netty.util.internal.logging.InternalLogger;
@@ -45,6 +46,7 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
             BasicAuthConfig basicAuth = config.getBasicAuth();
             if (basicAuth != null && basicAuth.isEnabled()) {
                 if (basicAuthHeader == null || !basicAuthHeader.toLowerCase().startsWith("basic ")) {
+                    ReferenceCountUtil.release(msg);
                     sendBasicAuth(visitor);
                     return;
                 }
@@ -56,15 +58,18 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
                         String username = parts[0];
                         String password = parts[1];
                         if (!check(username, password, basicAuth)) {
+                            ReferenceCountUtil.release(msg);
                             sendBasicAuth(visitor);
                             return;
                         }
                     } else {
+                        ReferenceCountUtil.release(msg);
                         sendBasicAuth(visitor);
                         return;
                     }
                 } catch (Exception e) {
                     logger.debug("Basic Auth 解码失败: {}", e.getMessage());
+                    ReferenceCountUtil.release(msg);
                     sendBasicAuth(visitor);
                     return;
                 }

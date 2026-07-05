@@ -20,9 +20,10 @@ import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
+import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -38,7 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * TCP服务启动、停止、管理
  *
- * @author liuxin
+ * @author lxien
  */
 public final class TcpProxyServer implements Lifecycle {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TcpProxyServer.class);
@@ -48,13 +49,13 @@ public final class TcpProxyServer implements Lifecycle {
     private EventLoopGroup workerGroup;
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final TcpVisitorHandler tcpVisitorHandler;
-    private final EventBus eventBus;
     private final TcpIpCheckHandler tcpIpCheckHandler;
+    private final AppConfig appConfig;
 
-    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
+    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, AppConfig appConfig) {
         this.tcpVisitorHandler = tcpVisitorHandler;
-        this.eventBus = eventBus;
         this.tcpIpCheckHandler = tcpIpCheckHandler;
+        this.appConfig = appConfig;
     }
 
     @Override
@@ -77,6 +78,7 @@ public final class TcpProxyServer implements Lifecycle {
                     protected void initChannel(SocketChannel sc) {
                         ChannelPipeline pipeline = sc.pipeline();
 
+                        VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                         pipeline.addLast(new IdleCheckHandler());
                         pipeline.addLast(tcpIpCheckHandler);
                         pipeline.addLast(uploadRateLimitHandler);

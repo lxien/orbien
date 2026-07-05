@@ -19,6 +19,7 @@ package io.github.lxien.orbien.server.transport.bridge;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.concurrent.Future;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -39,8 +40,8 @@ public class MetricsTunnelBridge implements TunnelBridge {
     }
 
     @Override
-    public void open() {
-        delegate.open();
+    public Future<Void> openAsync() {
+        return delegate.openAsync();
     }
 
     @Override

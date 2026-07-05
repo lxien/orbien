@@ -26,6 +26,7 @@ import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.enums.DomainType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.core.notify.EventBus;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.event.ProxyAddEvent;
@@ -125,6 +126,7 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         builder.setName(proxy.getName());
         builder.setHealthCheck(proxy.getHealthCheck());
         builder.addAllTargets(proxy.getTargetsList());
+        RuntimeInfoSupport.applyTransport(builder, proxy);
 
         for (String d : domainSet) {
             builder.addRemoteAddr(buildAddress(d));

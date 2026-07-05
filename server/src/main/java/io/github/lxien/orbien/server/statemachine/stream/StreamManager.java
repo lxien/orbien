@@ -6,9 +6,11 @@ import io.github.lxien.orbien.core.domain.BandwidthConfig;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.PausedStreamRegistry;
+import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.UdpSessionKey;
 import io.github.lxien.orbien.server.generator.StreamIdGenerator;
 import io.github.lxien.orbien.server.transport.BandwidthLimiter;
+import io.github.lxien.orbien.core.transport.VisitorAddressResolver;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
@@ -344,6 +346,26 @@ public class StreamManager {
         }
     }
 
+    public void closeStreamsByTunnel(Channel tunnel) {
+        if (tunnel == null) {
+            return;
+        }
+        for (StreamContext ctx : new ArrayList<>(visitors.values())) {
+            if (ctx == null) {
+                continue;
+            }
+            TunnelEntry entry = ctx.getTunnelEntry();
+            if (entry != null && entry.getChannel() == tunnel) {
+                ctx.abortLocalForwarding();
+                StreamState state = ctx.getState();
+                if (state != StreamState.CLOSED && state != StreamState.FAILED) {
+                    ctx.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                }
+            }
+        }
+        pausedStreamRegistry.removeByChannel(tunnel);
+    }
+
     public void addPausedStreamId(Channel tunnel, int streamId) {
         pausedStreamRegistry.addPausedStreamId(tunnel, streamId);
     }
@@ -393,7 +415,8 @@ public class StreamManager {
      */
     private String getRemoteAddress(Channel visitor) {
         try {
-            return visitor.remoteAddress().toString();
+            String ip = VisitorAddressResolver.resolveIp(visitor);
+            return ip != null ? ip : "unknown";
         } catch (Exception e) {
             return "unknown";
         }

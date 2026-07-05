@@ -15,6 +15,34 @@
             <artifactId>netty-all</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-classes-io_uring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-io_uring</artifactId>
+            <classifier>linux-x86_64</classifier>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport-native-io_uring</artifactId>
+            <classifier>linux-aarch_64</classifier>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.netty.incubator</groupId>
+            <artifactId>netty-incubator-codec-classes-quic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty.incubator</groupId>
+            <artifactId>netty-incubator-codec-native-quic</artifactId>
+            <version>${netty-quic.version}</version>
+            <classifier>osx-aarch_64</classifier>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
         </dependency>

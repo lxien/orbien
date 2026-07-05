@@ -101,10 +101,12 @@ public class ProxyConfigAssembler {
         if (proxyDO == null) {
             return;
         }
-        if (proxyDO.getMultiplex() == null && proxyDO.getEncrypt() == null && proxyDO.getCompress() == null) {
+        if (proxyDO.getMultiplex() == null && proxyDO.getEncrypt() == null
+                && proxyDO.getCompress() == null && proxyDO.getTransportProtocol() == null) {
             return;
         }
         config.setTransport(TransportCustomConfig.builder()
+                .protocol(proxyDO.getTransportProtocol())
                 .multiplex(proxyDO.getMultiplex())
                 .encrypt(proxyDO.getEncrypt())
                 .compress(proxyDO.getCompress())

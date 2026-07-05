@@ -5,16 +5,20 @@ import io.github.lxien.orbien.client.config.AppConfig;
 import io.github.lxien.orbien.client.config.TomlConfigLoader;
 import io.github.lxien.orbien.client.config.domain.LogConfig;
 import io.github.lxien.orbien.client.logging.LogbackConfigurator;
+import io.github.lxien.orbien.core.transport.NettyJvmSupport;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TunnelClientStartup {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelClientStartup.class);
     private static TunnelClient tunnelClient;
+
     public static void main(String[] args) {
+        NettyJvmSupport.ensureNativeAccess();
         try {
             AppConfig config = buildConfig(args);
             initLogback(config);
@@ -43,10 +47,12 @@ public class TunnelClientStartup {
     }
 
     private static AppConfig loadConfigFromFile(String configPath) {
-        if (!Files.exists(Paths.get(configPath))) {
-            throw new IllegalArgumentException("配置文件不存在: " + configPath);
+        Path resolved = Paths.get(configPath).toAbsolutePath().normalize();
+        if (!Files.exists(resolved)) {
+            throw new IllegalArgumentException("配置文件不存在: " + resolved);
         }
-        TomlConfigLoader configSource = new TomlConfigLoader(configPath);
+        logger.info("使用配置文件: {}", resolved);
+        TomlConfigLoader configSource = new TomlConfigLoader(resolved.toString());
         return configSource.load();
     }
 

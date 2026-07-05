@@ -11,6 +11,8 @@ orbien:
       transport:
         multiplex: true
         encrypt: true
+        protocol: quic
+
     transport:
       tls:
         enabled: true

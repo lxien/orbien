@@ -1,14 +1,14 @@
 package io.github.lxien.orbien.server.configuration;
 
 import io.github.lxien.orbien.core.notify.EventBus;
-import io.github.lxien.orbien.server.TunnelServer;
+import io.github.lxien.orbien.server.transport.TransportListenerManager;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
+import io.github.lxien.orbien.server.transport.http.ForceHttpsRedirectHandler;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.http.HttpProxyServer;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
 import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
-import io.github.lxien.orbien.server.transport.http.*;
 import io.github.lxien.orbien.server.transport.https.HttpsProxyServer;
 import io.github.lxien.orbien.server.transport.tcp.TcpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpProxyServer;
@@ -29,13 +29,13 @@ public class TransportConfiguration {
     private AppConfig config;
 
     @Bean
-    public TunnelServer tunnelServer(EventBus eventBus, ControlFrameHandler controlFrameHandler) {
-        return new TunnelServer(config, eventBus, controlFrameHandler);
+    public TransportListenerManager transportListenerManager(EventBus eventBus, ControlFrameHandler controlFrameHandler) {
+        return new TransportListenerManager(config, eventBus, controlFrameHandler);
     }
 
     @Bean
-    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, EventBus eventBus) {
-        return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, eventBus);
+    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler) {
+        return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, config);
     }
 
     @Bean
@@ -47,23 +47,23 @@ public class TransportConfiguration {
     public HttpProxyServer httpProxyServer(HttpVisitorHandler httpVisitorHandler,
                                            HttpIpCheckHandler httpIpCheckHandler,
                                            BasicAuthHandler basicAuthHandler,
-                                           EventBus eventBus) {
+                                           ForceHttpsRedirectHandler forceHttpsRedirectHandler) {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                eventBus);
+                forceHttpsRedirectHandler
+        );
     }
     @Bean
     public HttpsProxyServer httpsProxyServer(HttpVisitorHandler httpVisitorHandler,
                                              HttpIpCheckHandler httpIpCheckHandler,
                                              BasicAuthHandler basicAuthHandler,
-                                             EventBus eventBus, SslCertificateManager sslCertificateManager) {
+                                             SslCertificateManager sslCertificateManager) {
         return new HttpsProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                eventBus,
                 sslCertificateManager);
     }
 }

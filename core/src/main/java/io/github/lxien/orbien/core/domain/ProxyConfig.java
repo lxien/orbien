@@ -16,6 +16,8 @@
 package io.github.lxien.orbien.core.domain;
 
 import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import lombok.*;
 
@@ -153,12 +155,21 @@ public class ProxyConfig implements Serializable {
     public boolean isHttp() {
         return ProtocolType.isHttp(protocol);
     }
+
     /**
      * 是否是 HTTPS 协议
      */
     public boolean isHttps() {
         return ProtocolType.isHttps(protocol);
     }
+
+    /**
+     * HTTPS 代理是否开启 HTTP→HTTPS 强制跳转（未配置时默认 true）。
+     */
+    public boolean isForceHttpsEnabled() {
+        return io.github.lxien.orbien.core.http.ForceHttpsPolicy.isRedirectEnabled(this);
+    }
+
     public boolean isHttpOrHttps() {
         return ProtocolType.isHttp(protocol) || ProtocolType.isHttps(protocol);
     }
@@ -213,7 +224,18 @@ public class ProxyConfig implements Serializable {
     }
 
     public boolean isMuxTunnel() {
-        return transport != null && transport.getMultiplex();
+        return transport != null && Boolean.TRUE.equals(transport.getMultiplex());
+    }
+
+    public TransportProtocol getTransportProtocol(TransportProtocol globalDefault) {
+        return TransportEndpointResolver.resolveDataProtocol(globalDefault, transport);
+    }
+
+    public boolean isMuxTunnelFor(TransportProtocol protocol) {
+        if (transport != null && transport.getMultiplex() != null) {
+            return TransportEndpointResolver.normalizeMultiplex(protocol, transport.getMultiplex());
+        }
+        return isMuxTunnel();
     }
 
     public DeploymentMode getDeploymentMode() {

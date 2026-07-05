@@ -45,7 +45,7 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
         if (!checkAccess) {
             logger.debug("来源IP {} 无访问权限", visitorIp);
             ProtocolType protocol = config.getProtocol();
-            if (protocol.isHttp()) {
+            if (protocol.isHttp() || protocol.isHttps()) {
                 NettyHttpUtils.sendHttp403(visitor).addListener(future -> {
                     ChannelUtils.closeOnFlush(visitor);
                 });

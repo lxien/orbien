@@ -25,8 +25,7 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildDirect(StreamContext streamContext) {
         TunnelBridge bridge = new DirectTunnelBridge(streamContext);
-        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
-        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
+        return addMetricsIfNeeded(bridge, streamContext);
     }
 
     /**
@@ -34,8 +33,7 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildMux(StreamContext streamContext) {
         TunnelBridge bridge = new MultiplexTunnelBridge(streamContext);
-        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
-        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
+        return addMetricsIfNeeded(bridge, streamContext);
     }
 
     /**
@@ -43,8 +41,7 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildUdpMux(StreamContext streamContext) {
         TunnelBridge bridge = new UdpMultiplexTunnelBridge(streamContext);
-        TunnelBridge tunnelBridge = addMetricsIfNeeded(bridge, streamContext);
-        return new BackpressureTunnelBridge(tunnelBridge, streamContext);
+        return addMetricsIfNeeded(bridge, streamContext);
     }
 
     /**

@@ -23,6 +23,7 @@ public class AppConfig implements Config {
     private Set<String> rootDomains;
     private TransportConfig transportConfig;
     private AuthConfig authConfig;
+    private ProxyProtocolConfig proxyProtocol;
 
     private AppConfig(Builder builder) {
         this.serverAddr = builder.serverAddr;
@@ -34,6 +35,7 @@ public class AppConfig implements Config {
         this.rootDomains = builder.rootDomains;
         this.transportConfig = builder.transportConfig;
         this.authConfig = builder.authConfig;
+        this.proxyProtocol = builder.proxyProtocol;
     }
 
     public static class Builder {
@@ -46,6 +48,7 @@ public class AppConfig implements Config {
         private DashboardConfig dashboard = new DashboardConfig(false);
         private PortPoolConfig portPool = PortPoolConfig.empty();
         private AuthConfig authConfig = new AuthConfig();
+        private ProxyProtocolConfig proxyProtocol = new ProxyProtocolConfig();
 
         public Builder serverAddr(String serverAddr) {
             this.serverAddr = serverAddr;
@@ -74,6 +77,11 @@ public class AppConfig implements Config {
 
         public Builder authConfig(AuthConfig authConfig) {
             this.authConfig = authConfig;
+            return this;
+        }
+
+        public Builder proxyProtocol(ProxyProtocolConfig proxyProtocol) {
+            this.proxyProtocol = proxyProtocol;
             return this;
         }
 

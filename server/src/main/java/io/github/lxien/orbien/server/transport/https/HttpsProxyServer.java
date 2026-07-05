@@ -18,15 +18,17 @@
 
 package io.github.lxien.orbien.server.transport.https;
 
-import io.github.lxien.orbien.core.notify.EventBus;
 import io.github.lxien.orbien.core.server.Lifecycle;
+import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
+import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
+import io.github.lxien.orbien.server.transport.http.HeaderInjectDecoder;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
 import io.netty.bootstrap.ServerBootstrap;
@@ -53,15 +55,13 @@ public class HttpsProxyServer implements Lifecycle {
     private EventLoopGroup workerGroup;
     private final HttpVisitorHandler httpVisitorHandler;
     private final AppConfig appConfig;
-    private final EventBus eventBus;
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
     private final SslCertificateManager sslCertificateManager;
 
-    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, EventBus eventBus, SslCertificateManager sslCertificateManager) {
+    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, SslCertificateManager sslCertificateManager) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
-        this.eventBus = eventBus;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.sslCertificateManager = sslCertificateManager;
@@ -84,13 +84,15 @@ public class HttpsProxyServer implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             ChannelPipeline pipeline = sc.pipeline();
+                            // PROXY 必须在 TLS 之前
+                            VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                             pipeline.addLast(new SniHandler(sslCertificateManager::getSslContext));
-                            //pipeline.addLast(new IdleCheckHandler());
+                            pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
-                           // pipeline.addLast(new HeaderInjectDecoder());
-                          //  pipeline.addLast(httpIpCheckHandler);
-                         //   pipeline.addLast(uploadRateLimitHandler);
-                           // pipeline.addLast(basicAuthHandler);
+                            pipeline.addLast(new HeaderInjectDecoder());
+                            pipeline.addLast(httpIpCheckHandler);
+                            //   pipeline.addLast(uploadRateLimitHandler);
+                            pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

@@ -14,7 +14,7 @@ import java.util.Optional;
 
 /**
  *
- * @author liuxin
+ * @author lxien
  */
 public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(RealServerHandler.class);
@@ -29,9 +29,7 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
                     if (!tunnel.isWritable()) {
                         logger.debug("数据无法转发到远程，流量过高，隧道不可写，暂停从服务读取，streamId={}", streamContext.getStreamId());
                         server.config().setOption(ChannelOption.AUTO_READ, false);
-                        if (tunnelEntry.getTunnelType().isMultiplex()){
-                            StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
-                        }
+                        StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
                     }
                     streamContext.forwardToRemote(msg);
                 }
@@ -55,16 +53,11 @@ public class RealServerHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-        logger.warn("服务端可写状态发生变化，当前状态：{}", ctx.channel().isWritable());
         Channel server = ctx.channel();
-        StreamManager.getStreamContext(server).ifPresent(streamContext -> {
-            Channel tunnel = streamContext.getTunnelEntry().getChannel();
-            if (tunnel != null) {
-                logger.warn("隧道流量过高，改变隧道的可读状态，无法写入服务器，当前隧道可写状态：{}", tunnel.isWritable());
-                boolean shouldRead = server.isWritable();
-                tunnel.config().setOption(ChannelOption.AUTO_READ, shouldRead);
-            }
-        });
+        if (server.isWritable()) {
+            server.config().setOption(ChannelOption.AUTO_READ, true);
+            server.read();
+        }
         ctx.fireChannelWritabilityChanged();
     }
 

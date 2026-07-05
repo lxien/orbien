@@ -16,13 +16,8 @@
 
 package io.github.lxien.orbien.server.utils;
 
+import io.github.lxien.orbien.core.transport.VisitorAddressResolver;
 import io.netty.channel.Channel;
-import io.netty.util.NetUtil;
-
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 
 public final class NetUtils {
 
@@ -30,31 +25,9 @@ public final class NetUtils {
     }
 
     /**
-     * 获取客户端 IP（优先 IPv4）
+     * 访客 IP：PROXY 解析优先，否则 remoteAddress
      */
     public static String getIp(Channel channel) {
-        if (!(channel.remoteAddress() instanceof InetSocketAddress addr)) {
-            return null;
-        }
-        InetAddress address = addr.getAddress();
-        // 纯 IPv4
-        if (address instanceof Inet4Address) {
-            return address.getHostAddress();
-        }
-        // IPv6
-        if (address instanceof Inet6Address) {
-            String ip = NetUtil.toAddressString(address);
-            // IPv4-Mapped IPv6
-            if (ip.startsWith("::ffff:")) {
-                return ip.substring(7);
-            }
-            // localhost
-            if ("::1".equals(ip)) {
-                return "127.0.0.1";
-            }
-            return ip;
-        }
-
-        return address.getHostAddress();
+        return VisitorAddressResolver.resolveIp(channel);
     }
 }

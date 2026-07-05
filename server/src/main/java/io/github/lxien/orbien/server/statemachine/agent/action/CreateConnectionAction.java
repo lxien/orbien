@@ -5,6 +5,7 @@ import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.*;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.server.statemachine.agent.AgentConstants;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
@@ -16,6 +17,7 @@ import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPoo
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -34,38 +36,72 @@ public class CreateConnectionAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("开始建立连接隧道");
         ConnectionCreateCmd cmd = context.getAndRemoveAs(AgentConstants.TUNNEL_CREATE_CMD, ConnectionCreateCmd.class);
+        registerTunnelImmediately(context, cmd);
+    }
+
+    /**
+     * 在数据隧道所属 EventLoop 上同步完成入池与响应，避免 QUIC 等异步传输与控制面竞态。
+     */
+    public void registerTunnelImmediately(AgentContext agentContext, ConnectionCreateCmd cmd) {
+        Channel tunnel = cmd.getTunnel();
+        Runnable task = () -> executeRegister(agentContext, cmd);
+        if (tunnel.eventLoop().inEventLoop()) {
+            task.run();
+        } else {
+            tunnel.eventLoop().execute(task);
+        }
+    }
+
+    private void executeRegister(AgentContext context, ConnectionCreateCmd cmd) {
         Channel tunnel = cmd.getTunnel();
         tunnel.attr(AttributeKeys.CHANNEL_TYPE).set(ChannelType.TUNNEL);
 
         String tunnelId = cmd.getTunnelId();
         boolean multiplex = cmd.isMultiplex();
         boolean encrypt = cmd.isEncrypt();
-
         String agentId = context.getAgentInfo().getAgentId();
-        createPool(agentId, tunnelId, multiplex, encrypt, tunnel);
-        Channel control = context.getControl();
+
+        TransportProtocol protocol = tunnel.attr(AttributeKeys.TRANSPORT_PROTOCOL).get();
+        if (protocol == null) {
+            logger.warn("[传输] 隧道 channel 未标记协议，回退为 tcp tunnelId={} channelClass={}",
+                    tunnelId, tunnel.getClass().getSimpleName());
+            protocol = TransportProtocol.TCP;
+        }
+        final TransportProtocol tunnelProtocol = protocol;
+
+        logger.debug("[传输] 注册数据隧道 agentId={} tunnelId={} protocol={} encrypt={} multiplex={} channelClass={} streamId={}",
+                agentId, tunnelId, tunnelProtocol.getName(), encrypt, multiplex,
+                tunnel.getClass().getSimpleName(), describeQuicStreamId(tunnel));
+
+        createPool(agentId, tunnelId, protocol, multiplex, encrypt, tunnel);
+        tunnel.config().setOption(ChannelOption.AUTO_READ, true);
+
         Message.CreateConnectionResponse resp = Message.CreateConnectionResponse.newBuilder()
                 .setTunnelId(tunnelId)
                 .setStatus(Message.Status.newBuilder().setCode(0))
                 .build();
 
-        ByteBuf payload = ProtobufUtil.toByteBuf(resp, control.alloc());
+        ByteBuf payload = ProtobufUtil.toByteBuf(resp, tunnel.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_CONNECTION_CREATE_RESP, payload);
         frame.setEncrypted(encrypt);
         frame.setMultiplexTunnel(multiplex);
-        if (!control.isActive() || !control.isWritable()) {
-            logger.error("控制通道不可用，隧道创建结果结果发送失败");
+        if (!tunnel.isActive() || !tunnel.isWritable()) {
+            logger.error("[传输] 数据隧道不可用，隧道创建结果发送失败 tunnelId={} protocol={} active={} writable={}",
+                    tunnelId, tunnelProtocol.getName(), tunnel.isActive(), tunnel.isWritable());
             return;
         }
-        control.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
-            logger.debug("隧道创建结果响应引用计数：{}", payload.refCnt());
+        tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            logger.debug("[传输] 隧道创建结果已写入数据通道 tunnelId={} protocol={} refCnt={} success={}",
+                    tunnelId, tunnelProtocol.getName(), payload.refCnt(), future.isSuccess());
             if (!future.isSuccess()) {
-                logger.error("隧道创建结果响应失败", future.cause());
+                logger.error("[传输] 隧道创建结果响应失败 tunnelId={} protocol={}",
+                        tunnelId, tunnelProtocol.getName(), future.cause());
             }
         });
     }
 
-    public void createPool(String agentId, String tunnelId, boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
+    public void createPool(String agentId, String tunnelId, TransportProtocol protocol,
+                           boolean isMultiplex, boolean isEncrypt, Channel tunnel) {
         if (tunnel == null) {
             throw new IllegalArgumentException("tunnel 不能为空");
         }
@@ -78,9 +114,10 @@ public class CreateConnectionAction extends AgentBaseAction {
         if (!tunnel.isActive()) {
             throw new IllegalArgumentException("连接不可用，连接池创建失败");
         }
-        logger.debug("创建隧道 客户端ID={} 隧道ID={} 加密={} 多路复用={}", agentId, tunnelId, isEncrypt, isMultiplex);
-        // NettyBatchWriteQueue writeQueue = NettyBatchWriteQueue.createWriteQueue(tunnel);
-        TunnelEntry poolEntry = new TunnelEntry(tunnelId, isEncrypt, tunnel, isMultiplex ? TunnelType.MULTIPLEX : TunnelType.DIRECT);
+        logger.debug("[传输] 写入连接池 agentId={} tunnelId={} protocol={} encrypt={} multiplex={}",
+                agentId, tunnelId, protocol.getName(), isEncrypt, isMultiplex);
+        TunnelEntry poolEntry = new TunnelEntry(tunnelId, protocol, isEncrypt, tunnel,
+                isMultiplex ? TunnelType.MULTIPLEX : TunnelType.DIRECT);
         poolEntry.setActive(true);
         if (isMultiplex) {
             PipelineConfigure.removeControlIdleCheckHandler(tunnel);
@@ -88,9 +125,16 @@ public class CreateConnectionAction extends AgentBaseAction {
             if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
                 pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER, NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
             }
-            multiplexConnectionPool.setChannel(agentId, isEncrypt, poolEntry);
+            multiplexConnectionPool.setChannel(agentId, protocol, isEncrypt, poolEntry);
         } else {
             directConnectionPool.register(agentId, poolEntry);
         }
+    }
+
+    private static Object describeQuicStreamId(Channel tunnel) {
+        if (tunnel instanceof io.netty.incubator.codec.quic.QuicStreamChannel streamChannel) {
+            return streamChannel.streamId();
+        }
+        return "n/a";
     }
 }

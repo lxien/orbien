@@ -18,12 +18,12 @@ package io.github.lxien.orbien.server.transport.http;
 
 import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
-import io.github.lxien.orbien.core.notify.EventBus;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
+import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -48,16 +48,16 @@ public class HttpProxyServer implements Lifecycle {
     private EventLoopGroup workerGroup;
     private final HttpVisitorHandler httpVisitorHandler;
     private final AppConfig appConfig;
-    private final EventBus eventBus;
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
+    private final ForceHttpsRedirectHandler forceHttpsRedirectHandler;
 
-    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, EventBus eventBus) {
+    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, ForceHttpsRedirectHandler forceHttpsRedirectHandler) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
-        this.eventBus = eventBus;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
+        this.forceHttpsRedirectHandler = forceHttpsRedirectHandler;
     }
 
     @Override
@@ -71,14 +71,17 @@ public class HttpProxyServer implements Lifecycle {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .childOption(ChannelOption.SO_KEEPALIVE, true)
+                    .childOption(ChannelOption.TCP_NODELAY, true)
                     .channel(NettyEventLoopFactory.serverSocketChannelClass())
                     .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             ChannelPipeline pipeline = sc.pipeline();
+                            VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                             pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
+                            pipeline.addLast(forceHttpsRedirectHandler);
                             pipeline.addLast(new HeaderInjectDecoder());
                             pipeline.addLast(httpIpCheckHandler);
                             pipeline.addLast(uploadRateLimitHandler);

@@ -21,9 +21,9 @@ public class TlslnitAction extends AgentBaseAction {
         try {
             AppConfig config = context.getConfig();
             TransportConfig transportConfig = config.getTransportConfig();
-            TlsConfig tlsConfig = transportConfig.getTlsConfig();
+            TlsConfig tlsConfig = transportConfig.resolveTls(transportConfig.getProtocol());
             if (tlsConfig == null || tlsConfig.isEnabled()) {
-                logger.debug("初始化 TLS 上下文");
+                logger.debug("[传输] 初始化 TLS 上下文，控制连接协议={}", transportConfig.getProtocol().getName());
                 SslContext sslContext = TlsHelper.buildSslContext(true, tlsConfig, tlsConfig == null);
                 TlsContextHolder.initialize(sslContext);
                 context.setTlsContext(sslContext);

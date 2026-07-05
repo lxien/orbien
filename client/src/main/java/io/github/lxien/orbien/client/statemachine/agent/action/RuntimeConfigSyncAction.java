@@ -60,5 +60,6 @@ public class RuntimeConfigSyncAction extends AgentBaseAction {
                 break;
             }
         }
+        context.fireEvent(AgentEvent.CREATE_CONN_POOL);
     }
 }

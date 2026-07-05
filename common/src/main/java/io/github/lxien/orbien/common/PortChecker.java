@@ -7,7 +7,7 @@ import java.util.List;
 
 /**
  * 端口可用性检查
- * @author liuxin
+ * @author lxien
  */
 public class PortChecker {
     /**

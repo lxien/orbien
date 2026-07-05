@@ -72,6 +72,7 @@
 
         <!-- ==================== 核心网络框架 ==================== -->
         <netty.version>4.2.15.Final</netty.version>
+        <netty-quic.version>0.0.75.Final</netty-quic.version>
         <protobuf.version>4.33.4</protobuf.version>
 
         <!-- ==================== 日志框架 ==================== -->
@@ -236,6 +237,26 @@
                 <groupId>io.netty</groupId>
                 <artifactId>netty-all</artifactId>
                 <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-classes-io_uring</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport-native-io_uring</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty.incubator</groupId>
+                <artifactId>netty-incubator-codec-classes-quic</artifactId>
+                <version>${netty-quic.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty.incubator</groupId>
+                <artifactId>netty-incubator-codec-native-quic</artifactId>
+                <version>${netty-quic.version}</version>
             </dependency>
             <!--项目模块-->
             <dependency>

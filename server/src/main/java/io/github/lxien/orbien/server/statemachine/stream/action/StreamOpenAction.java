@@ -35,7 +35,7 @@ public class StreamOpenAction extends StreamBaseAction {
         }
         Target target = context.getTarget();
         ByteBuf payload = control.alloc().buffer();
-        NewStreamCodec.encode(payload, target.getHost(), target.getPort());
+        NewStreamCodec.encode(payload, target.getHost(), target.getPort(), context.getTransportProtocol());
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);
 
         frame.setMultiplexTunnel(config.isMuxTunnel() || config.isUdp());

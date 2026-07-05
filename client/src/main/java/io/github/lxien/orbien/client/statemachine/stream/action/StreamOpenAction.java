@@ -7,13 +7,15 @@ import io.github.lxien.orbien.client.statemachine.stream.*;
 import io.github.lxien.orbien.client.statemachine.stream.StreamConstants;
 import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
-import io.github.lxien.orbien.client.statemachine.stream.StreamState;
-import io.github.lxien.orbien.client.transport.bridge.TunnelBridgeFactory;
 import io.github.lxien.orbien.core.codec.NewStreamCodec;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.client.transport.bridge.TunnelBridgeFactory;
+import io.github.lxien.orbien.client.transport.TransportProtocolResolver;
+import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
@@ -53,15 +55,27 @@ public class StreamOpenAction extends StreamBaseAction {
             streamContext.setLocalIp(localIp);
             streamContext.setLocalPort(localPort);
 
+            TransportProtocol transportProtocol = visitorInfo.getTransportProtocol() != null
+                    ? visitorInfo.getTransportProtocol()
+                    : TransportProtocolResolver.globalDefault(agentContext.getConfig());
+
+            streamContext.setTransportProtocol(transportProtocol);
+            boolean multiplex = TransportEndpointResolver.normalizeMultiplex(
+                    transportProtocol, streamContext.isMultiplex());
+            streamContext.setMultiplex(multiplex);
+            logger.debug("[传输] 流 {} 解析数据隧道协议={} encrypt={} multiplex={} target={}:{}",
+                    streamContext.getStreamId(), transportProtocol.getName(),
+                    streamContext.isEncrypt(), multiplex, localIp, localPort);
+            //UDP协议内网服务
             if (streamContext.isDatagram()) {
                 openDatagramStream(streamContext, agentContext, control, streamId);
                 return;
             }
-
+            //TCP协议内网服务
             Bootstrap serverBootstrap = agentContext.getServerBootstrap();
             serverBootstrap.connect(localIp, localPort).addListener((ChannelFutureListener) serverFuture -> {
                 if (serverFuture.isSuccess()) {
-                    logger.debug("成功连接到目标服务 - [地址={}，端口={}]", localIp, localPort);
+                    logger.debug("成功连接到TCP协议目标服务 - [地址={}，端口={}]", localIp, localPort);
                     Channel server = serverFuture.channel();
                     server.config().setOption(ChannelOption.AUTO_READ, false);
                     server.attr(AttributeKeys.STREAM_ID).set(streamId);
@@ -94,20 +108,30 @@ public class StreamOpenAction extends StreamBaseAction {
                     frame.setEncrypted(streamContext.isEncrypt());
                     frame.setMultiplexTunnel(streamContext.isMultiplex());
                     control.writeAndFlush(frame).addListener(f -> {
-                        if (f.isSuccess()) {
-                            TunnelBridge tunnelBridge;
-                            if (streamContext.isMultiplex()) {
-                                tunnelBridge = TunnelBridgeFactory.buildMux(streamContext);
-                                logger.debug("流打开成功 - [隧道类型=多路复用， 目标地址={}，目标端口={}]", localIp, localPort);
-                            } else {
-                                tunnelBridge = TunnelBridgeFactory.buildDirect(streamContext);
-                                logger.debug("流打开成功 - [隧道类型=独立连接， 目标地址={}，目标端口={}]", localIp, localPort);
-                            }
-                            tunnelBridge.open();
+                        if (!f.isSuccess()) {
+                            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                            return;
+                        }
+                        if (streamContext.isMultiplex()) {
+                            TunnelBridge tunnelBridge = TunnelBridgeFactory.buildMux(streamContext);
+                            logger.debug("流打开成功 - [隧道类型=多路复用， 目标地址={}，目标端口={}]", localIp, localPort);
+                            tunnelBridge.openAsync().addListener(openFuture -> {
+                                if (!openFuture.isSuccess()) {
+                                    logger.error("多路复用隧道打开失败 streamId={}", streamId, openFuture.cause());
+                                    streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                                    return;
+                                }
+                                streamContext.setTunnelBridge(tunnelBridge);
+                                streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                                tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
+                                server.config().setOption(ChannelOption.AUTO_READ, true);
+                                server.read();
+                            });
+                        } else {
+                            TunnelBridge tunnelBridge = TunnelBridgeFactory.buildDirect(streamContext);
                             streamContext.setTunnelBridge(tunnelBridge);
-                            streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-                            tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
-                            server.config().setOption(ChannelOption.AUTO_READ, true);
+                            logger.debug("独立隧道 OPEN_RESP 已发送，等待服务端透传就绪 streamId={} target={}:{}",
+                                    streamId, localIp, localPort);
                         }
                     });
 
@@ -126,19 +150,23 @@ public class StreamOpenAction extends StreamBaseAction {
      */
     private TunnelEntry getOrCreateTunnel(StreamContext context) {
         AgentContext agentContext = (AgentContext) context.getAgentContext();
-
-        TunnelEntry tunnelEntry = agentContext.getConn(context.isEncrypt(), context.isMultiplex());
+        //根据不同的传输协议获取数据连接
+        TransportProtocol protocol = context.getTransportProtocol();
+        TunnelEntry tunnelEntry = agentContext.getConn(protocol, context.isEncrypt(), context.isMultiplex());
         if (tunnelEntry != null) {
+            logger.debug("[传输] 流 {} 命中连接池 protocol={} tunnelId={}",
+                    context.getStreamId(), protocol.getName(), tunnelEntry.getTunnelId());
             return tunnelEntry;
         }
 
-        logger.debug("没有可用连接，开始创建新隧道");
+        logger.debug("[传输] 流 {} 无可用隧道，创建新连接 protocol={} encrypt={} multiplex={}",
+                context.getStreamId(), protocol.getName(), context.isEncrypt(), context.isMultiplex());
 
         ConnCreateCommand connCreateCommand;
         if (context.isMultiplex()) {
-            connCreateCommand = ConnCreateCommand.ofMultiplex(context.isEncrypt());
+            connCreateCommand = ConnCreateCommand.ofMultiplex(protocol, context.isEncrypt());
         } else {
-            connCreateCommand = ConnCreateCommand.ofDirect(context.isEncrypt(), 1);
+            connCreateCommand = ConnCreateCommand.ofDirect(protocol, context.isEncrypt(), 1);
         }
         agentContext.setVariable("create_conn_command", connCreateCommand);
         agentContext.fireEvent(AgentEvent.CREATE_NEW_CONN);
@@ -153,7 +181,7 @@ public class StreamOpenAction extends StreamBaseAction {
                 return null;
             }
 
-            tunnelEntry = agentContext.getConn(context.isEncrypt(), context.isMultiplex());
+            tunnelEntry = agentContext.getConn(protocol, context.isEncrypt(), context.isMultiplex());
             if (tunnelEntry != null) {
                 logger.debug("第 {} 次重试后获取到隧道", i);
                 return tunnelEntry;
@@ -210,11 +238,16 @@ public class StreamOpenAction extends StreamBaseAction {
             control.writeAndFlush(frame).addListener(f -> {
                 if (f.isSuccess()) {
                     TunnelBridge tunnelBridge = TunnelBridgeFactory.buildMux(streamContext);
-                    tunnelBridge.open();
-                    streamContext.setTunnelBridge(tunnelBridge);
-                    streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
-                    tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
-                    logger.debug("UDP 流打开成功 - [目标地址={}，目标端口={}]", streamContext.getLocalIp(), streamContext.getLocalPort());
+                    tunnelBridge.openAsync().addListener(openFuture -> {
+                        if (!openFuture.isSuccess()) {
+                            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                            return;
+                        }
+                        streamContext.setTunnelBridge(tunnelBridge);
+                        streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
+                        tunnelEntry.getChannel().config().setOption(ChannelOption.AUTO_READ, true);
+                        logger.debug("UDP 流打开成功 - [目标地址={}，目标端口={}]", streamContext.getLocalIp(), streamContext.getLocalPort());
+                    });
                 } else {
                     streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                 }

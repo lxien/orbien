@@ -24,11 +24,14 @@ import io.github.lxien.orbien.core.domain.PortInterval;
 import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.server.config.domain.*;
 import io.github.lxien.orbien.server.config.domain.*;
+import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
 import lombok.Getter;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author lxien
@@ -55,6 +58,7 @@ public class TomlConfigSource implements ConfigSource {
         parseTransport(builder, root);
         parsePortPool(builder, root);
         parseAuth(builder, root);
+        parseProxyProtocol(builder, root);
 
         return builder.build();
     }
@@ -107,10 +111,70 @@ public class TomlConfigSource implements ConfigSource {
 
     private void parseTransport(AppConfig.Builder builder, Toml root) {
         Toml transport = root.getTable("transport");
+        TransportConfig transportConfig = new TransportConfig();
         if (transport != null) {
-            TransportConfig transportConfig = new TransportConfig();
             parseTls(transportConfig, transport);
-            builder.transport(transportConfig);
+            parseServerProtocol(transport.getTable("tcp"), transportConfig.getTcp(), DEFAULT_BIND_PORT, true);
+            parseServerProtocol(transport.getTable("websocket"), transportConfig.getWebsocket(), 9528, false);
+            parseServerProtocol(transport.getTable("quic"), transportConfig.getQuic(), 9529, false);
+        } else {
+            transportConfig.getTcp().setPort(DEFAULT_BIND_PORT);
+        }
+        transportConfig.syncLegacyTls();
+        resolveTransportCertPaths(transportConfig, Paths.get(path).toAbsolutePath().normalize().getParent());
+        builder.transport(transportConfig);
+    }
+
+    private void parseServerProtocol(Toml table,
+                                     io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig target,
+                                     int defaultPort,
+                                     boolean defaultEnabled) {
+        target.setPort(defaultPort);
+        target.setEnabled(defaultEnabled);
+        if (table == null) {
+            return;
+        }
+        Boolean enabled = table.getBoolean("enabled");
+        if (enabled != null) {
+            target.setEnabled(enabled);
+        }
+        String addr = table.getString("addr");
+        if (StringUtils.hasText(addr)) {
+            target.setAddr(addr.trim());
+        }
+        Long port = table.getLong("port");
+        if (port != null) {
+            validatePort(port.intValue());
+            target.setPort(port.intValue());
+        }
+        Toml tlsTable = table.getTable("tls");
+        if (tlsTable != null) {
+            Boolean tlsEnabled = tlsTable.getBoolean("enabled", true);
+            String certFile = tlsTable.getString("cert_file");
+            String keyFile = tlsTable.getString("key_file");
+            String caFile = tlsTable.getString("ca_file");
+            String keyPass = tlsTable.getString("key_pass");
+            target.setTlsConfig(new TlsConfig(tlsEnabled, certFile, keyFile, caFile, keyPass));
+        }
+        if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
+            String path = table.getString("path");
+            if (StringUtils.hasText(path)) {
+                ws.setPath(path.trim());
+            }
+            Long maxFrame = table.getLong("max_frame_size");
+            if (maxFrame != null) {
+                ws.setMaxFrameSize(maxFrame.intValue());
+            }
+        }
+        if (target instanceof io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig quic) {
+            Long maxIdle = table.getLong("max_idle_timeout_ms");
+            if (maxIdle != null) {
+                quic.setMaxIdleTimeoutMs(maxIdle);
+            }
+            Long maxStreams = table.getLong("initial_max_streams_bidi");
+            if (maxStreams != null) {
+                quic.setInitialMaxStreamsBidi(maxStreams.intValue());
+            }
         }
     }
 
@@ -125,6 +189,19 @@ public class TomlConfigSource implements ConfigSource {
             TlsConfig tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass);
             transportConfig.setTlsConfig(tlsConfig);
         }
+    }
+
+    private void resolveTransportCertPaths(TransportConfig transportConfig, Path configDir) {
+        if (transportConfig == null || configDir == null) {
+            return;
+        }
+        transportConfig.setTlsConfig(TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
+        transportConfig.getTcp().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTcp().getTlsConfig(), configDir));
+        transportConfig.getWebsocket().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getWebsocket().getTlsConfig(), configDir));
+        transportConfig.getQuic().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getQuic().getTlsConfig(), configDir));
     }
 
     private void parsePortPool(AppConfig.Builder builder, Toml root) {
@@ -198,6 +275,27 @@ public class TomlConfigSource implements ConfigSource {
             parseAuthTokens(authConfig, authNode);
             builder.authConfig(authConfig);
         }
+    }
+
+    private void parseProxyProtocol(AppConfig.Builder builder, Toml root) {
+        Toml table = root.getTable("proxy_protocol");
+        if (table == null) {
+            return;
+        }
+        ProxyProtocolConfig config = new ProxyProtocolConfig();
+        Boolean enabled = table.getBoolean("enabled");
+        if (enabled != null) {
+            config.setEnabled(enabled);
+        }
+        Boolean strict = table.getBoolean("strict");
+        if (strict != null) {
+            config.setStrict(strict);
+        }
+        List<String> trusted = table.getList("trusted_proxies");
+        if (trusted != null && !trusted.isEmpty()) {
+            config.setTrustedProxies(new HashSet<>(trusted));
+        }
+        builder.proxyProtocol(config);
     }
 
     private void parseAuthTokens(AuthConfig authConfig, Toml authNode) {

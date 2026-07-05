@@ -5,8 +5,8 @@ import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
-import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
+import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.netty.buffer.ByteBuf;
@@ -36,6 +36,9 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
             StreamContext streamContext = contextOpt.get();
+            if (!streamContext.canAcceptVisitorData()) {
+                return;
+            }
             if (streamContext.getState() == StreamState.OPENED) {
                 TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
                 Channel tunnel = tunnelEntry.getChannel();
@@ -47,8 +50,13 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
                     }
                 }
                 streamContext.forwardToLocal(buf);
+            } else if (streamContext.getState() == StreamState.OPENING) {
+                logger.debug("[HTTP] 流打开中，缓存上传数据 streamId={} bytes={}",
+                        streamContext.getStreamId(), buf.readableBytes());
+                streamContext.enqueue(buf.retain());
             } else {
-                logger.error("隧道未开启，无法传输数据");
+                logger.error("隧道未开启，无法传输数据 streamId={} state={}",
+                        streamContext.getStreamId(), streamContext.getState());
             }
         } else {
             logger.debug("[HTTP] 创建流上下文");
@@ -101,20 +109,5 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             cause = cause.getCause();
         }
         return false;
-    }
-
-    @Override
-    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-        Channel visitor = ctx.channel();
-        logger.warn("[HTTP] 访问者可写性发生变化：{}", visitor.isWritable());
-        streamManager.getStreamContext(visitor).ifPresent(streamContext -> {
-            logger.warn("流量过高，触发背压");
-            if (!visitor.isWritable()) {
-                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_PAUSE);
-            } else {
-                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_RESUME);
-            }
-        });
-        ctx.fireChannelWritabilityChanged();
     }
 }

@@ -107,6 +107,23 @@ public class NettyHttpUtils {
         return writeAndFlush(channel, buildResponse(channel, response));
     }
 
+    /**
+     * 发送 HTTP 重定向（默认 308 Permanent Redirect）。
+     */
+    public static ChannelFuture sendRedirect(Channel channel, int statusCode, String location) {
+        String reasonPhrase = statusCode == 308 ? "Permanent Redirect"
+                : statusCode == 301 ? "Moved Permanently"
+                : "Redirect";
+        String response = String.format("""
+                HTTP/1.1 %d %s\r
+                Location: %s\r
+                Content-Length: 0\r
+                Connection: close\r
+                \r
+                """, statusCode, reasonPhrase, location);
+        return writeAndFlush(channel, buildResponse(channel, response));
+    }
+
     public static ChannelFuture sendHttpResponse(
             Channel channel,
             int statusCode,

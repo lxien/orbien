@@ -16,15 +16,14 @@
 
 package io.github.lxien.orbien.core.transport;
 
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicLong;
 
 
 @Getter
@@ -36,27 +35,12 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     protected boolean encrypt;
     protected boolean multiplex;
     protected boolean datagram;
+    protected TransportProtocol transportProtocol = TransportProtocol.TCP;
     protected AbstractAgentContext agentContext;
     protected TunnelBridge tunnelBridge;
 
     /**
-     * 高水位，超过此水位通知远端暂停发送数据
-     */
-    protected final long DEFAULT_HIGH_WATERMARK = 8 * 1024 * 1024;
-
-    /**
-     * 低水位，低于此值通知远端恢复数据发送
-     */
-    protected final long DEFAULT_LOW_WATERMARK = 2 * 1024 * 1024;
-
-    private long highWaterMark = DEFAULT_HIGH_WATERMARK;
-    private long lowWaterMark = DEFAULT_LOW_WATERMARK;
-    /**
-     * 当前待发送总字节数
-     */
-    private final AtomicLong pendingBytes = new AtomicLong();
-    /**
-     * 待发送缓冲队列
+     * 流打开前（OPENING）暂存的上传数据
      */
     private final Queue<ByteBuf> pendingQueue = new ConcurrentLinkedQueue<>();
 
@@ -84,22 +68,9 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
 
     public void enqueue(ByteBuf byteBuf) {
         pendingQueue.offer(byteBuf);
-        pendingBytes.addAndGet(byteBuf.readableBytes());
     }
 
     public ByteBuf pollPending() {
-        ByteBuf buf = pendingQueue.poll();
-        if (buf != null) {
-            pendingBytes.addAndGet(-buf.readableBytes());
-        }
-        return buf;
-    }
-
-    public boolean isHighWatermark() {
-        return pendingBytes.get() >= getHighWaterMark();
-    }
-
-    public boolean isLowWatermark() {
-        return pendingBytes.get() <= getLowWaterMark();
+        return pendingQueue.poll();
     }
 }

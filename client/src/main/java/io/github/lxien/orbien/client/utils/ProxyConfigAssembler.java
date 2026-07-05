@@ -20,7 +20,7 @@ package io.github.lxien.orbien.client.utils;
 
 import io.github.lxien.orbien.common.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.*;
-import io.github.lxien.orbien.core.domain.*;
+import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
 import io.github.lxien.orbien.core.enums.LoadBalanceType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
@@ -60,7 +60,7 @@ public class ProxyConfigAssembler {
         ).collect(Collectors.toList());
         proxyBuilder.setName(config.getName())
                 .addAllTargets(targets)
-                .setForceHttps(config.getForceHttps())
+                .setForceHttps(ForceHttpsPolicy.resolveFlag(config))
                 .setProtocol(Message.ProtocolType.valueOf(config.getProtocol().name()));
 
         if (config.getStatus().isOpen()) {
@@ -141,6 +141,9 @@ public class ProxyConfigAssembler {
             }
             if (mux != null) {
                 builder.setMultiplex(mux);
+            }
+            if (transport.getProtocol() != null) {
+                builder.setProtocol(transport.getProtocol().getName());
             }
             proxyBuilder.setTransport(builder.build());
         }

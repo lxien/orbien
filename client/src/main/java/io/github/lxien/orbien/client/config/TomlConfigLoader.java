@@ -1,4 +1,5 @@
 package io.github.lxien.orbien.client.config;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.common.utils.StringUtils;
@@ -11,9 +12,14 @@ import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
 import lombok.Getter;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,14 +30,21 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class TomlConfigLoader implements ConfigSource {
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TomlConfigLoader.class);
+
     private final String path;
 
     public TomlConfigLoader(String path) {
-        this.path = path;
+        this.path = Paths.get(path).toAbsolutePath().normalize().toString();
     }
 
     @Override
     public AppConfig load() {
+        File configFile = new File(path);
+        if (!configFile.exists()) {
+            throw new IllegalArgumentException("配置文件不存在: " + path);
+        }
+        logger.info("加载客户端配置: {}", path);
         Toml root = TomlUtils.readToml(path);
         DefaultAppConfig.Builder builder = DefaultAppConfig.builder();
 
@@ -54,26 +67,26 @@ public class TomlConfigLoader implements ConfigSource {
         TlsConfig tlsConfig = new TlsConfig(true);
         globalTransportConfig.setTlsConfig(tlsConfig);
         if (transportTable != null) {
-            // 读取多路复用配置
+            String protocol = transportTable.getString("protocol", "tcp");
+            globalTransportConfig.setProtocol(TransportProtocol.fromName(protocol, TransportProtocol.TCP));
+
             Toml multiplexTable = transportTable.getTable("multiplex");
             if (multiplexTable != null) {
                 Boolean enabled = multiplexTable.getBoolean("enabled", true);
                 multiplexConfig.setEnabled(enabled);
-                globalTransportConfig.setMultiplexConfig(multiplexConfig);
             }
 
-            // 读取 TLS 配置
-            Toml tlsTable = transportTable.getTable("tls");
-            if (tlsTable != null) {
-                Boolean enabled = tlsTable.getBoolean("enabled", true);
-                String certFile = tlsTable.getString("cert_file");
-                String keyFile = tlsTable.getString("key_file");
-                String caFile = tlsTable.getString("ca_file");
-                String keyPass = tlsTable.getString("key_pass");
-                tlsConfig = new TlsConfig(enabled, certFile, keyFile, caFile, keyPass);
+            parseClientProtocolTable(transportTable.getTable("tcp"), globalTransportConfig.getTcp(), tlsConfig, 9527);
+            parseClientProtocolTable(transportTable.getTable("websocket"), globalTransportConfig.getWebsocket(), tlsConfig, 9528);
+            parseClientProtocolTable(transportTable.getTable("quic"), globalTransportConfig.getQuic(), tlsConfig, 9529);
+
+            Toml legacyTls = transportTable.getTable("tls");
+            if (legacyTls != null) {
+                tlsConfig = parseTlsConfig(legacyTls);
                 globalTransportConfig.setTlsConfig(tlsConfig);
             }
-
+            globalTransportConfig.syncLegacyTls();
+            resolveTransportCertPaths(globalTransportConfig, Paths.get(path).getParent());
             builder.transportConfig(globalTransportConfig);
         }
 
@@ -150,7 +163,10 @@ public class TomlConfigLoader implements ConfigSource {
                 Long localPortValue = proxyTable.getLong("local_port");
                 Long remotePortValue = proxyTable.getLong("remote_port");
                 Boolean enableV = proxyTable.getBoolean("enabled", true);
-                Boolean forceHttpsV = proxyTable.getBoolean("force_Https", false);
+                Boolean forceHttpsV = proxyTable.getBoolean("force_https");
+                if (forceHttpsV == null) {
+                    forceHttpsV = proxyTable.getBoolean("force_Https");
+                }
                 String loadBalanceStrategy = proxyTable.getString("load_balance_strategy");
 
                 if (!StringUtils.hasText(name)) {
@@ -172,7 +188,11 @@ public class TomlConfigLoader implements ConfigSource {
                 }
                 proxyConfig.setName(name.trim());
                 proxyConfig.setProtocol(protocolType);
-                proxyConfig.setForceHttps(forceHttpsV);
+                if (protocolType.isHttps()) {
+                    proxyConfig.setForceHttps(forceHttpsV == null || forceHttpsV);
+                } else {
+                    proxyConfig.setForceHttps(false);
+                }
                 proxyConfig.setStatus(enableV ? ProxyStatus.OPEN : ProxyStatus.CLOSED);
                 if (remotePortValue != null) {
                     validatePort(remotePortValue.intValue());
@@ -244,7 +264,6 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setAccessControl(accessControlConfig);
                 }
 
-                proxies.add(proxyConfig);
                 //HTTP(S) BASIC AUTH
                 if (ProtocolType.isHttpOrHttps(protocol)) {
                     Toml basicAuth = proxyTable.getTable("basic_auth");
@@ -335,9 +354,13 @@ public class TomlConfigLoader implements ConfigSource {
                 //自定义传输配置
                 Toml transport = proxyTable.getTable("transport");
                 TransportCustomConfig transportCustomConfig = new TransportCustomConfig();
-                //默认使用全局配置
                 transportCustomConfig.setMultiplex(globalTransportConfig.getMultiplexConfig().isEnabled());
                 if (transport != null) {
+                    String transportProtocol = transport.getString("protocol");
+                    if (StringUtils.hasText(transportProtocol)) {
+                        transportCustomConfig.setProtocol(
+                                TransportProtocol.fromName(transportProtocol.trim(), TransportProtocol.TCP));
+                    }
                     Boolean multiplex = transport.getBoolean("multiplex");
                     Boolean compress = transport.getBoolean("compress", true);
                     Boolean encrypt = transport.getBoolean("encrypt", true);
@@ -352,7 +375,10 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 proxyConfig.setTransport(transportCustomConfig);
+                proxies.add(proxyConfig);
             }
+            logger.info("已解析 {} 个代理: {}", proxies.size(),
+                    proxies.stream().map(ProxyConfig::getName).collect(Collectors.toList()));
             builder.addProxies(proxies);
         }
 
@@ -404,5 +430,67 @@ public class TomlConfigLoader implements ConfigSource {
         if (port < 1 || port > 65535) {
             throw new IllegalArgumentException("端口号必须在1-65535范围内: " + port);
         }
+    }
+
+    private void parseClientProtocolTable(Toml table,
+                                          io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig target,
+                                          TlsConfig fallbackTls,
+                                          int defaultPort) {
+        if (table == null) {
+            target.setPort(defaultPort);
+            target.setTlsConfig(fallbackTls);
+            return;
+        }
+        Long port = table.getLong("port");
+        if (port != null) {
+            validatePort(port.intValue());
+            target.setPort(port.intValue());
+        } else {
+            target.setPort(defaultPort);
+        }
+        Toml tlsTable = table.getTable("tls");
+        if (tlsTable != null) {
+            target.setTlsConfig(parseTlsConfig(tlsTable));
+        } else {
+            target.setTlsConfig(fallbackTls);
+        }
+        if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
+            String path = table.getString("path");
+            if (StringUtils.hasText(path)) {
+                ws.setPath(path.trim());
+            }
+        }
+        if (target instanceof io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig quic) {
+            Long maxIdle = table.getLong("max_idle_timeout_ms");
+            if (maxIdle != null) {
+                quic.setMaxIdleTimeoutMs(maxIdle);
+            }
+            Long maxStreams = table.getLong("initial_max_streams_bidi");
+            if (maxStreams != null) {
+                quic.setInitialMaxStreamsBidi(maxStreams.intValue());
+            }
+        }
+    }
+
+    private TlsConfig parseTlsConfig(Toml tlsTable) {
+        Boolean enabled = tlsTable.getBoolean("enabled", true);
+        String certFile = tlsTable.getString("cert_file");
+        String keyFile = tlsTable.getString("key_file");
+        String caFile = tlsTable.getString("ca_file");
+        String keyPass = tlsTable.getString("key_pass");
+        return new TlsConfig(enabled, certFile, keyFile, caFile, keyPass);
+    }
+
+    private void resolveTransportCertPaths(TransportConfig transportConfig, Path configDir) {
+        if (transportConfig == null || configDir == null) {
+            return;
+        }
+        transportConfig.setTlsConfig(TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
+        transportConfig.getTcp().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTcp().getTlsConfig(), configDir));
+        transportConfig.getWebsocket().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getWebsocket().getTlsConfig(), configDir));
+        transportConfig.getQuic().setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getQuic().getTlsConfig(), configDir));
     }
 }

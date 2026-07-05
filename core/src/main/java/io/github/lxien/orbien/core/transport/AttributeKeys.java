@@ -1,12 +1,15 @@
 package io.github.lxien.orbien.core.transport;
 
 import io.github.lxien.orbien.core.enums.ProtocolType;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
 import io.netty.util.AttributeKey;
 
 /**
  * 通道相关常量
- * @author liuxin
+ *
+ * @author lxien
  */
 public class AttributeKeys {
     public static final AttributeKey<Integer> CONNECTION_ID = AttributeKey.valueOf("orbien.connection_id");
@@ -19,4 +22,17 @@ public class AttributeKeys {
     public static final AttributeKey<ByteBuf> UDP_FIRST_PACKET = AttributeKey.valueOf("cachedUdpFirstPacket");
     public static final AttributeKey<ByteBuf> PENDING_READ = AttributeKey.valueOf("pending.read");
     public static final AttributeKey<ChannelType> CHANNEL_TYPE = AttributeKey.valueOf("channel.type");
+    public static final AttributeKey<TransportProtocol> TRANSPORT_PROTOCOL = AttributeKey.valueOf("transport.protocol");
+    /**
+     * QUIC 连接级 Channel（QuicChannel），用于保活与诊断
+     */
+    public static final AttributeKey<Channel> QUIC_CONNECTION = AttributeKey.valueOf("quic.connection");
+    /**
+     * QUIC 底层 UDP Channel
+     */
+    public static final AttributeKey<Channel> QUIC_DATAGRAM = AttributeKey.valueOf("quic.datagram");
+    /**
+     * 独立隧道是否处于原始 TCP 透传模式
+     */
+    public static final AttributeKey<Boolean> DIRECT_PASSTHROUGH = AttributeKey.valueOf("direct.passthrough");
 }

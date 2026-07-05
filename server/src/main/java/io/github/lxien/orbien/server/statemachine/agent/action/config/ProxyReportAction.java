@@ -56,6 +56,9 @@ public class ProxyReportAction extends AgentBaseAction {
         if (proxies == null) return;
 
         List<Message.Proxy> proxiesList = proxies.getProxiesList();
+        logger.info("收到客户端代理配置上报，共 {} 条: {}",
+                proxiesList.size(),
+                proxiesList.stream().map(Message.Proxy::getName).toList());
 
         Message.BatchCreateProxiesResponse.Builder builder = Message.BatchCreateProxiesResponse.newBuilder();
         for (Message.Proxy proxy : proxiesList) {

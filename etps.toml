@@ -4,12 +4,45 @@ http_proxy_port = 80
 https_proxy_port = 8443
 root_domains = ["domain1.com", "domain2.com"]
 
-[transport.tls]
+# 访客入口 PROXY 协议（前置 HAProxy/云/Nginx LB 时开启）
+[proxy_protocol]
 enabled = true
-cert_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/server.crt"
-key_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/server.key"
-ca_file = "/Users/lxien/Desktop/workspace/orbien/cert/transport/ca.crt"
-#key_pass=""
+strict = false
+trusted_proxies = ["127.0.0.1/32"]
+
+
+[transport]
+
+[transport.tcp]
+enabled = true
+port = 9527
+
+[transport.tcp.tls]
+enabled = true
+cert_file = "cert/transport/server.crt"
+key_file = "cert/transport/server.key"
+ca_file = "cert/transport/ca.crt"
+
+[transport.websocket]
+enabled = true
+port = 9528
+path = "/tunnel"
+
+[transport.websocket.tls]
+enabled = true
+cert_file = "cert/transport/server.crt"
+key_file = "cert/transport/server.key"
+ca_file = "cert/transport/ca.crt"
+
+[transport.quic]
+enabled = true
+port = 9529
+
+[transport.quic.tls]
+enabled = true
+cert_file = "cert/transport/server.crt"
+key_file = "cert/transport/server.key"
+ca_file = "cert/transport/ca.crt"
 
 [auth]
 [[auth.tokens]]

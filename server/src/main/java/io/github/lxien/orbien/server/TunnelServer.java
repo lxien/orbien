@@ -7,6 +7,7 @@ import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.core.server.Lifecycle;
 
 import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.transport.tls.TlsHelper;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.config.domain.TransportConfig;
@@ -35,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * 控制隧道服务容器
  *
- * @author liuxin
+ * @author lxien
  */
 public class TunnelServer implements Lifecycle {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelServer.class);
@@ -59,9 +60,10 @@ public class TunnelServer implements Lifecycle {
         try {
             logger.debug("正在启动Orbien服务");
             TransportConfig transportConfig = config.getTransportConfig();
-            TlsConfig tlsConfig = transportConfig.getTlsConfig();
+            transportConfig.syncLegacyTls();
+            TlsConfig tlsConfig = transportConfig.resolveTls(TransportProtocol.TCP);
 
-            if (tlsConfig == null || (tlsConfig != null && tlsConfig.isEnabled())) {
+            if (tlsConfig == null || tlsConfig.isEnabled()) {
                 tlsContext = TlsHelper.buildSslContext(false, tlsConfig, tlsConfig == null);
                 TlsContextHolder.initialize(tlsContext);
             }
@@ -82,10 +84,10 @@ public class TunnelServer implements Lifecycle {
                                 sc.pipeline().addLast(new OptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()
-                                    .addLast(new SnappyFrameEncoder())
-                                    .addLast(new SnappyFrameDecoder())
+                                    .addLast(NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder())
+                                    .addLast(NettyConstants.SNAPPY_DECODER, new SnappyFrameDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
-                                    .addLast(downloadRateLimitHandler)
+                                    .addLast(NettyConstants.DOWNLOAD_RATE_LIMIT_HANDLER, downloadRateLimitHandler)
                                     .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS))
                                     .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
                         }

@@ -10,6 +10,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -33,7 +35,8 @@ public class UdpMultiplexTunnelBridge implements TunnelBridge {
     }
 
     @Override
-    public void open() {
+    public Future<Void> openAsync() {
+        return ImmediateEventExecutor.INSTANCE.newSucceededFuture(null);
     }
 
     @Override
@@ -45,8 +48,8 @@ public class UdpMultiplexTunnelBridge implements TunnelBridge {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
+        payload.retain();
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, payload);
-        frame.retain();
         tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
             if (!future.isSuccess()) {
                 logger.debug("[UDP] 数据转发到内网失败 streamId={}", streamId, future.cause());
