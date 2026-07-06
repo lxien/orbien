@@ -63,9 +63,12 @@ public class AgentInitAction extends AgentBaseAction {
                             proxyManager.registerHttps(config.getAgentId(), config.getProxyId(), domains);
                             logger.debug("注册HTTPS代理: {}", config.getName());
                         }
-                    } else {
-                        logger.debug("激活TCP代理配置: {}", config.getName());
+                    } else if (config.isUdp()) {
+                        proxyManager.registerUdp(config.getAgentId(), config.getProxyId(), config.getListenPort());
+                        logger.debug("注册UDP代理: {}", config.getName());
+                    } else if (config.isTcp()) {
                         proxyManager.registerTcp(config.getAgentId(), config.getProxyId(), config.getListenPort());
+                        logger.debug("注册TCP代理: {}", config.getName());
                     }
                 }
             });

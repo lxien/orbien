@@ -23,6 +23,7 @@ import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.service.repository.ProxyQueryRepository;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -47,14 +48,29 @@ public class ProxyRuntimeSyncService {
     private AppConfig appConfig;
     @Autowired
     private HealthManager healthManager;
+    @Autowired
+    private ProxyConfigService proxyConfigService;
+
+    public void syncProxyCreated(String proxyId) {
+        publishRuntimeProxy(proxyId, true);
+    }
 
     public void syncProxy(String proxyId) {
+        publishRuntimeProxy(proxyId, false);
+    }
+
+    private void publishRuntimeProxy(String proxyId, boolean create) {
+        proxyConfigService.evictByProxyId(proxyId);
         ProxyConfigExt ext = proxyQueryRepository.findById(proxyId);
         if (ext == null || ext.getProxyConfig() == null) {
             logger.debug("跳过运行时同步，代理不存在: {}", proxyId);
             return;
         }
         ProxyConfig config = ext.getProxyConfig();
+        if (!config.getStatus().isOpen()) {
+            logger.debug("跳过运行时同步，代理未启用: {}", proxyId);
+            return;
+        }
         applyHealthCheckLifecycle(config);
         List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
                 ext.getDomains(),
@@ -62,7 +78,11 @@ public class ProxyRuntimeSyncService {
                 appConfig.getHttpProxyPort(),
                 appConfig.getHttpsProxyPort());
         Message.RuntimeInfo runtimeInfo = RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
-        proxyConfigSyncService.syncOnUpdate(config.getAgentId(), runtimeInfo);
+        if (create) {
+            proxyConfigSyncService.syncOnCreate(config.getAgentId(), runtimeInfo);
+        } else {
+            proxyConfigSyncService.syncOnUpdate(config.getAgentId(), runtimeInfo);
+        }
     }
 
     private void applyHealthCheckLifecycle(ProxyConfig config) {

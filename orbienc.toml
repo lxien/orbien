@@ -86,7 +86,7 @@ name = "http-quic"
 protocol = "http"
 custom_domains = ["35.domain1.com"]
 targets = [
-    { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-quic" }
+    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
 ]
 
 [proxies.transport]
@@ -156,6 +156,19 @@ remote_port=9080
 
 [proxies.transport]
 multiplex = true
+
+
+[[proxies]]
+name = "tcp-quic2"
+protocol = "tcp"
+local_ip = "127.0.0.1"
+local_port = 8084
+
+
+[proxies.transport]
+multiplex = true
+protocol = "quic"
+
 
 [[proxies]]
 name = "udp-proxy"

@@ -34,6 +34,9 @@ export default ({ mode }: { mode: string }) => {
       },
       host: true,
       allowedHosts: [
+        "38.domain1.com",
+          "37.domain1.com",
+          "35.domain1.com"
       ]
     },
     // 路径别名

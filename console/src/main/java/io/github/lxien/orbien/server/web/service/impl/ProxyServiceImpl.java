@@ -21,6 +21,7 @@ import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.port.PortPoolManager;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.vhost.DomainGenerator;
 import io.github.lxien.orbien.core.domain.DomainInfo;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
@@ -110,6 +111,8 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyRuntimeSyncService proxyRuntimeSyncService;
     @Autowired
     private HealthManager healthManager;
+    @Autowired
+    private ProxyConfigService proxyConfigService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -143,6 +146,7 @@ public class ProxyServiceImpl implements ProxyService {
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.HTTP));
 
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("{}代理创建成功：{}", protocol.name(), proxyDO.getName());
     }
 
@@ -194,6 +198,7 @@ public class ProxyServiceImpl implements ProxyService {
             saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
 
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
         logger.debug("{}代理更新成功：{}", protocol.name(), existsProxyDO.getName());
     }
 
@@ -321,6 +326,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyTargetRepository.save(buildTcpTarget(param, proxyId));
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
     }
 
@@ -340,6 +346,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyTargetRepository.save(buildUdpTarget(param, proxyId));
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("UDP 代理创建成功：{}", proxyDO.getName());
     }
 
@@ -363,6 +370,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         replaceSingleTargetIfNotCluster(proxyId, () ->
                 proxyTargetRepository.save(buildTcpTarget(param, proxyId)));
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
         logger.debug("TCP 代理更新成功：{}", existsProxyDO.getName());
     }
 
@@ -389,6 +397,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         replaceSingleTargetIfNotCluster(proxyId, () ->
                 proxyTargetRepository.save(buildUdpTarget(param, proxyId)));
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
         logger.debug("UDP 代理更新成功：{}", existsProxyDO.getName());
     }
 
@@ -412,7 +421,7 @@ public class ProxyServiceImpl implements ProxyService {
         proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(normalizedTargets, proxyId));
         cleanupStaleTargetHealth(proxyId, targetRecords, normalizedTargets);
 
-        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(proxyId));
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
         logger.debug("代理 {} 负载均衡配置保存成功，后端数量: {}", proxyDO.getName(), normalizedTargets.size());
     }
 
@@ -1008,12 +1017,29 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private void applyRuntimeStatus(ProxyDO proxyDO) {
-        String proxyId = proxyDO.getId();
+        refreshRuntimeProxy(proxyDO.getId(), false);
+    }
+
+    /**
+     * 刷新服务端运行时注册（域名/端口监听）并推送到在线客户端。
+     */
+    private void refreshRuntimeProxy(String proxyId, boolean newlyCreated) {
+        ProxyDO proxyDO = proxyRepository.findById(proxyId).orElse(null);
+        if (proxyDO == null) {
+            return;
+        }
+        proxyConfigService.evictByProxyId(proxyId);
         if (proxyDO.getStatus().isClosed()) {
             proxyManager.deactivate(proxyId);
             return;
         }
+        proxyManager.deactivate(proxyId);
         activateProxy(proxyDO);
+        if (newlyCreated) {
+            proxyRuntimeSyncService.syncProxyCreated(proxyId);
+        } else {
+            proxyRuntimeSyncService.syncProxy(proxyId);
+        }
     }
 
     private void activateProxy(ProxyDO proxyDO) {
