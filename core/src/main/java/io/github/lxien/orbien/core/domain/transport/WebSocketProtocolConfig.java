@@ -11,6 +11,7 @@ public class WebSocketProtocolConfig extends ProtocolListenerConfig {
     private int maxFrameSize = 10 * 1024 * 1024;
 
     public WebSocketProtocolConfig() {
+        setEnabled(false);
         setPort(TransportProtocol.WEBSOCKET.getDefaultPort());
     }
 }

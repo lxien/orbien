@@ -28,6 +28,22 @@ public class AppConfigInfoDTO implements Serializable {
     private String serverAddr;
     private Integer serverPort;
     private Integer httpProxyPort;
-   private Integer httpsProxyPort;
+    private Integer httpsProxyPort;
     private String rootDomain;
+    /**
+     * WebSocket 传输是否启用
+     */
+    private Boolean websocketEnabled;
+    /**
+     * WebSocket 监听端口（启用时有效）
+     */
+    private Integer websocketPort;
+    /**
+     * QUIC 传输是否启用
+     */
+    private Boolean quicEnabled;
+    /**
+     * QUIC 监听端口（启用时有效）
+     */
+    private Integer quicPort;
 }

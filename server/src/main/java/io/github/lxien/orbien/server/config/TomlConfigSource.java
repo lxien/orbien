@@ -135,10 +135,6 @@ public class TomlConfigSource implements ConfigSource {
         if (enabled != null) {
             target.setEnabled(enabled);
         }
-        String addr = table.getString("addr");
-        if (StringUtils.hasText(addr)) {
-            target.setAddr(addr.trim());
-        }
         int port = readServerPort(table, defaultPort);
         target.setPort(port);
         if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {

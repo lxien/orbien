@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class TcpProtocolConfig extends ProtocolListenerConfig {
     public TcpProtocolConfig() {
+        setEnabled(true);
         setPort(TransportProtocol.TCP.getDefaultPort());
     }
 }

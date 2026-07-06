@@ -67,19 +67,19 @@ public class TransportListenerManager implements Lifecycle {
 
             TcpProtocolConfig tcp = transportConfig.getTcp();
             if (tcp.isEnabled()) {
-                startListener(TransportProtocol.TCP, null, config.getServerPort(), tlsContext, sharedTls,
+                startListener(TransportProtocol.TCP, config.getServerPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, null, transportConfig.getQuic());
             }
 
             WebSocketProtocolConfig websocket = transportConfig.getWebsocket();
             if (websocket.isEnabled()) {
-                startListener(TransportProtocol.WEBSOCKET, websocket.getAddr(), websocket.getPort(), tlsContext, sharedTls,
+                startListener(TransportProtocol.WEBSOCKET, websocket.getPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, websocket, transportConfig.getQuic());
             }
 
             QuicProtocolConfig quic = transportConfig.getQuic();
             if (quic.isEnabled()) {
-                startListener(TransportProtocol.QUIC, quic.getAddr(), quic.getPort(), tlsContext, sharedTls,
+                startListener(TransportProtocol.QUIC, quic.getPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, transportConfig.getWebsocket(), quic);
             }
 
@@ -90,7 +90,6 @@ public class TransportListenerManager implements Lifecycle {
     }
 
     private void startListener(TransportProtocol protocol,
-                               String addr,
                                int port,
                                SslContext tlsContext,
                                TlsConfig tlsConfig,
@@ -98,9 +97,7 @@ public class TransportListenerManager implements Lifecycle {
                                AgentManager agentManager,
                                WebSocketProtocolConfig webSocketConfig,
                                QuicProtocolConfig quicConfig) {
-        if (addr == null || addr.isBlank()) {
-            addr = config.getServerAddr();
-        }
+        String addr = resolveListenAddr(config.getServerAddr());
         TransportListener listener = TransportRegistry.getListener(protocol);
         TransportBindOptions bindOptions = TransportBindOptions.builder()
                 .protocol(protocol)
@@ -123,6 +120,13 @@ public class TransportListenerManager implements Lifecycle {
         listener.start();
         startedListeners.add(listener);
         logger.info("[传输] 监听已启动 protocol={} addr={}:{}", protocol.getName(), addr, port);
+    }
+
+    private static String resolveListenAddr(String serverAddr) {
+        if (serverAddr == null || serverAddr.isBlank()) {
+            return "0.0.0.0";
+        }
+        return serverAddr.trim();
     }
 
     private SslContext buildSharedTlsContext(TlsConfig tlsConfig) throws Exception {

@@ -16,7 +16,10 @@
 
 package io.github.lxien.orbien.server.web.service.impl;
 
+import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
+import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
 import io.github.lxien.orbien.server.config.AppConfig;
+import io.github.lxien.orbien.server.config.domain.TransportConfig;
 import io.github.lxien.orbien.server.web.dto.app.AppConfigInfoDTO;
 import io.github.lxien.orbien.server.web.service.AppService;
 import jakarta.annotation.Resource;
@@ -32,11 +35,29 @@ public class AppServiceImpl implements AppService {
         AppConfigInfoDTO dto = new AppConfigInfoDTO();
         dto.setServerAddr(appConfig.getServerAddr());
         dto.setServerPort(appConfig.getServerPort());
-        //todo test
-        dto.setRootDomain(appConfig.getRootDomains().stream().toList().getFirst());
+        if (appConfig.getRootDomains() != null && !appConfig.getRootDomains().isEmpty()) {
+            dto.setRootDomain(appConfig.getRootDomains().iterator().next());
+        }
         dto.setHttpProxyPort(appConfig.getHttpProxyPort());
         dto.setHttpsProxyPort(appConfig.getHttpsProxyPort());
 
+        TransportConfig transportConfig = appConfig.getTransportConfig();
+        if (transportConfig != null) {
+            WebSocketProtocolConfig websocket = transportConfig.getWebsocket();
+            if (websocket != null) {
+                dto.setWebsocketEnabled(websocket.isEnabled());
+                if (websocket.isEnabled()) {
+                    dto.setWebsocketPort(websocket.getPort());
+                }
+            }
+            QuicProtocolConfig quic = transportConfig.getQuic();
+            if (quic != null) {
+                dto.setQuicEnabled(quic.isEnabled());
+                if (quic.isEnabled()) {
+                    dto.setQuicPort(quic.getPort());
+                }
+            }
+        }
         return dto;
     }
 }

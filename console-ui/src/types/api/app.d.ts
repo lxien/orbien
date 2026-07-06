@@ -20,6 +20,10 @@ declare namespace Api.App {
     serverPort: number
     httpProxyPort: number
     httpsProxyPort: number
-    baseDomain: string
+    rootDomain?: string
+    websocketEnabled?: boolean
+    websocketPort?: number
+    quicEnabled?: boolean
+    quicPort?: number
   }
 }

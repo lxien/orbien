@@ -14,6 +14,7 @@ public class QuicProtocolConfig extends ProtocolListenerConfig {
     private String congestionControl = "bbr";
 
     public QuicProtocolConfig() {
+        setEnabled(false);
         setPort(TransportProtocol.QUIC.getDefaultPort());
     }
 }
