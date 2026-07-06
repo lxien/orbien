@@ -67,6 +67,7 @@ import HttpsDialog from './modules/https-dialog.vue'
 import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
 import {renderTargetTags} from '../common/render-target-tag'
+import {renderTransportProtocolTag} from '../common/render-transport-protocol-tag'
 import {useProxyStatusToggle} from '../common/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -118,12 +119,11 @@ const {
       {
         prop: 'name',
         label: '代理名称',
-        minWidth: 80
+        minWidth: 50
       },
       {
         prop: 'domains',
         label: '外网地址',
-        minWidth: 150,
         formatter: (row: HttpsProxyItem) => {
           if (!row.domains || row.domains.length === 0) {
             return ''
@@ -151,8 +151,12 @@ const {
       {
         prop: 'targets',
         label: '内网服务',
-        minWidth: 150,
         formatter: (row: HttpsProxyItem) => renderTargetTags(row.targets)
+      },
+      {
+        prop: 'transportProtocol',
+        label: '传输协议',
+        formatter: (row: HttpsProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
         prop: 'status',

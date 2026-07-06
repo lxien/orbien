@@ -64,6 +64,7 @@ import UdpDialog from './modules/udp-dialog.vue'
 import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
 import {renderTargetTags} from '../common/render-target-tag'
+import {renderTransportProtocolTag} from '../common/render-transport-protocol-tag'
 import {useProxyStatusToggle} from '../common/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -114,7 +115,7 @@ const {
       {
         prop: 'name',
         label: '代理名称',
-        minWidth: 100
+        minWidth: 50
       },
       {
         prop: 'listenPort',
@@ -126,8 +127,14 @@ const {
         formatter: (row: UdpProxyItem) => renderTargetTags(row.targets, {showHealth: false})
       },
       {
+        prop: 'transportProtocol',
+        label: '传输协议',
+        formatter: (row: UdpProxyItem) => renderTransportProtocolTag(row.transportProtocol)
+      },
+      {
         prop: 'status',
         label: '状态',
+        width: 80,
         formatter: (row: UdpProxyItem) =>
             h(ElSwitch, {
               modelValue: row.status === ProxyStatus.OPEN,

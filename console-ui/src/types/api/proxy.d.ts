@@ -53,6 +53,8 @@ declare namespace Api.Proxy {
     protocol: number
     agentType: number
     status: number
+    /** 数据隧道传输协议：1 TCP，2 WebSocket，3 QUIC */
+    transportProtocol?: number
     targets: TargetDTO[]
   }
 

@@ -29,5 +29,6 @@ public class ProxyListDTO implements Serializable {
     private Integer protocol;
     private Integer agentType;
     private Integer status;
+    private Integer transportProtocol;
     private List<TargetDTO> targets;
 }

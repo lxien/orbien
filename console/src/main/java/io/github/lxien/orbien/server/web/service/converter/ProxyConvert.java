@@ -17,20 +17,26 @@ package io.github.lxien.orbien.server.web.service.converter;
 
 import io.github.lxien.orbien.core.enums.DomainType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", imports = {ProtocolType.class, DomainType.class})
+@Mapper(componentModel = "spring", imports = {ProtocolType.class, DomainType.class, TransportProtocol.class})
 public interface ProxyConvert {
+    @Mapping(target = "transportProtocol", ignore = true)
     TcpProxyListDTO toTcpListDTO(ProxyDO proxy);
 
+    @Mapping(target = "transportProtocol", ignore = true)
     UdpProxyListDTO toUdpListDTO(ProxyDO proxy);
 
     List<TcpProxyListDTO> toTcpDTOList(List<ProxyDO> proxies);
@@ -48,6 +54,16 @@ public interface ProxyConvert {
     }
 
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
+    @Mapping(target = "transportProtocol", ignore = true)
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
 
+    @AfterMapping
+    default void fillProxyListFields(ProxyDO proxy, @MappingTarget ProxyListDTO dto) {
+        dto.setTransportProtocol(resolveTransportProtocolCode(proxy.getTransportProtocol()));
+    }
+
+    static Integer resolveTransportProtocolCode(TransportProtocol protocol) {
+        TransportProtocol resolved = protocol != null ? protocol : TransportProtocol.TCP;
+        return resolved.getCode();
+    }
 }
