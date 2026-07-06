@@ -138,4 +138,10 @@ public class ProxyController {
         proxyService.setProxyStatus(id, param.getStatus());
         return Ajax.success();
     }
+
+    @PutMapping("{id}/cluster")
+    public Ajax saveClusterConfig(@PathVariable String id, @RequestBody @Validated ProxyClusterSaveParam param) {
+        proxyService.saveClusterConfig(id, param);
+        return Ajax.success();
+    }
 }

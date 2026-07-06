@@ -32,7 +32,9 @@ import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.dto.proxy.*;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
+import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyConfigSyncService;
+import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
@@ -103,6 +105,8 @@ public class ProxyServiceImpl implements ProxyService {
     private CertBindingSyncService certBindingSyncService;
     @Autowired
     private TargetHealthEnricher targetHealthEnricher;
+    @Autowired
+    private ProxyRuntimeSyncService proxyRuntimeSyncService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -174,8 +178,8 @@ public class ProxyServiceImpl implements ProxyService {
         }
         proxyRepository.save(existsProxyDO);
 
-        proxyTargetRepository.deleteByProxyId(proxyId);
-        proxyTargetRepository.save(buildHttpTarget(param.getLocalHost(), param.getLocalPort(), param.getName(), proxyId));
+        replaceSingleTargetIfNotCluster(proxyId, () ->
+                proxyTargetRepository.save(buildHttpTarget(param.getLocalHost(), param.getLocalPort(), param.getName(), proxyId)));
 
         if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
             // 自动域名类型未变化，保留已有域名
@@ -278,7 +282,7 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private void fillHttpDetailDTO(HttpProxyDetailDTO dto, ProxyDO proxyDO) {
-        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(proxyDO.getId()).orElse(null);
+        List<ProxyTargetDO> targetRecords = proxyTargetRepository.findByProxyId(proxyDO.getId());
         List<ProxyDomainDO> domainRecords = proxyDomainRepository.findByProxyId(proxyDO.getId());
 
         dto.setId(proxyDO.getId());
@@ -286,7 +290,10 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setName(proxyDO.getName());
         dto.setDomainType(domainTypeToCode(proxyDO.getDomainType()));
         fillHttpDomainFields(dto, proxyDO.getDomainType(), domainRecords);
-        if (target != null) {
+        dto.setTargets(proxyTargetConvert.toDTOList(targetRecords));
+        dto.setLoadBalance(buildLoadBalanceDTO(proxyDO));
+        if (!targetRecords.isEmpty()) {
+            ProxyTargetDO target = targetRecords.getFirst();
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
@@ -351,8 +358,8 @@ public class ProxyServiceImpl implements ProxyService {
         applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
         proxyRepository.save(existsProxyDO);
 
-        proxyTargetRepository.deleteByProxyId(proxyId);
-        proxyTargetRepository.save(buildTcpTarget(param, proxyId));
+        replaceSingleTargetIfNotCluster(proxyId, () ->
+                proxyTargetRepository.save(buildTcpTarget(param, proxyId)));
         logger.debug("TCP 代理更新成功：{}", existsProxyDO.getName());
     }
 
@@ -377,9 +384,31 @@ public class ProxyServiceImpl implements ProxyService {
         applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
         proxyRepository.save(existsProxyDO);
 
-        proxyTargetRepository.deleteByProxyId(proxyId);
-        proxyTargetRepository.save(buildUdpTarget(param, proxyId));
+        replaceSingleTargetIfNotCluster(proxyId, () ->
+                proxyTargetRepository.save(buildUdpTarget(param, proxyId)));
         logger.debug("UDP 代理更新成功：{}", existsProxyDO.getName());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveClusterConfig(String proxyId, ProxyClusterSaveParam param) {
+        ProxyDO proxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+
+        LoadBalanceType strategy = LoadBalanceType.fromCode(param.getLoadBalance().getStrategy());
+        if (strategy == null) {
+            throw new BizException("无效的负载均衡策略");
+        }
+
+        List<ProxyTargetSaveParam> normalizedTargets = normalizeClusterTargets(param.getTargets());
+        proxyDO.setLoadBalanceStrategy(strategy);
+        proxyRepository.save(proxyDO);
+
+        proxyTargetRepository.deleteByProxyId(proxyId);
+        proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(normalizedTargets, proxyId));
+
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(proxyId));
+        logger.debug("代理 {} 负载均衡配置保存成功，后端数量: {}", proxyDO.getName(), normalizedTargets.size());
     }
 
     @Override
@@ -387,7 +416,7 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyDO proxyDO = proxyRepository.findById(id)
                 .filter(proxy -> proxy.getProtocol().isTcp())
                 .orElseThrow(() -> new BizException("TCP 代理不存在"));
-        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(id).orElse(null);
+        List<ProxyTargetDO> targetRecords = proxyTargetRepository.findByProxyId(id);
 
         TcpProxyDetailDTO dto = new TcpProxyDetailDTO();
         dto.setId(proxyDO.getId());
@@ -395,7 +424,10 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setName(proxyDO.getName());
         dto.setRemotePort(proxyDO.getRemotePort());
         dto.setListenPort(proxyDO.getListenPort());
-        if (target != null) {
+        dto.setTargets(proxyTargetConvert.toDTOList(targetRecords));
+        dto.setLoadBalance(buildLoadBalanceDTO(proxyDO));
+        if (!targetRecords.isEmpty()) {
+            ProxyTargetDO target = targetRecords.getFirst();
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
@@ -410,7 +442,7 @@ public class ProxyServiceImpl implements ProxyService {
         ProxyDO proxyDO = proxyRepository.findById(id)
                 .filter(proxy -> proxy.getProtocol().isUdp())
                 .orElseThrow(() -> new BizException("UDP 代理不存在"));
-        ProxyTargetDO target = proxyTargetRepository.findFirstByProxyIdOrderByIdAsc(id).orElse(null);
+        List<ProxyTargetDO> targetRecords = proxyTargetRepository.findByProxyId(id);
 
         UdpProxyDetailDTO dto = new UdpProxyDetailDTO();
         dto.setId(proxyDO.getId());
@@ -418,7 +450,10 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setName(proxyDO.getName());
         dto.setRemotePort(proxyDO.getRemotePort());
         dto.setListenPort(proxyDO.getListenPort());
-        if (target != null) {
+        dto.setTargets(proxyTargetConvert.toDTOList(targetRecords));
+        dto.setLoadBalance(buildLoadBalanceDTO(proxyDO));
+        if (!targetRecords.isEmpty()) {
+            ProxyTargetDO target = targetRecords.getFirst();
             dto.setLocalHost(target.getHost());
             dto.setLocalPort(target.getPort());
         }
@@ -594,6 +629,46 @@ public class ProxyServiceImpl implements ProxyService {
             proxyDO.setForceHttps(forceHttps == null || Boolean.TRUE.equals(forceHttps));
         }
         return proxyDO;
+    }
+
+    private void replaceSingleTargetIfNotCluster(String proxyId, Runnable saveSingleTarget) {
+        List<ProxyTargetDO> existingTargets = proxyTargetRepository.findByProxyId(proxyId);
+        if (existingTargets.size() > 1) {
+            logger.debug("代理 {} 处于负载均衡模式，跳过内网目标更新", proxyId);
+            return;
+        }
+        proxyTargetRepository.deleteByProxyId(proxyId);
+        saveSingleTarget.run();
+    }
+
+    private LoadBalanceDTO buildLoadBalanceDTO(ProxyDO proxyDO) {
+        LoadBalanceType strategy = proxyDO.getLoadBalanceStrategy();
+        if (strategy == null) {
+            strategy = LoadBalanceType.ROUND_ROBIN;
+        }
+        return new LoadBalanceDTO(strategy.getCode());
+    }
+
+    private List<ProxyTargetSaveParam> normalizeClusterTargets(List<ProxyTargetSaveParam> targets) {
+        if (CollectionUtils.isEmpty(targets)) {
+            throw new BizException("请至少添加一个服务");
+        }
+        List<ProxyTargetSaveParam> normalized = new ArrayList<>(targets.size());
+        for (ProxyTargetSaveParam target : targets) {
+            if (target == null) {
+                continue;
+            }
+            ProxyTargetSaveParam item = new ProxyTargetSaveParam();
+            item.setHost(target.getHost().trim());
+            item.setPort(target.getPort());
+            item.setWeight(target.getWeight() == null || target.getWeight() < 1 ? 1 : target.getWeight());
+            item.setName(StringUtils.hasText(target.getName()) ? target.getName().trim() : item.getHost());
+            normalized.add(item);
+        }
+        if (normalized.isEmpty()) {
+            throw new BizException("请至少添加一个服务");
+        }
+        return normalized;
     }
 
     private ProxyTargetDO buildHttpTarget(String localHost, Integer localPort, String name, String proxyId) {

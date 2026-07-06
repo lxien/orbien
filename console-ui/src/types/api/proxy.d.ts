@@ -115,6 +115,9 @@ declare namespace Api.Proxy {
     customDomains?: string[]
     /** 子域名绑定，仅 domainType=SUBDOMAIN 时有值 */
     subdomainBindings?: SubdomainBindingDTO[]
+    /** 全部内网后端（用于判断是否负载均衡模式） */
+    targets?: TargetDTO[]
+    loadBalance?: LoadBalanceDTO | null
     localHost: string
     localPort: number
     /** 总带宽 Mbps */
@@ -137,6 +140,9 @@ declare namespace Api.Proxy {
     remotePort: number | null
     /** 实际监听端口 */
     listenPort: number
+    /** 全部内网后端（用于判断是否负载均衡模式） */
+    targets?: TargetDTO[]
+    loadBalance?: LoadBalanceDTO | null
     localHost: string
     localPort: number
     /** 总带宽 Mbps */
@@ -152,6 +158,9 @@ declare namespace Api.Proxy {
     name: string
     remotePort: number | null
     listenPort: number
+    /** 全部内网后端（用于判断是否负载均衡模式） */
+    targets?: TargetDTO[]
+    loadBalance?: LoadBalanceDTO | null
     localHost: string
     localPort: number
     limitTotal: number | null

@@ -1,66 +1,66 @@
 <template>
   <ElDialog
-    v-model="dialogVisible"
-    :title="dialogType === 'add' ? '添加 UDP 代理' : '编辑 UDP 代理'"
-    width="650px"
-    align-center
+      v-model="dialogVisible"
+      :title="dialogType === 'add' ? '添加 UDP 代理' : '编辑 UDP 代理'"
+      width="650px"
+      align-center
   >
     <ElForm
-      ref="formRef"
-      :model="formData"
-      :rules="rules"
-      label-width="120px"
-      :show-message="false"
+        ref="formRef"
+        :model="formData"
+        :rules="rules"
+        label-width="120px"
+        :show-message="false"
     >
       <ElFormItem label="客户端" prop="agentId">
         <ElSelect
-          v-model="formData.agentId"
-          placeholder="请选择客户端"
-          :disabled="dialogType === 'edit'"
-          style="width: 250px"
+            v-model="formData.agentId"
+            placeholder="请选择客户端"
+            :disabled="dialogType === 'edit'"
+            style="width: 250px"
         >
-          <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id" />
+          <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id"/>
         </ElSelect>
       </ElFormItem>
 
       <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable />
+        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
       </ElFormItem>
 
-      <ElFormItem label="内网服务" prop="localHost">
+      <BackendServiceField
+          :cluster-mode="clusterMode"
+          :targets="targets"
+          @open-cluster="handleOpenCluster"
+      >
         <ElRow :gutter="20">
           <ElCol :span="12">
-            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1" />
+            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1"/>
           </ElCol>
           <ElCol :span="12">
-            <ElInput v-model.number="formData.localPort" type="number" placeholder="内网端口">
-              <template #prepend>
-                <el-select v-model="formData.localPort" placeholder="常用端口" style="width: 125px">
-                  <el-option label="DNS - 53" :value="53" />
-                  <el-option label="NTP - 123" :value="123" />
-                  <el-option label="SNMP - 161" :value="161" />
-                </el-select>
-              </template>
-            </ElInput>
+            <LocalPortInput
+                v-model="formData.localPort"
+                :presets="UDP_LOCAL_PORT_PRESETS"
+                select-width="125px"
+            />
           </ElCol>
         </ElRow>
-      </ElFormItem>
+      </BackendServiceField>
       <ElFormItem label="远程端口" prop="remotePort">
         <div class="remote-port-field">
           <ElInput
-            v-model="remotePortInput"
-            type="number"
-            placeholder="不填自动生成"
-            class="remote-port-input"
-            @input="onRemotePortInput"
+              v-model="remotePortInput"
+              type="number"
+              placeholder="不填自动生成"
+              class="remote-port-input"
+              @input="onRemotePortInput"
           />
           <ElButton
-            v-for="port in suggestedPorts"
-            :key="port"
-            size="small"
-            :type="selectedSuggestPort === port ? 'primary' : 'default'"
-            plain
-            @click="selectSuggestedPort(port)"
+              v-for="port in suggestedPorts"
+              :key="port"
+              size="small"
+              :type="selectedSuggestPort === port ? 'primary' : 'default'"
+              plain
+              @click="selectSuggestedPort(port)"
           >
             {{ port }}
           </ElButton>
@@ -74,13 +74,13 @@
       </ElFormItem>
       <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
-          v-model.number="formData.limitTotal"
-          placeholder="总带宽"
-          :controls="false"
-          :min="1"
-          type="number"
-          :precision="0"
-          style="width: 200px"
+            v-model.number="formData.limitTotal"
+            placeholder="总带宽"
+            :controls="false"
+            :min="1"
+            type="number"
+            :precision="0"
+            style="width: 200px"
         >
           <template #append>Mbps</template>
         </el-input>
@@ -96,200 +96,223 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch, computed } from 'vue'
-  import { ElMessage } from 'element-plus'
-  import type { FormInstance, FormRules } from 'element-plus'
-  import { DialogType } from '@/types'
-  import { fetchGetAgentListAll } from '@/api/agent'
-  import { fetchCreateUdpProxy, fetchUpdateUdpProxy, fetchGetUdpProxyById } from '@/api/proxy'
-  import { fetchSuggestAvailablePorts } from '@/api/port-pool'
-  import { PortPoolType } from '@/enums/orbien/business'
+import {ref, reactive, watch, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import type {FormInstance, FormRules} from 'element-plus'
+import {DialogType} from '@/types'
+import {fetchGetAgentListAll} from '@/api/agent'
+import {fetchCreateUdpProxy, fetchUpdateUdpProxy, fetchGetUdpProxyById} from '@/api/proxy'
+import {fetchSuggestAvailablePorts} from '@/api/port-pool'
+import {PortPoolType} from '@/enums/orbien/business'
+import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
+import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
+import {UDP_LOCAL_PORT_PRESETS} from '@/views/orbien/common/port-presets'
+import {isClusterMode} from '@/views/orbien/common/is-cluster-mode'
 
-  defineOptions({ name: 'UdpDialog' })
+defineOptions({name: 'UdpDialog'})
 
-  interface FormDataState {
+interface FormDataState {
+  agentId: string
+  name: string
+  localHost: string
+  localPort: number | undefined
+  limitTotal: number
+}
+
+interface Props {
+  visible: boolean
+  type: DialogType
+  proxyData?: Partial<{
+    id: string
     agentId: string
     name: string
-    localHost: string
-    localPort: number | undefined
-    limitTotal: number
-  }
+  }>
+}
 
-  interface Props {
-    visible: boolean
-    type: DialogType
-    proxyData?: Partial<{
-      id: string
-      agentId: string
-      name: string
-    }>
-  }
+interface Emits {
+  (e: 'update:visible', value: boolean): void
 
-  interface Emits {
-    (e: 'update:visible', value: boolean): void
-    (e: 'submit'): void
-  }
+  (e: 'submit'): void
 
-  const props = defineProps<Props>()
-  const emit = defineEmits<Emits>()
+  (e: 'open-cluster-config', payload: { id: string; name: string }): void
+}
 
-  const dialogVisible = computed({
-    get: () => props.visible,
-    set: (value) => emit('update:visible', value)
-  })
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-  const dialogType = computed(() => props.type)
-  const formRef = ref<FormInstance>()
-  const agents = ref<Api.Agent.AgentDTO[]>([])
-  const suggestedPorts = ref<number[]>([])
-  const selectedSuggestPort = ref<number | null>(null)
-  const suggestLoading = ref(false)
-  const remotePortInput = ref('')
-  const SUGGEST_PORT_COUNT = 4
+const dialogVisible = computed({
+  get: () => props.visible,
+  set: (value) => emit('update:visible', value)
+})
 
-  watch(
+const dialogType = computed(() => props.type)
+const formRef = ref<FormInstance>()
+const agents = ref<Api.Agent.AgentDTO[]>([])
+const suggestedPorts = ref<number[]>([])
+const selectedSuggestPort = ref<number | null>(null)
+const suggestLoading = ref(false)
+const remotePortInput = ref('')
+const SUGGEST_PORT_COUNT = 4
+
+watch(
     () => props.visible,
     (newVal) => {
       dialogVisible.value = newVal
     }
-  )
+)
 
-  const DEFAULT_FORM_DATA: FormDataState = {
-    agentId: '',
-    name: '',
-    localHost: '127.0.0.1',
-    localPort: undefined,
-    limitTotal: 1
-  }
-  const formData = reactive<FormDataState>({ ...DEFAULT_FORM_DATA })
+const DEFAULT_FORM_DATA: FormDataState = {
+  agentId: '',
+  name: '',
+  localHost: '127.0.0.1',
+  localPort: undefined,
+  limitTotal: 1
+}
+const formData = reactive<FormDataState>({...DEFAULT_FORM_DATA})
+const targets = ref<Api.Proxy.TargetDTO[]>([])
 
-  const rules: FormRules = {
-    agentId: [{ required: true, message: '请选择客户端', trigger: 'change' }],
-    name: [{ required: true, message: '请输入代理名称', trigger: 'blur' }],
-    remotePort: [
-      {
-        validator: (_rule, _value, callback) => {
-          if (!remotePortInput.value) {
-            callback()
-            return
-          }
-          const numValue = parseInt(remotePortInput.value, 10)
-          if (isNaN(numValue)) {
-            callback(new Error('远程端口必须是数字'))
-          } else if (numValue < 1 || numValue > 65535) {
-            callback(new Error('远程端口必须在 1-65535 之间'))
-          } else {
-            callback()
-          }
-        },
-        trigger: 'blur'
-      }
-    ],
-    localHost: [{ required: true, message: '请输入主机', trigger: 'blur' }],
-    localPort: [
-      { required: true, message: '请输入端口', trigger: 'blur' },
-      { type: 'number', message: '端口必须是数字', trigger: 'blur' },
-      { min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur' }
-    ],
-    limitTotal: [
-      { required: true, message: '请输入带宽限制', trigger: 'blur' },
-      { type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur' }
-    ]
-  }
+const clusterMode = computed(() => isClusterMode(targets.value))
 
-  const parseRemotePort = (): number | undefined => {
-    if (!remotePortInput.value) {
-      return undefined
+const rules = computed<FormRules>(() => ({
+  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
+  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
+  remotePort: [
+    {
+      validator: (_rule, _value, callback) => {
+        if (!remotePortInput.value) {
+          callback()
+          return
+        }
+        const numValue = parseInt(remotePortInput.value, 10)
+        if (isNaN(numValue)) {
+          callback(new Error('远程端口必须是数字'))
+        } else if (numValue < 1 || numValue > 65535) {
+          callback(new Error('远程端口必须在 1-65535 之间'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
     }
-    const num = parseInt(remotePortInput.value, 10)
-    return isNaN(num) ? undefined : num
-  }
+  ],
+  ...(clusterMode.value
+      ? {}
+      : {
+        localHost: [{required: true, message: '请输入主机', trigger: 'blur'}],
+        localPort: [
+          {required: true, message: '请输入端口', trigger: 'blur'},
+          {type: 'number', message: '端口必须是数字', trigger: 'blur'},
+          {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
+        ]
+      }),
+  limitTotal: [
+    {required: true, message: '请输入带宽限制', trigger: 'blur'},
+    {type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur'}
+  ]
+}))
 
-  const fetchAgents = async () => {
-    try {
-      const agentsList = await fetchGetAgentListAll()
-      agents.value = agentsList || []
-    } catch (error) {
-      console.error('获取客户端列表失败:', error)
-      ElMessage.error('获取客户端列表失败')
-    }
+const parseRemotePort = (): number | undefined => {
+  if (!remotePortInput.value) {
+    return undefined
   }
+  const num = parseInt(remotePortInput.value, 10)
+  return isNaN(num) ? undefined : num
+}
 
-  const applyDefaultAgentIfNeeded = () => {
-    if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
-      return
-    }
-    formData.agentId = agents.value[0].id
+const fetchAgents = async () => {
+  try {
+    const agentsList = await fetchGetAgentListAll()
+    agents.value = agentsList || []
+  } catch (error) {
+    console.error('获取客户端列表失败:', error)
+    ElMessage.error('获取客户端列表失败')
   }
+}
 
-  const resetSuggestState = () => {
+const applyDefaultAgentIfNeeded = () => {
+  if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
+    return
+  }
+  formData.agentId = agents.value[0].id
+}
+
+const resetSuggestState = () => {
+  suggestedPorts.value = []
+  selectedSuggestPort.value = null
+}
+
+const resetFormData = () => {
+  targets.value = []
+  Object.assign(formData, {...DEFAULT_FORM_DATA})
+  remotePortInput.value = ''
+  resetSuggestState()
+}
+
+const handleOpenCluster = () => {
+  const proxyId = props.proxyData?.id
+  if (!proxyId) return
+  emit('open-cluster-config', {id: proxyId, name: formData.name})
+  dialogVisible.value = false
+}
+
+const loadSuggestedPorts = async () => {
+  suggestLoading.value = true
+  selectedSuggestPort.value = null
+  try {
+    suggestedPorts.value = await fetchSuggestAvailablePorts(PortPoolType.UDP, SUGGEST_PORT_COUNT)
+  } catch (error) {
+    console.error('获取可用端口失败:', error)
     suggestedPorts.value = []
-    selectedSuggestPort.value = null
+  } finally {
+    suggestLoading.value = false
   }
+}
 
-  const resetFormData = () => {
-    Object.assign(formData, { ...DEFAULT_FORM_DATA })
-    remotePortInput.value = ''
-    resetSuggestState()
-  }
+const onRemotePortInput = () => {
+  selectedSuggestPort.value = null
+}
 
-  const loadSuggestedPorts = async () => {
-    suggestLoading.value = true
-    selectedSuggestPort.value = null
+const selectSuggestedPort = (port: number) => {
+  remotePortInput.value = String(port)
+  selectedSuggestPort.value = port
+  formRef.value?.clearValidate('remotePort')
+}
+
+const initFormData = async () => {
+  const isEdit = props.type === 'edit' && props.proxyData && props.proxyData.id
+
+  if (isEdit) {
     try {
-      suggestedPorts.value = await fetchSuggestAvailablePorts(PortPoolType.UDP, SUGGEST_PORT_COUNT)
+      const proxyDetail = await fetchGetUdpProxyById(props.proxyData!.id!)
+      targets.value = proxyDetail.targets ?? []
+      Object.assign(formData, {
+        ...DEFAULT_FORM_DATA,
+        agentId: proxyDetail.agentId || '',
+        name: proxyDetail.name || '',
+        localHost: proxyDetail.localHost || '127.0.0.1',
+        localPort: proxyDetail.localPort,
+        limitTotal: proxyDetail.limitTotal ?? 1
+      })
+      const displayPort = proxyDetail.remotePort ?? proxyDetail.listenPort
+      remotePortInput.value = displayPort != null ? String(displayPort) : ''
     } catch (error) {
-      console.error('获取可用端口失败:', error)
-      suggestedPorts.value = []
-    } finally {
-      suggestLoading.value = false
+      console.error('获取代理详情失败:', error)
+      ElMessage.error('获取代理详情失败，请稍后重试')
+      const row = props.proxyData
+      Object.assign(formData, {
+        ...DEFAULT_FORM_DATA,
+        agentId: row?.agentId || '',
+        name: row?.name || ''
+      })
+      remotePortInput.value = ''
     }
+  } else {
+    resetFormData()
   }
+  await loadSuggestedPorts()
+}
 
-  const onRemotePortInput = () => {
-    selectedSuggestPort.value = null
-  }
-
-  const selectSuggestedPort = (port: number) => {
-    remotePortInput.value = String(port)
-    selectedSuggestPort.value = port
-    formRef.value?.clearValidate('remotePort')
-  }
-
-  const initFormData = async () => {
-    const isEdit = props.type === 'edit' && props.proxyData && props.proxyData.id
-
-    if (isEdit) {
-      try {
-        const proxyDetail = await fetchGetUdpProxyById(props.proxyData!.id!)
-        Object.assign(formData, {
-          ...DEFAULT_FORM_DATA,
-          agentId: proxyDetail.agentId || '',
-          name: proxyDetail.name || '',
-          localHost: proxyDetail.localHost || '127.0.0.1',
-          localPort: proxyDetail.localPort,
-          limitTotal: proxyDetail.limitTotal ?? 1
-        })
-        const displayPort = proxyDetail.remotePort ?? proxyDetail.listenPort
-        remotePortInput.value = displayPort != null ? String(displayPort) : ''
-      } catch (error) {
-        console.error('获取代理详情失败:', error)
-        ElMessage.error('获取代理详情失败，请稍后重试')
-        const row = props.proxyData
-        Object.assign(formData, {
-          ...DEFAULT_FORM_DATA,
-          agentId: row?.agentId || '',
-          name: row?.name || ''
-        })
-        remotePortInput.value = ''
-      }
-    } else {
-      resetFormData()
-    }
-    await loadSuggestedPorts()
-  }
-
-  watch(
+watch(
     () => [props.visible, props.type, props.proxyData],
     async ([visible]) => {
       if (visible) {
@@ -304,73 +327,73 @@
         applyDefaultAgentIfNeeded()
       }
     },
-    { immediate: true }
-  )
+    {immediate: true}
+)
 
-  watch(dialogVisible, (newVal) => {
-    emit('update:visible', newVal)
-    if (!newVal) {
-      resetFormData()
-      formRef.value?.clearValidate()
+watch(dialogVisible, (newVal) => {
+  emit('update:visible', newVal)
+  if (!newVal) {
+    resetFormData()
+    formRef.value?.clearValidate()
+  }
+})
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+
+  await formRef.value.validate(async (valid) => {
+    if (valid) {
+      try {
+        const remotePort = parseRemotePort()
+        const commonData: Omit<Api.Proxy.UdpProxyUpdateParam, 'id'> = {
+          name: formData.name,
+          localHost: formData.localHost,
+          localPort: formData.localPort!,
+          limitTotal: formData.limitTotal,
+          ...(remotePort != null ? {remotePort} : {})
+        }
+
+        if (dialogType.value === 'add') {
+          await fetchCreateUdpProxy({
+            agentId: formData.agentId,
+            ...commonData
+          })
+        } else {
+          await fetchUpdateUdpProxy({
+            id: props.proxyData?.id || '',
+            ...commonData
+          })
+        }
+
+        dialogVisible.value = false
+        emit('submit')
+        resetFormData()
+        formRef.value?.clearValidate()
+      } catch (error) {
+        console.error('提交失败:', error)
+      }
     }
   })
-
-  const handleSubmit = async () => {
-    if (!formRef.value) return
-
-    await formRef.value.validate(async (valid) => {
-      if (valid) {
-        try {
-          const remotePort = parseRemotePort()
-          const commonData: Omit<Api.Proxy.UdpProxyUpdateParam, 'id'> = {
-            name: formData.name,
-            localHost: formData.localHost,
-            localPort: formData.localPort!,
-            limitTotal: formData.limitTotal,
-            ...(remotePort != null ? { remotePort } : {})
-          }
-
-          if (dialogType.value === 'add') {
-            await fetchCreateUdpProxy({
-              agentId: formData.agentId,
-              ...commonData
-            })
-          } else {
-            await fetchUpdateUdpProxy({
-              id: props.proxyData?.id || '',
-              ...commonData
-            })
-          }
-
-          dialogVisible.value = false
-          emit('submit')
-          resetFormData()
-          formRef.value?.clearValidate()
-        } catch (error) {
-          console.error('提交失败:', error)
-        }
-      }
-    })
-  }
+}
 </script>
 
 <style scoped lang="scss">
-  .remote-port-field {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-  }
+.remote-port-field {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  align-items: center;
+  width: 100%;
+}
 
-  .remote-port-input {
-    width: 146px;
-    flex-shrink: 0;
-  }
+.remote-port-input {
+  width: 146px;
+  flex-shrink: 0;
+}
 
-  .port-suggestions-empty {
-    font-size: 12px;
-    color: var(--el-text-color-secondary);
-    white-space: nowrap;
-  }
+.port-suggestions-empty {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
+}
 </style>

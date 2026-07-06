@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.server.web.dto.proxy;
 
+import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -22,6 +23,11 @@ public class HttpProxyDetailDTO {
     private List<SubdomainBindingDTO> subdomainBindings;
     private String localHost;
     private Integer localPort;
+    /**
+     * 全部内网后端（用于判断是否负载均衡模式）
+     */
+    private List<TargetDTO> targets;
+    private LoadBalanceDTO loadBalance;
     /**
      * 总带宽 Mbps
      */

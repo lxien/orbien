@@ -1,9 +1,11 @@
 package io.github.lxien.orbien.server.web.dto.proxy;
 
+import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class TcpProxyDetailDTO {
@@ -20,6 +22,8 @@ public class TcpProxyDetailDTO {
     private Integer listenPort;
     private String localHost;
     private Integer localPort;
+    private List<TargetDTO> targets;
+    private LoadBalanceDTO loadBalance;
     /**
      * 总带宽 Mbps
      */

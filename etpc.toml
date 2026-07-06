@@ -82,12 +82,8 @@ multiplex =false
 encrypt = false
 compress = false
 
-[health_check]
-enabled = true
-type="tcp"
 
-
-
+# HTTP + WebSocket
 [[proxies]]
 name = "http-websocket"
 protocol = "http"
@@ -102,7 +98,7 @@ multiplex = true
 encrypt = true
 compress = true
 
-
+# ③ HTTP + QUIC（QUIC Phase1 仅支持 multiplex）
 [[proxies]]
 name = "http-quic"
 protocol = "http"
@@ -138,7 +134,6 @@ targets = [
     { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
 ]
 
-
 [proxies.transport]
 protocol = "tcp"
 multiplex = true
@@ -158,6 +153,10 @@ protocol = "websocket"
 multiplex = true
 encrypt = true
 compress = true
+##############################################################################################################
+# 可选：HTTPS / TCP / UDP 回归用例（数据隧道均走 TCP）
+##############################################################################################################
+
 [[proxies]]
 name = "web-https"
 protocol = "https"
@@ -168,6 +167,13 @@ targets = [
 force_https = true
 
 
+
+[[proxies]]
+name = "tcp-proxy"
+protocol = "tcp"
+local_ip = "127.0.0.1"
+local_port = 8084
+remote_port=9080
 
 [proxies.transport]
 multiplex = true

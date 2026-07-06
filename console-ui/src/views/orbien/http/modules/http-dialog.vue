@@ -53,29 +53,20 @@
         />
       </ElFormItem>
 
-      <ElFormItem label="内网服务" prop="localHost">
+      <BackendServiceField
+        :cluster-mode="clusterMode"
+        :targets="targets"
+        @open-cluster="handleOpenCluster"
+      >
         <ElRow :gutter="20">
           <ElCol :span="12">
             <ElInput v-model="formData.localHost" placeholder="如127.0.0.1" />
           </ElCol>
           <ElCol :span="12">
-            <ElInput v-model.number="formData.localPort" type="number" placeholder="内网端口">
-              <template #prepend>
-                <el-select v-model="formData.localPort" placeholder="常用端口" style="width: 115px">
-                  <el-option label="HTTP - 80" :value="80" />
-                  <el-option label="HTTPS - 443" :value="443" />
-                  <el-option label="SSH - 22" :value="22" />
-                  <el-option label="Redis - 6379" :value="6379" />
-                  <el-option label="Tomcat - 8080" :value="8080" />
-                  <el-option label="MySQL - 3306" :value="3306" />
-                  <el-option label="SQL Server - 1433" :value="1433" />
-                  <el-option label="Windows远程桌面 - 3389" :value="3389" />
-                </el-select>
-              </template>
-            </ElInput>
+            <LocalPortInput v-model="formData.localPort" :presets="COMMON_LOCAL_PORT_PRESETS" />
           </ElCol>
         </ElRow>
-      </ElFormItem>
+      </BackendServiceField>
 
       <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
@@ -108,6 +99,10 @@
   import { DomainType } from '@/enums/orbien/business'
   import { useRootDomainOptions, validateSubdomainBindings, buildSubdomainBindingsPayload } from '@/views/orbien/common/use-root-domain-options'
   import SubdomainBindingRows from '@/views/orbien/common/subdomain-binding-rows.vue'
+  import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
+  import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
+  import { COMMON_LOCAL_PORT_PRESETS } from '@/views/orbien/common/port-presets'
+  import { isClusterMode } from '@/views/orbien/common/is-cluster-mode'
 
   defineOptions({ name: 'HttpDialog' })
 
@@ -135,6 +130,7 @@
   interface Emits {
     (e: 'update:visible', value: boolean): void
     (e: 'submit'): void
+    (e: 'open-cluster-config', payload: { id: string; name: string }): void
   }
 
   const props = defineProps<Props>()
@@ -169,12 +165,15 @@
 
   const formData = reactive<FormDataState>(createDefaultFormData())
   const subdomainErrorIndexes = ref<number[]>([])
+  const targets = ref<Api.Proxy.TargetDTO[]>([])
+
+  const clusterMode = computed(() => isClusterMode(targets.value))
 
   const resetSubdomainErrors = () => {
     subdomainErrorIndexes.value = []
   }
 
-  const rules: FormRules = {
+  const rules = computed<FormRules>(() => ({
     agentId: [{ required: true, message: '请选择客户端', trigger: 'change' }],
     name: [{ required: true, message: '请输入代理名称', trigger: 'blur' }],
     domainType: [{ required: true, message: '请选择域名类型', trigger: 'change' }],
@@ -194,17 +193,21 @@
         trigger: 'blur'
       }
     ],
-    localHost: [{ required: true, message: '请输入主机', trigger: 'blur' }],
-    localPort: [
-      { required: true, message: '请输入端口', trigger: 'blur' },
-      { type: 'number', message: '端口必须是数字', trigger: 'blur' },
-      { min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur' }
-    ],
+    ...(clusterMode.value
+      ? {}
+      : {
+          localHost: [{ required: true, message: '请输入主机', trigger: 'blur' }],
+          localPort: [
+            { required: true, message: '请输入端口', trigger: 'blur' },
+            { type: 'number', message: '端口必须是数字', trigger: 'blur' },
+            { min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur' }
+          ]
+        }),
     limitTotal: [
       { required: true, message: '请输入带宽限制', trigger: 'blur' },
       { type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur' }
     ]
-  }
+  }))
 
   const parseLines = (value: string): string[] =>
     value
@@ -220,6 +223,7 @@
   }
 
   const applyDetail = (detail: Api.Proxy.HttpProxyDetailDTO) => {
+    targets.value = detail.targets ?? []
     Object.assign(formData, {
       ...createDefaultFormData(),
       agentId: detail.agentId || '',
@@ -251,8 +255,16 @@
   }
 
   const resetFormData = () => {
+    targets.value = []
     Object.assign(formData, createDefaultFormData())
     refreshSubdomainBindings()
+  }
+
+  const handleOpenCluster = () => {
+    const proxyId = props.proxyData?.id
+    if (!proxyId) return
+    emit('open-cluster-config', { id: proxyId, name: formData.name })
+    dialogVisible.value = false
   }
 
   const initFormData = async () => {

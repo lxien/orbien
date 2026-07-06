@@ -84,4 +84,6 @@ public interface ProxyService {
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 
     PageResult<HttpProxyListDTO> findHttpsProxies(PageQuery pageQuery);
+
+    void saveClusterConfig(String proxyId, ProxyClusterSaveParam param);
 }
