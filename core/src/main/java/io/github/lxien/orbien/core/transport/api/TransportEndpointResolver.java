@@ -2,11 +2,10 @@ package io.github.lxien.orbien.core.transport.api;
 
 import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.core.domain.TransportCustomConfig;
-import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig;
 import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
-import io.github.lxien.orbien.core.domain.transport.TcpProtocolConfig;
 import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
-import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 public final class TransportEndpointResolver {
 
@@ -28,28 +27,28 @@ public final class TransportEndpointResolver {
     public static TransportEndpoint resolveEndpoint(String serverHost,
                                                       int fallbackPort,
                                                       TransportProtocol protocol,
-                                                      TcpProtocolConfig tcp,
                                                       WebSocketProtocolConfig websocket,
-                                                      QuicProtocolConfig quic) {
+                                                      QuicProtocolConfig quic,
+                                                      TlsConfig tlsConfig) {
         return switch (protocol) {
             case TCP -> TransportEndpoint.builder()
                     .host(serverHost)
-                    .port(tcp != null && tcp.getPort() > 0 ? tcp.getPort() : fallbackPort)
+                    .port(fallbackPort)
                     .protocol(TransportProtocol.TCP)
-                    .tlsConfig(tcp != null ? tcp.getTlsConfig() : null)
+                    .tlsConfig(tlsConfig)
                     .build();
             case WEBSOCKET -> TransportEndpoint.builder()
                     .host(serverHost)
-                    .port(websocket != null ? websocket.getPort() : TransportProtocol.WEBSOCKET.getDefaultPort())
+                    .port(resolvePort(websocket, TransportProtocol.WEBSOCKET.getDefaultPort()))
                     .protocol(TransportProtocol.WEBSOCKET)
-                    .tlsConfig(websocket != null ? websocket.getTlsConfig() : null)
+                    .tlsConfig(tlsConfig)
                     .webSocketPath(websocket != null ? websocket.getPath() : "/tunnel")
                     .build();
             case QUIC -> TransportEndpoint.builder()
                     .host(serverHost)
-                    .port(quic != null ? quic.getPort() : TransportProtocol.QUIC.getDefaultPort())
+                    .port(resolvePort(quic, TransportProtocol.QUIC.getDefaultPort()))
                     .protocol(TransportProtocol.QUIC)
-                    .tlsConfig(quic != null ? quic.getTlsConfig() : null)
+                    .tlsConfig(tlsConfig)
                     .build();
         };
     }
@@ -61,16 +60,14 @@ public final class TransportEndpointResolver {
         return multiplex;
     }
 
-    public static TlsConfig resolveTls(TransportProtocol protocol,
-                                       TcpProtocolConfig tcp,
-                                       WebSocketProtocolConfig websocket,
-                                       QuicProtocolConfig quic,
-                                       TlsConfig legacyTls) {
-        TlsConfig tls = switch (protocol) {
-            case TCP -> tcp != null ? tcp.getTlsConfig() : legacyTls;
-            case WEBSOCKET -> websocket != null ? websocket.getTlsConfig() : legacyTls;
-            case QUIC -> quic != null ? quic.getTlsConfig() : legacyTls;
-        };
-        return TlsConfigSupport.effective(tls, legacyTls);
+    public static TlsConfig resolveTls(TlsConfig sharedTls) {
+        return sharedTls;
+    }
+
+    private static int resolvePort(ProtocolListenerConfig config, int defaultPort) {
+        if (config != null && config.getPort() > 0) {
+            return config.getPort();
+        }
+        return defaultPort;
     }
 }

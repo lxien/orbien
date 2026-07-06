@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 public class TransportProperties implements Serializable {
     /**
-     * 控制连接与数据隧道 传输协议。
+     * 控制连接与数据隧道传输协议。
      */
     private TransportProtocol protocol = TransportProtocol.TCP;
 
@@ -18,6 +18,12 @@ public class TransportProperties implements Serializable {
 
     @NestedConfigurationProperty
     private TlsProperties tls = new TlsProperties();
+
+    @NestedConfigurationProperty
+    private WebSocketProperties websocket = new WebSocketProperties();
+
+    @NestedConfigurationProperty
+    private QuicProperties quic = new QuicProperties();
 
     @Data
     static class MultiplexProperties implements Serializable {
@@ -31,5 +37,16 @@ public class TransportProperties implements Serializable {
         private String keyFile;
         private String caFile;
         private String keyPassword;
+    }
+
+    @Data
+    static class WebSocketProperties implements Serializable {
+        private Integer serverPort = 9528;
+        private String path = "/tunnel";
+    }
+
+    @Data
+    static class QuicProperties implements Serializable {
+        private Integer serverPort = 9529;
     }
 }

@@ -9,6 +9,9 @@
     <artifactId>orbien-client</artifactId>
     <packaging>jar</packaging>
     <name>client</name>
+    <properties>
+        <java.version>${client.sdk.java.version}</java.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>io.github.lxien</groupId>
@@ -19,4 +22,15 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${client.sdk.java.version}</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

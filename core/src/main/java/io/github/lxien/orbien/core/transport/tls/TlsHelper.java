@@ -10,8 +10,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.cert.CertificateException;
+import java.util.List;
 
 public class TlsHelper {
+
+    private static final String TLS_V1_3 = "TLSv1.3";
+    private static final String TLS_V1_2 = "TLSv1.2";
+
     public static SslContext buildSslContext(boolean forClient, TlsConfig tlsConfig, boolean isTestMode) throws IOException, CertificateException {
         SslProvider provider = SslProvider.JDK;
         if (forClient) {
@@ -41,7 +46,7 @@ public class TlsHelper {
     private static SslContext createTestSslContextForClient(SslProvider provider) throws IOException {
         return SslContextBuilder
                 .forClient()
-                .protocols(getProtocols())
+                .protocols(getSupportedProtocols())
                 .sslProvider(provider)
                 .trustManager(InsecureTrustManagerFactory.INSTANCE)
                 .build();
@@ -51,7 +56,7 @@ public class TlsHelper {
     private static SslContext createSslContextForClient(TlsConfig tlsConfig, SslProvider provider) throws IOException {
         SslContextBuilder sslContextBuilder = SslContextBuilder
                 .forClient()
-                .protocols(getProtocols())
+                .protocols(getSupportedProtocols())
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
@@ -79,7 +84,7 @@ public class TlsHelper {
         return SslContextBuilder
                 .forServer(selfSignedCertificate.certificate(), selfSignedCertificate.privateKey())
                 .sslProvider(provider)
-                .protocols(getProtocols())
+                .protocols(getSupportedProtocols())
                 .clientAuth(ClientAuth.OPTIONAL)
                 .build();
     }
@@ -90,7 +95,7 @@ public class TlsHelper {
                         StringUtils.hasText(tlsConfig.getCertFile()) ? new FileInputStream(tlsConfig.getCertFile()) : null,
                         StringUtils.hasText(tlsConfig.getKeyFile()) ? new FileInputStream(tlsConfig.getKeyFile()) : null
                 )
-                .protocols(getProtocols())
+                .protocols(getSupportedProtocols())
                 .sslProvider(provider);
 
         if (!tlsConfig.mTLSEnabled()) {
@@ -104,12 +109,14 @@ public class TlsHelper {
         return sslContextBuilder.build();
     }
 
-    public static String getProtocols() {
+    /**
+     * 返回支持的 TLS 协议列表，按优先级排序：JDK 11+ 优先 TLS 1.3，不支持时降级 TLS 1.2。
+     */
+    public static Iterable<String> getSupportedProtocols() {
         if (isJava11OrHigher()) {
-            return "TLSv1.3";
-        } else {
-            return "TLSv1.2";
+            return List.of(TLS_V1_3, TLS_V1_2);
         }
+        return List.of(TLS_V1_2);
     }
 
     public static boolean isJava11OrHigher() {

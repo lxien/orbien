@@ -61,6 +61,8 @@
     <properties>
         <!-- ==================== 项目基础配置 ==================== -->
         <java.version>25</java.version>
+        <!-- SDK 库（core/common/client/starter）编译目标 -->
+        <client.sdk.java.version>17</client.sdk.java.version>
         <revision>0.20.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

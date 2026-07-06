@@ -76,16 +76,14 @@ public class TomlConfigLoader implements ConfigSource {
                 multiplexConfig.setEnabled(enabled);
             }
 
-            parseClientProtocolTable(transportTable.getTable("tcp"), globalTransportConfig.getTcp(), tlsConfig, 9527);
-            parseClientProtocolTable(transportTable.getTable("websocket"), globalTransportConfig.getWebsocket(), tlsConfig, 9528);
-            parseClientProtocolTable(transportTable.getTable("quic"), globalTransportConfig.getQuic(), tlsConfig, 9529);
-
             Toml legacyTls = transportTable.getTable("tls");
             if (legacyTls != null) {
                 tlsConfig = parseTlsConfig(legacyTls);
                 globalTransportConfig.setTlsConfig(tlsConfig);
             }
-            globalTransportConfig.syncLegacyTls();
+            parseClientProtocolTable(transportTable.getTable("websocket"), globalTransportConfig.getWebsocket(), 9528);
+            parseClientProtocolTable(transportTable.getTable("quic"), globalTransportConfig.getQuic(), 9529);
+
             resolveTransportCertPaths(globalTransportConfig, Paths.get(path).getParent());
             builder.transportConfig(globalTransportConfig);
         }
@@ -434,26 +432,12 @@ public class TomlConfigLoader implements ConfigSource {
 
     private void parseClientProtocolTable(Toml table,
                                           io.github.lxien.orbien.core.domain.transport.ProtocolListenerConfig target,
-                                          TlsConfig fallbackTls,
                                           int defaultPort) {
         if (table == null) {
             target.setPort(defaultPort);
-            target.setTlsConfig(fallbackTls);
             return;
         }
-        Long port = table.getLong("port");
-        if (port != null) {
-            validatePort(port.intValue());
-            target.setPort(port.intValue());
-        } else {
-            target.setPort(defaultPort);
-        }
-        Toml tlsTable = table.getTable("tls");
-        if (tlsTable != null) {
-            target.setTlsConfig(parseTlsConfig(tlsTable));
-        } else {
-            target.setTlsConfig(fallbackTls);
-        }
+        target.setPort(readServerPort(table, defaultPort));
         if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
             String path = table.getString("path");
             if (StringUtils.hasText(path)) {
@@ -472,6 +456,20 @@ public class TomlConfigLoader implements ConfigSource {
         }
     }
 
+    private int readServerPort(Toml table, int defaultPort) {
+        Long serverPort = table.getLong("server_port");
+        if (serverPort != null) {
+            validatePort(serverPort.intValue());
+            return serverPort.intValue();
+        }
+        Long legacyPort = table.getLong("port");
+        if (legacyPort != null) {
+            validatePort(legacyPort.intValue());
+            return legacyPort.intValue();
+        }
+        return defaultPort;
+    }
+
     private TlsConfig parseTlsConfig(Toml tlsTable) {
         Boolean enabled = tlsTable.getBoolean("enabled", true);
         String certFile = tlsTable.getString("cert_file");
@@ -485,12 +483,7 @@ public class TomlConfigLoader implements ConfigSource {
         if (transportConfig == null || configDir == null) {
             return;
         }
-        transportConfig.setTlsConfig(TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
-        transportConfig.getTcp().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTcp().getTlsConfig(), configDir));
-        transportConfig.getWebsocket().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getWebsocket().getTlsConfig(), configDir));
-        transportConfig.getQuic().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getQuic().getTlsConfig(), configDir));
+        transportConfig.setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
     }
 }

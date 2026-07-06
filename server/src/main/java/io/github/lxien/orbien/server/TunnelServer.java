@@ -60,8 +60,7 @@ public class TunnelServer implements Lifecycle {
         try {
             logger.debug("正在启动Orbien服务");
             TransportConfig transportConfig = config.getTransportConfig();
-            transportConfig.syncLegacyTls();
-            TlsConfig tlsConfig = transportConfig.resolveTls(TransportProtocol.TCP);
+            TlsConfig tlsConfig = transportConfig.getTlsConfig();
 
             if (tlsConfig == null || tlsConfig.isEnabled()) {
                 tlsContext = TlsHelper.buildSslContext(false, tlsConfig, tlsConfig == null);

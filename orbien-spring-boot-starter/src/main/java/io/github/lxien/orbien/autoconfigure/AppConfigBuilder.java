@@ -76,7 +76,16 @@ final class AppConfigBuilder {
 
         TlsConfig tlsConfig = buildTlsConfig(tlsProps, resourceLoader);
         transportConfig.setTlsConfig(tlsConfig);
-        transportConfig.syncLegacyTls();
+
+        if (transportProps.getWebsocket().getServerPort() != null) {
+            transportConfig.getWebsocket().setPort(transportProps.getWebsocket().getServerPort());
+        }
+        if (StringUtils.hasText(transportProps.getWebsocket().getPath())) {
+            transportConfig.getWebsocket().setPath(transportProps.getWebsocket().getPath());
+        }
+        if (transportProps.getQuic().getServerPort() != null) {
+            transportConfig.getQuic().setPort(transportProps.getQuic().getServerPort());
+        }
         return transportConfig;
     }
 

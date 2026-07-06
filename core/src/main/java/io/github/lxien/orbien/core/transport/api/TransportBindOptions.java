@@ -1,6 +1,7 @@
 package io.github.lxien.orbien.core.transport.api;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
+import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
 import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
 import io.netty.channel.Channel;
@@ -19,6 +20,7 @@ public class TransportBindOptions {
     private final String addr;
     private final int port;
     private final SslContext sslContext;
+    private final TlsConfig tlsConfig;
     private final WebSocketProtocolConfig webSocketConfig;
     private final QuicProtocolConfig quicConfig;
     private final EventLoopGroup bossGroup;

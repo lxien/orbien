@@ -42,7 +42,7 @@ public class QuicTransportListener implements TransportListener {
                 ? bindOptions.getQuicConfig()
                 : new QuicProtocolConfig();
         try {
-            TlsConfig tlsConfig = quicConfig.getTlsConfig();
+            TlsConfig tlsConfig = bindOptions.getTlsConfig();
             if (tlsConfig == null) {
                 tlsConfig = new TlsConfig(true);
             }

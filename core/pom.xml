@@ -9,6 +9,9 @@
     <artifactId>orbien-core</artifactId>
     <packaging>jar</packaging>
     <name>orbien-core</name>
+    <properties>
+        <java.version>${client.sdk.java.version}</java.version>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>io.netty</groupId>
@@ -77,5 +80,14 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <release>${client.sdk.java.version}</release>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 </project>

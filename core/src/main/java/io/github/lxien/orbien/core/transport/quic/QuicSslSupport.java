@@ -1,6 +1,7 @@
 package io.github.lxien.orbien.core.transport.quic;
 
 import io.github.lxien.orbien.core.domain.TlsConfig;
+import io.github.lxien.orbien.core.transport.tls.SslKeyLogSupport;
 import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
@@ -36,6 +37,7 @@ final class QuicSslSupport {
             builder.clientAuth(ClientAuth.REQUIRE);
             builder.trustManager(QuicChainTrustManager.create(new File(tlsConfig.getCaFile())));
         }
+        SslKeyLogSupport.applyQuicKeyLog(builder);
         return builder.build();
     }
 
@@ -55,6 +57,7 @@ final class QuicSslSupport {
         } else {
             builder.trustManager(InsecureTrustManagerFactory.INSTANCE);
         }
+        SslKeyLogSupport.applyQuicKeyLog(builder);
         return builder.build();
     }
 }

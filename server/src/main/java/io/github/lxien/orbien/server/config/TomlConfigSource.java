@@ -114,13 +114,10 @@ public class TomlConfigSource implements ConfigSource {
         TransportConfig transportConfig = new TransportConfig();
         if (transport != null) {
             parseTls(transportConfig, transport);
-            parseServerProtocol(transport.getTable("tcp"), transportConfig.getTcp(), DEFAULT_BIND_PORT, true);
             parseServerProtocol(transport.getTable("websocket"), transportConfig.getWebsocket(), 9528, false);
             parseServerProtocol(transport.getTable("quic"), transportConfig.getQuic(), 9529, false);
-        } else {
-            transportConfig.getTcp().setPort(DEFAULT_BIND_PORT);
         }
-        transportConfig.syncLegacyTls();
+        transportConfig.getTcp().setEnabled(true);
         resolveTransportCertPaths(transportConfig, Paths.get(path).toAbsolutePath().normalize().getParent());
         builder.transport(transportConfig);
     }
@@ -142,24 +139,12 @@ public class TomlConfigSource implements ConfigSource {
         if (StringUtils.hasText(addr)) {
             target.setAddr(addr.trim());
         }
-        Long port = table.getLong("port");
-        if (port != null) {
-            validatePort(port.intValue());
-            target.setPort(port.intValue());
-        }
-        Toml tlsTable = table.getTable("tls");
-        if (tlsTable != null) {
-            Boolean tlsEnabled = tlsTable.getBoolean("enabled", true);
-            String certFile = tlsTable.getString("cert_file");
-            String keyFile = tlsTable.getString("key_file");
-            String caFile = tlsTable.getString("ca_file");
-            String keyPass = tlsTable.getString("key_pass");
-            target.setTlsConfig(new TlsConfig(tlsEnabled, certFile, keyFile, caFile, keyPass));
-        }
+        int port = readServerPort(table, defaultPort);
+        target.setPort(port);
         if (target instanceof io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig ws) {
-            String path = table.getString("path");
-            if (StringUtils.hasText(path)) {
-                ws.setPath(path.trim());
+            String wsPath = table.getString("path");
+            if (StringUtils.hasText(wsPath)) {
+                ws.setPath(wsPath.trim());
             }
             Long maxFrame = table.getLong("max_frame_size");
             if (maxFrame != null) {
@@ -176,6 +161,20 @@ public class TomlConfigSource implements ConfigSource {
                 quic.setInitialMaxStreamsBidi(maxStreams.intValue());
             }
         }
+    }
+
+    private int readServerPort(Toml table, int defaultPort) {
+        Long serverPort = table.getLong("server_port");
+        if (serverPort != null) {
+            validatePort(serverPort.intValue());
+            return serverPort.intValue();
+        }
+        Long legacyPort = table.getLong("port");
+        if (legacyPort != null) {
+            validatePort(legacyPort.intValue());
+            return legacyPort.intValue();
+        }
+        return defaultPort;
     }
 
     private void parseTls(TransportConfig transportConfig, Toml transport) {
@@ -195,13 +194,8 @@ public class TomlConfigSource implements ConfigSource {
         if (transportConfig == null || configDir == null) {
             return;
         }
-        transportConfig.setTlsConfig(TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
-        transportConfig.getTcp().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTcp().getTlsConfig(), configDir));
-        transportConfig.getWebsocket().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getWebsocket().getTlsConfig(), configDir));
-        transportConfig.getQuic().setTlsConfig(
-                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getQuic().getTlsConfig(), configDir));
+        transportConfig.setTlsConfig(
+                TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
     }
 
     private void parsePortPool(AppConfig.Builder builder, Toml root) {

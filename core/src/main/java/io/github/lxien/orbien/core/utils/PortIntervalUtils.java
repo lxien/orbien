@@ -49,7 +49,7 @@ public final class PortIntervalUtils {
 
         // 单次扫描合并
         List<PortInterval> merged = new ArrayList<>();
-        PortInterval current = sorted.getFirst();
+        PortInterval current = sorted.get(0);
         for (int i = 1; i < sorted.size(); i++) {
             PortInterval next = sorted.get(i);
             if (next.start() <= current.end() + 1) {

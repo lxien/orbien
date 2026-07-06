@@ -51,9 +51,9 @@ public class TransportListenerManager implements Lifecycle {
         try {
             logger.debug("正在启动 Orbien 传输监听");
             TransportConfig transportConfig = config.getTransportConfig();
-            transportConfig.syncLegacyTls();
+            TlsConfig sharedTls = transportConfig.getTlsConfig();
 
-            SslContext tlsContext = buildSharedTlsContext(transportConfig);
+            SslContext tlsContext = buildSharedTlsContext(sharedTls);
             if (tlsContext != null) {
                 TlsContextHolder.initialize(tlsContext);
             }
@@ -67,19 +67,19 @@ public class TransportListenerManager implements Lifecycle {
 
             TcpProtocolConfig tcp = transportConfig.getTcp();
             if (tcp.isEnabled()) {
-                startListener(TransportProtocol.TCP, tcp.getAddr(), resolveTcpPort(tcp), tlsContext,
+                startListener(TransportProtocol.TCP, null, config.getServerPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, null, transportConfig.getQuic());
             }
 
             WebSocketProtocolConfig websocket = transportConfig.getWebsocket();
             if (websocket.isEnabled()) {
-                startListener(TransportProtocol.WEBSOCKET, websocket.getAddr(), websocket.getPort(), tlsContext,
+                startListener(TransportProtocol.WEBSOCKET, websocket.getAddr(), websocket.getPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, websocket, transportConfig.getQuic());
             }
 
             QuicProtocolConfig quic = transportConfig.getQuic();
             if (quic.isEnabled()) {
-                startListener(TransportProtocol.QUIC, quic.getAddr(), quic.getPort(), tlsContext,
+                startListener(TransportProtocol.QUIC, quic.getAddr(), quic.getPort(), tlsContext, sharedTls,
                         downloadRateLimitHandler, agentManager, transportConfig.getWebsocket(), quic);
             }
 
@@ -93,6 +93,7 @@ public class TransportListenerManager implements Lifecycle {
                                String addr,
                                int port,
                                SslContext tlsContext,
+                               TlsConfig tlsConfig,
                                MultiplexDownloadRateLimitHandler downloadRateLimitHandler,
                                AgentManager agentManager,
                                WebSocketProtocolConfig webSocketConfig,
@@ -106,6 +107,7 @@ public class TransportListenerManager implements Lifecycle {
                 .addr(addr)
                 .port(port)
                 .sslContext(tlsContext)
+                .tlsConfig(tlsConfig)
                 .webSocketConfig(webSocketConfig)
                 .quicConfig(quicConfig)
                 .bossGroup(bossGroup)
@@ -123,16 +125,7 @@ public class TransportListenerManager implements Lifecycle {
         logger.info("[传输] 监听已启动 protocol={} addr={}:{}", protocol.getName(), addr, port);
     }
 
-    private int resolveTcpPort(TcpProtocolConfig tcp) {
-        if (tcp.getPort() > 0) {
-            return tcp.getPort();
-        }
-        return config.getServerPort();
-    }
-
-    private SslContext buildSharedTlsContext(TransportConfig transportConfig) throws Exception {
-        transportConfig.syncLegacyTls();
-        TlsConfig tlsConfig = transportConfig.resolveTls(TransportProtocol.TCP);
+    private SslContext buildSharedTlsContext(TlsConfig tlsConfig) throws Exception {
         if (tlsConfig != null && tlsConfig.isEnabled()) {
             return TlsHelper.buildSslContext(false, tlsConfig, false);
         }

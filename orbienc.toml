@@ -3,6 +3,7 @@ server_port = 9527
 
 [auth]
 token = "414083A8563774142CAC91DDB5C9A2ED"
+########################################################################################################################
 
 [connection]
 [connection.retry]
@@ -20,42 +21,28 @@ encrypt = true
 [connection.pool.direct]
 plain_count = 1
 encrypt_count = 1
+########################################################################################################################
 
-# 控制连接走 TCP；各代理可在 [proxies.transport] 单独指定数据隧道协议
 [transport]
 protocol = "tcp"
 
 [transport.multiplex]
 enabled = true
 
-[transport.tcp]
-port = 9527
-
-[transport.tcp.tls]
+[transport.tls]
 enabled = true
 cert_file = "cert/transport/client.crt"
 key_file = "cert/transport/client.key"
 ca_file = "cert/transport/ca.crt"
 
 [transport.websocket]
-port = 9528
+server_port = 9528
 path = "/tunnel"
 
-[transport.websocket.tls]
-enabled = true
-cert_file = "cert/transport/client.crt"
-key_file = "cert/transport/client.key"
-ca_file = "cert/transport/ca.crt"
-
 [transport.quic]
-port = 9529
+server_port = 9529
 
-[transport.quic.tls]
-enabled = true
-cert_file = "cert/transport/client.crt"
-key_file = "cert/transport/client.key"
-ca_file = "cert/transport/ca.crt"
-
+########################################################################################################################
 [[proxies]]
 name = "http-tcp"
 protocol = "http"
@@ -64,9 +51,8 @@ targets = [
     { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-tcp" }
 ]
 [proxies.transport]
-protocol = "tcp"
-multiplex =false
-encrypt = false
+multiplex =true
+encrypt = true
 compress = false
 
 [[proxies]]
@@ -81,8 +67,6 @@ multiplex =false
 encrypt = false
 compress = false
 
-
-# HTTP + WebSocket
 [[proxies]]
 name = "http-websocket"
 protocol = "http"
@@ -97,7 +81,6 @@ multiplex = true
 encrypt = true
 compress = true
 
-# ③ HTTP + QUIC（QUIC Phase1 仅支持 multiplex）
 [[proxies]]
 name = "http-quic"
 protocol = "http"
@@ -183,6 +166,7 @@ remote_port = 9060
 
 [proxies.transport]
 multiplex = true
+########################################################################################################################
 
 [log]
 level = "debug"

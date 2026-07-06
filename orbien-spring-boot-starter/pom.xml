@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
     <description>orbien-spring-boot-starter</description>
     <properties>
-        <java.version>8</java.version>
+        <java.version>17</java.version>
         <orbien.version>0.20.0</orbien.version>
         <orbien-spring-boot.version>0.3.0</orbien-spring-boot.version>
         <spring-boot.version>2.7.18</spring-boot.version>
@@ -170,8 +170,7 @@
                             <version>${spring-boot.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
                     <encoding>UTF-8</encoding>
                     <compilerArgs>
                         <arg>-Xlint:none</arg>
