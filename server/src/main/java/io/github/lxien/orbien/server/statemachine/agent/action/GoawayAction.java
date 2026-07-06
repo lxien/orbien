@@ -5,7 +5,6 @@ import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.statemachine.agent.*;
-import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
@@ -40,24 +39,34 @@ public class GoawayAction extends AgentBaseAction {
             return;
         }
         String agentId = agentInfo.getAgentId();
+        Channel control = context.getControl();
+
+        if (event == AgentEvent.LOCAL_GOAWAY && control != null && control.isActive()) {
+            logger.info("{} 强制下线，向客户端发送 GOAWAY", agentId);
+            control.eventLoop().execute(() ->
+                    control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY))
+                            .addListener((ChannelFutureListener) future -> {
+                                if (!future.isSuccess()) {
+                                    logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
+                                }
+                                cleanupResources(context, agentId, control);
+                            })
+            );
+            return;
+        }
+        cleanupResources(context, agentId, control);
+    }
+
+    private void cleanupResources(AgentContext context, String agentId, Channel control) {
         logger.debug("{} 客户端断开，开始清理资源", agentId);
         try {
-            // 清理流资源
-            streamManager.fireCloseByAgent(context.getAgentId());
-            // 清理隧道资源
+            streamManager.fireCloseByAgent(agentId);
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
-            //清理连接上下文
             agentManager.removeAgentContext(agentId);
             proxyManager.onAgentOffline(agentId);
-            if (event == AgentEvent.LOCAL_GOAWAY) {
-                Channel control = context.getControl();
-                control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY)).addListener((ChannelFutureListener) future -> {
-                    if (!future.isSuccess()) {
-                        logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
-                    }
-                    ChannelUtils.closeOnFlush(control);
-                });
+            if (control != null) {
+                ChannelUtils.closeOnFlush(control);
             }
             logger.info("{} 客户端资源清理完成", agentId);
         } catch (Exception e) {

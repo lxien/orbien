@@ -24,6 +24,7 @@ public class TunnelClientStartup {
             initLogback(config);
             registerShutdownHook();
             tunnelClient = new TunnelClient(config);
+            tunnelClient.setExitJvmOnStop(true);
             tunnelClient.start();
         } catch (IllegalArgumentException e) {
             logger.error("参数错误: {}", e.getMessage());
@@ -95,11 +96,11 @@ public class TunnelClientStartup {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (tunnelClient != null) {
                 try {
-                    tunnelClient.stop();
+                    tunnelClient.stopFromShutdownHook();
                 } catch (Exception e) {
                     logger.error("停止客户端时发生错误", e);
                 }
             }
-        }));
+        }, "orbien-shutdown-hook"));
     }
 }

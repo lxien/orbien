@@ -190,7 +190,8 @@ public class AgentStateMachineBuilder {
 
             // 来自远程停止客户端
             builder.externalTransitions()
-                    .fromAmong(AgentState.CONNECTED, AgentState.DISCONNECTED, AgentState.FAILED)
+                    .fromAmong(AgentState.CONNECTING, AgentState.CONNECTED,
+                            AgentState.DISCONNECTED, AgentState.FAILED)
                     .to(AgentState.SHUTDOWN)
                     .on(AgentEvent.REMOTE_GOAWAY)
                     .perform(goawayAction);

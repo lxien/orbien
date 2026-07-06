@@ -13,6 +13,9 @@ public class NetworkErrorAction extends AgentBaseAction {
     private final InternalLogger logger= InternalLoggerFactory.getInstance(NetworkErrorAction.class);
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        if (context.isShuttingDown()) {
+            return;
+        }
         logger.error("网络错误");
         context.fireEvent(AgentEvent.RETRY);
     }

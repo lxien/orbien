@@ -75,7 +75,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 break;
             }
             case TMSP.MSG_GOAWAY: {
-                logger.debug("收到停止消息，准备停止客户端");
+                logger.info("收到服务端停止指令，准备停止客户端");
+                agentContext.markShuttingDown();
                 agentContext.fireEvent(AgentEvent.REMOTE_GOAWAY);
                 break;
             }
@@ -190,6 +191,10 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     public void channelInactive(ChannelHandlerContext ctx) {
         //如果是控制连接断开，需要进行重连
         if (agentContext.getControl() == ctx.channel()) {
+            if (agentContext.isShuttingDown()) {
+                logger.debug("控制连接已关闭（主动停止）");
+                return;
+            }
             logger.warn("与服务器断开连接");
             agentContext.fireEvent(AgentEvent.DISCONNECT);
         } else {

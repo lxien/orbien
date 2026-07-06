@@ -31,6 +31,9 @@ public class ConnRetryAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext ctx) {
+        if (ctx.isShuttingDown()) {
+            return;
+        }
         ConnectionConfig connectionConfig = ctx.getConfig().getConnectionConfig();
         RetryConfig retryConfig = connectionConfig.getRetryConfig();
         int currentRetry = ctx.getRetryCount().incrementAndGet();
@@ -44,6 +47,9 @@ public class ConnRetryAction extends AgentBaseAction {
         logger.warn("连接失败，第 {} 次重连将在 {} 秒后执行...", currentRetry, delay);
 
         ctx.getControlWorkerGroup().schedule(() -> {
+            if (ctx.isShuttingDown()) {
+                return;
+            }
             logger.info("开始执行第 {} 次重连", currentRetry);
             ctx.fireEvent(AgentEvent.RETRY);
         }, delay, TimeUnit.SECONDS);

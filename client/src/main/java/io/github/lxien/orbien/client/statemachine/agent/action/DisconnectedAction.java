@@ -23,6 +23,9 @@ import io.github.lxien.orbien.core.utils.ChannelUtils;
 public class DisconnectedAction extends AgentBaseAction {
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        if (context.isShuttingDown()) {
+            return;
+        }
          //前置处理
         ChannelUtils.closeOnFlush(context.getControl());
         //重新连接

@@ -88,7 +88,10 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public void kickout(String agentId) {
-        logger.debug("强制客户端下线：{}", agentId);
+        if (!agentManager.isOnline(agentId)) {
+            throw new BizException("客户端未在线，无法强退");
+        }
+        logger.info("强制客户端下线：{}", agentId);
         agentManager.kickout(agentId);
     }
 

@@ -37,6 +37,10 @@ public class AgentContext extends AbstractAgentContext {
     private AgentIdentity agentIdentity;
     private final AtomicInteger retryCount = new AtomicInteger(0);
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;
+    /**
+     * 收到停止指令后拒绝重连
+     */
+    private volatile boolean shuttingDown;
 
     public AgentContext(AppConfig config, StateMachine<AgentState, AgentEvent, AgentContext> stateMachine) {
         this.config = config;
@@ -48,7 +52,18 @@ public class AgentContext extends AbstractAgentContext {
     }
 
     public void fireEvent(AgentEvent clientEvent) {
+        if (shuttingDown && clientEvent != AgentEvent.REMOTE_GOAWAY && clientEvent != AgentEvent.LOCAL_GOAWAY) {
+            return;
+        }
         stateMachine.fireEvent(state, clientEvent, this);
+    }
+
+    public boolean isShuttingDown() {
+        return shuttingDown || state == AgentState.SHUTDOWN;
+    }
+
+    public void markShuttingDown() {
+        shuttingDown = true;
     }
 
     public TunnelEntry getConn(TransportProtocol protocol, boolean encrypt, boolean multiplex) {

@@ -9,6 +9,7 @@ import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.client.transport.ControlIdleCheckHandler;
 import io.github.lxien.orbien.client.transport.HeartbeatHandler;
 import io.github.lxien.orbien.client.health.HealthCheckHolder;
+import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -34,6 +35,12 @@ public class ConnectAction extends AgentBaseAction {
                         .addLast(new HeartbeatHandler(30))
                         .addLast(NettyConstants.CONTROL_FRAME_HANDLER, ctx.getControlFrameHandler())
         ).whenComplete((session, error) -> {
+            if (ctx.isShuttingDown()) {
+                if (session != null && session.nettyChannel() != null) {
+                    ChannelUtils.closeOnFlush(session.nettyChannel());
+                }
+                return;
+            }
             if (error != null) {
                 logger.error("无法连接到代理服务器：{}:{}", appConfig.getServerAddr(), appConfig.getServerPort(), error);
                 ctx.fireEvent(AgentEvent.CONNECT_FAILURE);

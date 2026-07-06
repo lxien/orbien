@@ -82,7 +82,18 @@ public class AgentManager {
 
     public void kickout(String agentId) {
         AgentContext agentContext = agentToContextMap.get(agentId);
-        if (agentContext != null) {
+        if (agentContext == null) {
+            logger.debug("强制下线跳过，客户端不在线: {}", agentId);
+            return;
+        }
+        if (agentContext.getState() != AgentState.CONNECTED) {
+            logger.debug("强制下线跳过，客户端状态非 CONNECTED: {} state={}", agentId, agentContext.getState());
+            return;
+        }
+        Channel control = agentContext.getControl();
+        if (control != null && control.isActive()) {
+            control.eventLoop().execute(() -> agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY));
+        } else {
             agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }

@@ -2,6 +2,7 @@ package io.github.lxien.orbien.client;
 
 import io.github.lxien.orbien.client.config.AppConfig;
 import io.github.lxien.orbien.client.config.ConfigUtils;
+import io.github.lxien.orbien.client.health.HealthCheckHolder;
 import io.github.lxien.orbien.client.identity.AgentIdentity;
 import io.github.lxien.orbien.client.transport.ControlFrameHandler;
 import io.github.lxien.orbien.client.transport.RealServerHandler;
@@ -18,8 +19,13 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.SocketChannel;
+import io.netty.util.concurrent.Future;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.Setter;
+
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 代理客户端服务容器
@@ -27,9 +33,15 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 public final class TunnelClient implements Lifecycle {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(TunnelClient.class);
     private final AppConfig config;
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
     private EventLoopGroup controlWorkerGroup;
     private EventLoopGroup serverWorkBootstrap;
     private AgentContext agentContext;
+    /**
+     * 独立进程模式下停止后退出 JVM。
+     */
+    @Setter
+    private volatile boolean exitJvmOnStop;
 
     public TunnelClient(AppConfig config) {
         this.config = config;
@@ -88,14 +100,64 @@ public final class TunnelClient implements Lifecycle {
 
     @Override
     public void stop() {
-        if (controlWorkerGroup != null) {
-            controlWorkerGroup.shutdownGracefully();
+        stopInternal(false);
+    }
+
+    /**
+     * JVM shutdown hook 调用：只做资源清理，不再触发进程退出。
+     */
+    void stopFromShutdownHook() {
+        stopInternal(true);
+    }
+
+    private void stopInternal(boolean fromShutdownHook) {
+        if (!stopped.compareAndSet(false, true)) {
+            return;
         }
-        if (serverWorkBootstrap != null) {
-            serverWorkBootstrap.shutdownGracefully();
+        if (agentContext != null) {
+            agentContext.markShuttingDown();
         }
         try {
-            Thread.sleep(1000);
+            HealthCheckHolder.shutdown();
+        } catch (IllegalStateException ignored) {
+            // 尚未初始化
+        }
+
+        Future<?> controlShutdown = null;
+        Future<?> serverShutdown = null;
+        if (controlWorkerGroup != null) {
+            controlShutdown = controlWorkerGroup.shutdownGracefully(0, 2, TimeUnit.SECONDS);
+        }
+        if (serverWorkBootstrap != null) {
+            serverShutdown = serverWorkBootstrap.shutdownGracefully(0, 2, TimeUnit.SECONDS);
+        }
+
+        if (exitJvmOnStop && !fromShutdownHook) {
+            logger.info("客户端已停止，退出进程");
+            scheduleProcessExit(controlShutdown, serverShutdown);
+        }
+    }
+
+    /**
+     * 强退等场景必须在独立线程退出：若在 Netty EventLoop 上 System.exit，
+     * shutdown hook 会再次 shutdownGracefully，与 EventLoop 线程互相等待导致死锁。
+     */
+    private void scheduleProcessExit(Future<?> controlShutdown, Future<?> serverShutdown) {
+        Thread exitThread = new Thread(() -> {
+            awaitQuietly(controlShutdown, 3);
+            awaitQuietly(serverShutdown, 3);
+            Runtime.getRuntime().halt(0);
+        }, "orbien-exit");
+        exitThread.setDaemon(false);
+        exitThread.start();
+    }
+
+    private static void awaitQuietly(Future<?> future, long timeoutSeconds) {
+        if (future == null) {
+            return;
+        }
+        try {
+            future.await(timeoutSeconds, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
