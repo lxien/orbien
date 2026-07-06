@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.server.config.domain;
 
+import io.github.lxien.orbien.common.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,6 +14,9 @@ public class DashboardConfig {
     private String password;
     private String addr;
     private Integer port;
+    private String certFile;
+    private String keyFile;
+    private String keyPassword;
 
     public DashboardConfig(boolean enabled) {
         this.enabled=enabled;
@@ -23,5 +27,9 @@ public class DashboardConfig {
         this.password = password;
         this.addr = addr;
         this.port = port;
+    }
+
+    public boolean isSslEnabled() {
+        return StringUtils.hasText(certFile) && StringUtils.hasText(keyFile);
     }
 }

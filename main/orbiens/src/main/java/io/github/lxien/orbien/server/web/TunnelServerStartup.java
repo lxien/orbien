@@ -17,6 +17,7 @@
 package io.github.lxien.orbien.server.web;
 
 import io.github.lxien.orbien.server.config.AppConfig;
+import io.github.lxien.orbien.server.config.DashboardSpringBootSupport;
 import io.github.lxien.orbien.server.config.domain.DashboardConfig;
 import io.github.lxien.orbien.server.config.ConfigParser;
 import io.github.lxien.orbien.core.transport.NettyJvmSupport;
@@ -40,7 +41,7 @@ public class TunnelServerStartup {
         DashboardConfig dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);
         if (Boolean.TRUE.equals(dashboard.getEnabled())) {
-            builder.properties("spring.main.web-application-type=servlet", "server.port=" + dashboard.getPort());
+            DashboardSpringBootSupport.apply(builder, dashboard);
         } else {
             builder.properties("spring.main.web-application-type=none");
         }

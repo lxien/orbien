@@ -33,6 +33,10 @@ public final class TlsConfigSupport {
         );
     }
 
+    public static String resolveAbsolutePath(Path configDir, String path) {
+        return resolvePath(configDir, path);
+    }
+
     private static String resolvePath(Path configDir, String path) {
         if (!StringUtils.hasText(path)) {
             return path;

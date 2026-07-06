@@ -97,6 +97,9 @@ public class TomlConfigSource implements ConfigSource {
                 Long port = dash.getLong("port", (long) DEFAULT_DASHBOARD_PORT);
                 String username = dash.getString("username");
                 String password = dash.getString("password");
+                String certFile = dash.getString("cert_file");
+                String keyFile = dash.getString("key_file");
+                String keyPass = dash.getString("key_pass");
                 if (!StringUtils.hasText(username)) {
                     throw new IllegalArgumentException("请配置 Dashboard 用户名");
                 }
@@ -104,6 +107,11 @@ public class TomlConfigSource implements ConfigSource {
                     throw new IllegalArgumentException("请配置 Dashboard 密码");
                 }
                 DashboardConfig dashboard = new DashboardConfig(enabled, username, password, addr, port.intValue());
+                dashboard.setCertFile(trimToNull(certFile));
+                dashboard.setKeyFile(trimToNull(keyFile));
+                dashboard.setKeyPassword(trimToNull(keyPass));
+                validateDashboardSsl(dashboard);
+                resolveDashboardCertPaths(dashboard, Paths.get(path).toAbsolutePath().normalize().getParent());
                 builder.dashboard(dashboard);
             }
         }
@@ -192,6 +200,30 @@ public class TomlConfigSource implements ConfigSource {
         }
         transportConfig.setTlsConfig(
                 TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
+    }
+
+    private void validateDashboardSsl(DashboardConfig dashboard) {
+        boolean hasCert = StringUtils.hasText(dashboard.getCertFile());
+        boolean hasKey = StringUtils.hasText(dashboard.getKeyFile());
+        if (hasCert != hasKey) {
+            throw new IllegalArgumentException("[dashboard] cert_file 与 key_file 需同时配置");
+        }
+    }
+
+    private void resolveDashboardCertPaths(DashboardConfig dashboard, Path configDir) {
+        if (dashboard == null || configDir == null || !dashboard.isSslEnabled()) {
+            return;
+        }
+        dashboard.setCertFile(TlsConfigSupport.resolveAbsolutePath(configDir, dashboard.getCertFile()));
+        dashboard.setKeyFile(TlsConfigSupport.resolveAbsolutePath(configDir, dashboard.getKeyFile()));
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private void parsePortPool(AppConfig.Builder builder, Toml root) {
