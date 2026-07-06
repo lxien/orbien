@@ -19,6 +19,7 @@ package io.github.lxien.orbien.server.web.proxy.listener.persistence;
 import io.github.lxien.orbien.core.notify.EventBus;
 import io.github.lxien.orbien.core.notify.EventListener;
 import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
+import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
@@ -64,6 +65,8 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private CertBindingSyncService certBindingSyncService;
     @Autowired
+    private HealthManager healthManager;
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @PostConstruct
@@ -108,6 +111,7 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
         }
 
         metricsService.deleteByProxyId(proxyId);
+        healthManager.removeProxy(proxyId);
         proxyRepository.deleteById(proxyId);
         logger.debug("代理配置已从数据库删除: agentId={}, proxyId={}, name={}",
                 proxyDO.getAgentId(), proxyId, proxyDO.getName());

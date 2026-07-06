@@ -39,7 +39,6 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     commonMenus.access,
     commonMenus.load,
     commonMenus.trans,
-    commonMenus.health,
     commonMenus.limit
   ],
   [ProtocolType.HTTP]: [

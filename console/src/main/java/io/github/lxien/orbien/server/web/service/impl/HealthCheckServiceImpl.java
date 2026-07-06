@@ -19,6 +19,7 @@ import io.github.lxien.orbien.core.enums.HealthCheckType;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.dto.healthcheck.HealthCheckDTO;
 import io.github.lxien.orbien.server.web.entity.HealthCheckDO;
+import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.param.healthcheck.HealthCheckSaveParam;
 import io.github.lxien.orbien.server.web.param.healthcheck.HealthCheckStatusUpdateParam;
 import io.github.lxien.orbien.server.web.repository.HealthCheckRepository;
@@ -47,6 +48,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
 
     @Override
     public HealthCheckDTO getByProxyId(String proxyId) {
+        assertHealthCheckSupported(proxyId);
         HealthCheckDO healthCheckDO = healthCheckRepository.findById(proxyId)
                 .orElseThrow(() -> new BizException("健康检查配置不存在"));
         return healthCheckConvert.toDTO(healthCheckDO);
@@ -55,6 +57,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void save(HealthCheckSaveParam param) {
+        assertHealthCheckSupported(param.getProxyId());
         ensureProxyExists(param.getProxyId());
         HealthCheckType type = HealthCheckType.fromCode(param.getType());
         if (type == null) {
@@ -75,6 +78,7 @@ public class HealthCheckServiceImpl implements HealthCheckService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateStatus(HealthCheckStatusUpdateParam param) {
+        assertHealthCheckSupported(param.getProxyId());
         ensureProxyExists(param.getProxyId());
         HealthCheckDO healthCheckDO = healthCheckRepository.findById(param.getProxyId())
                 .orElseThrow(() -> new BizException("健康检查配置不存在"));
@@ -86,6 +90,14 @@ public class HealthCheckServiceImpl implements HealthCheckService {
     private void ensureProxyExists(String proxyId) {
         if (!proxyRepository.existsById(proxyId)) {
             throw new BizException("代理配置不存在");
+        }
+    }
+
+    private void assertHealthCheckSupported(String proxyId) {
+        ProxyDO proxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        if (proxyDO.getProtocol().isUdp()) {
+            throw new BizException("UDP 代理暂不支持健康检查");
         }
     }
 }

@@ -171,7 +171,8 @@ public class ProxyConfigAssembler {
             return;
         }
         HealthCheckConfig healthCheck = new HealthCheckConfig();
-        healthCheck.setEnabled(Boolean.TRUE.equals(healthCheckDO.getEnabled()));
+        boolean enabled = Boolean.TRUE.equals(healthCheckDO.getEnabled()) && !config.isUdp();
+        healthCheck.setEnabled(enabled);
         healthCheck.setType(healthCheckDO.getType());
         healthCheck.setInterval(healthCheckDO.getInterval());
         healthCheck.setTimeout(healthCheckDO.getTimeout());

@@ -36,6 +36,15 @@ public class ProxyManager {
      * 同步来自服务端全量最新配置
      */
     public void apply(List<Message.RuntimeInfo> proxies) {
+        Set<String> incomingIds = new HashSet<>();
+        for (Message.RuntimeInfo runtimeInfo : proxies) {
+            incomingIds.add(runtimeInfo.getProxyId());
+        }
+        for (String proxyId : new ArrayList<>(map.keySet())) {
+            if (!incomingIds.contains(proxyId)) {
+                delete(proxyId);
+            }
+        }
         map.clear();
         for (Message.RuntimeInfo runtimeInfo : proxies) {
             map.put(runtimeInfo.getProxyId(), runtimeInfo);

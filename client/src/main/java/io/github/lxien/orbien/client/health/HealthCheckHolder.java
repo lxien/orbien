@@ -1,21 +1,3 @@
-/*
- *
- *  *    Copyright 2026 lxien
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
- *
- */
-
 package io.github.lxien.orbien.client.health;
 
 import io.netty.channel.Channel;
@@ -26,16 +8,19 @@ public final class HealthCheckHolder {
     private HealthCheckHolder() {
     }
 
+    /**
+     * 初始化或更新控制通道。重连时必须传入新的 control，否则健康状态仍会发往已断开的连接。
+     */
     public static void init(Channel control) {
         if (control == null) {
             throw new IllegalArgumentException("control cannot be null");
         }
 
-        if (INSTANCE == null) {
-            synchronized (HealthCheckHolder.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new HealthCheckManager(control);
-                }
+        synchronized (HealthCheckHolder.class) {
+            if (INSTANCE == null) {
+                INSTANCE = new HealthCheckManager(control);
+            } else {
+                INSTANCE.updateControlChannel(control);
             }
         }
     }
@@ -49,13 +34,10 @@ public final class HealthCheckHolder {
     }
 
     public static void shutdown() {
-        HealthCheckManager manager = INSTANCE;
-        if (manager != null) {
-            synchronized (HealthCheckHolder.class) {
-                if (INSTANCE != null) {
-                    manager.shutdown();
-                    INSTANCE = null;
-                }
+        synchronized (HealthCheckHolder.class) {
+            if (INSTANCE != null) {
+                INSTANCE.shutdown();
+                INSTANCE = null;
             }
         }
     }

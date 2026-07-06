@@ -67,9 +67,9 @@ public class ProxyRuntimeSyncService {
 
     private void applyHealthCheckLifecycle(ProxyConfig config) {
         HealthCheckConfig healthCheck = config.getHealthCheck();
-        if (healthCheck == null || !healthCheck.isEnabled()) {
+        if (config.isUdp() || healthCheck == null || !healthCheck.isEnabled()) {
             healthManager.removeProxy(config.getProxyId());
-            logger.debug("健康检查已关闭，清除代理 {} 的运行时健康状态", config.getProxyId());
+            logger.debug("健康检查已关闭或不适用于 UDP，清除代理 {} 的运行时健康状态", config.getProxyId());
         }
     }
 }

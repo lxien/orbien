@@ -123,7 +123,7 @@ const {
       {
         prop: 'targets',
         label: '内网服务',
-        formatter: (row: UdpProxyItem) => renderTargetTags(row.targets)
+        formatter: (row: UdpProxyItem) => renderTargetTags(row.targets, {showHealth: false})
       },
       {
         prop: 'status',

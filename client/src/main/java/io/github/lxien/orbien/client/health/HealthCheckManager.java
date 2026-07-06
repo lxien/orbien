@@ -7,6 +7,7 @@ import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
@@ -22,7 +23,7 @@ public class HealthCheckManager {
     private final Map<String, ScheduledFuture<?>> proxyTasks = new ConcurrentHashMap<>();
     private final Set<ServiceHealth> pendingReports = ConcurrentHashMap.newKeySet();
 
-    private final Channel control;
+    private volatile Channel control;
 
     public HealthCheckManager(Channel control) {
         this.healthChecker = new HealthChecker();
@@ -42,11 +43,14 @@ public class HealthCheckManager {
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown, "HealthCheck-Shutdown"));
     }
 
-    /**
-     * 启动心跳健康检查，如果存在则先取消再启动
-     *
-     * @param runtimeInfo 代理运行时信息
-     */
+    public void updateControlChannel(Channel control) {
+        if (control == null) {
+            throw new IllegalArgumentException("control cannot be null");
+        }
+        this.control = control;
+        logger.debug("健康检查控制通道已更新 active={}", control.isActive());
+    }
+
     public void startHealthCheck(Message.RuntimeInfo runtimeInfo) {
         String proxyId = runtimeInfo.getProxyId();
         stopHealthCheck(proxyId);
@@ -133,35 +137,52 @@ public class HealthCheckManager {
         if (pendingReports.isEmpty()) {
             return;
         }
+        Channel currentControl = control;
+        if (currentControl == null || !currentControl.isActive()) {
+            logger.debug("控制连接不可用，暂缓健康状态上报，队列长度: {}", pendingReports.size());
+            return;
+        }
+
         List<ServiceHealth> toReport = pendingReports.stream()
                 .filter(item -> isHealthCheckActive(item.getProxyId()))
                 .toList();
-        pendingReports.clear();
         if (toReport.isEmpty()) {
+            pendingReports.clear();
             return;
         }
+
+        pendingReports.removeAll(toReport);
         logger.debug("上报服务健康状态个数：{}", toReport.size());
-        List<Message.ServiceHealth> list = toReport.stream().map(serviceHealth -> {
-            return Message.ServiceHealth.newBuilder()
-                    .setProxyId(serviceHealth.getProxyId())
-                    .setHost(serviceHealth.getHost())
-                    .setPort(serviceHealth.getPort())
-                    .setStatus(serviceHealth.getStatus())
-                    .setResponseTimeMs(serviceHealth.getResponseTimeMs() != null ? serviceHealth.getResponseTimeMs() : 0L)
-                    .build();
-        }).toList();
+
+        List<Message.ServiceHealth> list = toReport.stream().map(serviceHealth ->
+                Message.ServiceHealth.newBuilder()
+                        .setProxyId(serviceHealth.getProxyId())
+                        .setHost(serviceHealth.getHost())
+                        .setPort(serviceHealth.getPort())
+                        .setStatus(serviceHealth.getStatus())
+                        .setResponseTimeMs(serviceHealth.getResponseTimeMs() != null ? serviceHealth.getResponseTimeMs() : 0L)
+                        .build()
+        ).toList();
+
         Message.BatchReportServiceHealthRequest request = Message.BatchReportServiceHealthRequest
                 .newBuilder()
                 .addAllItems(list)
                 .build();
 
-        ByteBuf buf = ProtobufUtil.toByteBuf(request, control.alloc());
+        ByteBuf buf = ProtobufUtil.toByteBuf(request, currentControl.alloc());
         TMSPFrame frame = new TMSPFrame(0, TMSP.MSG_SERVICE_HEALTH_REPORT, buf);
-        control.writeAndFlush(frame);
+        currentControl.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            if (!future.isSuccess()) {
+                pendingReports.addAll(toReport);
+                logger.warn("健康状态上报失败，已重新入队: {}", future.cause() != null ? future.cause().getMessage() : "unknown");
+            }
+        });
     }
 
     public void shutdown() {
         proxyTasks.values().forEach(f -> f.cancel(true));
+        proxyTasks.clear();
+        pendingReports.clear();
         checkScheduler.shutdown();
         reportScheduler.shutdown();
         healthChecker.shutdown();

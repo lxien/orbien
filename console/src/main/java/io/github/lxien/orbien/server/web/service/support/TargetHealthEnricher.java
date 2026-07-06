@@ -19,7 +19,9 @@ package io.github.lxien.orbien.server.web.service.support;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.dto.proxy.TargetDTO;
+import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.HealthCheckRepository;
+import io.github.lxien.orbien.server.web.repository.ProxyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -35,9 +37,11 @@ public class TargetHealthEnricher {
     private HealthManager healthManager;
     @Autowired
     private HealthCheckRepository healthCheckRepository;
+    @Autowired
+    private ProxyRepository proxyRepository;
 
     public void enrich(String proxyId, List<TargetDTO> targets) {
-        if (CollectionUtils.isEmpty(targets) || !isHealthCheckEnabled(proxyId)) {
+        if (CollectionUtils.isEmpty(targets) || isUdpProxy(proxyId) || !isHealthCheckEnabled(proxyId)) {
             return;
         }
         fillHealthStatus(proxyId, targets);
@@ -47,6 +51,10 @@ public class TargetHealthEnricher {
         if (CollectionUtils.isEmpty(targetsByProxyId)) {
             return;
         }
+        Set<String> udpProxyIds = proxyRepository.findAllById(targetsByProxyId.keySet()).stream()
+                .filter(proxy -> proxy.getProtocol().isUdp())
+                .map(ProxyDO::getId)
+                .collect(Collectors.toSet());
         Set<String> enabledProxyIds = healthCheckRepository
                 .findByProxyIdIn(List.copyOf(targetsByProxyId.keySet()))
                 .stream()
@@ -54,7 +62,7 @@ public class TargetHealthEnricher {
                 .map(item -> item.getProxyId())
                 .collect(Collectors.toSet());
         for (Map.Entry<String, List<TargetDTO>> entry : targetsByProxyId.entrySet()) {
-            if (!enabledProxyIds.contains(entry.getKey())) {
+            if (udpProxyIds.contains(entry.getKey()) || !enabledProxyIds.contains(entry.getKey())) {
                 continue;
             }
             fillHealthStatus(entry.getKey(), entry.getValue());
@@ -75,6 +83,12 @@ public class TargetHealthEnricher {
     private boolean isHealthCheckEnabled(String proxyId) {
         return healthCheckRepository.findById(proxyId)
                 .map(item -> Boolean.TRUE.equals(item.getEnabled()))
+                .orElse(false);
+    }
+
+    private boolean isUdpProxy(String proxyId) {
+        return proxyRepository.findById(proxyId)
+                .map(proxy -> proxy.getProtocol().isUdp())
                 .orElse(false);
     }
 }

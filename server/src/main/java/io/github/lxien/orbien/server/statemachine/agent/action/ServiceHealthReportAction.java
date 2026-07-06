@@ -1,21 +1,3 @@
-/*
- *
- *  *    Copyright 2026 lxien
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
- *
- */
-
 package io.github.lxien.orbien.server.statemachine.agent.action;
 
 import io.github.lxien.orbien.core.message.Message;
@@ -28,6 +10,7 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -42,11 +25,23 @@ public class ServiceHealthReportAction extends AgentBaseAction {
         Message.BatchReportServiceHealthRequest req = context.getAndRemoveAs(
                 AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST,
                 Message.BatchReportServiceHealthRequest.class);
+        if (req == null || CollectionUtils.isEmpty(req.getItemsList())) {
+            logger.debug("收到空的健康状态上报，忽略");
+            return;
+        }
 
         List<Message.ServiceHealth> items = req.getItemsList();
+        int updated = 0;
         for (Message.ServiceHealth item : items) {
+            if (item.getStatus() == Message.HealthStatus.UNKNOWN) {
+                continue;
+            }
             logger.debug("更新代理服务健康：{},{}:{},{}", item.getProxyId(), item.getHost(), item.getPort(), item.getStatus());
             healthManager.updateHealth(item.getProxyId(), item.getHost(), item.getPort(), item.getStatus());
+            updated++;
+        }
+        if (updated > 0) {
+            logger.debug("批量更新健康状态完成，条数: {}", updated);
         }
     }
 }

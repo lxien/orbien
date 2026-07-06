@@ -35,6 +35,8 @@ public class AgentStateMachineConfig {
     private RetryTimeoutAction retryTimeoutAction;
     @Autowired
     private ServiceHealthReportAction serviceHealthReportAction;
+    @Autowired
+    private AgentDisconnectHealthCleanupAction agentDisconnectHealthCleanupAction;
 
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
@@ -94,7 +96,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.DISCONNECT)
                 .when(ctx -> true)
-                .perform((from, to, event, context) -> context.setState(to));
+                .perform(agentDisconnectHealthCleanupAction);
 
         // 心跳超时
         builder.externalTransition()
@@ -102,7 +104,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.HEARTBEAT_TIMEOUT)
                 .when(ctx -> true)
-                .perform(heartbeatTimeoutAction);
+                .perform(agentDisconnectHealthCleanupAction);
 
         // 认证中断开
         builder.externalTransition()

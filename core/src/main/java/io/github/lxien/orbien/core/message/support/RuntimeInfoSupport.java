@@ -130,9 +130,11 @@ public final class RuntimeInfoSupport {
             builder.addAllRemoteAddr(remoteAddrs);
         }
 
-        Message.HealthCheck healthCheck = toHealthCheckProto(config.getHealthCheck());
-        if (healthCheck != null) {
-            builder.setHealthCheck(healthCheck);
+        if (!config.isUdp()) {
+            Message.HealthCheck healthCheck = toHealthCheckProto(config.getHealthCheck());
+            if (healthCheck != null) {
+                builder.setHealthCheck(healthCheck);
+            }
         }
 
         applyTransport(builder, config);

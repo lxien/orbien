@@ -233,13 +233,26 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 }
                 //代理服务节点健康状态上报
                 case TMSP.MSG_SERVICE_HEALTH_REPORT -> {
-                     logger.debug("代理服务节点健康状态上报");
-                    agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-                        Message.BatchReportServiceHealthRequest proxies = ProtobufUtil.parseFrom(frame.getPayload(),
-                                Message.BatchReportServiceHealthRequest.parser());
-                        agentContext.setVariable(AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST, proxies);
-                        agentContext.fireEvent(AgentEvent.SERVICE_HEALTH_REPORT);
-                    });
+                    Optional<AgentContext> agentOpt = agentManager.getAgentContext(ctx.channel());
+                    if (agentOpt.isEmpty()) {
+                        logger.warn("收到健康状态上报但 AgentContext 不存在，已丢弃");
+                        break;
+                    }
+                    AgentContext agentContext = agentOpt.get();
+                    if (agentContext.getState() != AgentState.CONNECTED) {
+                        logger.debug("Agent 状态为 {}，忽略健康状态上报", agentContext.getState());
+                        break;
+                    }
+                    if (frame.getPayload() == null) {
+                        logger.warn("健康状态上报 payload 为空，已丢弃");
+                        break;
+                    }
+                    logger.debug("代理服务节点健康状态上报 agentId={}", agentContext.getAgentId());
+                    Message.BatchReportServiceHealthRequest healthReq = ProtobufUtil.parseFrom(
+                            frame.getPayload(),
+                            Message.BatchReportServiceHealthRequest.parser());
+                    agentContext.setVariable(AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST, healthReq);
+                    agentContext.fireEvent(AgentEvent.SERVICE_HEALTH_REPORT);
                 }
             }
         } catch (Exception e) {

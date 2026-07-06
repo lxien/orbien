@@ -34,6 +34,7 @@ import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyConfigSyncService;
+import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
@@ -107,6 +108,8 @@ public class ProxyServiceImpl implements ProxyService {
     private TargetHealthEnricher targetHealthEnricher;
     @Autowired
     private ProxyRuntimeSyncService proxyRuntimeSyncService;
+    @Autowired
+    private HealthManager healthManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -400,12 +403,14 @@ public class ProxyServiceImpl implements ProxyService {
             throw new BizException("无效的负载均衡策略");
         }
 
+        List<ProxyTargetDO> targetRecords = proxyTargetRepository.findByProxyId(proxyId);
         List<ProxyTargetSaveParam> normalizedTargets = normalizeClusterTargets(param.getTargets());
         proxyDO.setLoadBalanceStrategy(strategy);
         proxyRepository.save(proxyDO);
 
         proxyTargetRepository.deleteByProxyId(proxyId);
         proxyTargetRepository.saveAll(proxyTargetConvert.toDOList(normalizedTargets, proxyId));
+        cleanupStaleTargetHealth(proxyId, targetRecords, normalizedTargets);
 
         transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(proxyId));
         logger.debug("代理 {} 负载均衡配置保存成功，后端数量: {}", proxyDO.getName(), normalizedTargets.size());
@@ -671,6 +676,23 @@ public class ProxyServiceImpl implements ProxyService {
         return normalized;
     }
 
+    private void cleanupStaleTargetHealth(String proxyId,
+                                          List<ProxyTargetDO> previousTargets,
+                                          List<ProxyTargetSaveParam> currentTargets) {
+        if (CollectionUtils.isEmpty(previousTargets)) {
+            return;
+        }
+        Set<String> currentKeys = currentTargets.stream()
+                .map(target -> target.getHost() + ":" + target.getPort())
+                .collect(Collectors.toSet());
+        for (ProxyTargetDO previous : previousTargets) {
+            String key = previous.getHost() + ":" + previous.getPort();
+            if (!currentKeys.contains(key)) {
+                healthManager.removeTarget(proxyId, previous.getHost(), previous.getPort());
+            }
+        }
+    }
+
     private ProxyTargetDO buildHttpTarget(String localHost, Integer localPort, String name, String proxyId) {
         ProxyTargetDO target = new ProxyTargetDO();
         target.setProxyId(proxyId);
@@ -908,17 +930,14 @@ public class ProxyServiceImpl implements ProxyService {
         List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
         Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds).stream()
                 .collect(java.util.stream.Collectors.groupingBy(ProxyTargetDO::getProxyId));
-        Map<String, List<TargetDTO>> targetDtoMap = new HashMap<>();
         List<UdpProxyListDTO> res = new ArrayList<>();
         for (ProxyDO proxyDO : content) {
             UdpProxyListDTO udpListDTO = proxyConvert.toUdpListDTO(proxyDO);
             List<TargetDTO> targets = proxyTargetConvert.toDTOList(
                     targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
-            targetDtoMap.put(proxyDO.getId(), targets);
             udpListDTO.setTargets(targets);
             res.add(udpListDTO);
         }
-        targetHealthEnricher.enrichBatch(targetDtoMap);
         return PageResult.wrap(resultPage, res);
     }
 
