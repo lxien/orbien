@@ -19,7 +19,7 @@
 package io.github.lxien.orbien.server.web.service.impl;
 
 import io.github.lxien.orbien.core.enums.ProtocolType;
-import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
+import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.common.exception.SystemException;
 import io.github.lxien.orbien.server.web.dto.binding.*;
@@ -27,16 +27,16 @@ import io.github.lxien.orbien.server.web.dto.binding.*;
 import io.github.lxien.orbien.server.web.entity.CertDomainBinding;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.entity.ProxyDomainDO;
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import io.github.lxien.orbien.server.web.enums.BindStatus;
-import io.github.lxien.orbien.server.web.enums.SslStatus;
+import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import io.github.lxien.orbien.server.web.param.binding.CertBindParam;
 import io.github.lxien.orbien.server.web.param.binding.CertBindPreviewParam;
 import io.github.lxien.orbien.server.web.param.binding.CertRebindParam;
 import io.github.lxien.orbien.server.web.repository.CertDomainBindingRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyDomainRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyRepository;
-import io.github.lxien.orbien.server.web.repository.SslCertRepository;
+import io.github.lxien.orbien.server.web.repository.TlsCertRepository;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.DomainCertMatcher;
 import lombok.RequiredArgsConstructor;
@@ -60,15 +60,15 @@ public class CertBindingServiceImpl implements CertBindingService {
     private static final Logger logger = LoggerFactory.getLogger(CertBindingServiceImpl.class);
 
     private final CertDomainBindingRepository bindingRepository;
-    private final SslCertRepository sslCertRepository;
+    private final TlsCertRepository tlsCertRepository;
     private final ProxyDomainRepository proxyDomainRepository;
     private final ProxyRepository proxyRepository;
-    private final SslCertificateManager sslCertificateManager;
+    private final TlsCertificateManager tlsCertificateManager;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CertBindResultDTO bind(CertBindParam param) {
-        SslCertDO cert = requireActiveCert(param.getCertId());
+        TlsCertDO cert = requireActiveCert(param.getCertId());
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
         File keyFile = requireCertFile(cert.getKeyPath(), "证书私钥文件不存在");
         File certFile = requireCertFile(cert.getFullChainPath(), "证书链文件不存在");
@@ -90,7 +90,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
     @Override
     public List<CertBindPreviewItemDTO> preview(CertBindPreviewParam param) {
-        SslCertDO cert = sslCertRepository.findById(param.getCertId())
+        TlsCertDO cert = tlsCertRepository.findById(param.getCertId())
                 .orElseThrow(() -> new BizException("证书不存在"));
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
         Map<Long, CertDomainBinding> bindingMap = loadBindingMap(param.getProxyDomainIds());
@@ -99,7 +99,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
     @Override
     public List<CertBindPreviewItemDTO> listBindableDomains(String certId) {
-        SslCertDO cert = sslCertRepository.findById(certId)
+        TlsCertDO cert = tlsCertRepository.findById(certId)
                 .orElseThrow(() -> new BizException("证书不存在"));
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
 
@@ -130,7 +130,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
         List<Long> proxyDomainIds = domains.stream().map(ProxyDomainDO::getId).toList();
         Map<Long, CertDomainBinding> bindingMap = loadBindingMap(proxyDomainIds);
-        Map<String, SslCertDO> certMap = loadCertMap(bindingMap.values());
+        Map<String, TlsCertDO> certMap = loadCertMap(bindingMap.values());
 
         int boundCount = 0;
         int warningCount = 0;
@@ -162,7 +162,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
     @Override
     public CertUsageDTO getCertUsage(String certId) {
-        sslCertRepository.findById(certId).orElseThrow(() -> new BizException("证书不存在"));
+        tlsCertRepository.findById(certId).orElseThrow(() -> new BizException("证书不存在"));
         List<CertDomainBinding> bindings = bindingRepository.findByCertId(certId);
 
         CertUsageDTO usage = new CertUsageDTO();
@@ -189,14 +189,14 @@ public class CertBindingServiceImpl implements CertBindingService {
         binding.setEnabled(false);
         binding.setStatus(BindStatus.DISABLED);
         bindingRepository.save(binding);
-        sslCertificateManager.cancelDeploy(binding.getDomain());
+        tlsCertificateManager.cancelDeploy(binding.getDomain());
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void enable(Long bindingId) {
         CertDomainBinding binding = requireBinding(bindingId);
-        SslCertDO cert = requireActiveCert(binding.getCertId());
+        TlsCertDO cert = requireActiveCert(binding.getCertId());
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
         if (!DomainCertMatcher.matches(binding.getDomain(), sanDomains)) {
             binding.setStatus(BindStatus.SAN_MISMATCH);
@@ -210,7 +210,7 @@ public class CertBindingServiceImpl implements CertBindingService {
     @Transactional(rollbackFor = Exception.class)
     public void unbind(Long bindingId) {
         CertDomainBinding binding = requireBinding(bindingId);
-        sslCertificateManager.cancelDeploy(binding.getDomain());
+        tlsCertificateManager.cancelDeploy(binding.getDomain());
         bindingRepository.delete(binding);
     }
 
@@ -218,12 +218,12 @@ public class CertBindingServiceImpl implements CertBindingService {
     @Transactional(rollbackFor = Exception.class)
     public void rebind(Long bindingId, CertRebindParam param) {
         CertDomainBinding binding = requireBinding(bindingId);
-        SslCertDO cert = requireActiveCert(param.getCertId());
+        TlsCertDO cert = requireActiveCert(param.getCertId());
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
         if (!DomainCertMatcher.matches(binding.getDomain(), sanDomains)) {
             throw new BizException("证书 SAN 不匹配域名: " + binding.getDomain());
         }
-        sslCertificateManager.cancelDeploy(binding.getDomain());
+        tlsCertificateManager.cancelDeploy(binding.getDomain());
         binding.setCertId(cert.getId());
         binding.setEnabled(true);
         deployBinding(binding, cert);
@@ -236,7 +236,7 @@ public class CertBindingServiceImpl implements CertBindingService {
         if (!Boolean.TRUE.equals(binding.getEnabled())) {
             throw new BizException("绑定已禁用，请先启用");
         }
-        SslCertDO cert = requireActiveCert(binding.getCertId());
+        TlsCertDO cert = requireActiveCert(binding.getCertId());
         deployBinding(binding, cert);
     }
 
@@ -252,7 +252,7 @@ public class CertBindingServiceImpl implements CertBindingService {
         for (CertDomainBinding binding : bindings) {
             binding.setEnabled(false);
             binding.setStatus(BindStatus.DISABLED);
-            sslCertificateManager.cancelDeploy(binding.getDomain());
+            tlsCertificateManager.cancelDeploy(binding.getDomain());
         }
         bindingRepository.saveAll(bindings);
     }
@@ -260,7 +260,7 @@ public class CertBindingServiceImpl implements CertBindingService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CertBindResultDTO bindMatchingDomainsForProxy(String certId, String proxyId, boolean override) {
-        SslCertDO cert = requireActiveCert(certId);
+        TlsCertDO cert = requireActiveCert(certId);
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
         List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyId(proxyId);
         List<Long> matchedIds = domains.stream()
@@ -278,7 +278,7 @@ public class CertBindingServiceImpl implements CertBindingService {
     }
 
     private CertBindItemResultDTO bindSingleDomain(Long proxyDomainId,
-                                                   SslCertDO cert,
+                                                   TlsCertDO cert,
                                                    List<String> sanDomains,
                                                    File keyFile,
                                                    File certFile,
@@ -311,7 +311,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
         CertDomainBinding binding = existingOpt.orElseGet(CertDomainBinding::new);
         if (existingOpt.isPresent()) {
-            sslCertificateManager.cancelDeploy(binding.getDomain());
+            tlsCertificateManager.cancelDeploy(binding.getDomain());
         }
         binding.setProxyDomainId(proxyDomainId);
         binding.setCertId(cert.getId());
@@ -319,7 +319,7 @@ public class CertBindingServiceImpl implements CertBindingService {
         binding.setEnabled(true);
 
         try {
-            sslCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
+            tlsCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
             binding.setStatus(BindStatus.ACTIVE);
             binding.setDeployVersion(Optional.ofNullable(binding.getDeployVersion()).orElse(0) + 1);
             binding.setLastDeployedAt(LocalDateTime.now());
@@ -337,11 +337,11 @@ public class CertBindingServiceImpl implements CertBindingService {
         return item;
     }
 
-    private void deployBinding(CertDomainBinding binding, SslCertDO cert) {
+    private void deployBinding(CertDomainBinding binding, TlsCertDO cert) {
         File keyFile = requireCertFile(cert.getKeyPath(), "证书私钥文件不存在");
         File certFile = requireCertFile(cert.getFullChainPath(), "证书链文件不存在");
         try {
-            sslCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
+            tlsCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
             binding.setStatus(BindStatus.ACTIVE);
             binding.setEnabled(true);
             binding.setDeployVersion(Optional.ofNullable(binding.getDeployVersion()).orElse(0) + 1);
@@ -402,16 +402,16 @@ public class CertBindingServiceImpl implements CertBindingService {
                 .collect(Collectors.toMap(CertDomainBinding::getProxyDomainId, b -> b, (a, b) -> a));
     }
 
-    private Map<String, SslCertDO> loadCertMap(Collection<CertDomainBinding> bindings) {
+    private Map<String, TlsCertDO> loadCertMap(Collection<CertDomainBinding> bindings) {
         Set<String> certIds = bindings.stream().map(CertDomainBinding::getCertId).collect(Collectors.toSet());
         if (certIds.isEmpty()) {
             return Collections.emptyMap();
         }
-        return sslCertRepository.findAllById(certIds).stream()
-                .collect(Collectors.toMap(SslCertDO::getId, c -> c, (a, b) -> a));
+        return tlsCertRepository.findAllById(certIds).stream()
+                .collect(Collectors.toMap(TlsCertDO::getId, c -> c, (a, b) -> a));
     }
 
-    private DomainCertBindingDTO toBindingDTO(CertDomainBinding binding, SslCertDO cert) {
+    private DomainCertBindingDTO toBindingDTO(CertDomainBinding binding, TlsCertDO cert) {
         DomainCertBindingDTO dto = new DomainCertBindingDTO();
         dto.setBindingId(binding.getId());
         dto.setCertId(binding.getCertId());
@@ -431,10 +431,10 @@ public class CertBindingServiceImpl implements CertBindingService {
                 .orElseThrow(() -> new BizException("绑定记录不存在"));
     }
 
-    private SslCertDO requireActiveCert(String certId) {
-        SslCertDO cert = sslCertRepository.findById(certId)
+    private TlsCertDO requireActiveCert(String certId) {
+        TlsCertDO cert = tlsCertRepository.findById(certId)
                 .orElseThrow(() -> new BizException("证书不存在"));
-        if (cert.getStatus() == SslStatus.EXPIRED) {
+        if (cert.getStatus() == TlsCertStatus.EXPIRED) {
             throw new BizException("证书已过期");
         }
         LocalDate notAfter = cert.getNotAfter();

@@ -16,21 +16,26 @@
  *
  */
 
-package io.github.lxien.orbien.server.web.param.ssl;
+package io.github.lxien.orbien.server.web.param.tls;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import java.util.List;
+
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class SslCertSaveParam implements Serializable {
+public class TlsCertSaveAndDeployParam {
+    @NotBlank(message = "代理ID不能为空")
+    private String proxyId;
+
     @NotBlank(message = "私钥不能为空")
     private String key;
 
     @NotBlank(message = "证书不能为空")
     private String fullChain;
+
+    /**
+     * 指定绑定的代理域名ID，为空时自动绑定 SAN 匹配的域名
+     */
+    private List<Long> proxyDomainIds;
 }

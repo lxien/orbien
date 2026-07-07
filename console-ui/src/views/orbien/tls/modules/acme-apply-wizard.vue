@@ -1,7 +1,7 @@
 <template>
   <ElDialog
     v-model="dialogVisible"
-    title="申请免费 SSL 证书"
+    title="申请免费 TLS 证书"
     width="720px"
     align-center
     destroy-on-close

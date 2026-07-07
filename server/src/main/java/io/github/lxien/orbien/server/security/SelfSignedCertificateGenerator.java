@@ -18,7 +18,7 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 /**
- * 自签名SSL证书生成器
+ * 自签名TLS 证书生成器
  */
 public final class SelfSignedCertificateGenerator {
 
@@ -33,7 +33,7 @@ public final class SelfSignedCertificateGenerator {
     }
 
     /**
-     * 生成自签名SSL证书。
+     * 生成自签名TLS 证书。
      * <p>
      * 证书配置：
      * <ul>

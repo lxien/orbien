@@ -52,7 +52,7 @@
   import { ref, computed, watch } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import { fetchListBindableDomains, fetchBindCert } from '@/api/cert-binding'
-  import { fetchGetCertListByPage } from '@/api/ssl'
+  import { fetchGetCertListByPage } from '@/api/tls'
 
   defineOptions({ name: 'BindDialog' })
 

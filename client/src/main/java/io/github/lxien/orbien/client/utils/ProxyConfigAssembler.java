@@ -109,17 +109,17 @@ public class ProxyConfigAssembler {
                     }
                     proxyBuilder.setBasicAuth(basicAuthBuilder);
                 }
-                //HTTPS SSL证书
+                //HTTPS TLS 证书
                 if (config.isHttps()) {
-                    SslConfig sslConfig = config.getSslConfig();
-                    if (sslConfig != null) {
+                    ProxyTlsCertConfig tlsCertConfig = config.getTlsCertConfig();
+                    if (tlsCertConfig != null) {
                         try {
-                            String keyPem = Files.readString(new File(sslConfig.getKeyFile()).toPath(), StandardCharsets.UTF_8);
-                            String certChainPem = Files.readString(new File(sslConfig.getCertFile()).toPath(), StandardCharsets.UTF_8);
-                            Message.SslCert.Builder sslInfoBuilder = Message.SslCert.newBuilder()
+                            String keyPem = Files.readString(new File(tlsCertConfig.getKeyFile()).toPath(), StandardCharsets.UTF_8);
+                            String certChainPem = Files.readString(new File(tlsCertConfig.getCertFile()).toPath(), StandardCharsets.UTF_8);
+                            Message.TlsCert.Builder tlsCertBuilder = Message.TlsCert.newBuilder()
                                     .setPrivateKeyPem(keyPem)
                                     .setCertChainPem(certChainPem);
-                            proxyBuilder.setSslCert(sslInfoBuilder);
+                            proxyBuilder.setTlsCert(tlsCertBuilder);
                         } catch (Exception e) {
                             logger.error(e);
                         }

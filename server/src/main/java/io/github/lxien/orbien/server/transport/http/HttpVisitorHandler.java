@@ -98,7 +98,7 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
      * 证书未知错误异常判断
      *
      * @param cause 异常
-     * @return 是否是未知SSL证书异常
+     * @return 是否是未知TLS 证书异常
      */
     private boolean isCertificateUnknownError(Throwable cause) {
         while (cause != null) {

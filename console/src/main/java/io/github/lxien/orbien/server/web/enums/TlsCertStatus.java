@@ -21,25 +21,25 @@ package io.github.lxien.orbien.server.web.enums;
 import lombok.Getter;
 
 /**
- * SSL证书状态
+ * TLS 证书状态
  */
 @Getter
-public enum SslStatus {
-    /** SSL证书已激活 */
+public enum TlsCertStatus {
+    /** TLS 证书已激活 */
     ACTIVE(1, "已激活"),
-    /** SSL证书已过期 */
+    /** TLS 证书已过期 */
     EXPIRED(2, "已过期");
 
     private final Integer code;
     private final String description;
 
-    SslStatus(Integer code, String description) {
+    TlsCertStatus(Integer code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static SslStatus fromCode(Integer code) {
-        for (SslStatus status : values()) {
+    public static TlsCertStatus fromCode(Integer code) {
+        for (TlsCertStatus status : values()) {
             if (status.code.equals(code)) {
                 return status;
             }
@@ -47,8 +47,8 @@ public enum SslStatus {
         throw new IllegalArgumentException("未知SSL状态: " + code);
     }
 
-    public static SslStatus fromValue(String value) {
-        for (SslStatus status : values()) {
+    public static TlsCertStatus fromValue(String value) {
+        for (TlsCertStatus status : values()) {
             if (status.name().equalsIgnoreCase(value)) {
                 return status;
             }

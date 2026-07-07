@@ -87,7 +87,7 @@ public class AgentStateMachineBuilder {
             // SSL 初始化
             builder.internalTransition()
                     .within(AgentState.CONNECTING)
-                    .on(AgentEvent.SSL_INITIALIZED)
+                    .on(AgentEvent.TLS_INITIALIZED)
                     .perform(connectAction);
 
             // TCP 连接成功

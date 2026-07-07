@@ -24,6 +24,6 @@ import java.io.File;
  * 系统常量
  */
 public interface SystemConstants {
-    String DEFAULT_DOMAIN_SSL_PATH = "cert" + File.separator + "domains";
-    String DEFAULT_GATEWAY_SSL_PATH = "cert" + File.separator + "gateway";
+    String DEFAULT_DOMAIN_TLS_CERT_PATH = "cert" + File.separator + "domains";
+    String DEFAULT_GATEWAY_TLS_CERT_PATH = "cert" + File.separator + "gateway";
 }

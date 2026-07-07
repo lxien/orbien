@@ -16,17 +16,21 @@
  *
  */
 
-package io.github.lxien.orbien.core.domain;
+package io.github.lxien.orbien.server.web.param.tls;
 
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-@Getter
-@Setter
-@ToString
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SslConfig implements Serializable {
-    private String keyFile;
-    private String certFile;
+public class TlsCertSaveParam implements Serializable {
+    @NotBlank(message = "私钥不能为空")
+    private String key;
+
+    @NotBlank(message = "证书不能为空")
+    private String fullChain;
 }

@@ -20,25 +20,25 @@ package io.github.lxien.orbien.server.web.service;
 
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertAutoRenewResultDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDownloadDTO;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveAndDeployParam;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveParam;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertAutoRenewResultDTO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDownloadDTO;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveAndDeployParam;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveParam;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindResultDTO;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
-public interface SslCertificateService {
+public interface TlsCertificateService {
 
-    SslCertDTO saveCert(SslCertSaveParam param);
+    TlsCertDTO saveCert(TlsCertSaveParam param);
 
-    SslCertDTO saveAcmeCert(String keyPem, String fullChainPem);
+    TlsCertDTO saveAcmeCert(String keyPem, String fullChainPem);
 
-    PageResult<SslCertDTO> findByPage(PageQuery pageQuery);
+    PageResult<TlsCertDTO> findByPage(PageQuery pageQuery);
 
-    SslCertDownloadDTO getSslDownloadInfo(String certId);
+    TlsCertDownloadDTO getTlsDownloadInfo(String certId);
 
     void deleteByIds(List<String> ids);
 
@@ -50,7 +50,7 @@ public interface SslCertificateService {
      */
     void downloadCert(String certId, HttpServletResponse response);
 
-    CertBindResultDTO saveAndDeployCert(SslCertSaveAndDeployParam param);
+    CertBindResultDTO saveAndDeployCert(TlsCertSaveAndDeployParam param);
 
-    SslCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew);
+    TlsCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew);
 }

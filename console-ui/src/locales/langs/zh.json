@@ -253,7 +253,7 @@
       "portPool": "端口池",
       "agent": "客户端",
       "domain": "域名管理",
-      "ssl": "SSL证书",
+      "tls": "TLS 证书",
       "token": "访问令牌",
       "scheduledJob": "计划任务",
       "stats": "流量统计"

@@ -88,10 +88,10 @@ public class ProxyConfig implements Serializable {
     @Setter
     private RouteConfig routeConfig;
     /**
-     * HTTPS Ssl证书配置
+     * HTTPS TLS 证书配置
      */
     @Setter
-    private SslConfig sslConfig;
+    private ProxyTlsCertConfig tlsCertConfig;
     /**
      * IP 防火墙
      */

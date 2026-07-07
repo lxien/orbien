@@ -282,12 +282,15 @@ public class TomlConfigLoader implements ConfigSource {
                         proxyConfig.setBasicAuth(basicAuthConfig);
                     }
                 }
-                //HTTPS SSL证书
+                //HTTPS TLS 证书
                 if (protocolType.isHttps()) {
-                    Toml ssl = proxyTable.getTable("ssl");
-                    if (ssl != null) {
-                        String keyFile = ssl.getString("key_file");
-                        String certFile = ssl.getString("cert_file");
+                    Toml tls = proxyTable.getTable("tls");
+                    if (tls == null) {
+                        tls = proxyTable.getTable("ssl");
+                    }
+                    if (tls != null) {
+                        String keyFile = tls.getString("key_file");
+                        String certFile = tls.getString("cert_file");
                         if (!StringUtils.hasText(keyFile)) {
                             throw new IllegalArgumentException("请配置私钥路径：" + keyFile);
                         }
@@ -300,7 +303,7 @@ public class TomlConfigLoader implements ConfigSource {
                         if (!new File(certFile).exists()) {
                             throw new IllegalArgumentException("证书不存在，请检查证书路径");
                         }
-                        proxyConfig.setSslConfig(new SslConfig(keyFile, certFile));
+                        proxyConfig.setTlsCertConfig(new ProxyTlsCertConfig(keyFile, certFile));
                     }
                 }
                 Toml healthCheck = proxyTable.getTable("health_check");

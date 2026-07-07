@@ -16,26 +16,25 @@
  *
  */
 
-package io.github.lxien.orbien.server.web.param.ssl;
+package io.github.lxien.orbien.server.web.dto.tls;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.List;
+import java.io.Serializable;
 
+/**
+ * TLS 证书下载DTO
+ * 用于返回证书文件内容供下载
+ */
 @Data
-public class SslCertSaveAndDeployParam {
-    @NotBlank(message = "代理ID不能为空")
-    private String proxyId;
-
-    @NotBlank(message = "私钥不能为空")
-    private String key;
-
-    @NotBlank(message = "证书不能为空")
-    private String fullChain;
+public class TlsCertDownloadDTO implements Serializable {
+    /**
+     * 私钥内容（PEM格式）
+     */
+    private String keyPem;
 
     /**
-     * 指定绑定的代理域名ID，为空时自动绑定 SAN 匹配的域名
+     * 完整证书链内容（PEM格式）
      */
-    private List<Long> proxyDomainIds;
+    private String fullChainPem;
 }

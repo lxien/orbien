@@ -10862,8 +10862,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
-  public interface SslCertOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.SslCert)
+  public interface TlsCertOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.TlsCert)
       com.google.protobuf.MessageOrBuilder {
 
     /**
@@ -10891,12 +10891,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         getCertChainPemBytes();
   }
   /**
-   * Protobuf type {@code io.github.lxien.orbien.core.message.SslCert}
+   * Protobuf type {@code io.github.lxien.orbien.core.message.TlsCert}
    */
-  public static final class SslCert extends
+  public static final class TlsCert extends
       com.google.protobuf.GeneratedMessage implements
-      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.SslCert)
-      SslCertOrBuilder {
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.TlsCert)
+      TlsCertOrBuilder {
   private static final long serialVersionUID = 0L;
     static {
       com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
@@ -10905,28 +10905,28 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         /* minor= */ 33,
         /* patch= */ 4,
         /* suffix= */ "",
-        "SslCert");
+        "TlsCert");
     }
-    // Use SslCert.newBuilder() to construct.
-    private SslCert(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+    // Use TlsCert.newBuilder() to construct.
+    private TlsCert(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
     }
-    private SslCert() {
+    private TlsCert() {
       privateKeyPem_ = "";
       certChainPem_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
         getDescriptor() {
-      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor;
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor;
     }
 
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
-      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_SslCert_fieldAccessorTable
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
-              io.github.lxien.orbien.core.message.Message.SslCert.class, io.github.lxien.orbien.core.message.Message.SslCert.Builder.class);
+              io.github.lxien.orbien.core.message.Message.TlsCert.class, io.github.lxien.orbien.core.message.Message.TlsCert.Builder.class);
     }
 
     public static final int PRIVATE_KEY_PEM_FIELD_NUMBER = 1;
@@ -11052,10 +11052,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (obj == this) {
        return true;
       }
-      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.SslCert)) {
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.TlsCert)) {
         return super.equals(obj);
       }
-      io.github.lxien.orbien.core.message.Message.SslCert other = (io.github.lxien.orbien.core.message.Message.SslCert) obj;
+      io.github.lxien.orbien.core.message.Message.TlsCert other = (io.github.lxien.orbien.core.message.Message.TlsCert) obj;
 
       if (!getPrivateKeyPem()
           .equals(other.getPrivateKeyPem())) return false;
@@ -11081,44 +11081,44 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return hash;
     }
 
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         java.nio.ByteBuffer data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         java.nio.ByteBuffer data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         com.google.protobuf.ByteString data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         com.google.protobuf.ByteString data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(byte[] data)
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(byte[] data)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         byte[] data,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(java.io.InputStream input)
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -11126,26 +11126,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseDelimitedFrom(java.io.InputStream input)
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input);
     }
 
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseDelimitedFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseDelimitedFrom(
         java.io.InputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         com.google.protobuf.CodedInputStream input)
         throws java.io.IOException {
       return com.google.protobuf.GeneratedMessage
           .parseWithIOException(PARSER, input);
     }
-    public static io.github.lxien.orbien.core.message.Message.SslCert parseFrom(
+    public static io.github.lxien.orbien.core.message.Message.TlsCert parseFrom(
         com.google.protobuf.CodedInputStream input,
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
@@ -11158,7 +11158,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     public static Builder newBuilder() {
       return DEFAULT_INSTANCE.toBuilder();
     }
-    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.SslCert prototype) {
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.TlsCert prototype) {
       return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
     }
     @java.lang.Override
@@ -11174,26 +11174,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return builder;
     }
     /**
-     * Protobuf type {@code io.github.lxien.orbien.core.message.SslCert}
+     * Protobuf type {@code io.github.lxien.orbien.core.message.TlsCert}
      */
     public static final class Builder extends
         com.google.protobuf.GeneratedMessage.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.SslCert)
-        io.github.lxien.orbien.core.message.Message.SslCertOrBuilder {
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.TlsCert)
+        io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor;
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor;
       }
 
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_SslCert_fieldAccessorTable
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
-                io.github.lxien.orbien.core.message.Message.SslCert.class, io.github.lxien.orbien.core.message.Message.SslCert.Builder.class);
+                io.github.lxien.orbien.core.message.Message.TlsCert.class, io.github.lxien.orbien.core.message.Message.TlsCert.Builder.class);
       }
 
-      // Construct using io.github.lxien.orbien.core.message.Message.SslCert.newBuilder()
+      // Construct using io.github.lxien.orbien.core.message.Message.TlsCert.newBuilder()
       private Builder() {
 
       }
@@ -11215,17 +11215,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
-        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor;
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor;
       }
 
       @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.SslCert getDefaultInstanceForType() {
-        return io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance();
+      public io.github.lxien.orbien.core.message.Message.TlsCert getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance();
       }
 
       @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.SslCert build() {
-        io.github.lxien.orbien.core.message.Message.SslCert result = buildPartial();
+      public io.github.lxien.orbien.core.message.Message.TlsCert build() {
+        io.github.lxien.orbien.core.message.Message.TlsCert result = buildPartial();
         if (!result.isInitialized()) {
           throw newUninitializedMessageException(result);
         }
@@ -11233,14 +11233,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
 
       @java.lang.Override
-      public io.github.lxien.orbien.core.message.Message.SslCert buildPartial() {
-        io.github.lxien.orbien.core.message.Message.SslCert result = new io.github.lxien.orbien.core.message.Message.SslCert(this);
+      public io.github.lxien.orbien.core.message.Message.TlsCert buildPartial() {
+        io.github.lxien.orbien.core.message.Message.TlsCert result = new io.github.lxien.orbien.core.message.Message.TlsCert(this);
         if (bitField0_ != 0) { buildPartial0(result); }
         onBuilt();
         return result;
       }
 
-      private void buildPartial0(io.github.lxien.orbien.core.message.Message.SslCert result) {
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.TlsCert result) {
         int from_bitField0_ = bitField0_;
         if (((from_bitField0_ & 0x00000001) != 0)) {
           result.privateKeyPem_ = privateKeyPem_;
@@ -11252,16 +11252,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
       @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof io.github.lxien.orbien.core.message.Message.SslCert) {
-          return mergeFrom((io.github.lxien.orbien.core.message.Message.SslCert)other);
+        if (other instanceof io.github.lxien.orbien.core.message.Message.TlsCert) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.TlsCert)other);
         } else {
           super.mergeFrom(other);
           return this;
         }
       }
 
-      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.SslCert other) {
-        if (other == io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance()) return this;
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.TlsCert other) {
+        if (other == io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance()) return this;
         if (!other.getPrivateKeyPem().isEmpty()) {
           privateKeyPem_ = other.privateKeyPem_;
           bitField0_ |= 0x00000001;
@@ -11469,23 +11469,23 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
-      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.SslCert)
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.TlsCert)
     }
 
-    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.SslCert)
-    private static final io.github.lxien.orbien.core.message.Message.SslCert DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.TlsCert)
+    private static final io.github.lxien.orbien.core.message.Message.TlsCert DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.SslCert();
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.TlsCert();
     }
 
-    public static io.github.lxien.orbien.core.message.Message.SslCert getDefaultInstance() {
+    public static io.github.lxien.orbien.core.message.Message.TlsCert getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<SslCert>
-        PARSER = new com.google.protobuf.AbstractParser<SslCert>() {
+    private static final com.google.protobuf.Parser<TlsCert>
+        PARSER = new com.google.protobuf.AbstractParser<TlsCert>() {
       @java.lang.Override
-      public SslCert parsePartialFrom(
+      public TlsCert parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -11504,17 +11504,17 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     };
 
-    public static com.google.protobuf.Parser<SslCert> parser() {
+    public static com.google.protobuf.Parser<TlsCert> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<SslCert> getParserForType() {
+    public com.google.protobuf.Parser<TlsCert> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.SslCert getDefaultInstanceForType() {
+    public io.github.lxien.orbien.core.message.Message.TlsCert getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -13439,19 +13439,19 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     io.github.lxien.orbien.core.message.Message.TransportOrBuilder getTransportOrBuilder();
 
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-     * @return Whether the sslCert field is set.
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+     * @return Whether the tlsCert field is set.
      */
-    boolean hasSslCert();
+    boolean hasTlsCert();
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-     * @return The sslCert.
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+     * @return The tlsCert.
      */
-    io.github.lxien.orbien.core.message.Message.SslCert getSslCert();
+    io.github.lxien.orbien.core.message.Message.TlsCert getTlsCert();
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
      */
-    io.github.lxien.orbien.core.message.Message.SslCertOrBuilder getSslCertOrBuilder();
+    io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder getTlsCertOrBuilder();
 
     /**
      * <code>optional .io.github.lxien.orbien.core.message.HealthCheck health_check = 15;</code>
@@ -13844,30 +13844,30 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return transport_ == null ? io.github.lxien.orbien.core.message.Message.Transport.getDefaultInstance() : transport_;
     }
 
-    public static final int SSL_CERT_FIELD_NUMBER = 14;
-    private io.github.lxien.orbien.core.message.Message.SslCert sslCert_;
+    public static final int TLS_CERT_FIELD_NUMBER = 14;
+    private io.github.lxien.orbien.core.message.Message.TlsCert tlsCert_;
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-     * @return Whether the sslCert field is set.
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+     * @return Whether the tlsCert field is set.
      */
     @java.lang.Override
-    public boolean hasSslCert() {
+    public boolean hasTlsCert() {
       return ((bitField0_ & 0x00000080) != 0);
     }
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-     * @return The sslCert.
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+     * @return The tlsCert.
      */
     @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.SslCert getSslCert() {
-      return sslCert_ == null ? io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
+    public io.github.lxien.orbien.core.message.Message.TlsCert getTlsCert() {
+      return tlsCert_ == null ? io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance() : tlsCert_;
     }
     /**
-     * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+     * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
      */
     @java.lang.Override
-    public io.github.lxien.orbien.core.message.Message.SslCertOrBuilder getSslCertOrBuilder() {
-      return sslCert_ == null ? io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
+    public io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder getTlsCertOrBuilder() {
+      return tlsCert_ == null ? io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance() : tlsCert_;
     }
 
     public static final int HEALTH_CHECK_FIELD_NUMBER = 15;
@@ -13950,7 +13950,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         output.writeMessage(13, getTransport());
       }
       if (((bitField0_ & 0x00000080) != 0)) {
-        output.writeMessage(14, getSslCert());
+        output.writeMessage(14, getTlsCert());
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         output.writeMessage(15, getHealthCheck());
@@ -14016,7 +14016,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000080) != 0)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(14, getSslCert());
+          .computeMessageSize(14, getTlsCert());
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         size += com.google.protobuf.CodedOutputStream
@@ -14082,10 +14082,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getTransport()
             .equals(other.getTransport())) return false;
       }
-      if (hasSslCert() != other.hasSslCert()) return false;
-      if (hasSslCert()) {
-        if (!getSslCert()
-            .equals(other.getSslCert())) return false;
+      if (hasTlsCert() != other.hasTlsCert()) return false;
+      if (hasTlsCert()) {
+        if (!getTlsCert()
+            .equals(other.getTlsCert())) return false;
       }
       if (hasHealthCheck() != other.hasHealthCheck()) return false;
       if (hasHealthCheck()) {
@@ -14147,9 +14147,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         hash = (37 * hash) + TRANSPORT_FIELD_NUMBER;
         hash = (53 * hash) + getTransport().hashCode();
       }
-      if (hasSslCert()) {
-        hash = (37 * hash) + SSL_CERT_FIELD_NUMBER;
-        hash = (53 * hash) + getSslCert().hashCode();
+      if (hasTlsCert()) {
+        hash = (37 * hash) + TLS_CERT_FIELD_NUMBER;
+        hash = (53 * hash) + getTlsCert().hashCode();
       }
       if (hasHealthCheck()) {
         hash = (37 * hash) + HEALTH_CHECK_FIELD_NUMBER;
@@ -14291,7 +14291,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetBasicAuthFieldBuilder();
           internalGetBandwidthFieldBuilder();
           internalGetTransportFieldBuilder();
-          internalGetSslCertFieldBuilder();
+          internalGetTlsCertFieldBuilder();
           internalGetHealthCheckFieldBuilder();
         }
       }
@@ -14338,10 +14338,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           transportBuilder_.dispose();
           transportBuilder_ = null;
         }
-        sslCert_ = null;
-        if (sslCertBuilder_ != null) {
-          sslCertBuilder_.dispose();
-          sslCertBuilder_ = null;
+        tlsCert_ = null;
+        if (tlsCertBuilder_ != null) {
+          tlsCertBuilder_.dispose();
+          tlsCertBuilder_ = null;
         }
         healthCheck_ = null;
         if (healthCheckBuilder_ != null) {
@@ -14449,9 +14449,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           to_bitField0_ |= 0x00000040;
         }
         if (((from_bitField0_ & 0x00002000) != 0)) {
-          result.sslCert_ = sslCertBuilder_ == null
-              ? sslCert_
-              : sslCertBuilder_.build();
+          result.tlsCert_ = tlsCertBuilder_ == null
+              ? tlsCert_
+              : tlsCertBuilder_.build();
           to_bitField0_ |= 0x00000080;
         }
         if (((from_bitField0_ & 0x00004000) != 0)) {
@@ -14541,8 +14541,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (other.hasTransport()) {
           mergeTransport(other.getTransport());
         }
-        if (other.hasSslCert()) {
-          mergeSslCert(other.getSslCert());
+        if (other.hasTlsCert()) {
+          mergeTlsCert(other.getTlsCert());
         }
         if (other.hasHealthCheck()) {
           mergeHealthCheck(other.getHealthCheck());
@@ -14658,7 +14658,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               } // case 106
               case 114: {
                 input.readMessage(
-                    internalGetSslCertFieldBuilder().getBuilder(),
+                    internalGetTlsCertFieldBuilder().getBuilder(),
                     extensionRegistry);
                 bitField0_ |= 0x00002000;
                 break;
@@ -15889,125 +15889,125 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return transportBuilder_;
       }
 
-      private io.github.lxien.orbien.core.message.Message.SslCert sslCert_;
+      private io.github.lxien.orbien.core.message.Message.TlsCert tlsCert_;
       private com.google.protobuf.SingleFieldBuilder<
-          io.github.lxien.orbien.core.message.Message.SslCert, io.github.lxien.orbien.core.message.Message.SslCert.Builder, io.github.lxien.orbien.core.message.Message.SslCertOrBuilder> sslCertBuilder_;
+          io.github.lxien.orbien.core.message.Message.TlsCert, io.github.lxien.orbien.core.message.Message.TlsCert.Builder, io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder> tlsCertBuilder_;
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-       * @return Whether the sslCert field is set.
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+       * @return Whether the tlsCert field is set.
        */
-      public boolean hasSslCert() {
+      public boolean hasTlsCert() {
         return ((bitField0_ & 0x00002000) != 0);
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
-       * @return The sslCert.
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
+       * @return The tlsCert.
        */
-      public io.github.lxien.orbien.core.message.Message.SslCert getSslCert() {
-        if (sslCertBuilder_ == null) {
-          return sslCert_ == null ? io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
+      public io.github.lxien.orbien.core.message.Message.TlsCert getTlsCert() {
+        if (tlsCertBuilder_ == null) {
+          return tlsCert_ == null ? io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance() : tlsCert_;
         } else {
-          return sslCertBuilder_.getMessage();
+          return tlsCertBuilder_.getMessage();
         }
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public Builder setSslCert(io.github.lxien.orbien.core.message.Message.SslCert value) {
-        if (sslCertBuilder_ == null) {
+      public Builder setTlsCert(io.github.lxien.orbien.core.message.Message.TlsCert value) {
+        if (tlsCertBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          sslCert_ = value;
+          tlsCert_ = value;
         } else {
-          sslCertBuilder_.setMessage(value);
+          tlsCertBuilder_.setMessage(value);
         }
         bitField0_ |= 0x00002000;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public Builder setSslCert(
-          io.github.lxien.orbien.core.message.Message.SslCert.Builder builderForValue) {
-        if (sslCertBuilder_ == null) {
-          sslCert_ = builderForValue.build();
+      public Builder setTlsCert(
+          io.github.lxien.orbien.core.message.Message.TlsCert.Builder builderForValue) {
+        if (tlsCertBuilder_ == null) {
+          tlsCert_ = builderForValue.build();
         } else {
-          sslCertBuilder_.setMessage(builderForValue.build());
+          tlsCertBuilder_.setMessage(builderForValue.build());
         }
         bitField0_ |= 0x00002000;
         onChanged();
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public Builder mergeSslCert(io.github.lxien.orbien.core.message.Message.SslCert value) {
-        if (sslCertBuilder_ == null) {
+      public Builder mergeTlsCert(io.github.lxien.orbien.core.message.Message.TlsCert value) {
+        if (tlsCertBuilder_ == null) {
           if (((bitField0_ & 0x00002000) != 0) &&
-            sslCert_ != null &&
-            sslCert_ != io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance()) {
-            getSslCertBuilder().mergeFrom(value);
+            tlsCert_ != null &&
+            tlsCert_ != io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance()) {
+            getTlsCertBuilder().mergeFrom(value);
           } else {
-            sslCert_ = value;
+            tlsCert_ = value;
           }
         } else {
-          sslCertBuilder_.mergeFrom(value);
+          tlsCertBuilder_.mergeFrom(value);
         }
-        if (sslCert_ != null) {
+        if (tlsCert_ != null) {
           bitField0_ |= 0x00002000;
           onChanged();
         }
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public Builder clearSslCert() {
+      public Builder clearTlsCert() {
         bitField0_ = (bitField0_ & ~0x00002000);
-        sslCert_ = null;
-        if (sslCertBuilder_ != null) {
-          sslCertBuilder_.dispose();
-          sslCertBuilder_ = null;
+        tlsCert_ = null;
+        if (tlsCertBuilder_ != null) {
+          tlsCertBuilder_.dispose();
+          tlsCertBuilder_ = null;
         }
         onChanged();
         return this;
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public io.github.lxien.orbien.core.message.Message.SslCert.Builder getSslCertBuilder() {
+      public io.github.lxien.orbien.core.message.Message.TlsCert.Builder getTlsCertBuilder() {
         bitField0_ |= 0x00002000;
         onChanged();
-        return internalGetSslCertFieldBuilder().getBuilder();
+        return internalGetTlsCertFieldBuilder().getBuilder();
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
-      public io.github.lxien.orbien.core.message.Message.SslCertOrBuilder getSslCertOrBuilder() {
-        if (sslCertBuilder_ != null) {
-          return sslCertBuilder_.getMessageOrBuilder();
+      public io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder getTlsCertOrBuilder() {
+        if (tlsCertBuilder_ != null) {
+          return tlsCertBuilder_.getMessageOrBuilder();
         } else {
-          return sslCert_ == null ?
-              io.github.lxien.orbien.core.message.Message.SslCert.getDefaultInstance() : sslCert_;
+          return tlsCert_ == null ?
+              io.github.lxien.orbien.core.message.Message.TlsCert.getDefaultInstance() : tlsCert_;
         }
       }
       /**
-       * <code>optional .io.github.lxien.orbien.core.message.SslCert ssl_cert = 14;</code>
+       * <code>optional .io.github.lxien.orbien.core.message.TlsCert tls_cert = 14;</code>
        */
       private com.google.protobuf.SingleFieldBuilder<
-          io.github.lxien.orbien.core.message.Message.SslCert, io.github.lxien.orbien.core.message.Message.SslCert.Builder, io.github.lxien.orbien.core.message.Message.SslCertOrBuilder> 
-          internalGetSslCertFieldBuilder() {
-        if (sslCertBuilder_ == null) {
-          sslCertBuilder_ = new com.google.protobuf.SingleFieldBuilder<
-              io.github.lxien.orbien.core.message.Message.SslCert, io.github.lxien.orbien.core.message.Message.SslCert.Builder, io.github.lxien.orbien.core.message.Message.SslCertOrBuilder>(
-                  getSslCert(),
+          io.github.lxien.orbien.core.message.Message.TlsCert, io.github.lxien.orbien.core.message.Message.TlsCert.Builder, io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder> 
+          internalGetTlsCertFieldBuilder() {
+        if (tlsCertBuilder_ == null) {
+          tlsCertBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.TlsCert, io.github.lxien.orbien.core.message.Message.TlsCert.Builder, io.github.lxien.orbien.core.message.Message.TlsCertOrBuilder>(
+                  getTlsCert(),
                   getParentForChildren(),
                   isClean());
-          sslCert_ = null;
+          tlsCert_ = null;
         }
-        return sslCertBuilder_;
+        return tlsCertBuilder_;
       }
 
       private io.github.lxien.orbien.core.message.Message.HealthCheck healthCheck_;
@@ -22864,10 +22864,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_io_github_lxien_orbien_core_message_Domain_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor;
+    internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_io_github_lxien_orbien_core_message_SslCert_fieldAccessorTable;
+      internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_io_github_lxien_orbien_core_message_Transport_descriptor;
   private static final 
@@ -22960,7 +22960,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "\001\001B\007\n\005_nameB\t\n\007_weight\"_\n\006Domain\022\030\n\013auto" +
       "_domain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003" +
       "(\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_domain\"" +
-      ":\n\007SslCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016c" +
+      ":\n\007TlsCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016c" +
       "ert_chain_pem\030\002 \001(\t\"\233\001\n\tTransport\022\026\n\tmul" +
       "tiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022" +
       "\025\n\010compress\030\003 \001(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\t" +
@@ -22987,13 +22987,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "xien.orbien.core.message.LoadBalanceStra" +
       "tegyH\005\210\001\001\022F\n\ttransport\030\r \001(\0132..io.github" +
       ".lxien.orbien.core.message.TransportH\006\210\001" +
-      "\001\022C\n\010ssl_cert\030\016 \001(\0132,.io.github.lxien.or" +
-      "bien.core.message.SslCertH\007\210\001\001\022K\n\014health" +
+      "\001\022C\n\010tls_cert\030\016 \001(\0132,.io.github.lxien.or" +
+      "bien.core.message.TlsCertH\007\210\001\001\022K\n\014health" +
       "_check\030\017 \001(\01320.io.github.lxien.orbien.co" +
       "re.message.HealthCheckH\010\210\001\001B\016\n\014_remote_p" +
       "ortB\t\n\007_domainB\021\n\017_access_controlB\r\n\013_ba" +
       "sic_authB\014\n\n_bandwidthB\030\n\026_load_balance_" +
-      "strategyB\014\n\n_transportB\013\n\t_ssl_certB\017\n\r_" +
+      "strategyB\014\n\n_transportB\013\n\t_tls_certB\017\n\r_" +
       "health_check\"\263\002\n\013RuntimeInfo\022\017\n\007proxyId\030" +
       "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.i" +
       "o.github.lxien.orbien.core.message.Targe" +
@@ -23108,11 +23108,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Domain_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
-    internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor =
+    internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor =
       getDescriptor().getMessageType(12);
-    internal_static_io_github_lxien_orbien_core_message_SslCert_fieldAccessorTable = new
+    internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_io_github_lxien_orbien_core_message_SslCert_descriptor,
+        internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor,
         new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
     internal_static_io_github_lxien_orbien_core_message_Transport_descriptor =
       getDescriptor().getMessageType(13);
@@ -23131,7 +23131,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     internal_static_io_github_lxien_orbien_core_message_Proxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor,
-        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "SslCert", "HealthCheck", });
+        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", });
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor =
       getDescriptor().getMessageType(16);
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_fieldAccessorTable = new

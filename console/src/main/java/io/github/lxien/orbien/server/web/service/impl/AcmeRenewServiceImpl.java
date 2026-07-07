@@ -3,13 +3,13 @@ package io.github.lxien.orbien.server.web.service.impl;
 import io.github.lxien.orbien.server.web.common.utils.JsonUtils;
 import io.github.lxien.orbien.server.web.dto.acme.AcmeOrderDTO;
 import io.github.lxien.orbien.server.web.entity.AcmeCertOrderDO;
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import io.github.lxien.orbien.server.web.enums.AcmeOrderStatus;
 import io.github.lxien.orbien.server.web.enums.CertSource;
-import io.github.lxien.orbien.server.web.enums.SslStatus;
+import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import io.github.lxien.orbien.server.web.param.acme.AcmeOrderCreateParam;
 import io.github.lxien.orbien.server.web.repository.AcmeCertOrderRepository;
-import io.github.lxien.orbien.server.web.repository.SslCertRepository;
+import io.github.lxien.orbien.server.web.repository.TlsCertRepository;
 import io.github.lxien.orbien.server.web.service.AcmeOrderService;
 import io.github.lxien.orbien.server.web.service.AcmeRenewService;
 import io.github.lxien.orbien.server.web.service.scheduled.job.AcmeRenewJobParams;
@@ -36,7 +36,7 @@ public class AcmeRenewServiceImpl implements AcmeRenewService {
             AcmeOrderStatus.VALIDATING,
             AcmeOrderStatus.ISSUING);
 
-    private final SslCertRepository sslCertRepository;
+    private final TlsCertRepository tlsCertRepository;
     private final AcmeCertOrderRepository acmeCertOrderRepository;
     private final AcmeOrderService acmeOrderService;
 
@@ -44,9 +44,9 @@ public class AcmeRenewServiceImpl implements AcmeRenewService {
     public int renewDueCertificates(AcmeRenewJobParams params) {
         LocalDate today = LocalDate.now();
         LocalDate deadline = today.plusDays(params.getRenewBeforeDays());
-        List<SslCertDO> candidates = sslCertRepository.findRenewCandidates(deadline, today);
+        List<TlsCertDO> candidates = tlsCertRepository.findRenewCandidates(deadline, today);
         int renewed = 0;
-        for (SslCertDO cert : candidates) {
+        for (TlsCertDO cert : candidates) {
             if (renewed >= params.getMaxCertsPerRun()) {
                 break;
             }
@@ -56,7 +56,7 @@ public class AcmeRenewServiceImpl implements AcmeRenewService {
             if (params.isRespectCertAutoRenew() && !Boolean.TRUE.equals(cert.getAutoRenew())) {
                 continue;
             }
-            if (cert.getStatus() != SslStatus.ACTIVE) {
+            if (cert.getStatus() != TlsCertStatus.ACTIVE) {
                 continue;
             }
             if (acmeCertOrderRepository.existsByCertIdAndStatusIn(cert.getId(), IN_PROGRESS)) {
@@ -72,7 +72,7 @@ public class AcmeRenewServiceImpl implements AcmeRenewService {
         return renewed;
     }
 
-    private void renewSingle(SslCertDO cert) {
+    private void renewSingle(TlsCertDO cert) {
         AcmeCertOrderDO template = acmeCertOrderRepository
                 .findFirstByCertIdAndStatusOrderByCreatedAtDesc(cert.getId(), AcmeOrderStatus.SUCCESS)
                 .orElseThrow(() -> new IllegalStateException("未找到历史成功申请记录"));
@@ -88,7 +88,7 @@ public class AcmeRenewServiceImpl implements AcmeRenewService {
         AcmeOrderDTO order = acmeOrderService.createAndSubmit(param);
         cert.setRenewOrderId(order.getId());
         cert.setLastRenewAt(LocalDateTime.now());
-        sslCertRepository.save(cert);
+        tlsCertRepository.save(cert);
     }
 
     private List<String> parseDomains(String sanDomains) {

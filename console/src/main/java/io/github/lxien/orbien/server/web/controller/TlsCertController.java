@@ -20,10 +20,10 @@ package io.github.lxien.orbien.server.web.controller;
 
 import io.github.lxien.orbien.server.web.common.message.Ajax;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertAutoRenewParam;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveAndDeployParam;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveParam;
-import io.github.lxien.orbien.server.web.service.SslCertificateService;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertAutoRenewParam;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveAndDeployParam;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveParam;
+import io.github.lxien.orbien.server.web.service.TlsCertificateService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,37 +31,37 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ssl-cert")
-public class SslCertController {
+@RequestMapping("/api/tls-cert")
+public class TlsCertController {
     @Autowired
-    private SslCertificateService sslCertificateService;
+    private TlsCertificateService tlsCertificateService;
 
     @PostMapping("save-cert")
-    public Ajax saveCert(@RequestBody SslCertSaveParam param) {
-        return Ajax.success(sslCertificateService.saveCert(param));
+    public Ajax saveCert(@RequestBody TlsCertSaveParam param) {
+        return Ajax.success(tlsCertificateService.saveCert(param));
     }
     @PostMapping("save-and-deploy")
-    public Ajax saveAndDeploy(@RequestBody SslCertSaveAndDeployParam param) {
-        return Ajax.success(sslCertificateService.saveAndDeployCert(param));
+    public Ajax saveAndDeploy(@RequestBody TlsCertSaveAndDeployParam param) {
+        return Ajax.success(tlsCertificateService.saveAndDeployCert(param));
     }
     @GetMapping
     public Ajax findByPage(@ModelAttribute PageQuery pageQuery) {
-        return Ajax.success(sslCertificateService.findByPage(pageQuery));
+        return Ajax.success(tlsCertificateService.findByPage(pageQuery));
     }
 
     @DeleteMapping
     public Ajax deleteByIds(@RequestBody List<String> ids) {
-        sslCertificateService.deleteByIds(ids);
+        tlsCertificateService.deleteByIds(ids);
         return Ajax.success();
     }
 
     @GetMapping("download-cert/{certId}")
     public void downloadCert(@PathVariable String certId, HttpServletResponse response) {
-        sslCertificateService.downloadCert(certId, response);
+        tlsCertificateService.downloadCert(certId, response);
     }
 
     @PutMapping("{certId}/auto-renew")
-    public Ajax updateAutoRenew(@PathVariable String certId, @RequestBody SslCertAutoRenewParam param) {
-        return Ajax.success(sslCertificateService.updateAutoRenew(certId, Boolean.TRUE.equals(param.getAutoRenew())));
+    public Ajax updateAutoRenew(@PathVariable String certId, @RequestBody TlsCertAutoRenewParam param) {
+        return Ajax.success(tlsCertificateService.updateAutoRenew(certId, Boolean.TRUE.equals(param.getAutoRenew())));
     }
 }

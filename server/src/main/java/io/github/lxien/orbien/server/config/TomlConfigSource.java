@@ -110,7 +110,7 @@ public class TomlConfigSource implements ConfigSource {
                 dashboard.setCertFile(trimToNull(certFile));
                 dashboard.setKeyFile(trimToNull(keyFile));
                 dashboard.setKeyPassword(trimToNull(keyPass));
-                validateDashboardSsl(dashboard);
+                validateDashboardTls(dashboard);
                 resolveDashboardCertPaths(dashboard, Paths.get(path).toAbsolutePath().normalize().getParent());
                 builder.dashboard(dashboard);
             }
@@ -202,7 +202,7 @@ public class TomlConfigSource implements ConfigSource {
                 TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
     }
 
-    private void validateDashboardSsl(DashboardConfig dashboard) {
+    private void validateDashboardTls(DashboardConfig dashboard) {
         boolean hasCert = StringUtils.hasText(dashboard.getCertFile());
         boolean hasKey = StringUtils.hasText(dashboard.getKeyFile());
         if (hasCert != hasKey) {
@@ -211,7 +211,7 @@ public class TomlConfigSource implements ConfigSource {
     }
 
     private void resolveDashboardCertPaths(DashboardConfig dashboard, Path configDir) {
-        if (dashboard == null || configDir == null || !dashboard.isSslEnabled()) {
+        if (dashboard == null || configDir == null || !dashboard.isTlsEnabled()) {
             return;
         }
         dashboard.setCertFile(TlsConfigSupport.resolveAbsolutePath(configDir, dashboard.getCertFile()));

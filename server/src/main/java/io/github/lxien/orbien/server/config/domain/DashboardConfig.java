@@ -29,7 +29,7 @@ public class DashboardConfig {
         this.port = port;
     }
 
-    public boolean isSslEnabled() {
+    public boolean isTlsEnabled() {
         return StringUtils.hasText(certFile) && StringUtils.hasText(keyFile);
     }
 }

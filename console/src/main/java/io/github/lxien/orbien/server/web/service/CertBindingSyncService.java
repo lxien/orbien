@@ -18,7 +18,7 @@
 
 package io.github.lxien.orbien.server.web.service;
 
-import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
+import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.web.entity.CertDomainBinding;
 import io.github.lxien.orbien.server.web.entity.ProxyDomainDO;
 import io.github.lxien.orbien.server.web.repository.CertDomainBindingRepository;
@@ -36,7 +36,7 @@ public class CertBindingSyncService {
 
     private final CertDomainBindingRepository bindingRepository;
     private final ProxyDomainRepository proxyDomainRepository;
-    private final SslCertificateManager sslCertificateManager;
+    private final TlsCertificateManager tlsCertificateManager;
 
     @Transactional(rollbackFor = Exception.class)
     public void removeBindingsByProxyId(String proxyId) {
@@ -63,7 +63,7 @@ public class CertBindingSyncService {
         }
         List<CertDomainBinding> bindings = bindingRepository.findByProxyDomainIdIn(proxyDomainIds);
         for (CertDomainBinding binding : bindings) {
-            sslCertificateManager.cancelDeploy(binding.getDomain());
+            tlsCertificateManager.cancelDeploy(binding.getDomain());
         }
         bindingRepository.deleteByProxyDomainIdIn(proxyDomainIds);
     }

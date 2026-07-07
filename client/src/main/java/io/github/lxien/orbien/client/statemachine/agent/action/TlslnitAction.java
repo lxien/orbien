@@ -28,7 +28,7 @@ public class TlslnitAction extends AgentBaseAction {
                 TlsContextHolder.initialize(sslContext);
                 context.setTlsContext(sslContext);
             }
-            context.getStateMachine().fireEvent(context.getState(), AgentEvent.SSL_INITIALIZED, context);
+            context.getStateMachine().fireEvent(context.getState(), AgentEvent.TLS_INITIALIZED, context);
         } catch (Exception e) {
             logger.error("TLS 初始化失败", e);
             context.fireEvent(AgentEvent.LOCAL_GOAWAY);

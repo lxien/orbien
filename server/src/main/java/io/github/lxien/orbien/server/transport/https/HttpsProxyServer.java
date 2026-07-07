@@ -57,14 +57,14 @@ public class HttpsProxyServer implements Lifecycle {
     private final AppConfig appConfig;
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
-    private final SslCertificateManager sslCertificateManager;
+    private final TlsCertificateManager tlsCertificateManager;
 
-    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, SslCertificateManager sslCertificateManager) {
+    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, TlsCertificateManager tlsCertificateManager) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
-        this.sslCertificateManager = sslCertificateManager;
+        this.tlsCertificateManager = tlsCertificateManager;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class HttpsProxyServer implements Lifecycle {
                             ChannelPipeline pipeline = sc.pipeline();
                             // PROXY 必须在 TLS 之前
                             VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
-                            pipeline.addLast(new SniHandler(sslCertificateManager::getSslContext));
+                            pipeline.addLast(new SniHandler(tlsCertificateManager::getSslContext));
                             pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
                             pipeline.addLast(new HeaderInjectDecoder());

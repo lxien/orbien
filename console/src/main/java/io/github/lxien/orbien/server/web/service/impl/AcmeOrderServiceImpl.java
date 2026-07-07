@@ -7,7 +7,7 @@ import io.github.lxien.orbien.server.web.common.utils.JsonUtils;
 import io.github.lxien.orbien.server.web.config.AcmeProperties;
 import io.github.lxien.orbien.server.web.dto.acme.AcmeDnsChallengeDTO;
 import io.github.lxien.orbien.server.web.dto.acme.AcmeOrderDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDTO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
 import io.github.lxien.orbien.server.web.entity.AcmeCertOrderDO;
 import io.github.lxien.orbien.server.web.entity.AcmeDnsChallengeDO;
 import io.github.lxien.orbien.server.web.entity.DnsCredentialDO;
@@ -23,7 +23,7 @@ import io.github.lxien.orbien.server.web.repository.DnsCredentialRepository;
 import io.github.lxien.orbien.server.web.service.AcmeOrderService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.DnsCredentialService;
-import io.github.lxien.orbien.server.web.service.SslCertificateService;
+import io.github.lxien.orbien.server.web.service.TlsCertificateService;
 import io.github.lxien.orbien.server.web.service.acme.AcmeClientService;
 import io.github.lxien.orbien.server.web.service.acme.DnsNameHelper;
 import io.github.lxien.orbien.server.web.service.acme.DnsPropagationChecker;
@@ -72,7 +72,7 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
     private final AcmeClientService acmeClientService;
     private final DnsProviderRegistry dnsProviderRegistry;
     private final DnsPropagationChecker dnsPropagationChecker;
-    private final SslCertificateService sslCertificateService;
+    private final TlsCertificateService tlsCertificateService;
     private final CertBindingService certBindingService;
     private final AcmeProperties acmeProperties;
 
@@ -280,7 +280,7 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
             acmeCertOrderRepository.save(order);
             List<String> domains = JsonUtils.toStringList(order.getDomains());
             AcmeClientService.IssuedCertificate issued = acmeClientService.issueCertificate(login, order.getAcmeOrderUrl());
-            SslCertDTO cert = sslCertificateService.saveAcmeCert(issued.getKeyPem(), issued.getFullChainPem());
+            TlsCertDTO cert = tlsCertificateService.saveAcmeCert(issued.getKeyPem(), issued.getFullChainPem());
 
             List<Long> bindDomainIds = JsonUtils.toLongList(order.getBindProxyDomainIds());
             if (!CollectionUtils.isEmpty(bindDomainIds)) {
@@ -299,7 +299,7 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
             order.setErrorMessage(null);
             acmeCertOrderRepository.save(order);
             if (Boolean.TRUE.equals(order.getAutoRenew())) {
-                sslCertificateService.updateAutoRenew(cert.getId(), true);
+                tlsCertificateService.updateAutoRenew(cert.getId(), true);
             }
         } catch (Exception e) {
             logger.error("ACME 申请验证失败: orderId={}", orderId, e);

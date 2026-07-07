@@ -21,7 +21,7 @@ const commonMenus = {
   auth: { key: 'auth', label: '认证鉴权', icon: 'ri:key-line' },
   load: { key: 'load', label: '负载均衡', icon: 'ri:server-line' },
   health: { key: 'health', label: '健康检查', icon: 'ri:heart-pulse-line' },
-  ssl: { key: 'ssl', label: 'SSL加密', icon: 'ri:shield-check-line' },
+  tls: { key: 'tls', label: 'TLS 加密', icon: 'ri:shield-check-line' },
   trans: { key: 'trans', label: '传输安全', icon: 'ri:lock-line' },
   limit: { key: 'limit', label: '流量限制', icon: 'ri:speed-line' }
 } as const satisfies Record<string, ProxyConfigMenuItem>
@@ -53,7 +53,7 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     commonMenus.access,
     commonMenus.auth,
     commonMenus.load,
-    commonMenus.ssl,
+    commonMenus.tls,
     commonMenus.health,
     commonMenus.trans,
     commonMenus.limit

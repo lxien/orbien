@@ -28,7 +28,7 @@ import java.util.*;
  * @author lxien
  * @since 1.0
  */
-public class SslParser {
+public class TlsCertParser {
 
     static {
         // 注册 BouncyCastle 安全提供者
@@ -42,7 +42,7 @@ public class SslParser {
      * SSL 证书信息实体类。
      */
     @Data
-    public static class SslInfo {
+    public static class TlsCertInfo {
 
         /**
          * 通用名称列表
@@ -95,8 +95,8 @@ public class SslParser {
      * @param fullChain PEM 格式的完整证书链
      * @return SSL 证书信息对象
      */
-    public static SslInfo parsePem(String fullChain) {
-        SslInfo info = new SslInfo();
+    public static TlsCertInfo parsePem(String fullChain) {
+        TlsCertInfo info = new TlsCertInfo();
         try {
             List<X509Certificate> certs = parseCertificates(fullChain, info);
             if (certs.isEmpty()) {
@@ -122,7 +122,7 @@ public class SslParser {
      * @param info 用于存放解析错误信息的对象
      * @return 解析出的证书列表
      */
-    private static List<X509Certificate> parseCertificates(String pem, SslInfo info) {
+    private static List<X509Certificate> parseCertificates(String pem, TlsCertInfo info) {
         List<X509Certificate> out = new ArrayList<>();
         if (pem == null) return out;
         try (Reader r = new StringReader(pem); PEMParser p = new PEMParser(r)) {
@@ -155,7 +155,7 @@ public class SslParser {
      * @param info  用于存放诊断信息的对象
      * @return 叶证书，若无法确定则返回 null
      */
-    private static X509Certificate selectLeafStrictWithFallback(List<X509Certificate> certs, SslInfo info) {
+    private static X509Certificate selectLeafStrictWithFallback(List<X509Certificate> certs, TlsCertInfo info) {
         // 第一阶段：找出未被其他证书签发的候选证书
         List<X509Certificate> candidates = new ArrayList<>();
         for (X509Certificate c : certs) {
@@ -235,12 +235,12 @@ public class SslParser {
     }
 
     /**
-     * 从证书中提取信息并填充到 SslInfo 对象。
+     * 从证书中提取信息并填充到 TlsCertInfo 对象。
      *
      * @param c    X.509 证书
      * @param info 用于存放提取结果的对象
      */
-    private static void fillFromCert(X509Certificate c, SslInfo info) {
+    private static void fillFromCert(X509Certificate c, TlsCertInfo info) {
         try {
             // 提取颁发者信息
             try {

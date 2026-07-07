@@ -18,9 +18,9 @@
 
 package io.github.lxien.orbien.server.web.entity;
 
-import io.github.lxien.orbien.server.web.entity.converter.SslStatusConverter;
+import io.github.lxien.orbien.server.web.entity.converter.TlsCertStatusConverter;
 import io.github.lxien.orbien.server.web.enums.CertSource;
-import io.github.lxien.orbien.server.web.enums.SslStatus;
+import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import io.github.lxien.orbien.server.web.entity.converter.CertSourceConverter;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 @Table(name = "ssl_cert", indexes = {
         @Index(name = "idx_ssl_cert_fingerprint", columnList = "fingerprint")
     })
-public class SslCertDO {
+public class TlsCertDO {
     /**
      * 主键ID
      */
@@ -70,8 +70,8 @@ public class SslCertDO {
      * 证书状态
      */
     @Column(name = "status")
-    @Convert(converter = SslStatusConverter.class)
-    private SslStatus status;
+    @Convert(converter = TlsCertStatusConverter.class)
+    private TlsCertStatus status;
 
     /**
      * 生效时间

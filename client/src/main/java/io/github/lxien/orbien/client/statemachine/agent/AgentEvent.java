@@ -15,7 +15,7 @@ public enum AgentEvent {
     /**
      * SSL 初始化完成
      */
-    SSL_INITIALIZED,
+    TLS_INITIALIZED,
     /**
      * 尝试连接
      */

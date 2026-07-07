@@ -61,7 +61,7 @@ import {ProtocolType} from '@/enums/orbien/business'
 import ArtSvgIcon from '@/components/core/base/art-svg-icon/index.vue'
 import AccessControlPage from './modules/access-control/index.vue'
 import BasicAuthPage from './modules/basic-auth/index.vue'
-import SslPage from './modules/ssl/index.vue'
+import TlsPage from './modules/tls/index.vue'
 import ClusterPage from './modules/cluster/index.vue'
 import TransportPage from './modules/transport/index.vue'
 import RateLimitPolicyPage from './modules/rate-limit-policy/index.vue'
@@ -122,7 +122,7 @@ const pageComponents: Record<string, Component> = {
   trans: TransportPage,
   limit: RateLimitPolicyPage,
   health: HealthCheckPage,
-  ssl: SslPage
+  tls: TlsPage
 }
 
 const resetActiveMenu = () => {

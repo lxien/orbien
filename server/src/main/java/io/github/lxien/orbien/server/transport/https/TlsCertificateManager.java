@@ -43,8 +43,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * SSL 证书管理器
  */
 @Component
-public class SslCertificateManager {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SslCertificateManager.class);
+public class TlsCertificateManager {
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(TlsCertificateManager.class);
     private final Cache<String/*domain*/, SslContext> l1Cache = Caffeine.newBuilder()
             .maximumSize(1000)
             .expireAfterAccess(1, TimeUnit.HOURS)
@@ -59,16 +59,16 @@ public class SslCertificateManager {
     @PostConstruct
     public void init() {
         try {
-            File keyFile = new File(SystemConstants.DEFAULT_GATEWAY_SSL_PATH, "privkey.pem");
-            File certFile = new File(SystemConstants.DEFAULT_GATEWAY_SSL_PATH, "fullchain.pem");
+            File keyFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "privkey.pem");
+            File certFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "fullchain.pem");
             if (certFile.exists() && keyFile.exists()) {
                 this.defaultSslContext = SslContextBuilder.forServer(certFile, keyFile).build();
-                logger.info("默认SSL证书已加载");
+                logger.info("默认TLS 证书已加载");
             } else {
                 SelfSignedCertificateGenerator.Result result = SelfSignedCertificateGenerator.generate();
                 this.defaultSslContext = SslContextBuilder.forServer(result.privateKey(), result.certificate()).build();
                 SelfSignedCertificateGenerator.writeToPemFiles(result, keyFile, certFile);
-                logger.info("生成HTTPS自签名SSL证书");
+                logger.info("生成HTTPS自签名TLS 证书");
             }
         } catch (Exception e) {
             logger.error("HTTPS默认证书加载错误", e);
@@ -152,7 +152,7 @@ public class SslCertificateManager {
             if (certId == null) {
                 return null;
             }
-            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_SSL_PATH, certId);
+            File domainDir = new File(SystemConstants.DEFAULT_DOMAIN_TLS_CERT_PATH, certId);
             File certFile = new File(domainDir, "fullchain.pem");
             File keyFile = new File(domainDir, "privkey.pem");
 

@@ -24,7 +24,7 @@ import io.github.lxien.orbien.core.enums.PortPoolType;
 import io.github.lxien.orbien.server.port.PortPoolManager;
 import io.github.lxien.orbien.server.security.IpAccessChecker;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
-import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
+import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -66,7 +66,7 @@ public class ProxyManager {
     @Autowired
     private StreamManager streamManager;
     @Autowired
-    private SslCertificateManager sslCertificateManager;
+    private TlsCertificateManager tlsCertificateManager;
     private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
     private final Lock readLock = rwLock.readLock();
     private final Lock writeLock = rwLock.writeLock();
@@ -134,7 +134,7 @@ public class ProxyManager {
             proxyAgentMap.put(proxyId, agentId);
             agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
             domainRegistry.register(proxyId, domains);
-            //todo sslCertificateManager.addDeployedDomains(domains);
+            //todo tlsCertificateManager.addDeployedDomains(domains);
         } finally {
             writeLock.unlock();
         }
@@ -165,7 +165,7 @@ public class ProxyManager {
         // HTTP(S)协议
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
-           //todo  sslCertificateManager.cancelDeploy(domain);// HTTPS协议
+           //todo  tlsCertificateManager.cancelDeploy(domain);// HTTPS协议
             streamManager.fireCloseByDomain(domain);
         }
         //从注册中心删除域名

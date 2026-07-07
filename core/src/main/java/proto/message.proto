@@ -109,7 +109,7 @@ message Domain {
   repeated string sub_domains = 3;
 }
 
-message SslCert {
+message TlsCert {
   string private_key_pem = 1;
   string cert_chain_pem = 2;
 }
@@ -143,7 +143,7 @@ message Proxy {
   optional Bandwidth bandwidth = 11;
   optional LoadBalanceStrategy load_balance_strategy = 12;
   optional Transport transport = 13;
-  optional SslCert ssl_cert = 14;
+  optional TlsCert tls_cert = 14;
   optional HealthCheck health_check = 15;
 }
 

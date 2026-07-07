@@ -1,7 +1,7 @@
 <template>
-  <div class="ssl-page art-full-height">
+  <div class="tls-page art-full-height">
     <ElCard class="art-table-card">
-      <ElTabs v-model="activeTab" class="ssl-tabs">
+      <ElTabs v-model="activeTab" class="tls-tabs">
         <ElTabPane label="证书列表" name="certs">
           <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
             <template #left>
@@ -36,7 +36,7 @@
       </ElTabs>
     </ElCard>
 
-    <SslDialog v-model:visible="dialogVisible" @submit="handleUploadSubmit" />
+    <TlsDialog v-model:visible="dialogVisible" @submit="handleUploadSubmit" />
     <BindDialog v-model:visible="bindDialogVisible" :cert-id="currentCertId" @submit="handleBindSubmit" />
     <AcmeApplyWizard
       v-model:visible="wizardVisible"
@@ -49,21 +49,21 @@
   import { ref, h } from 'vue'
   import { useTable } from '@/hooks/core/useTable'
   import { ElMessage, ElMessageBox, ElTag, ElSwitch } from 'element-plus'
-  import SslDialog from './modules/ssl-dialog.vue'
+  import TlsDialog from './modules/tls-dialog.vue'
   import BindDialog from './modules/bind-dialog.vue'
   import AcmeOrderPanel from './modules/acme-order-panel.vue'
   import DnsCredentialPanel from './modules/dns-credential-panel.vue'
   import AcmeApplyWizard from './modules/acme-apply-wizard.vue'
-  import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert, fetchUpdateCertAutoRenew } from '@/api/ssl'
+  import { fetchGetCertListByPage, fetchDownloadCert, fetchDeleteCert, fetchUpdateCertAutoRenew } from '@/api/tls'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
   import { downloadBlob } from '@/utils/download'
 
-  defineOptions({ name: 'SslManagement' })
+  defineOptions({ name: 'TlsManagement' })
 
-  type SslItem = Api.Ssl.CertDTO
+  type TlsItem = Api.Tls.CertDTO
 
   const activeTab = ref('certs')
-  const selectedRows = ref<SslItem[]>([])
+  const selectedRows = ref<TlsItem[]>([])
   const dialogVisible = ref(false)
   const bindDialogVisible = ref(false)
   const wizardVisible = ref(false)
@@ -79,7 +79,7 @@
     return h(ElTag, { type: 'warning', size: 'small' }, () => '手动')
   }
 
-  const getExpireDays = (item: SslItem) => {
+  const getExpireDays = (item: TlsItem) => {
     const now = new Date()
     const notAfter = new Date(item.notAfter)
     if (now > notAfter) {
@@ -112,13 +112,13 @@
           prop: 'sanDomains',
           label: '认证域名',
           minWidth: 120,
-          formatter: (row: SslItem) => row.sanDomains?.join(', ') || ''
+          formatter: (row: TlsItem) => row.sanDomains?.join(', ') || ''
         },
         {
           prop: 'source',
           label: '来源',
           width: 90,
-          formatter: (row: SslItem) => sourceLabel(row.source)
+          formatter: (row: TlsItem) => sourceLabel(row.source)
         },
         {
           prop: 'org',
@@ -132,18 +132,18 @@
           prop: 'boundDomainCount',
           label: '使用域名数',
           width: 100,
-          formatter: (row: SslItem) => row.boundDomainCount ?? 0
+          formatter: (row: TlsItem) => row.boundDomainCount ?? 0
         },
         {
           prop: 'notAfter',
           label: '到期时间',
-          formatter: (row: SslItem) => getExpireDays(row)
+          formatter: (row: TlsItem) => getExpireDays(row)
         },
         {
           prop: 'autoRenew',
           label: '自动续签',
           width: 100,
-          formatter: (row: SslItem) => {
+          formatter: (row: TlsItem) => {
             if (row.source !== 2) {
               return h('span', { class: 'text-muted' }, '-')
             }
@@ -165,7 +165,7 @@
           label: '操作',
           width: 150,
           fixed: 'right',
-          formatter: (row: SslItem) => {
+          formatter: (row: TlsItem) => {
             const now = new Date()
             const notAfter = new Date(row.notAfter)
             const isExpired = now > notAfter
@@ -198,7 +198,7 @@
     }
   })
 
-  const handleSelectionChange = (selection: SslItem[]): void => {
+  const handleSelectionChange = (selection: TlsItem[]): void => {
     selectedRows.value = selection
   }
 
@@ -241,12 +241,12 @@
     }
   }
 
-  const handleBind = (row: SslItem) => {
+  const handleBind = (row: TlsItem) => {
     currentCertId.value = row.id || null
     bindDialogVisible.value = true
   }
 
-  const handleAutoRenewChange = async (row: SslItem, autoRenew: boolean) => {
+  const handleAutoRenewChange = async (row: TlsItem, autoRenew: boolean) => {
     if (!row.id) return
     renewingCertId.value = row.id
     try {
@@ -264,7 +264,7 @@
     }
   }
 
-  const handleDownload = async (row: SslItem) => {
+  const handleDownload = async (row: TlsItem) => {
     try {
       const blob = await fetchDownloadCert(row.id)
       const fileName = `${row.sanDomains?.join('_') || 'cert'}.zip`
@@ -274,7 +274,7 @@
     }
   }
 
-  const handleDelete = async (row: SslItem) => {
+  const handleDelete = async (row: TlsItem) => {
     try {
       await ElMessageBox.confirm('确定要删除该证书吗？', '证书删除确认', {
         confirmButtonText: '删除',
@@ -291,7 +291,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .ssl-tabs {
+  .tls-tabs {
     :deep(.el-tabs__header) {
       margin-bottom: 16px;
     }

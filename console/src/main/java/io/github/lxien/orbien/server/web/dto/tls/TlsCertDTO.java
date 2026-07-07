@@ -16,7 +16,7 @@
  *
  */
 
-package io.github.lxien.orbien.server.web.dto.ssl;
+package io.github.lxien.orbien.server.web.dto.tls;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class SslCertDTO implements Serializable {
+public class TlsCertDTO implements Serializable {
     private String id;
     private String org;
     private String issuer;

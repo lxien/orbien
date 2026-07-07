@@ -18,8 +18,8 @@
 
 package io.github.lxien.orbien.server.web.service.converter;
 
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDTO;
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -29,16 +29,16 @@ import java.util.Collections;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface SslCertConvert {
+public interface TlsCertConvert {
     @Mapping(target = "status", expression = "java(sslCertificate.getStatus().getCode())")
     @Mapping(target = "source", expression = "java(sslCertificate.getSource() != null ? sslCertificate.getSource().getCode() : 1)")
     @Mapping(target = "sanDomains", source = "sslCertificate.sanDomains", qualifiedByName = "stringToList")
     @Mapping(target = "boundDomainCount", source = "boundDomainCount")
     @Mapping(target = "autoRenew", source = "sslCertificate.autoRenew")
     @Mapping(target = "lastRenewAt", source = "sslCertificate.lastRenewAt")
-    SslCertDTO toDTO(SslCertDO sslCertificate, Long boundDomainCount);
+    TlsCertDTO toDTO(TlsCertDO sslCertificate, Long boundDomainCount);
 
-    default SslCertDTO toDTO(SslCertDO sslCertificate) {
+    default TlsCertDTO toDTO(TlsCertDO sslCertificate) {
         return toDTO(sslCertificate, 0L);
     }
 

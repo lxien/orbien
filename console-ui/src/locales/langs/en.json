@@ -253,7 +253,7 @@
       "portPool": "Port Pool",
       "agent": "Agent",
       "domain": "Domain",
-      "ssl": "SSL Certificate",
+      "tls": "TLS Certificate",
       "token": "Token",
       "scheduledJob": "Scheduled Jobs",
       "stats": "Statistics"

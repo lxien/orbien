@@ -16,25 +16,17 @@
  *
  */
 
-package io.github.lxien.orbien.server.web.dto.ssl;
+package io.github.lxien.orbien.core.domain;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
-
-/**
- * SSL证书下载DTO
- * 用于返回证书文件内容供下载
- */
-@Data
-public class SslCertDownloadDTO implements Serializable {
-    /**
-     * 私钥内容（PEM格式）
-     */
-    private String keyPem;
-
-    /**
-     * 完整证书链内容（PEM格式）
-     */
-    private String fullChainPem;
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProxyTlsCertConfig implements Serializable {
+    private String keyFile;
+    private String certFile;
 }

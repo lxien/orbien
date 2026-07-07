@@ -1,4 +1,4 @@
-declare namespace Api.Ssl {
+declare namespace Api.Tls {
   interface CertDTO {
     id: string
     issuer: string

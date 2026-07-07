@@ -8,7 +8,7 @@ import io.github.lxien.orbien.server.transport.http.ForceHttpsRedirectHandler;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.http.HttpProxyServer;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
-import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
+import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.transport.https.HttpsProxyServer;
 import io.github.lxien.orbien.server.transport.tcp.TcpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpProxyServer;
@@ -59,11 +59,11 @@ public class TransportConfiguration {
     public HttpsProxyServer httpsProxyServer(HttpVisitorHandler httpVisitorHandler,
                                              HttpIpCheckHandler httpIpCheckHandler,
                                              BasicAuthHandler basicAuthHandler,
-                                             SslCertificateManager sslCertificateManager) {
+                                             TlsCertificateManager tlsCertificateManager) {
         return new HttpsProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                sslCertificateManager);
+                tlsCertificateManager);
     }
 }

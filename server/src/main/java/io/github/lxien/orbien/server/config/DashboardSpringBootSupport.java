@@ -20,7 +20,7 @@ public final class DashboardSpringBootSupport {
         if (StringUtils.hasText(dashboard.getAddr())) {
             builder.properties("server.address=" + dashboard.getAddr());
         }
-        if (!dashboard.isSslEnabled()) {
+        if (!dashboard.isTlsEnabled()) {
             return;
         }
         builder.properties(

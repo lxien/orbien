@@ -18,23 +18,23 @@
 
 package io.github.lxien.orbien.server.web.repository;
 
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SslCertRepository extends JpaRepository<SslCertDO, String> {
+public interface TlsCertRepository extends JpaRepository<TlsCertDO, String> {
 
     boolean existsByFingerprint(String fingerprint);
 
-    SslCertDO findByFingerprint(String sha256Fingerprint);
+    TlsCertDO findByFingerprint(String sha256Fingerprint);
 
     @org.springframework.data.jpa.repository.Query("""
-            SELECT c FROM SslCertDO c
+            SELECT c FROM TlsCertDO c
             WHERE c.notAfter <= :deadline AND c.notAfter > :today
             ORDER BY c.notAfter ASC
             """)
-    java.util.List<SslCertDO> findRenewCandidates(
+    java.util.List<TlsCertDO> findRenewCandidates(
             @org.springframework.data.repository.query.Param("deadline") java.time.LocalDate deadline,
             @org.springframework.data.repository.query.Param("today") java.time.LocalDate today);
 }

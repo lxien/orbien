@@ -72,11 +72,11 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
-    name: 'SSL',
-    path: '/ssl',
-    component: '/orbien/ssl',
+    name: 'TLS',
+    path: '/tls',
+    component: '/orbien/tls',
     meta: {
-      title: 'menus.orbien.ssl',
+      title: 'menus.orbien.tls',
       icon: 'ri:shield-check-line',
       roles: ['R_SUPER']
     }

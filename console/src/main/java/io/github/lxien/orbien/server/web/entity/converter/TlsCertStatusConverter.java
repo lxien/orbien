@@ -15,22 +15,22 @@
  */
 package io.github.lxien.orbien.server.web.entity.converter;
 
-import io.github.lxien.orbien.server.web.enums.SslStatus;
+import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
 /**
- * SSL证书状态转换器
+ * TLS 证书状态转换器
  */
 @Converter
-public class SslStatusConverter implements AttributeConverter<SslStatus, Integer> {
+public class TlsCertStatusConverter implements AttributeConverter<TlsCertStatus, Integer> {
     @Override
-    public Integer convertToDatabaseColumn(SslStatus sslStatus) {
+    public Integer convertToDatabaseColumn(TlsCertStatus sslStatus) {
         return sslStatus.getCode();
     }
 
     @Override
-    public SslStatus convertToEntityAttribute(Integer code) {
-        return SslStatus.fromCode(code);
+    public TlsCertStatus convertToEntityAttribute(Integer code) {
+        return TlsCertStatus.fromCode(code);
     }
 }

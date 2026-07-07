@@ -36,7 +36,7 @@ export function resolveDnsCredentialStatusTagType(status: number): OutcomeTagTyp
 }
 
 /** 证书绑定状态：1=正常，2=已禁用，其余异常为失败 */
-export function resolveSslBindStatusTagType(status?: number): OutcomeTagType {
+export function resolveTlsBindStatusTagType(status?: number): OutcomeTagType {
   if (!status) return 'info'
   if (status === 1) return 'primary'
   if (status === 2) return 'danger'

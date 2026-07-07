@@ -25,24 +25,24 @@ import io.github.lxien.orbien.server.web.common.exception.SystemException;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.utils.DateUtil;
-import io.github.lxien.orbien.server.web.common.utils.SslParser;
+import io.github.lxien.orbien.server.web.common.utils.TlsCertParser;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindResultDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertAutoRenewResultDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDTO;
-import io.github.lxien.orbien.server.web.dto.ssl.SslCertDownloadDTO;
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertAutoRenewResultDTO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDownloadDTO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import io.github.lxien.orbien.server.web.enums.CertSource;
 import io.github.lxien.orbien.server.web.enums.ScheduledJobCode;
-import io.github.lxien.orbien.server.web.enums.SslStatus;
+import io.github.lxien.orbien.server.web.enums.TlsCertStatus;
 import io.github.lxien.orbien.server.web.param.binding.CertBindParam;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveAndDeployParam;
-import io.github.lxien.orbien.server.web.param.ssl.SslCertSaveParam;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveAndDeployParam;
+import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveParam;
 import io.github.lxien.orbien.server.web.repository.CertDomainBindingRepository;
-import io.github.lxien.orbien.server.web.repository.SslCertRepository;
+import io.github.lxien.orbien.server.web.repository.TlsCertRepository;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
-import io.github.lxien.orbien.server.web.service.SslCertificateService;
+import io.github.lxien.orbien.server.web.service.TlsCertificateService;
 import io.github.lxien.orbien.server.web.service.scheduled.ScheduledJobEnableSupport;
-import io.github.lxien.orbien.server.web.service.converter.SslCertConvert;
+import io.github.lxien.orbien.server.web.service.converter.TlsCertConvert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -67,13 +67,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 @Service
-public class SslCertServiceImpl implements SslCertificateService {
+public class TlsCertServiceImpl implements TlsCertificateService {
     @Autowired
-    private SslCertRepository sslCertRepository;
+    private TlsCertRepository tlsCertRepository;
     @Autowired
     private CertDomainBindingRepository certDomainBindingRepository;
     @Autowired
-    private SslCertConvert sslCertConvert;
+    private TlsCertConvert tlsCertConvert;
     @Autowired
     private UidGenerator uidGenerator;
     @Autowired
@@ -83,18 +83,18 @@ public class SslCertServiceImpl implements SslCertificateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SslCertDTO saveCert(SslCertSaveParam param) {
-        SslParser.SslInfo sslInfo = SslParser.parsePem(param.getFullChain());
+    public TlsCertDTO saveCert(TlsCertSaveParam param) {
+        TlsCertParser.TlsCertInfo sslInfo = TlsCertParser.parsePem(param.getFullChain());
         if (sslInfo.hasError()) {
             throw new BizException("证书不可用");
         }
         String sha256Fingerprint = sslInfo.getSha256Fingerprint();
-        if (sslCertRepository.existsByFingerprint(sha256Fingerprint)) {
+        if (tlsCertRepository.existsByFingerprint(sha256Fingerprint)) {
             throw new BizException("该证书已经存在");
         }
         String certId = uidGenerator.getUIDAsString();
 
-        SslCertDO sslCertDO = new SslCertDO();
+        TlsCertDO sslCertDO = new TlsCertDO();
         sslCertDO.setId(certId);
         sslCertDO.setIssuer(sslInfo.issuer);
         sslCertDO.setOrg(sslInfo.organization);
@@ -107,10 +107,10 @@ public class SslCertServiceImpl implements SslCertificateService {
         sslCertDO.setNotAfter(notAfter);
 
         LocalDate today = LocalDate.now();
-        SslStatus status = (notAfter != null && today.isAfter(notAfter)) ? SslStatus.EXPIRED : SslStatus.ACTIVE;
+        TlsCertStatus status = (notAfter != null && today.isAfter(notAfter)) ? TlsCertStatus.EXPIRED : TlsCertStatus.ACTIVE;
         sslCertDO.setStatus(status);
 
-        String rootPath = SystemConstants.DEFAULT_DOMAIN_SSL_PATH;
+        String rootPath = SystemConstants.DEFAULT_DOMAIN_TLS_CERT_PATH;
 
         File rootDir = new File(rootPath);
         if (!rootDir.exists() && !rootDir.mkdirs()) {
@@ -136,59 +136,59 @@ public class SslCertServiceImpl implements SslCertificateService {
         sslCertDO.setKeyPath(keyFile.getAbsolutePath());
         sslCertDO.setFullChainPath(fullChainFile.getAbsolutePath());
 
-        sslCertRepository.saveAndFlush(sslCertDO);
-        return sslCertConvert.toDTO(sslCertDO, 0L);
+        tlsCertRepository.saveAndFlush(sslCertDO);
+        return tlsCertConvert.toDTO(sslCertDO, 0L);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SslCertDTO saveAcmeCert(String keyPem, String fullChainPem) {
-        SslParser.SslInfo sslInfo = SslParser.parsePem(fullChainPem);
+    public TlsCertDTO saveAcmeCert(String keyPem, String fullChainPem) {
+        TlsCertParser.TlsCertInfo sslInfo = TlsCertParser.parsePem(fullChainPem);
         if (sslInfo.hasError()) {
             throw new BizException("证书不可用");
         }
         String fingerprint = sslInfo.getSha256Fingerprint();
-        SslCertDO existing = sslCertRepository.findByFingerprint(fingerprint);
+        TlsCertDO existing = tlsCertRepository.findByFingerprint(fingerprint);
         if (existing != null) {
-            return sslCertConvert.toDTO(existing, certDomainBindingRepository.countByCertId(existing.getId()));
+            return tlsCertConvert.toDTO(existing, certDomainBindingRepository.countByCertId(existing.getId()));
         }
 
-        SslCertSaveParam param = new SslCertSaveParam(keyPem, fullChainPem);
-        SslCertDTO created = saveCert(param);
-        SslCertDO sslCertDO = sslCertRepository.findById(created.getId()).orElseThrow();
+        TlsCertSaveParam param = new TlsCertSaveParam(keyPem, fullChainPem);
+        TlsCertDTO created = saveCert(param);
+        TlsCertDO sslCertDO = tlsCertRepository.findById(created.getId()).orElseThrow();
         sslCertDO.setSource(CertSource.ACME);
-        sslCertRepository.save(sslCertDO);
+        tlsCertRepository.save(sslCertDO);
         created.setSource(CertSource.ACME.getCode());
         return created;
     }
 
     @Override
-    public PageResult<SslCertDTO> findByPage(PageQuery pageQuery) {
+    public PageResult<TlsCertDTO> findByPage(PageQuery pageQuery) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
         Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
-        Page<SslCertDO> resultPage = sslCertRepository.findAll(pageable);
+        Page<TlsCertDO> resultPage = tlsCertRepository.findAll(pageable);
         if (resultPage.isEmpty()) {
             return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
         }
-        List<String> certIds = resultPage.getContent().stream().map(SslCertDO::getId).toList();
+        List<String> certIds = resultPage.getContent().stream().map(TlsCertDO::getId).toList();
         Map<String, Long> usageCountMap = certDomainBindingRepository.findByCertIdIn(certIds).stream()
                 .collect(Collectors.groupingBy(
                         binding -> binding.getCertId(),
                         Collectors.counting()
                 ));
-        List<SslCertDTO> dtoList = resultPage.getContent().stream()
-                .map(cert -> sslCertConvert.toDTO(cert, usageCountMap.getOrDefault(cert.getId(), 0L)))
+        List<TlsCertDTO> dtoList = resultPage.getContent().stream()
+                .map(cert -> tlsCertConvert.toDTO(cert, usageCountMap.getOrDefault(cert.getId(), 0L)))
                 .toList();
         return PageResult.wrap(resultPage, dtoList);
     }
 
     @Override
-    public SslCertDownloadDTO getSslDownloadInfo(String certId) {
-        Optional<SslCertDO> opt = sslCertRepository.findById(certId);
+    public TlsCertDownloadDTO getTlsDownloadInfo(String certId) {
+        Optional<TlsCertDO> opt = tlsCertRepository.findById(certId);
         if (opt.isEmpty()) {
             return null;
         }
-        SslCertDO sslCertDO = opt.get();
+        TlsCertDO sslCertDO = opt.get();
         String keyPath = sslCertDO.getKeyPath();
         String fullChainPath = sslCertDO.getFullChainPath();
 
@@ -200,7 +200,7 @@ public class SslCertServiceImpl implements SslCertificateService {
             String keyPem = Files.readString(new File(keyPath).toPath(), StandardCharsets.UTF_8);
             String fullChainPem = Files.readString(new File(fullChainPath).toPath(), StandardCharsets.UTF_8);
 
-            SslCertDownloadDTO dto = new SslCertDownloadDTO();
+            TlsCertDownloadDTO dto = new TlsCertDownloadDTO();
             dto.setKeyPem(keyPem);
             dto.setFullChainPem(fullChainPem);
             return dto;
@@ -220,9 +220,9 @@ public class SslCertServiceImpl implements SslCertificateService {
             throw new BizException("证书已被域名绑定使用，无法删除");
         }
 
-        List<SslCertDO> certificates = sslCertRepository.findAllById(ids);
+        List<TlsCertDO> certificates = tlsCertRepository.findAllById(ids);
 
-        for (SslCertDO sslCertDO : certificates) {
+        for (TlsCertDO sslCertDO : certificates) {
             String keyPath = sslCertDO.getKeyPath();
             if (keyPath != null && !keyPath.isEmpty()) {
                 try {
@@ -246,12 +246,12 @@ public class SslCertServiceImpl implements SslCertificateService {
             }
         }
 
-        sslCertRepository.deleteAllById(ids);
+        tlsCertRepository.deleteAllById(ids);
     }
 
     @Override
     public void downloadCert(String certId, HttpServletResponse response) {
-        SslCertDownloadDTO ssl = getSslDownloadInfo(certId);
+        TlsCertDownloadDTO ssl = getTlsDownloadInfo(certId);
         if (ssl == null) {
             throw new BizException("证书信息不存在");
         }
@@ -274,16 +274,16 @@ public class SslCertServiceImpl implements SslCertificateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public CertBindResultDTO saveAndDeployCert(SslCertSaveAndDeployParam param) {
-        SslParser.SslInfo sslInfo = SslParser.parsePem(param.getFullChain());
+    public CertBindResultDTO saveAndDeployCert(TlsCertSaveAndDeployParam param) {
+        TlsCertParser.TlsCertInfo sslInfo = TlsCertParser.parsePem(param.getFullChain());
         if (sslInfo.hasError()) {
             throw new BizException("证书不可用");
         }
         String sha256Fingerprint = sslInfo.getSha256Fingerprint();
-        SslCertDO sslCertDO = sslCertRepository.findByFingerprint(sha256Fingerprint);
+        TlsCertDO sslCertDO = tlsCertRepository.findByFingerprint(sha256Fingerprint);
         String certId;
         if (sslCertDO == null) {
-            certId = this.saveCert(new SslCertSaveParam(param.getKey(), param.getFullChain())).getId();
+            certId = this.saveCert(new TlsCertSaveParam(param.getKey(), param.getFullChain())).getId();
         } else {
             certId = sslCertDO.getId();
         }
@@ -300,26 +300,26 @@ public class SslCertServiceImpl implements SslCertificateService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public SslCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew) {
-        SslCertDO sslCert = sslCertRepository.findById(certId)
+    public TlsCertAutoRenewResultDTO updateAutoRenew(String certId, boolean autoRenew) {
+        TlsCertDO sslCert = tlsCertRepository.findById(certId)
                 .orElseThrow(() -> new BizException("证书不存在"));
         if (autoRenew) {
             if (sslCert.getSource() != CertSource.ACME) {
                 throw new BizException("仅 ACME 证书支持自动续签");
             }
-            if (sslCert.getStatus() != SslStatus.ACTIVE) {
+            if (sslCert.getStatus() != TlsCertStatus.ACTIVE) {
                 throw new BizException("证书不可用，无法开启自动续签");
             }
         }
         sslCert.setAutoRenew(autoRenew);
-        sslCertRepository.save(sslCert);
+        tlsCertRepository.save(sslCert);
 
         boolean jobAutoEnabled = false;
         if (autoRenew) {
             jobAutoEnabled = scheduledJobEnableSupport.enableIfDisabled(ScheduledJobCode.ACME_RENEW.getCode());
         }
 
-        SslCertAutoRenewResultDTO result = new SslCertAutoRenewResultDTO();
+        TlsCertAutoRenewResultDTO result = new TlsCertAutoRenewResultDTO();
         result.setAutoRenew(autoRenew);
         result.setAcmeRenewJobAutoEnabled(jobAutoEnabled);
         return result;

@@ -1,7 +1,7 @@
 <template>
-  <div class="ssl-page">
-    <div class="ssl-page-content">
-      <div v-if="matrix" class="ssl-summary">
+  <div class="tls-page">
+    <div class="tls-page-content">
+      <div v-if="matrix" class="tls-summary">
         <span>域名证书：{{ matrix.boundCount }}/{{ matrix.totalDomains }} 已配置</span>
         <ElTag v-if="matrix.warningCount > 0" type="danger" size="small">
           {{ matrix.warningCount }} 个异常
@@ -97,7 +97,7 @@
   import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
   import ArtTable from '@/components/core/tables/art-table/index.vue'
   import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
-  import { fetchGetCertListByPage, fetchDeleteCert, fetchSaveAndDeployCert } from '@/api/ssl'
+  import { fetchGetCertListByPage, fetchDeleteCert, fetchSaveAndDeployCert } from '@/api/tls'
   import {
     fetchGetProxyCertMatrix,
     fetchBindCert,
@@ -107,9 +107,9 @@
     fetchRedeployBinding,
     fetchDisableAllBindingsByProxy
   } from '@/api/cert-binding'
-  import { resolveSslBindStatusTagType } from '@/utils/ui/status-tag'
+  import { resolveTlsBindStatusTagType } from '@/utils/ui/status-tag'
 
-  defineOptions({ name: 'SslPage' })
+  defineOptions({ name: 'TlsPage' })
 
   const props = defineProps<{ proxyId: string }>()
 
@@ -128,7 +128,7 @@
   const bindDialogVisible = ref(false)
   const selectedCertId = ref('')
   const currentBindDomain = ref<Api.CertBinding.ProxyDomainCertItem | null>(null)
-  const allCerts = ref<Api.Ssl.CertDTO[]>([])
+  const allCerts = ref<Api.Tls.CertDTO[]>([])
 
   const matchedCerts = computed(() => {
     if (!currentBindDomain.value) return []
@@ -153,10 +153,10 @@
       return h(ElTag, { type: 'info', size: 'small' }, () => '未配置')
     }
     const text = map[status] || '未知'
-    return h(ElTag, { type: resolveSslBindStatusTagType(status), size: 'small' }, () => text)
+    return h(ElTag, { type: resolveTlsBindStatusTagType(status), size: 'small' }, () => text)
   }
 
-  const isDomainMatchedByCert = (domain: string, cert: Api.Ssl.CertDTO) => {
+  const isDomainMatchedByCert = (domain: string, cert: Api.Tls.CertDTO) => {
     const sanList = cert.sanDomains || []
     const normalized = domain.trim().toLowerCase()
     return sanList.some((san) => {
@@ -278,7 +278,7 @@
           prop: 'sanDomains',
           label: '认证域名',
           minWidth: 150,
-          formatter: (row: Api.Ssl.CertDTO) => row.sanDomains?.join(', ') || ''
+          formatter: (row: Api.Tls.CertDTO) => row.sanDomains?.join(', ') || ''
         },
         {
           prop: 'issuer',
@@ -289,13 +289,13 @@
           prop: 'notAfter',
           label: '到期时间',
           minWidth: 120,
-          formatter: (row: Api.Ssl.CertDTO) => formatDate(row.notAfter)
+          formatter: (row: Api.Tls.CertDTO) => formatDate(row.notAfter)
         },
         {
           prop: 'operation',
           label: '操作',
           width: 160,
-          formatter: (row: Api.Ssl.CertDTO) =>
+          formatter: (row: Api.Tls.CertDTO) =>
             h('div', [
               h(ArtButtonTable, {
                 type: 'link',
@@ -394,7 +394,7 @@
     await loadMatrix()
   }
 
-  const handleBindCertToProxy = async (cert: Api.Ssl.CertDTO) => {
+  const handleBindCertToProxy = async (cert: Api.Tls.CertDTO) => {
     const matchedDomainIds = (matrix.value?.domains || [])
       .filter((item) => isDomainMatchedByCert(item.fullDomain, cert))
       .map((item) => item.proxyDomainId)
@@ -445,13 +445,13 @@
   }
 
   const handleDisableAll = async () => {
-    await ElMessageBox.confirm('确定禁用本代理下所有域名的 SSL 证书？', '警告', { type: 'warning' })
+    await ElMessageBox.confirm('确定禁用本代理下所有域名的 TLS 证书？', '警告', { type: 'warning' })
     await fetchDisableAllBindingsByProxy(props.proxyId)
     ElMessage.success('已全部禁用')
     await loadMatrix()
   }
 
-  const handleCertDelete = async (row: Api.Ssl.CertDTO) => {
+  const handleCertDelete = async (row: Api.Tls.CertDTO) => {
     await ElMessageBox.confirm('确定要删除该证书？', '警告', { type: 'warning' })
     await fetchDeleteCert([row.id])
     ElMessage.success('删除成功')
@@ -460,16 +460,16 @@
 </script>
 
 <style scoped>
-  .ssl-page {
+  .tls-page {
     height: 100%;
   }
 
-  .ssl-page-content {
+  .tls-page-content {
     min-height: 100%;
     padding: 0 15px;
   }
 
-  .ssl-summary {
+  .tls-summary {
     display: flex;
     align-items: center;
     gap: 12px;

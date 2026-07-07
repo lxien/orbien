@@ -24,9 +24,9 @@
 <script setup lang="ts">
   import { reactive, computed } from 'vue'
   import { ElMessage } from 'element-plus'
-  import { fetchSaveCert } from '@/api/ssl'
+  import { fetchSaveCert } from '@/api/tls'
 
-  defineOptions({ name: 'SslDialog' })
+  defineOptions({ name: 'TlsDialog' })
 
   interface Props {
     visible: boolean

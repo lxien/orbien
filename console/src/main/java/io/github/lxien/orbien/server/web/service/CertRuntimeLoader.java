@@ -18,12 +18,12 @@
 
 package io.github.lxien.orbien.server.web.service;
 
-import io.github.lxien.orbien.server.transport.https.SslCertificateManager;
+import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.web.entity.CertDomainBinding;
-import io.github.lxien.orbien.server.web.entity.SslCertDO;
+import io.github.lxien.orbien.server.web.entity.TlsCertDO;
 import io.github.lxien.orbien.server.web.enums.BindStatus;
 import io.github.lxien.orbien.server.web.repository.CertDomainBindingRepository;
-import io.github.lxien.orbien.server.web.repository.SslCertRepository;
+import io.github.lxien.orbien.server.web.repository.TlsCertRepository;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,8 +43,8 @@ public class CertRuntimeLoader {
     private static final Logger logger = LoggerFactory.getLogger(CertRuntimeLoader.class);
 
     private final CertDomainBindingRepository bindingRepository;
-    private final SslCertRepository sslCertRepository;
-    private final SslCertificateManager sslCertificateManager;
+    private final TlsCertRepository tlsCertRepository;
+    private final TlsCertificateManager tlsCertificateManager;
 
     @EventListener(ApplicationReadyEvent.class)
     public void loadAllBindings() {
@@ -53,14 +53,14 @@ public class CertRuntimeLoader {
             logger.info("未发现需要加载的域名证书绑定");
             return;
         }
-        Map<String, SslCertDO> certMap = sslCertRepository.findAllById(
+        Map<String, TlsCertDO> certMap = tlsCertRepository.findAllById(
                 bindings.stream().map(CertDomainBinding::getCertId).collect(Collectors.toSet())
-        ).stream().collect(Collectors.toMap(SslCertDO::getId, c -> c, (a, b) -> a));
+        ).stream().collect(Collectors.toMap(TlsCertDO::getId, c -> c, (a, b) -> a));
 
         int success = 0;
         int failed = 0;
         for (CertDomainBinding binding : bindings) {
-            SslCertDO cert = certMap.get(binding.getCertId());
+            TlsCertDO cert = certMap.get(binding.getCertId());
             if (cert == null) {
                 markDeployFailed(binding);
                 failed++;
@@ -75,7 +75,7 @@ public class CertRuntimeLoader {
         logger.info("域名证书加载完成: 成功 {}, 失败 {}", success, failed);
     }
 
-    private boolean deploy(CertDomainBinding binding, SslCertDO cert) {
+    private boolean deploy(CertDomainBinding binding, TlsCertDO cert) {
         try {
             File keyFile = new File(cert.getKeyPath());
             File certFile = new File(cert.getFullChainPath());
@@ -83,7 +83,7 @@ public class CertRuntimeLoader {
                 markDeployFailed(binding);
                 return false;
             }
-            sslCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
+            tlsCertificateManager.deploy(cert.getId(), binding.getDomain(), keyFile, certFile);
             return true;
         } catch (Exception e) {
             logger.error("启动加载证书失败: {}", binding.getDomain(), e);
