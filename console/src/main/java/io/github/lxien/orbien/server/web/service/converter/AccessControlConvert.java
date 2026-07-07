@@ -56,8 +56,6 @@ public interface AccessControlConvert {
 
     List<AccessControlRuleDTO> toRuleDTOList(List<AccessControlRuleDO> rules);
 
-
-
     @Mapping(expression = "java(toRuleDTOList(accessControl))", target = "rules")
     @Mapping(expression = "java(accessControl.getMode().getCode())", target = "mode")
     AccessControlDetailDTO toDetailDTO(AccessControlConfig accessControl);

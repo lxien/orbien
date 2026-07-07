@@ -19,9 +19,12 @@ import io.github.lxien.orbien.core.enums.DomainType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.TlsCertSummaryDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
+import io.github.lxien.orbien.server.web.entity.AgentDO;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -56,6 +59,31 @@ public interface ProxyConvert {
     @Mapping(source = "httpProxyPort", target = "httpProxyPort")
     @Mapping(target = "transportProtocol", ignore = true)
     HttpProxyListDTO toHttpListDTO(ProxyDO proxyDO, int httpProxyPort);
+
+    @Mapping(target = "httpsProxyPort", ignore = true)
+    @Mapping(target = "tlsCertSummary", ignore = true)
+    HttpsProxyListDTO toHttpsListDTO(HttpProxyListDTO base);
+
+    default HttpsProxyListDTO toHttpsListDTO(ProxyDO proxyDO, int httpsProxyPort, AgentDO agentDO) {
+        HttpProxyListDTO base = toHttpListDTO(proxyDO, httpsProxyPort);
+        HttpsProxyListDTO dto = toHttpsListDTO(base);
+        dto.setHttpsProxyPort(httpsProxyPort);
+        enrichAgentType(dto, agentDO);
+        return dto;
+    }
+
+    default void enrichAgentType(ProxyListDTO dto, AgentDO agentDO) {
+        if (dto == null || agentDO == null || agentDO.getAgentType() == null) {
+            return;
+        }
+        dto.setAgentType(agentDO.getAgentType().getCode());
+    }
+
+    default void enrichTlsCertSummary(HttpsProxyListDTO dto, TlsCertSummaryDTO summary) {
+        if (dto != null) {
+            dto.setTlsCertSummary(summary);
+        }
+    }
 
     @AfterMapping
     default void fillProxyListFields(ProxyDO proxy, @MappingTarget ProxyListDTO dto) {

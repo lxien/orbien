@@ -23,7 +23,7 @@ import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.common.exception.SystemException;
 import io.github.lxien.orbien.server.web.dto.binding.*;
-import io.github.lxien.orbien.server.web.dto.binding.*;
+import io.github.lxien.orbien.server.web.dto.proxy.TlsCertSummaryDTO;
 import io.github.lxien.orbien.server.web.entity.CertDomainBinding;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.entity.ProxyDomainDO;
@@ -39,6 +39,7 @@ import io.github.lxien.orbien.server.web.repository.ProxyRepository;
 import io.github.lxien.orbien.server.web.repository.TlsCertRepository;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.DomainCertMatcher;
+import io.github.lxien.orbien.server.web.service.converter.CertBindingConvert;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class CertBindingServiceImpl implements CertBindingService {
     private final ProxyDomainRepository proxyDomainRepository;
     private final ProxyRepository proxyRepository;
     private final TlsCertificateManager tlsCertificateManager;
+    private final CertBindingConvert certBindingConvert;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -142,7 +144,7 @@ public class CertBindingServiceImpl implements CertBindingService {
 
             CertDomainBinding binding = bindingMap.get(domain.getId());
             if (binding != null) {
-                item.setBinding(toBindingDTO(binding, certMap.get(binding.getCertId())));
+                item.setBinding(certBindingConvert.toBindingDTO(binding, certMap.get(binding.getCertId())));
                 boundCount++;
                 if (binding.getStatus() != BindStatus.ACTIVE) {
                     warningCount++;
@@ -158,6 +160,22 @@ public class CertBindingServiceImpl implements CertBindingService {
         matrix.setUnboundCount(domains.size() - boundCount);
         matrix.setWarningCount(warningCount);
         return matrix;
+    }
+
+    @Override
+    public Map<String, TlsCertSummaryDTO> summarizeTlsCertByProxyIds(Collection<String> proxyIds) {
+        if (CollectionUtils.isEmpty(proxyIds)) {
+            return Collections.emptyMap();
+        }
+
+        List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyIdIn(new ArrayList<>(proxyIds));
+        Map<String, List<ProxyDomainDO>> domainsByProxyId = domains.stream()
+                .collect(Collectors.groupingBy(ProxyDomainDO::getProxyId));
+
+        List<Long> proxyDomainIds = domains.stream().map(ProxyDomainDO::getId).toList();
+        Map<Long, CertDomainBinding> bindingMap = loadBindingMap(proxyDomainIds);
+
+        return certBindingConvert.toTlsCertSummaryMap(proxyIds, domainsByProxyId, bindingMap);
     }
 
     @Override
@@ -392,21 +410,6 @@ public class CertBindingServiceImpl implements CertBindingService {
         }
         return tlsCertRepository.findAllById(certIds).stream()
                 .collect(Collectors.toMap(TlsCertDO::getId, c -> c, (a, b) -> a));
-    }
-
-    private DomainCertBindingDTO toBindingDTO(CertDomainBinding binding, TlsCertDO cert) {
-        DomainCertBindingDTO dto = new DomainCertBindingDTO();
-        dto.setBindingId(binding.getId());
-        dto.setCertId(binding.getCertId());
-        dto.setBindStatus(binding.getStatus().getCode());
-        dto.setEnabled(binding.getEnabled());
-        if (cert != null) {
-            dto.setIssuer(cert.getIssuer());
-            dto.setOrg(cert.getOrg());
-            dto.setNotAfter(cert.getNotAfter());
-            dto.setCertSanDomains(DomainCertMatcher.parseSanDomains(cert.getSanDomains()));
-        }
-        return dto;
     }
 
     private CertDomainBinding requireBinding(Long bindingId) {

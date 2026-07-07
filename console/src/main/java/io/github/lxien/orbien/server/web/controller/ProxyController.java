@@ -20,6 +20,7 @@ import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyDetailDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
@@ -130,7 +131,7 @@ public class ProxyController {
     }
     @GetMapping("https")
     public Ajax getHttpsProxies(@ModelAttribute PageQuery pageQuery) {
-        PageResult<HttpProxyListDTO> proxies = proxyService.findHttpsProxies(pageQuery);
+        PageResult<HttpsProxyListDTO> proxies = proxyService.findHttpsProxies(pageQuery);
         return Ajax.success(proxies);
     }
     @PutMapping("status/{id}")

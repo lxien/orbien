@@ -40,6 +40,7 @@ import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
+import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
 import io.github.lxien.orbien.server.web.service.ProxyService;
 import io.github.lxien.orbien.server.web.service.support.TargetHealthEnricher;
@@ -105,6 +106,8 @@ public class ProxyServiceImpl implements ProxyService {
     private ProxyConfigSyncService proxyConfigSyncService;
     @Autowired
     private CertBindingSyncService certBindingSyncService;
+    @Autowired
+    private CertBindingService certBindingService;
     @Autowired
     private TargetHealthEnricher targetHealthEnricher;
     @Autowired
@@ -214,8 +217,50 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     @Override
-    public PageResult<HttpProxyListDTO> findHttpsProxies(PageQuery pageQuery) {
-        return findHttpLikeProxies(pageQuery, ProtocolType.HTTPS, appConfig.getHttpsProxyPort());
+    public PageResult<HttpsProxyListDTO> findHttpsProxies(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        int httpsProxyPort = appConfig.getHttpsProxyPort();
+
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.HTTPS, pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+
+        List<ProxyListQueryResult> content = resultPage.getContent();
+        List<String> proxyIds = content.stream()
+                .map(ProxyListQueryResult::getProxyDO)
+                .map(ProxyDO::getId)
+                .collect(Collectors.toList());
+
+        Map<String, List<String>> domainsMap = proxyDomainRepository.findByProxyIdIn(proxyIds)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ProxyDomainDO::getProxyId,
+                        Collectors.mapping(ProxyDomainDO::getFullDomain, Collectors.toList())
+                ));
+        Map<String, List<ProxyTargetDO>> targetsMap = proxyTargetRepository.findByProxyIdIn(proxyIds)
+                .stream()
+                .collect(Collectors.groupingBy(ProxyTargetDO::getProxyId));
+        Map<String, TlsCertSummaryDTO> tlsCertSummaryMap = certBindingService.summarizeTlsCertByProxyIds(proxyIds);
+
+        Map<String, List<TargetDTO>> targetDtoMap = new HashMap<>();
+        List<HttpsProxyListDTO> res = new ArrayList<>();
+        for (ProxyListQueryResult r : content) {
+            ProxyDO proxyDO = r.getProxyDO();
+            AgentDO agentDO = r.getAgentDO();
+            HttpsProxyListDTO httpsDTO = proxyConvert.toHttpsListDTO(proxyDO, httpsProxyPort, agentDO);
+
+            httpsDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            List<TargetDTO> targets = proxyTargetConvert.toDTOList(
+                    targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
+            targetDtoMap.put(proxyDO.getId(), targets);
+            httpsDTO.setTargets(targets);
+            proxyConvert.enrichTlsCertSummary(httpsDTO, tlsCertSummaryMap.get(proxyDO.getId()));
+            res.add(httpsDTO);
+        }
+        targetHealthEnricher.enrichBatch(targetDtoMap);
+        return PageResult.wrap(resultPage, res);
     }
 
     private PageResult<HttpProxyListDTO> findHttpLikeProxies(PageQuery pageQuery, ProtocolType protocolType, int proxyPort) {
@@ -249,9 +294,7 @@ public class ProxyServiceImpl implements ProxyService {
             AgentDO agentDO = r.getAgentDO();
             HttpProxyListDTO httpDTO = proxyConvert.toHttpListDTO(proxyDO, proxyPort);
 
-            if (agentDO != null && agentDO.getAgentType() != null) {
-                httpDTO.setAgentType(agentDO.getAgentType().getCode());
-            }
+            proxyConvert.enrichAgentType(httpDTO, agentDO);
             httpDTO.setDomains(domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));
             List<TargetDTO> targets = proxyTargetConvert.toDTOList(
                     targetsMap.getOrDefault(proxyDO.getId(), Collections.emptyList()));

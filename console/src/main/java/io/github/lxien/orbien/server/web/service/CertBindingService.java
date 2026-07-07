@@ -24,9 +24,12 @@ import io.github.lxien.orbien.server.web.dto.binding.CertUsageDTO;
 import io.github.lxien.orbien.server.web.dto.binding.ProxyCertMatrixDTO;
 import io.github.lxien.orbien.server.web.param.binding.CertBindParam;
 import io.github.lxien.orbien.server.web.param.binding.CertBindPreviewParam;
+import io.github.lxien.orbien.server.web.dto.proxy.TlsCertSummaryDTO;
 import io.github.lxien.orbien.server.web.param.binding.CertRebindParam;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface CertBindingService {
 
@@ -51,4 +54,6 @@ public interface CertBindingService {
     void redeploy(Long bindingId);
 
     CertBindResultDTO bindMatchingDomainsForProxy(String certId, String proxyId, boolean override);
+
+    Map<String, TlsCertSummaryDTO> summarizeTlsCertByProxyIds(Collection<String> proxyIds);
 }

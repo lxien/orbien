@@ -20,11 +20,11 @@ import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
-import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 
 public interface ProxyService {
@@ -83,7 +83,7 @@ public interface ProxyService {
 
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 
-    PageResult<HttpProxyListDTO> findHttpsProxies(PageQuery pageQuery);
+    PageResult<HttpsProxyListDTO> findHttpsProxies(PageQuery pageQuery);
 
     void saveClusterConfig(String proxyId, ProxyClusterSaveParam param);
 }

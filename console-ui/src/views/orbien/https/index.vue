@@ -75,6 +75,7 @@ import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
 import InspectorDrawer from '../common/modules/inspector-drawer/index.vue'
 import {renderTargetTags} from '../common/render-target-tag'
 import {renderTransportProtocolTag} from '../common/render-transport-protocol-tag'
+import {renderTlsCertSummaryTag} from '../common/render-tls-cert-summary'
 import {useProxyStatusToggle} from '../common/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -165,6 +166,12 @@ const {
         formatter: (row: HttpsProxyItem) => renderTargetTags(row.targets)
       },
       {
+        prop: 'tlsCertSummary',
+        label: 'TLS 证书',
+        formatter: (row: HttpsProxyItem) =>
+            renderTlsCertSummaryTag(row.tlsCertSummary, () => handleOpenTlsConfig(row))
+      },
+      {
         prop: 'transportProtocol',
         label: '传输协议',
         formatter: (row: HttpsProxyItem) => renderTransportProtocolTag(row.transportProtocol)
@@ -246,6 +253,13 @@ const handleDialogSubmit = async () => {
 
 const handleSettings = (proxy: HttpsProxyItem) => {
   pluginInitialMenu.value = ''
+  currentPluginProxyId.value = proxy.id
+  currentPluginProxyName.value = proxy.name
+  pluginDialogVisible.value = true
+}
+
+const handleOpenTlsConfig = (proxy: HttpsProxyItem) => {
+  pluginInitialMenu.value = 'tls'
   currentPluginProxyId.value = proxy.id
   currentPluginProxyName.value = proxy.name
   pluginDialogVisible.value = true
