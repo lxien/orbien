@@ -54,6 +54,12 @@
           :show-time-range="true"
           @close="handleMetricsClose"
       />
+
+      <InspectorDrawer
+          v-model:visible="inspectorDrawerVisible"
+          :proxy-id="currentInspectorProxyId"
+          :proxy-name="currentInspectorProxyName"
+      />
     </ElCard>
   </div>
 </template>
@@ -66,6 +72,7 @@ import {fetchGetHttpsProxyList, fetchBatchDeleteProxy} from '@/api/proxy'
 import HttpsDialog from './modules/https-dialog.vue'
 import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
+import InspectorDrawer from '../common/modules/inspector-drawer/index.vue'
 import {renderTargetTags} from '../common/render-target-tag'
 import {renderTransportProtocolTag} from '../common/render-transport-protocol-tag'
 import {useProxyStatusToggle} from '../common/use-proxy-status-toggle'
@@ -94,6 +101,10 @@ const pluginInitialMenu = ref('')
 // 流量统计弹窗相关
 const metricsDialogVisible = ref(false)
 const currentMetricsProxyId = ref('')
+
+const inspectorDrawerVisible = ref(false)
+const currentInspectorProxyId = ref('')
+const currentInspectorProxyName = ref('')
 
 const {isToggling, handleStatusChange} = useProxyStatusToggle()
 
@@ -173,7 +184,7 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 190,
+        width: 230,
         fixed: 'right',
         formatter: (row: HttpsProxyItem) =>
             h('div', [
@@ -186,6 +197,11 @@ const {
                 type: 'link',
                 text: '统计',
                 onClick: () => handleMetrics(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'link',
+                text: '流量',
+                onClick: () => handleInspector(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',
@@ -251,6 +267,12 @@ const handleMetrics = (proxy: HttpsProxyItem) => {
 
 const handleMetricsClose = () => {
   currentMetricsProxyId.value = ''
+}
+
+const handleInspector = (proxy: HttpsProxyItem) => {
+  currentInspectorProxyId.value = proxy.id
+  currentInspectorProxyName.value = proxy.name
+  inspectorDrawerVisible.value = true
 }
 
 const handleBatchDelete = async () => {

@@ -80,6 +80,7 @@ public class ProxyConfigAssembler {
         }
         config.setProxyId(proxyDO.getId());
         config.setListenPort(config.getRemotePort());
+        config.setInspectorEnabled(Boolean.TRUE.equals(proxyDO.getInspectorEnabled()));
 
         if (proxyDO.getLimitTotal() != null || proxyDO.getLimitIn() != null || proxyDO.getLimitOut() != null) {
             config.setBandwidth(new BandwidthConfig(proxyDO.getLimitTotal(), proxyDO.getLimitIn(), proxyDO.getLimitOut()));

@@ -136,6 +136,11 @@ public class ProxyDO {
     @Column(name = "limit_out", comment = "出站带宽限制（bps）")
     private Long limitOut;
     /**
+     * 是否启用 HTTP 请求抓包（Inspector）
+     */
+    @Column(name = "inspector_enabled")
+    private Boolean inspectorEnabled;
+    /**
      * 创建时间
      */
     @Column(name = "created_at")

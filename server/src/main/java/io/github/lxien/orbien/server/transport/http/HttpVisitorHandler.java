@@ -5,12 +5,14 @@ import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
+import io.github.lxien.orbien.server.inspector.HttpMessageParser;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,15 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Optional<StreamContext> contextOpt = streamManager.getStreamContext(visitor);
         if (contextOpt.isPresent()) {
             StreamContext streamContext = contextOpt.get();
+            if (streamContext.getState() == StreamState.OPENED
+                    && streamContext.getProtocol().isHttp()
+                    && isNewHttpRequest(buf)) {
+                logger.debug("[HTTP] Keep-Alive 新请求到达，关闭旧流 streamId={}", streamContext.getStreamId());
+                ByteBuf retained = buf.retain();
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                visitor.eventLoop().execute(() -> reopenStreamForPendingRequest(visitor, retained));
+                return;
+            }
             if (!streamContext.canAcceptVisitorData()) {
                 return;
             }
@@ -92,6 +103,26 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireExceptionCaught(cause);
+    }
+
+    private void reopenStreamForPendingRequest(Channel visitor, ByteBuf firstPacket) {
+        if (streamManager.getStreamContext(visitor).isPresent()) {
+            ReferenceCountUtil.release(firstPacket);
+            return;
+        }
+        if (!firstPacket.isReadable()) {
+            ReferenceCountUtil.release(firstPacket);
+            return;
+        }
+        visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(firstPacket);
+        StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
+        streamContext.setProtocol(ProtocolType.HTTP);
+        streamContext.setStreamManager(streamManager);
+        streamContext.fireEvent(StreamEvent.STREAM_OPEN);
+    }
+
+    private static boolean isNewHttpRequest(ByteBuf buf) {
+        return HttpMessageParser.parseRequest(buf, 8192) != null;
     }
 
     /**

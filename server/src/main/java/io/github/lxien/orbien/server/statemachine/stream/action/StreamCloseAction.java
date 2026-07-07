@@ -7,6 +7,9 @@ import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.UdpSessionKey;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
+import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
+import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
+import io.github.lxien.orbien.server.inspector.InspectorBuffer;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
@@ -50,9 +53,12 @@ public class StreamCloseAction extends StreamBaseAction {
     private ControlFrameHandler controlFrameHandler;
     @Autowired
     private AgentManager agentManager;
+    @Autowired
+    private InspectorBuffer inspectorBuffer;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
+        finalizeHttpCapture(context);
         logger.debug("开启清理流 {} 相关资源", context.getStreamId());
         context.abortLocalForwarding();
         int streamId = context.getStreamId();
@@ -131,5 +137,17 @@ public class StreamCloseAction extends StreamBaseAction {
         }
 
         logger.debug("关闭流: streamId={}", context.getStreamId());
+    }
+
+    private void finalizeHttpCapture(StreamContext context) {
+        HttpStreamCapture capture = context.getHttpStreamCapture();
+        if (capture == null) {
+            return;
+        }
+        context.setHttpStreamCapture(null);
+        HttpCaptureRecord record = capture.finalizeCapture();
+        if (record != null) {
+            inspectorBuffer.append(record);
+        }
     }
 }

@@ -119,6 +119,16 @@ public class ProxyConfig implements Serializable {
     @Setter
     private HealthCheckConfig healthCheck;
 
+    /**
+     * 是否启用 HTTP 请求抓包（Inspector）
+     */
+    @Setter
+    private Boolean inspectorEnabled;
+
+    public boolean isInspectorEnabled() {
+        return Boolean.TRUE.equals(inspectorEnabled);
+    }
+
     public boolean hasTransport() {
         return transport != null;
     }

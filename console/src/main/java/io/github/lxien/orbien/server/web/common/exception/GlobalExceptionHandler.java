@@ -28,13 +28,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * todo 全局异常处理器
  * <p>
  * 处理系统中各类异常，包括业务异常、系统异常、参数校验异常等
  * </p>
@@ -72,6 +73,18 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * SSE / 长连接客户端主动断开时常见，响应已提交，无需再写错误体。
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    public void handleAsyncRequestNotUsable(AsyncRequestNotUsableException e) {
+        if (isClientDisconnect(e)) {
+            logger.debug("客户端已断开异步连接: {}", e.getMessage());
+            return;
+        }
+        logger.warn("异步请求不可用", e);
+    }
+
+    /**
      * 处理通用异常
      *
      * @param e 异常
@@ -79,6 +92,10 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Throwable.class)
     public Ajax handleException(Throwable e) {
+        if (isClientDisconnect(e)) {
+            logger.debug("客户端已断开: {}", e.getMessage());
+            return null;
+        }
         logger.error("错误", e);
         return Ajax.error(e.getMessage());
     }
@@ -147,6 +164,24 @@ public class GlobalExceptionHandler {
                     .collect(Collectors.joining("; "));
         }
         return "未知错误";
+    }
+
+    private static boolean isClientDisconnect(Throwable error) {
+        Throwable current = error;
+        while (current != null) {
+            if (current instanceof IOException ioEx) {
+                String message = ioEx.getMessage();
+                if (message != null && (message.contains("Broken pipe") || message.contains("Connection reset"))) {
+                    return true;
+                }
+            }
+            String message = current.getMessage();
+            if (message != null && message.contains("disconnected client")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
     }
 }
 

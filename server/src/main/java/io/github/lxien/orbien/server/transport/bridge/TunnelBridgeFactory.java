@@ -1,6 +1,8 @@
 package io.github.lxien.orbien.server.transport.bridge;
 
 import io.github.lxien.orbien.core.transport.TunnelBridge;
+import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
+import io.github.lxien.orbien.server.inspector.InspectorProperties;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +16,16 @@ import org.springframework.stereotype.Component;
 public class TunnelBridgeFactory {
 
     private static MetricsCollector metricsCollector;
+    private static InspectorProperties inspectorProperties;
 
     @Autowired
     public void setMetricsCollector(MetricsCollector collector) {
         TunnelBridgeFactory.metricsCollector = collector;
+    }
+
+    @Autowired
+    public void setInspectorProperties(InspectorProperties properties) {
+        TunnelBridgeFactory.inspectorProperties = properties;
     }
 
     /**
@@ -25,6 +33,7 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildDirect(StreamContext streamContext) {
         TunnelBridge bridge = new DirectTunnelBridge(streamContext);
+        bridge = wrapInspection(bridge, streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
     }
 
@@ -33,6 +42,7 @@ public class TunnelBridgeFactory {
      */
     public static TunnelBridge buildMux(StreamContext streamContext) {
         TunnelBridge bridge = new MultiplexTunnelBridge(streamContext);
+        bridge = wrapInspection(bridge, streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
     }
 
@@ -42,6 +52,14 @@ public class TunnelBridgeFactory {
     public static TunnelBridge buildUdpMux(StreamContext streamContext) {
         TunnelBridge bridge = new UdpMultiplexTunnelBridge(streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
+    }
+
+    private static TunnelBridge wrapInspection(TunnelBridge bridge, StreamContext ctx) {
+        HttpStreamCapture capture = ctx.getHttpStreamCapture();
+        if (capture != null) {
+            return new InspectionTunnelBridge(bridge, capture);
+        }
+        return bridge;
     }
 
     /**

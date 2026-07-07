@@ -8,6 +8,7 @@ import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AbstractStreamContext;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
+import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
 import io.github.lxien.orbien.server.transport.BandwidthLimiter;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -49,6 +50,8 @@ public class StreamContext extends AbstractStreamContext {
      * 独立隧道：服务端已透传，等待客户端确认后再开启 visitor 读取
      */
     private final AtomicBoolean awaitingClientPassthroughAck = new AtomicBoolean(false);
+
+    private HttpStreamCapture httpStreamCapture;
 
     public boolean isAwaitingClientPassthroughAck() {
         return awaitingClientPassthroughAck.get();

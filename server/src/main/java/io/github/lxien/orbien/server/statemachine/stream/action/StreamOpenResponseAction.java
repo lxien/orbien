@@ -5,6 +5,10 @@ import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
+import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
+import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
+import io.github.lxien.orbien.server.inspector.InspectorBuffer;
+import io.github.lxien.orbien.server.inspector.InspectorProperties;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
@@ -38,6 +42,11 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     private LeastConnHooks leastConnHooks;
     @Autowired
     private MetricsCollector metricsCollector;
+    @Autowired
+    private InspectorProperties inspectorProperties;
+    @Autowired
+    private InspectorBuffer inspectorBuffer;
+
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         logger.debug("收到流 {} 打开响应", context.getStreamId());
@@ -78,6 +87,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 context.getTransportProtocol().getName(), context.isEncrypt(), context.isMultiplex());
         context.setTunnelEntry(tunnelEntry);
         Channel visitor = context.getVisitor();
+        initHttpCaptureIfNeeded(context, visitor);
         TunnelBridge tunnelBridge;
         if (context.isDatagram()) {
             tunnelBridge = TunnelBridgeFactory.buildUdpMux(context);
@@ -151,6 +161,56 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         visitor.read();
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
+    }
+
+    private void initHttpCaptureIfNeeded(StreamContext context, Channel visitor) {
+        if (!InspectorBuffer.shouldCapture(context, inspectorProperties)) {
+            logger.debug("[Inspector] 跳过抓包 streamId={} proxyId={} globalEnabled={} inspectorEnabled={}",
+                    context.getStreamId(), context.getProxyId(),
+                    inspectorProperties != null && inspectorProperties.isEnabled(),
+                    context.getProxyConfig() != null && context.getProxyConfig().isInspectorEnabled());
+            return;
+        }
+        HttpStreamCapture capture = new HttpStreamCapture(context, inspectorProperties);
+        capture.setCompletionHandler(record -> onHttpCaptureComplete(context, record));
+        context.setHttpStreamCapture(capture);
+        logger.debug("[Inspector] 开始抓包 streamId={} proxyId={}", context.getStreamId(), context.getProxyId());
+        if (visitor != null) {
+            ByteBuf firstPacket = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
+            if (firstPacket != null && firstPacket.isReadable()) {
+                capture.captureRequestFirstPacket(firstPacket);
+            }
+        }
+    }
+
+    /**
+     * HTTP 响应抓包完成：写入缓冲，并在非协议升级场景下关闭当前流。
+     * Keep-Alive 连接保留访客 TCP，下一请求会创建新流并重新抓包。
+     */
+    private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
+        if (record != null) {
+            inspectorBuffer.append(record);
+        }
+        context.setHttpStreamCapture(null);
+        if (record == null || record.getStatus() == 101) {
+            return;
+        }
+        scheduleHttpStreamClose(context);
+    }
+
+    private void scheduleHttpStreamClose(StreamContext context) {
+        Channel visitor = context.getVisitor();
+        if (visitor == null || !visitor.isActive()) {
+            return;
+        }
+        visitor.eventLoop().execute(() -> {
+            StreamState state = context.getState();
+            if (state == StreamState.OPENED || state == StreamState.PAUSED) {
+                logger.debug("[Inspector] HTTP 响应完成，关闭流以支持 Keep-Alive 下一请求 streamId={}",
+                        context.getStreamId());
+                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            }
+        });
     }
 
     /**
