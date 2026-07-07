@@ -115,8 +115,10 @@ export function getDomainTypeLabel(domainType: number) {
             return {type: 'warning' as const, text: '自定义'}
         case DomainType.SUBDOMAIN:
             return {type: 'primary' as const, text: '子域名'}
+        case DomainType.AUTO:
+            return {type: 'primary' as const, text: '自动子域名'}
         default:
-            return {type: 'info' as const, text: '自动'}
+            return {type: 'info' as const, text: '未知'}
     }
 }
 

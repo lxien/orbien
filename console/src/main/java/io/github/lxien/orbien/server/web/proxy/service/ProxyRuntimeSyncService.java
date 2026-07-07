@@ -23,6 +23,7 @@ import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
+import io.github.lxien.orbien.server.security.IpAccessChecker;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.service.repository.ProxyQueryRepository;
 import jakarta.annotation.Resource;
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 将 Console 侧代理配置变更同步推送给在线客户端。
+ * 将代理配置变更同步推送给在线客户端。
  */
 @Service
 public class ProxyRuntimeSyncService {
@@ -50,6 +51,20 @@ public class ProxyRuntimeSyncService {
     private HealthManager healthManager;
     @Autowired
     private ProxyConfigService proxyConfigService;
+
+    @Autowired
+    private IpAccessChecker ipAccessChecker;
+
+    /**
+     * 公网入口策略（访问控制、Basic Auth）变更后刷新服务端缓存。
+     */
+    public void refreshServerEntryPolicy(String proxyId) {
+        if (proxyId == null) {
+            return;
+        }
+        proxyConfigService.evictByProxyId(proxyId);
+        ipAccessChecker.invalidate(proxyId);
+    }
 
     public void syncProxyCreated(String proxyId) {
         publishRuntimeProxy(proxyId, true);

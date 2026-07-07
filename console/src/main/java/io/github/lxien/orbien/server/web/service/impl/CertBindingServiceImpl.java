@@ -242,23 +242,6 @@ public class CertBindingServiceImpl implements CertBindingService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void disableAllByProxy(String proxyId) {
-        List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyId(proxyId);
-        if (CollectionUtils.isEmpty(domains)) {
-            return;
-        }
-        List<Long> proxyDomainIds = domains.stream().map(ProxyDomainDO::getId).toList();
-        List<CertDomainBinding> bindings = bindingRepository.findByProxyDomainIdIn(proxyDomainIds);
-        for (CertDomainBinding binding : bindings) {
-            binding.setEnabled(false);
-            binding.setStatus(BindStatus.DISABLED);
-            tlsCertificateManager.cancelDeploy(binding.getDomain());
-        }
-        bindingRepository.saveAll(bindings);
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
     public CertBindResultDTO bindMatchingDomainsForProxy(String certId, String proxyId, boolean override) {
         TlsCertDO cert = requireActiveCert(certId);
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());

@@ -1,5 +1,17 @@
 import request from '@/utils/http'
 
+export function fetchAcmeHttpsProxyOptions() {
+  return request.get<Api.AcmeOrder.HttpsProxyOption[]>({
+    url: '/api/acme-order/https-proxy-options'
+  })
+}
+
+export function fetchAcmeHttpsProxyDomains(proxyId: string) {
+  return request.get<Api.AcmeOrder.HttpsProxyDomainOption[]>({
+    url: `/api/acme-order/https-proxy-options/${proxyId}/domains`
+  })
+}
+
 export function fetchCreateAcmeOrder(params: Api.AcmeOrder.CreateParams) {
   return request.post<Api.AcmeOrder.OrderDTO>({
     url: '/api/acme-order/create',

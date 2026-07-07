@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum DomainType {
-    AUTO(0, "自动生成"),
+    AUTO(0, "自动子域名"),
     SUBDOMAIN(1, "子域名"),
     CUSTOM_DOMAIN(2, "自定义域名");
 

@@ -23,6 +23,7 @@ import io.github.lxien.orbien.server.web.entity.BasicUserDO;
 import io.github.lxien.orbien.server.web.param.basicauth.BasicAuthUpdateParam;
 import io.github.lxien.orbien.server.web.param.basicauth.httpuser.HttpUserAddParam;
 import io.github.lxien.orbien.server.web.param.basicauth.httpuser.HttpUserUpdateParam;
+import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.BasicAuthRepository;
 import io.github.lxien.orbien.server.web.repository.BasicUserRepository;
 import io.github.lxien.orbien.server.web.service.BasicAuthService;
@@ -48,6 +49,8 @@ public class BasicAuthServiceImpl implements BasicAuthService {
     private TransactionHelper transactionHelper;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private ProxyRuntimeSyncService proxyRuntimeSyncService;
 
     @Override
     public BasicAuthDetailDTO getByProxyId(String proxyId) {
@@ -65,21 +68,22 @@ public class BasicAuthServiceImpl implements BasicAuthService {
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
         basicAuthDO.setEnabled(request.getEnabled());
         basicAuthRepository.save(basicAuthDO);
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(HttpUserAddParam request) {
-        BasicAuthDO basicAuthDO = basicAuthRepository.findById(request.getProxyId())
+        String proxyId = request.getProxyId();
+        BasicAuthDO basicAuthDO = basicAuthRepository.findById(proxyId)
                 .orElseThrow(() -> new BizException("Basic Auth 配置不存在"));
-        boolean exists = basicUserRepository.existsByProxyIdAndUsername(basicAuthDO.getProxyId(), request.getUsername());
-        if (exists) {
+        if (basicUserRepository.existsByProxyIdAndUsername(basicAuthDO.getProxyId(), request.getUsername())) {
             throw new BizException("用户名已存在");
         }
         BasicUserDO basicUserDO = basicAuthConvert.toUserDO(request);
-        String encode = passwordEncoder.encode(request.getPassword());
-        basicUserDO.setPassword(encode);
+        basicUserDO.setPassword(passwordEncoder.encode(request.getPassword()));
         basicUserRepository.save(basicUserDO);
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
@@ -88,28 +92,27 @@ public class BasicAuthServiceImpl implements BasicAuthService {
         String proxyId = param.getProxyId();
         BasicUserDO basicUserDO = basicUserRepository.findById(param.getId())
                 .orElseThrow(() -> new BizException("用户不存在"));
-
-        boolean usernameChanged = !Objects.equals(param.getUsername(), basicUserDO.getUsername());
-
-        if (usernameChanged) {
-            boolean exists = basicUserRepository.existsByProxyIdAndUsernameAndIdNot(proxyId, param.getUsername(), param.getId());
-            if (exists) {
-                throw new BizException("用户名已存在");
-            }
+        if (!Objects.equals(param.getUsername(), basicUserDO.getUsername())
+                && basicUserRepository.existsByProxyIdAndUsernameAndIdNot(proxyId, param.getUsername(), param.getId())) {
+            throw new BizException("用户名已存在");
         }
-
         basicAuthConvert.updateUserDO(basicUserDO, param);
-        String encode = passwordEncoder.encode(param.getPassword());
-        basicUserDO.setPassword(encode);
+        basicUserDO.setPassword(passwordEncoder.encode(param.getPassword()));
         basicUserRepository.save(basicUserDO);
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Long id) {
-        BasicUserDO basicUserDO = basicUserRepository.findById(id).orElseThrow(() -> new BizException("用户不存在"));
+        BasicUserDO basicUserDO = basicUserRepository.findById(id)
+                .orElseThrow(() -> new BizException("用户不存在"));
         String proxyId = basicUserDO.getProxyId();
         basicUserRepository.deleteById(id);
+        scheduleEntryPolicyRefresh(proxyId);
+    }
+
+    private void scheduleEntryPolicyRefresh(String proxyId) {
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.refreshServerEntryPolicy(proxyId));
     }
 }
-

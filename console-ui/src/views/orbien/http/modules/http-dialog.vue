@@ -1,24 +1,24 @@
 <template>
   <ElDialog
-    v-model="dialogVisible"
-    :title="dialogType === 'add' ? '添加 HTTP 代理' : '编辑 HTTP 代理'"
-    width="650px"
-    align-center
+      v-model="dialogVisible"
+      :title="dialogType === 'add' ? '添加 HTTP 代理' : '编辑 HTTP 代理'"
+      width="650px"
+      align-center
   >
     <ElForm ref="formRef" :model="formData" :rules="rules" label-width="120px" :show-message="false">
       <ElFormItem label="客户端" prop="agentId">
         <ElSelect
-          v-model="formData.agentId"
-          placeholder="请选择客户端"
-          :disabled="dialogType === 'edit'"
-          style="width: 250px"
+            v-model="formData.agentId"
+            placeholder="请选择客户端"
+            :disabled="dialogType === 'edit'"
+            style="width: 250px"
         >
-          <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id" />
+          <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id"/>
         </ElSelect>
       </ElFormItem>
 
       <ElFormItem label="代理名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable />
+        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
       </ElFormItem>
 
       <ElFormItem label="域名类型" prop="domainType">
@@ -30,51 +30,51 @@
       </ElFormItem>
 
       <ElFormItem
-        v-if="formData.domainType === String(DomainType.SUBDOMAIN)">
+          v-if="formData.domainType === String(DomainType.SUBDOMAIN)">
         <SubdomainBindingRows
-          v-model="formData.subdomainBindings"
-          :root-domains="rootDomains"
-          :loading="rootDomainLoading"
-          :error-indexes="subdomainErrorIndexes"
-          @clear-error="resetSubdomainErrors"
+            v-model="formData.subdomainBindings"
+            :root-domains="rootDomains"
+            :loading="rootDomainLoading"
+            :error-indexes="subdomainErrorIndexes"
+            @clear-error="resetSubdomainErrors"
         />
       </ElFormItem>
 
       <ElFormItem
-        v-if="formData.domainType === String(DomainType.CUSTOM_DOMAIN)"
-        label="自定义域名"
-        prop="customDomains"
+          v-if="formData.domainType === String(DomainType.CUSTOM_DOMAIN)"
+          label="自定义域名"
+          prop="customDomains"
       >
         <ElInput
-          v-model="formData.customDomains"
-          type="textarea"
-          :rows="3"
-          placeholder="请输入完整域名，多个用换行分隔，如 www.example.com"
+            v-model="formData.customDomains"
+            type="textarea"
+            :rows="3"
+            placeholder="请输入完整域名，多个用换行分隔，如 www.example.com"
         />
       </ElFormItem>
 
       <BackendServiceField
-        :cluster-mode="clusterMode"
-        :targets="targets"
-        @open-cluster="handleOpenCluster"
+          :cluster-mode="clusterMode"
+          :targets="targets"
+          @open-cluster="handleOpenCluster"
       >
         <ElRow :gutter="20">
           <ElCol :span="12">
-            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1" />
+            <ElInput v-model="formData.localHost" placeholder="如127.0.0.1"/>
           </ElCol>
           <ElCol :span="12">
-            <LocalPortInput v-model="formData.localPort" :presets="COMMON_LOCAL_PORT_PRESETS" />
+            <LocalPortInput v-model="formData.localPort" :presets="COMMON_LOCAL_PORT_PRESETS"/>
           </ElCol>
         </ElRow>
       </BackendServiceField>
 
       <ElFormItem label="带宽限制" prop="limitTotal">
         <el-input
-          v-model.number="formData.limitTotal"
-          placeholder="总带宽"
-          type="number"
-          :precision="0"
-          style="width: 200px"
+            v-model.number="formData.limitTotal"
+            placeholder="总带宽"
+            type="number"
+            :precision="0"
+            style="width: 200px"
         >
           <template #append>Mbps</template>
         </el-input>
@@ -90,205 +90,211 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch, computed } from 'vue'
-  import { ElMessage } from 'element-plus'
-  import type { FormInstance, FormRules } from 'element-plus'
-  import { DialogType } from '@/types'
-  import { fetchGetAgentListAll } from '@/api/agent'
-  import { fetchCreateHttpProxy, fetchUpdateHttpProxy, fetchGetHttpProxyById } from '@/api/proxy'
-  import { DomainType } from '@/enums/orbien/business'
-  import { useRootDomainOptions, validateSubdomainBindings, buildSubdomainBindingsPayload } from '@/views/orbien/common/use-root-domain-options'
-  import SubdomainBindingRows from '@/views/orbien/common/subdomain-binding-rows.vue'
-  import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
-  import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
-  import { COMMON_LOCAL_PORT_PRESETS } from '@/views/orbien/common/port-presets'
-  import { isClusterMode } from '@/views/orbien/common/is-cluster-mode'
+import {ref, reactive, watch, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import type {FormInstance, FormRules} from 'element-plus'
+import {DialogType} from '@/types'
+import {fetchGetAgentListAll} from '@/api/agent'
+import {fetchCreateHttpProxy, fetchUpdateHttpProxy, fetchGetHttpProxyById} from '@/api/proxy'
+import {DomainType} from '@/enums/orbien/business'
+import {
+  useRootDomainOptions,
+  validateSubdomainBindings,
+  buildSubdomainBindingsPayload
+} from '@/views/orbien/common/use-root-domain-options'
+import SubdomainBindingRows from '@/views/orbien/common/subdomain-binding-rows.vue'
+import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
+import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
+import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/common/port-presets'
+import {isClusterMode} from '@/views/orbien/common/is-cluster-mode'
 
-  defineOptions({ name: 'HttpDialog' })
+defineOptions({name: 'HttpDialog'})
 
-  interface FormDataState {
+interface FormDataState {
+  agentId: string
+  name: string
+  domainType: string
+  subdomainBindings: Api.Proxy.SubdomainBindingParam[]
+  customDomains: string
+  localHost: string
+  localPort: number | undefined
+  limitTotal: number
+}
+
+interface Props {
+  visible: boolean
+  type: DialogType
+  proxyData?: Partial<{
+    id: string
     agentId: string
     name: string
-    domainType: string
-    subdomainBindings: Api.Proxy.SubdomainBindingParam[]
-    customDomains: string
-    localHost: string
-    localPort: number | undefined
-    limitTotal: number
-  }
+  }>
+}
 
-  interface Props {
-    visible: boolean
-    type: DialogType
-    proxyData?: Partial<{
-      id: string
-      agentId: string
-      name: string
-    }>
-  }
+interface Emits {
+  (e: 'update:visible', value: boolean): void
 
-  interface Emits {
-    (e: 'update:visible', value: boolean): void
-    (e: 'submit'): void
-    (e: 'open-cluster-config', payload: { id: string; name: string }): void
-  }
+  (e: 'submit'): void
 
-  const props = defineProps<Props>()
-  const emit = defineEmits<Emits>()
+  (e: 'open-cluster-config', payload: { id: string; name: string }): void
+}
 
-  const dialogVisible = computed({
-    get: () => props.visible,
-    set: (value) => emit('update:visible', value)
-  })
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-  const dialogType = computed(() => props.type)
-  const formRef = ref<FormInstance>()
-  const agents = ref<Api.Agent.AgentDTO[]>([])
-  const {
-    rootDomains,
-    rootDomainLoading,
-    loadRootDomains,
-    createDefaultSubdomainBinding,
-    normalizeSubdomainBindings
-  } = useRootDomainOptions()
+const dialogVisible = computed({
+  get: () => props.visible,
+  set: (value) => emit('update:visible', value)
+})
 
-  const createDefaultFormData = (): FormDataState => ({
-    agentId: '',
-    name: '',
-    domainType: String(DomainType.AUTO),
-    subdomainBindings: [createDefaultSubdomainBinding()],
-    customDomains: '',
-    localHost: '127.0.0.1',
-    localPort: undefined,
-    limitTotal: 1
-  })
+const dialogType = computed(() => props.type)
+const formRef = ref<FormInstance>()
+const agents = ref<Api.Agent.AgentDTO[]>([])
+const {
+  rootDomains,
+  rootDomainLoading,
+  loadRootDomains,
+  createDefaultSubdomainBinding,
+  normalizeSubdomainBindings
+} = useRootDomainOptions()
 
-  const formData = reactive<FormDataState>(createDefaultFormData())
-  const subdomainErrorIndexes = ref<number[]>([])
-  const targets = ref<Api.Proxy.TargetDTO[]>([])
+const createDefaultFormData = (): FormDataState => ({
+  agentId: '',
+  name: '',
+  domainType: String(DomainType.AUTO),
+  subdomainBindings: [createDefaultSubdomainBinding()],
+  customDomains: '',
+  localHost: '127.0.0.1',
+  localPort: undefined,
+  limitTotal: 1
+})
 
-  const clusterMode = computed(() => isClusterMode(targets.value))
+const formData = reactive<FormDataState>(createDefaultFormData())
+const subdomainErrorIndexes = ref<number[]>([])
+const targets = ref<Api.Proxy.TargetDTO[]>([])
 
-  const resetSubdomainErrors = () => {
-    subdomainErrorIndexes.value = []
-  }
+const clusterMode = computed(() => isClusterMode(targets.value))
 
-  const rules = computed<FormRules>(() => ({
-    agentId: [{ required: true, message: '请选择客户端', trigger: 'change' }],
-    name: [{ required: true, message: '请输入代理名称', trigger: 'blur' }],
-    domainType: [{ required: true, message: '请选择域名类型', trigger: 'change' }],
-    customDomains: [
-      {
-        validator: (_rule, value: string, callback) => {
-          if (formData.domainType !== String(DomainType.CUSTOM_DOMAIN)) {
-            callback()
-            return
-          }
-          if (!value?.trim()) {
-            callback(new Error('请输入自定义域名'))
-          } else {
-            callback()
-          }
-        },
-        trigger: 'blur'
-      }
-    ],
-    ...(clusterMode.value
+const resetSubdomainErrors = () => {
+  subdomainErrorIndexes.value = []
+}
+
+const rules = computed<FormRules>(() => ({
+  agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
+  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
+  domainType: [{required: true, message: '请选择域名类型', trigger: 'change'}],
+  customDomains: [
+    {
+      validator: (_rule, value: string, callback) => {
+        if (formData.domainType !== String(DomainType.CUSTOM_DOMAIN)) {
+          callback()
+          return
+        }
+        if (!value?.trim()) {
+          callback(new Error('请输入自定义域名'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ],
+  ...(clusterMode.value
       ? {}
       : {
-          localHost: [{ required: true, message: '请输入主机', trigger: 'blur' }],
-          localPort: [
-            { required: true, message: '请输入端口', trigger: 'blur' },
-            { type: 'number', message: '端口必须是数字', trigger: 'blur' },
-            { min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur' }
-          ]
-        }),
-    limitTotal: [
-      { required: true, message: '请输入带宽限制', trigger: 'blur' },
-      { type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur' }
-    ]
-  }))
+        localHost: [{required: true, message: '请输入主机', trigger: 'blur'}],
+        localPort: [
+          {required: true, message: '请输入端口', trigger: 'blur'},
+          {type: 'number', message: '端口必须是数字', trigger: 'blur'},
+          {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
+        ]
+      }),
+  limitTotal: [
+    {required: true, message: '请输入带宽限制', trigger: 'blur'},
+    {type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur'}
+  ]
+}))
 
-  const parseLines = (value: string): string[] =>
+const parseLines = (value: string): string[] =>
     value
-      .split('\n')
-      .map((item) => item.trim())
-      .filter(Boolean)
+        .split('\n')
+        .map((item) => item.trim())
+        .filter(Boolean)
 
-  const refreshSubdomainBindings = () => {
-    if (formData.domainType !== String(DomainType.SUBDOMAIN)) {
-      return
-    }
-    formData.subdomainBindings = normalizeSubdomainBindings(formData.subdomainBindings)
+const refreshSubdomainBindings = () => {
+  if (formData.domainType !== String(DomainType.SUBDOMAIN)) {
+    return
+  }
+  formData.subdomainBindings = normalizeSubdomainBindings(formData.subdomainBindings)
+}
+
+const applyDetail = (detail: Api.Proxy.HttpProxyDetailDTO) => {
+  targets.value = detail.targets ?? []
+  Object.assign(formData, {
+    ...createDefaultFormData(),
+    agentId: detail.agentId || '',
+    name: detail.name || '',
+    domainType: detail.domainType?.toString() || String(DomainType.AUTO),
+    subdomainBindings: normalizeSubdomainBindings(detail.subdomainBindings),
+    customDomains: (detail.customDomains || []).join('\n'),
+    localHost: detail.localHost || '127.0.0.1',
+    localPort: detail.localPort,
+    limitTotal: detail.limitTotal ?? 1
+  })
+  refreshSubdomainBindings()
+}
+
+const fetchAgents = async () => {
+  try {
+    agents.value = (await fetchGetAgentListAll()) || []
+  } catch (error) {
+    console.error('获取客户端列表失败:', error)
+    ElMessage.error('获取客户端列表失败')
+  }
+}
+
+const applyDefaultAgentIfNeeded = () => {
+  if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
+    return
+  }
+  formData.agentId = agents.value[0].id
+}
+
+const resetFormData = () => {
+  targets.value = []
+  Object.assign(formData, createDefaultFormData())
+  refreshSubdomainBindings()
+}
+
+const handleOpenCluster = () => {
+  const proxyId = props.proxyData?.id
+  if (!proxyId) return
+  emit('open-cluster-config', {id: proxyId, name: formData.name})
+  dialogVisible.value = false
+}
+
+const initFormData = async () => {
+  const isEdit = props.type === 'edit' && props.proxyData?.id
+
+  if (!isEdit) {
+    resetFormData()
+    return
   }
 
-  const applyDetail = (detail: Api.Proxy.HttpProxyDetailDTO) => {
-    targets.value = detail.targets ?? []
+  try {
+    applyDetail(await fetchGetHttpProxyById(props.proxyData!.id!))
+  } catch (error) {
+    console.error('获取代理详情失败:', error)
+    ElMessage.error('获取代理详情失败，请稍后重试')
     Object.assign(formData, {
       ...createDefaultFormData(),
-      agentId: detail.agentId || '',
-      name: detail.name || '',
-      domainType: detail.domainType?.toString() || String(DomainType.AUTO),
-      subdomainBindings: normalizeSubdomainBindings(detail.subdomainBindings),
-      customDomains: (detail.customDomains || []).join('\n'),
-      localHost: detail.localHost || '127.0.0.1',
-      localPort: detail.localPort,
-      limitTotal: detail.limitTotal ?? 1
+      agentId: props.proxyData?.agentId || '',
+      name: props.proxyData?.name || ''
     })
-    refreshSubdomainBindings()
   }
+}
 
-  const fetchAgents = async () => {
-    try {
-      agents.value = (await fetchGetAgentListAll()) || []
-    } catch (error) {
-      console.error('获取客户端列表失败:', error)
-      ElMessage.error('获取客户端列表失败')
-    }
-  }
-
-  const applyDefaultAgentIfNeeded = () => {
-    if (props.type === 'edit' || formData.agentId || agents.value.length === 0) {
-      return
-    }
-    formData.agentId = agents.value[0].id
-  }
-
-  const resetFormData = () => {
-    targets.value = []
-    Object.assign(formData, createDefaultFormData())
-    refreshSubdomainBindings()
-  }
-
-  const handleOpenCluster = () => {
-    const proxyId = props.proxyData?.id
-    if (!proxyId) return
-    emit('open-cluster-config', { id: proxyId, name: formData.name })
-    dialogVisible.value = false
-  }
-
-  const initFormData = async () => {
-    const isEdit = props.type === 'edit' && props.proxyData?.id
-
-    if (!isEdit) {
-      resetFormData()
-      return
-    }
-
-    try {
-      applyDetail(await fetchGetHttpProxyById(props.proxyData!.id!))
-    } catch (error) {
-      console.error('获取代理详情失败:', error)
-      ElMessage.error('获取代理详情失败，请稍后重试')
-      Object.assign(formData, {
-        ...createDefaultFormData(),
-        agentId: props.proxyData?.agentId || '',
-        name: props.proxyData?.name || ''
-      })
-    }
-  }
-
-  watch(
+watch(
     () => [props.visible, props.type, props.proxyData] as const,
     async ([visible]) => {
       if (visible) {
@@ -303,10 +309,10 @@
         refreshSubdomainBindings()
       }
     },
-    { immediate: true }
-  )
+    {immediate: true}
+)
 
-  watch(
+watch(
     () => formData.domainType,
     (domainType) => {
       resetSubdomainErrors()
@@ -317,90 +323,90 @@
         refreshSubdomainBindings()
       }
     }
-  )
+)
 
-  watch(rootDomains, () => {
-    refreshSubdomainBindings()
-  })
+watch(rootDomains, () => {
+  refreshSubdomainBindings()
+})
 
-  watch(dialogVisible, (visible) => {
-    emit('update:visible', visible)
-    if (!visible) {
-      resetFormData()
-      resetSubdomainErrors()
-      formRef.value?.clearValidate()
-    }
-  })
-
-  const buildDomainPayload = () => {
-    const domainType = parseInt(formData.domainType, 10)
-    if (domainType === DomainType.SUBDOMAIN) {
-      return {
-        subdomainBindings: buildSubdomainBindingsPayload(formData.subdomainBindings)
-      }
-    }
-    if (domainType === DomainType.CUSTOM_DOMAIN) {
-      return { customDomains: parseLines(formData.customDomains) }
-    }
-    return {}
-  }
-
-  const handleSubmit = async () => {
-    if (!formRef.value) return
-
+watch(dialogVisible, (visible) => {
+  emit('update:visible', visible)
+  if (!visible) {
+    resetFormData()
     resetSubdomainErrors()
+    formRef.value?.clearValidate()
+  }
+})
 
-    let formValid = false
-    try {
-      await formRef.value.validate()
-      formValid = true
-    } catch {
-      formValid = false
-    }
-
-    const subdomainResult =
-      formData.domainType === String(DomainType.SUBDOMAIN)
-        ? validateSubdomainBindings(formData.subdomainBindings)
-        : { valid: true, errorIndexes: [] as number[] }
-
-    if (!subdomainResult.valid) {
-      subdomainErrorIndexes.value = subdomainResult.errorIndexes
-      if (subdomainResult.message) {
-        ElMessage.warning(subdomainResult.message)
-      }
-    }
-
-    if (!formValid || !subdomainResult.valid) return
-
-    try {
-      const commonData: Omit<Api.Proxy.HttpProxyUpdateParam, 'id'> = {
-        name: formData.name,
-        domainType: parseInt(formData.domainType, 10),
-        localHost: formData.localHost,
-        localPort: formData.localPort!,
-        limitTotal: formData.limitTotal,
-        ...buildDomainPayload()
-      }
-
-      if (dialogType.value === 'add') {
-        await fetchCreateHttpProxy({
-          agentId: formData.agentId,
-          ...commonData
-        })
-      } else {
-        await fetchUpdateHttpProxy({
-          id: props.proxyData!.id!,
-          ...commonData
-        })
-      }
-
-      dialogVisible.value = false
-      emit('submit')
-      resetFormData()
-      resetSubdomainErrors()
-      formRef.value?.clearValidate()
-    } catch (error) {
-      console.error('提交失败:', error)
+const buildDomainPayload = () => {
+  const domainType = parseInt(formData.domainType, 10)
+  if (domainType === DomainType.SUBDOMAIN) {
+    return {
+      subdomainBindings: buildSubdomainBindingsPayload(formData.subdomainBindings, rootDomains.value)
     }
   }
+  if (domainType === DomainType.CUSTOM_DOMAIN) {
+    return {customDomains: parseLines(formData.customDomains)}
+  }
+  return {}
+}
+
+const handleSubmit = async () => {
+  if (!formRef.value) return
+
+  resetSubdomainErrors()
+
+  let formValid = false
+  try {
+    await formRef.value.validate()
+    formValid = true
+  } catch {
+    formValid = false
+  }
+
+  const subdomainResult =
+      formData.domainType === String(DomainType.SUBDOMAIN)
+          ? validateSubdomainBindings(formData.subdomainBindings, rootDomains.value)
+          : {valid: true, errorIndexes: [] as number[]}
+
+  if (!subdomainResult.valid) {
+    subdomainErrorIndexes.value = subdomainResult.errorIndexes
+    if (subdomainResult.message) {
+      ElMessage.warning(subdomainResult.message)
+    }
+  }
+
+  if (!formValid || !subdomainResult.valid) return
+
+  try {
+    const commonData: Omit<Api.Proxy.HttpProxyUpdateParam, 'id'> = {
+      name: formData.name,
+      domainType: parseInt(formData.domainType, 10),
+      localHost: formData.localHost,
+      localPort: formData.localPort!,
+      limitTotal: formData.limitTotal,
+      ...buildDomainPayload()
+    }
+
+    if (dialogType.value === 'add') {
+      await fetchCreateHttpProxy({
+        agentId: formData.agentId,
+        ...commonData
+      })
+    } else {
+      await fetchUpdateHttpProxy({
+        id: props.proxyData!.id!,
+        ...commonData
+      })
+    }
+
+    dialogVisible.value = false
+    emit('submit')
+    resetFormData()
+    resetSubdomainErrors()
+    formRef.value?.clearValidate()
+  } catch (error) {
+    console.error('提交失败:', error)
+  }
+}
 </script>

@@ -2,7 +2,7 @@
   <ElDialog
       v-model="dialogVisible"
       :title="formData.id ? '编辑 DNS 密钥' : '添加 DNS 密钥'"
-      width="560px"
+      width="580px"
       align-center
       destroy-on-close
   >
@@ -10,14 +10,27 @@
         ref="formRef"
         :model="formData"
         :rules="rules"
-        label-width="120px"
-        validate-on-rule-change="false"
+        label-width="140px"
+        autocomplete="off"
+        :validate-on-rule-change="false"
+        :show-message="false"
         class="dns-credential-form"
     >
-      <ElFormItem label="名称" prop="name" :show-message="false">
-        <ElInput v-model="formData.name" placeholder="如：生产环境-阿里云" maxlength="64"/>
+      <div class="autofill-trap" aria-hidden="true">
+        <input type="text" tabindex="-1" autocomplete="username"/>
+        <input type="password" tabindex="-1" autocomplete="current-password"/>
+      </div>
+
+      <ElFormItem label="名称" prop="name">
+        <ElInput
+            v-model="formData.name"
+            placeholder="如：生产环境-阿里云"
+            maxlength="64"
+            autocomplete="off"
+            name="dns-credential-label"
+        />
       </ElFormItem>
-      <ElFormItem label="DNS 厂商" prop="provider" :show-message="false">
+      <ElFormItem label="DNS 厂商" prop="provider">
         <ElSelect
             v-model="formData.provider"
             placeholder="请选择厂商"
@@ -33,33 +46,41 @@
           />
         </ElSelect>
       </ElFormItem>
-      <template v-if="currentSchema">
-        <ElFormItem
-            v-for="field in currentSchema.fields"
-            :key="field.key"
-            :label="field.label"
-            :prop="`config.${field.key}`"
-            :show-message="false"
-        >
-          <ElInput
-              v-model="formData.config[field.key]"
-              :type="field.secret ? 'password' : 'text'"
-              :placeholder="field.required ? '必填' : '选填'"
-              show-password
-          />
-        </ElFormItem>
-      </template>
+
+
       <ElAlert
           v-if="formData.id"
           type="info"
           :closable="false"
           show-icon
-          title="编辑时需重新填写密钥信息，保存后将重新测试连接"
-          class="mb-2"
+          title="编辑时需重新填写密钥信息"
+          class="edit-tip"
       />
+
+      <template v-if="currentSchema">
+        <ElFormItem
+            v-for="field in currentSchema.fields"
+            :key="field.key"
+            :prop="`config.${field.key}`"
+        >
+          <template #label>
+            <span class="field-label">{{ field.label }}</span>
+          </template>
+          <ElInput
+              v-model="formData.config[field.key]"
+              :type="field.secret ? 'password' : 'text'"
+              :placeholder="field.required ? '必填' : '选填'"
+              :show-password="field.secret"
+              :autocomplete="resolveFieldAutocomplete(field)"
+              :name="`dns-credential-${formData.provider}-${field.key}`"
+              readonly
+              @focus="unlockFieldReadonly"
+          />
+        </ElFormItem>
+      </template>
     </ElForm>
     <template #footer>
-      <ElButton @click="dialogVisible = false">取消</ElButton>
+      <ElButton :disabled="submitting" @click="dialogVisible = false">取消</ElButton>
       <ElButton type="primary" :loading="submitting" @click="handleSubmit">保存并测试</ElButton>
     </template>
   </ElDialog>
@@ -81,7 +102,7 @@ interface Props {
 interface Emits {
   (e: 'update:visible', value: boolean): void
 
-  (e: 'submit'): void
+  (e: 'submit', saved?: Api.DnsCredential.CredentialDTO): void
 }
 
 const props = withDefaults(defineProps<Props>(), {record: null})
@@ -106,6 +127,14 @@ const formData = reactive<Api.DnsCredential.SaveParams>({
 const currentSchema = computed(() =>
     providerSchemas.value.find((item) => item.provider === formData.provider)
 )
+
+const resolveFieldAutocomplete = (field: Api.DnsCredential.ProviderField) =>
+    field.secret ? 'new-password' : 'off'
+
+const unlockFieldReadonly = (event: FocusEvent) => {
+  const target = event.target as HTMLInputElement | null
+  target?.removeAttribute('readonly')
+}
 
 const requiredRule = {required: true, message: ' ', trigger: 'blur' as const}
 
@@ -147,6 +176,22 @@ const loadSchemas = async () => {
   resetConfig()
 }
 
+const buildSubmitPayload = (): Api.DnsCredential.SaveParams => {
+  const config: Record<string, string> = {}
+  currentSchema.value?.fields.forEach((field) => {
+    const value = formData.config[field.key]?.trim()
+    if (value) {
+      config[field.key] = value
+    }
+  })
+  return {
+    id: formData.id,
+    name: formData.name.trim(),
+    provider: formData.provider,
+    config
+  }
+}
+
 watch(
     () => props.visible,
     async (visible) => {
@@ -168,17 +213,18 @@ watch(
 )
 
 const handleSubmit = async () => {
+  if (!formRef.value) return
   try {
-    await formRef.value?.validate()
+    await formRef.value.validate()
   } catch {
     return
   }
   submitting.value = true
   try {
-    await fetchSaveDnsCredential({...formData, config: {...formData.config}})
+    const saved = await fetchSaveDnsCredential(buildSubmitPayload())
     ElMessage.success('保存成功')
     dialogVisible.value = false
-    emit('submit')
+    emit('submit', saved)
   } finally {
     submitting.value = false
   }
@@ -187,8 +233,56 @@ const handleSubmit = async () => {
 
 <style lang="scss" scoped>
 .dns-credential-form {
+  position: relative;
+
+  .autofill-trap {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  :deep(.el-form-item) {
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  :deep(.el-form-item__label) {
+    display: inline-flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    height: auto !important;
+    min-height: var(--el-component-custom-height);
+    padding-top: 7px;
+    line-height: 1.4 !important;
+    white-space: nowrap;
+  }
+
+  :deep(.el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label::before) {
+    margin-top: 2px;
+    margin-right: 4px;
+  }
+
+  :deep(.el-form-item__content) {
+    min-width: 0;
+  }
+
   :deep(.el-form-item__error) {
     display: none;
   }
+
+  .field-label {
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+  }
+}
+
+.edit-tip {
+  margin-bottom: 16px;
 }
 </style>

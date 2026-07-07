@@ -16,8 +16,6 @@
 
 package io.github.lxien.orbien.server.web.service.impl;
 
-import io.github.lxien.orbien.core.enums.AccessControl;
-import io.github.lxien.orbien.server.security.IpAccessChecker;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.dto.accesscontrol.AccessControlDetailDTO;
 import io.github.lxien.orbien.server.web.entity.AccessControlDO;
@@ -25,6 +23,7 @@ import io.github.lxien.orbien.server.web.entity.AccessControlRuleDO;
 import io.github.lxien.orbien.server.web.param.accesscontrol.AccessControlRuleAddParam;
 import io.github.lxien.orbien.server.web.param.accesscontrol.AccessControlRuleUpdateParam;
 import io.github.lxien.orbien.server.web.param.accesscontrol.AccessControlUpdateParam;
+import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.AccessControlRepository;
 import io.github.lxien.orbien.server.web.repository.AccessControlRuleRepository;
 import io.github.lxien.orbien.server.web.service.AccessControlService;
@@ -48,7 +47,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     @Autowired
     private TransactionHelper transactionHelper;
     @Autowired
-    private IpAccessChecker ipAccessChecker;
+    private ProxyRuntimeSyncService proxyRuntimeSyncService;
 
     @Override
     public AccessControlDetailDTO getByProxyId(String proxyId) {
@@ -66,7 +65,7 @@ public class AccessControlServiceImpl implements AccessControlService {
                 .orElseThrow(() -> new BizException("访问控制配置不存在"));
         accessControlConvert.updateDO(accessControlDO, param);
         accessControlRepository.save(accessControlDO);
-        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(param.getProxyId()));
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
@@ -74,24 +73,22 @@ public class AccessControlServiceImpl implements AccessControlService {
     public void deleteRuleById(Long id) {
         AccessControlRuleDO accessControlRuleDO = accessControlRuleRepository.findById(id)
                 .orElseThrow(() -> new BizException("规则不存在"));
-
         String proxyId = accessControlRuleDO.getProxyId();
         accessControlRuleRepository.deleteById(id);
-        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addRule(AccessControlRuleAddParam param) {
         String proxyId = param.getProxyId();
-        accessControlRepository.findById(proxyId).orElseThrow(() -> new BizException("访问控制配置不出在"));
+        accessControlRepository.findById(proxyId).orElseThrow(() -> new BizException("访问控制配置不存在"));
         if (accessControlRuleRepository.existsByProxyIdAndCidr(proxyId, param.getCidr())) {
             throw new BizException("已存在相同CIDR规则");
         }
-
         AccessControlRuleDO accessControlRuleDO = accessControlConvert.toRuleDO(param);
         accessControlRuleRepository.save(accessControlRuleDO);
-        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
+        scheduleEntryPolicyRefresh(proxyId);
     }
 
     @Override
@@ -99,30 +96,22 @@ public class AccessControlServiceImpl implements AccessControlService {
     public void updateRule(AccessControlRuleUpdateParam param) {
         AccessControlRuleDO ruleDO = accessControlRuleRepository.findById(param.getId())
                 .orElseThrow(() -> new BizException("规则不存在"));
-        //如果没有变化直接返回
         if (Objects.equals(ruleDO.getMode().getCode(), param.getRuleType())
                 && Objects.equals(param.getCidr(), ruleDO.getCidr())) {
             return;
         }
-        //如果cidr变化需要检查当前代理下是否存在相同的，但排除自己
-        if (!Objects.equals(ruleDO.getCidr(), param.getCidr())) {
-            boolean exists = accessControlRuleRepository
-                    .existsByProxyIdAndCidrAndIdNot(
-                            ruleDO.getProxyId(),
-                            param.getCidr(),
-                            param.getId()
-                    );
-            if (exists) {
-                throw new BizException("该规则已存在");
-            }
+        if (!Objects.equals(ruleDO.getCidr(), param.getCidr())
+                && accessControlRuleRepository.existsByProxyIdAndCidrAndIdNot(
+                        ruleDO.getProxyId(), param.getCidr(), param.getId())) {
+            throw new BizException("该规则已存在");
         }
         String proxyId = ruleDO.getProxyId();
-        //旧配置
-        String oldCidr = ruleDO.getCidr();
-        AccessControl oldRule = ruleDO.getMode();
-        //更新数据库
         accessControlConvert.updateRuleDO(ruleDO, param);
         accessControlRuleRepository.save(ruleDO);
-        transactionHelper.afterCommit(()->ipAccessChecker.invalidate(proxyId));
+        scheduleEntryPolicyRefresh(proxyId);
+    }
+
+    private void scheduleEntryPolicyRefresh(String proxyId) {
+        transactionHelper.afterCommit(() -> proxyRuntimeSyncService.refreshServerEntryPolicy(proxyId));
     }
 }

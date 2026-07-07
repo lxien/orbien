@@ -6,59 +6,66 @@
       </template>
     </ArtTableHeader>
 
-    <ArtTable :loading="loading" :data="data" :columns="columns" :show-pagination="false" />
+    <ArtTable :loading="loading" :data="data" :columns="columns" :show-pagination="false"/>
 
     <DnsCredentialDialog
-      v-model:visible="dialogVisible"
-      :record="currentRecord"
-      @submit="loadData"
+        v-model:visible="dialogVisible"
+        :record="currentRecord"
+        @submit="loadData"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-  import { h, onMounted, ref } from 'vue'
-  import { ElMessage, ElMessageBox, ElTag } from 'element-plus'
-  import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
-  import DnsCredentialDialog from './dns-credential-dialog.vue'
-  import {
-    fetchDeleteDnsCredential,
-    fetchDnsCredentialList,
-    fetchTestDnsCredential
-  } from '@/api/dns-credential'
-  import { resolveDnsCredentialStatusTagType } from '@/utils/ui/status-tag'
+import {h, onMounted, ref} from 'vue'
+import {ElMessage, ElMessageBox, ElTag} from 'element-plus'
+import ArtButtonTable from '@/components/core/forms/art-button-table/index.vue'
+import DnsCredentialDialog from './dns-credential-dialog.vue'
+import {
+  fetchDeleteDnsCredential,
+  fetchDnsCredentialList,
+  fetchTestDnsCredential
+} from '@/api/dns-credential'
+import {resolveDnsCredentialStatusTagType} from '@/utils/ui/status-tag'
 
-  defineOptions({ name: 'DnsCredentialPanel' })
+defineOptions({name: 'DnsCredentialPanel'})
 
-  const loading = ref(false)
-  const data = ref<Api.DnsCredential.CredentialDTO[]>([])
-  const dialogVisible = ref(false)
-  const currentRecord = ref<Api.DnsCredential.CredentialDTO | null>(null)
+const loading = ref(false)
+const data = ref<Api.DnsCredential.CredentialDTO[]>([])
+const dialogVisible = ref(false)
+const currentRecord = ref<Api.DnsCredential.CredentialDTO | null>(null)
 
-  const statusTag = (status: number) => {
-    const type = resolveDnsCredentialStatusTagType(status)
-    const label = status === 1 ? '正常' : status === 2 ? '无效' : '未测试'
-    return h(ElTag, { type, size: 'small' }, () => label)
-  }
+const statusTag = (status: number) => {
+  const type = resolveDnsCredentialStatusTagType(status)
+  const label = status === 1 ? '正常' : status === 2 ? '无效' : '未测试'
+  return h(ElTag, {type, size: 'small'}, () => label)
+}
 
-  const columns = [
-    { prop: 'name', label: '名称', minWidth: 140 },
-    { prop: 'providerLabel', label: '厂商', width: 120 },
-    { prop: 'accountHint', label: '账号标识', minWidth: 160 },
-    {
-      prop: 'status',
-      label: '状态',
-      width: 90,
-      formatter: (row: Api.DnsCredential.CredentialDTO) => statusTag(row.status)
-    },
-    { prop: 'lastTestAt', label: '最近测试', width: 170 },
-    { prop: 'lastTestMessage', label: '测试信息', minWidth: 140 },
-    {
-      prop: 'operation',
-      label: '操作',
-      width: 180,
-      fixed: 'right' as const,
-      formatter: (row: Api.DnsCredential.CredentialDTO) =>
+const formatDateTime = (value?: string) => value || ''
+
+const columns = [
+  {prop: 'name', label: '名称', minWidth: 140},
+  {prop: 'providerLabel', label: '厂商', width: 120},
+  {prop: 'accountHint', label: '账号标识', minWidth: 160},
+  {
+    prop: 'status',
+    label: '状态',
+    width: 90,
+    formatter: (row: Api.DnsCredential.CredentialDTO) => statusTag(row.status)
+  },
+  {
+    prop: 'lastTestAt',
+    label: '最近测试',
+    width: 170,
+    formatter: (row: Api.DnsCredential.CredentialDTO) => formatDateTime(row.lastTestAt)
+  },
+  {prop: 'lastTestMessage', label: '测试信息', minWidth: 140},
+  {
+    prop: 'operation',
+    label: '操作',
+    width: 180,
+    fixed: 'right' as const,
+    formatter: (row: Api.DnsCredential.CredentialDTO) =>
         h('div', [
           h(ArtButtonTable, {
             type: 'link',
@@ -76,50 +83,50 @@
             onClick: () => handleDelete(row)
           })
         ])
-    }
-  ]
-
-  const loadData = async () => {
-    loading.value = true
-    try {
-      data.value = await fetchDnsCredentialList()
-    } finally {
-      loading.value = false
-    }
   }
+]
 
-  const handleAdd = () => {
-    currentRecord.value = null
-    dialogVisible.value = true
+const loadData = async () => {
+  loading.value = true
+  try {
+    data.value = await fetchDnsCredentialList()
+  } finally {
+    loading.value = false
   }
+}
 
-  const handleEdit = (row: Api.DnsCredential.CredentialDTO) => {
-    currentRecord.value = row
-    dialogVisible.value = true
+const handleAdd = () => {
+  currentRecord.value = null
+  dialogVisible.value = true
+}
+
+const handleEdit = (row: Api.DnsCredential.CredentialDTO) => {
+  currentRecord.value = row
+  dialogVisible.value = true
+}
+
+const handleTest = async (row: Api.DnsCredential.CredentialDTO) => {
+  try {
+    await fetchTestDnsCredential(row.id)
+    ElMessage.success('连接测试成功')
+    loadData()
+  } catch {
+    loadData()
   }
+}
 
-  const handleTest = async (row: Api.DnsCredential.CredentialDTO) => {
-    try {
-      await fetchTestDnsCredential(row.id)
-      ElMessage.success('连接测试成功')
-      loadData()
-    } catch {
-      loadData()
-    }
+const handleDelete = async (row: Api.DnsCredential.CredentialDTO) => {
+  try {
+    await ElMessageBox.confirm(`确定删除密钥「${row.name}」吗？`, '删除确认', {type: 'warning'})
+    await fetchDeleteDnsCredential(row.id)
+    ElMessage.success('删除成功')
+    loadData()
+  } catch (error) {
+    if (error === 'cancel') return
   }
+}
 
-  const handleDelete = async (row: Api.DnsCredential.CredentialDTO) => {
-    try {
-      await ElMessageBox.confirm(`确定删除密钥「${row.name}」吗？`, '删除确认', { type: 'warning' })
-      await fetchDeleteDnsCredential(row.id)
-      ElMessage.success('删除成功')
-      loadData()
-    } catch (error) {
-      if (error === 'cancel') return
-    }
-  }
+onMounted(loadData)
 
-  onMounted(loadData)
-
-  defineExpose({ loadData })
+defineExpose({loadData})
 </script>

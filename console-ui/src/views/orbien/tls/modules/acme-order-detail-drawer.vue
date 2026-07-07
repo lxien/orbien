@@ -5,16 +5,21 @@
         <ElDescriptionsItem label="订单号">{{ detail?.orderNo }}</ElDescriptionsItem>
         <ElDescriptionsItem label="状态">
           <ElTag size="small" :type="resolveAcmeOrderStatusTagType(detail?.status)">{{
-            detail?.statusLabel
-          }}</ElTag>
+              detail?.statusLabel
+            }}
+          </ElTag>
         </ElDescriptionsItem>
         <ElDescriptionsItem label="域名">{{ detail?.domains?.join(', ') }}</ElDescriptionsItem>
         <ElDescriptionsItem label="验证方式">
           {{ detail?.validationMode === 2 ? '云 DNS 自动' : '手动 DNS' }}
         </ElDescriptionsItem>
+        <ElDescriptionsItem v-if="detail?.validationMode === 2" label="续期">
+          支持自动续期
+        </ElDescriptionsItem>
         <ElDescriptionsItem v-if="detail?.certId" label="证书 ID">{{
-          detail.certId
-        }}</ElDescriptionsItem>
+            detail.certId
+          }}
+        </ElDescriptionsItem>
         <ElDescriptionsItem v-if="detail?.errorMessage" label="错误信息">
           <span class="text-danger">{{ detail.errorMessage }}</span>
         </ElDescriptionsItem>
@@ -42,7 +47,7 @@
               </template>
             </ElInput>
           </div>
-          <ElTag size="small" :type="resolveAcmeChallengeTagType(item.status === 3)">
+          <ElTag size="small" :type="resolveAcmeChallengeStatusTagType(item.status)">
             {{ item.statusLabel || '待验证' }}
           </ElTag>
         </div>
@@ -54,7 +59,8 @@
         </ElButton>
         <ElButton v-if="canRetry" :loading="actionLoading" @click="handleRetry">重试</ElButton>
         <ElButton v-if="canCancel" :loading="actionLoading" @click="handleCancel"
-          >取消申请</ElButton
+        >取消申请
+        </ElButton
         >
       </div>
     </div>
@@ -62,156 +68,157 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, watch } from 'vue'
-  import { ElMessage } from 'element-plus'
-  import {
-    fetchAcmeOrderDetail,
-    fetchCancelAcmeOrder,
-    fetchRetryAcmeOrder,
-    fetchVerifyAcmeOrder
-  } from '@/api/acme-order'
-  import { resolveAcmeChallengeTagType, resolveAcmeOrderStatusTagType } from '@/utils/ui/status-tag'
+import {computed, ref, watch} from 'vue'
+import {ElMessage} from 'element-plus'
+import {
+  fetchAcmeOrderDetail,
+  fetchCancelAcmeOrder,
+  fetchRetryAcmeOrder,
+  fetchVerifyAcmeOrder
+} from '@/api/acme-order'
+import {resolveAcmeChallengeStatusTagType, resolveAcmeOrderStatusTagType} from '@/utils/ui/status-tag'
 
-  defineOptions({ name: 'AcmeOrderDetailDrawer' })
+defineOptions({name: 'AcmeOrderDetailDrawer'})
 
-  interface Props {
-    visible: boolean
-    orderId?: number | null
-  }
+interface Props {
+  visible: boolean
+  orderId?: number | null
+}
 
-  interface Emits {
-    (e: 'update:visible', value: boolean): void
-    (e: 'changed'): void
-  }
+interface Emits {
+  (e: 'update:visible', value: boolean): void
 
-  const props = withDefaults(defineProps<Props>(), { orderId: null })
-  const emit = defineEmits<Emits>()
+  (e: 'changed'): void
+}
 
-  const drawerVisible = computed({
-    get: () => props.visible,
-    set: (value) => emit('update:visible', value)
-  })
+const props = withDefaults(defineProps<Props>(), {orderId: null})
+const emit = defineEmits<Emits>()
 
-  const loading = ref(false)
-  const actionLoading = ref(false)
-  const detail = ref<Api.AcmeOrder.OrderDTO | null>(null)
+const drawerVisible = computed({
+  get: () => props.visible,
+  set: (value) => emit('update:visible', value)
+})
 
-  const terminalStatuses = [5, 6, 7]
-  const canVerify = computed(
+const loading = ref(false)
+const actionLoading = ref(false)
+const detail = ref<Api.AcmeOrder.OrderDTO | null>(null)
+
+const terminalStatuses = [5, 6, 7]
+const canVerify = computed(
     () => detail.value && [1, 2].includes(detail.value.status) && detail.value.validationMode === 1
-  )
-  const canRetry = computed(() => detail.value?.status === 6)
-  const canCancel = computed(() => detail.value && !terminalStatuses.includes(detail.value.status))
-  const showActions = computed(() => canVerify.value || canRetry.value || canCancel.value)
+)
+const canRetry = computed(() => detail.value?.status === 6)
+const canCancel = computed(() => detail.value && !terminalStatuses.includes(detail.value.status))
+const showActions = computed(() => canVerify.value || canRetry.value || canCancel.value)
 
-  const loadDetail = async () => {
-    if (!props.orderId) return
-    loading.value = true
-    try {
-      detail.value = await fetchAcmeOrderDetail(props.orderId)
-    } finally {
-      loading.value = false
-    }
+const loadDetail = async () => {
+  if (!props.orderId) return
+  loading.value = true
+  try {
+    detail.value = await fetchAcmeOrderDetail(props.orderId)
+  } finally {
+    loading.value = false
   }
+}
 
-  watch(
+watch(
     () => [props.visible, props.orderId],
     ([visible]) => {
       if (visible) loadDetail()
     }
-  )
+)
 
-  const copyText = async (text: string) => {
-    await navigator.clipboard.writeText(text)
-    ElMessage.success('已复制')
-  }
+const copyText = async (text: string) => {
+  await navigator.clipboard.writeText(text)
+  ElMessage.success('已复制')
+}
 
-  const handleVerify = async () => {
-    if (!props.orderId) return
-    actionLoading.value = true
-    try {
-      await fetchVerifyAcmeOrder(props.orderId)
-      ElMessage.success('已开始验证，请稍后刷新查看结果')
-      emit('changed')
-      await loadDetail()
-    } finally {
-      actionLoading.value = false
-    }
+const handleVerify = async () => {
+  if (!props.orderId) return
+  actionLoading.value = true
+  try {
+    await fetchVerifyAcmeOrder(props.orderId)
+    ElMessage.success('已开始验证，请稍后刷新查看结果')
+    emit('changed')
+    await loadDetail()
+  } finally {
+    actionLoading.value = false
   }
+}
 
-  const handleRetry = async () => {
-    if (!props.orderId) return
-    actionLoading.value = true
-    try {
-      await fetchRetryAcmeOrder(props.orderId)
-      ElMessage.success('已重新提交验证')
-      emit('changed')
-      await loadDetail()
-    } finally {
-      actionLoading.value = false
-    }
+const handleRetry = async () => {
+  if (!props.orderId) return
+  actionLoading.value = true
+  try {
+    await fetchRetryAcmeOrder(props.orderId)
+    ElMessage.success('已重新提交验证')
+    emit('changed')
+    await loadDetail()
+  } finally {
+    actionLoading.value = false
   }
+}
 
-  const handleCancel = async () => {
-    if (!props.orderId) return
-    actionLoading.value = true
-    try {
-      await fetchCancelAcmeOrder(props.orderId)
-      ElMessage.success('已取消')
-      emit('changed')
-      await loadDetail()
-    } finally {
-      actionLoading.value = false
-    }
+const handleCancel = async () => {
+  if (!props.orderId) return
+  actionLoading.value = true
+  try {
+    await fetchCancelAcmeOrder(props.orderId)
+    ElMessage.success('已取消')
+    emit('changed')
+    await loadDetail()
+  } finally {
+    actionLoading.value = false
   }
+}
 </script>
 
 <style lang="scss" scoped>
-  .challenge-section {
-    margin-top: 20px;
-  }
+.challenge-section {
+  margin-top: 20px;
+}
 
-  .section-title {
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
+.section-title {
+  margin-bottom: 12px;
+  font-weight: 600;
+}
 
-  .challenge-card {
-    padding: 12px;
-    margin-bottom: 12px;
-    background: var(--el-fill-color-light);
-    border-radius: 8px;
-  }
+.challenge-card {
+  padding: 12px;
+  margin-bottom: 12px;
+  background: var(--el-fill-color-light);
+  border-radius: 8px;
+}
 
-  .challenge-domain {
-    margin-bottom: 8px;
-    font-weight: 500;
-  }
+.challenge-domain {
+  margin-bottom: 8px;
+  font-weight: 500;
+}
 
-  .zone-tip {
-    margin-bottom: 8px;
+.zone-tip {
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+}
+
+.challenge-row {
+  margin-bottom: 8px;
+
+  .label {
+    display: block;
+    margin-bottom: 4px;
     font-size: 12px;
     color: var(--el-text-color-secondary);
   }
+}
 
-  .challenge-row {
-    margin-bottom: 8px;
+.drawer-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
 
-    .label {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 12px;
-      color: var(--el-text-color-secondary);
-    }
-  }
-
-  .drawer-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 20px;
-  }
-
-  .text-danger {
-    color: var(--el-color-danger);
-  }
+.text-danger {
+  color: var(--el-color-danger);
+}
 </style>

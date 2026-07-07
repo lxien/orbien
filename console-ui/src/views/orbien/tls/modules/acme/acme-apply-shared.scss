@@ -1,0 +1,270 @@
+.acme-wizard {
+  .wizard-steps {
+    margin-bottom: 24px;
+  }
+
+  .wizard-body {
+    min-height: 500px;
+    box-sizing: border-box;
+  }
+
+  .domain-step,
+  .validation-step,
+  .dns-verify-step {
+    min-height: 500px;
+    box-sizing: border-box;
+  }
+
+  .section-block + .section-block {
+    margin-top: 20px;
+  }
+
+  .section-title {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+
+  .proxy-option {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: 1.4;
+  }
+
+  .proxy-option__name {
+    font-weight: 500;
+  }
+
+  .proxy-option__meta {
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+  }
+
+  .proxy-summary {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
+
+  .proxy-summary__domains {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .proxy-context {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+    background: var(--el-fill-color-light);
+    border-radius: calc(var(--custom-radius) + 0px);
+  }
+
+  .proxy-context__name {
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+
+  .selected-domains {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .domain-tag {
+    max-width: 100%;
+  }
+
+  .advanced-collapse {
+    margin-top: 16px;
+    border: none;
+
+    .el-collapse-item__header {
+      height: 36px;
+      font-size: 13px;
+      color: var(--el-text-color-secondary);
+      background: transparent;
+      border: none;
+    }
+
+    .el-collapse-item__wrap {
+      border: none;
+    }
+  }
+
+  .validation-step {
+    padding-top: 4px;
+  }
+
+  .validation-modes {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+  }
+
+  .mode-card {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    height: 100%;
+    min-height: 96px;
+    padding: 16px;
+    margin: 0;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: background-color 0.2s, border-color 0.2s;
+
+    &:hover:not(.is-active) {
+      background-color: var(--art-hover-color);
+    }
+
+    &.is-active {
+      border-color: var(--theme-color) !important;
+      background-color: color-mix(in srgb, var(--theme-color) 8%, var(--default-box-color));
+    }
+
+    .el-radio {
+      height: auto;
+      margin-right: 0;
+      flex-shrink: 0;
+    }
+
+    .el-radio__label {
+      display: none;
+    }
+  }
+
+  .mode-card__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: 64px;
+  }
+
+  .mode-card__title {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    min-height: 22px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-text-color-primary);
+  }
+
+  .mode-card__tag {
+    font-weight: normal;
+  }
+
+  .mode-card__desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--el-text-color-secondary);
+  }
+
+  .dns-credential-block {
+    margin-top: 20px;
+  }
+
+  .dns-hint {
+    margin-bottom: 16px;
+  }
+
+  .credential-loading {
+    min-height: 48px;
+  }
+
+  .empty-credential {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 4px;
+    font-size: 13px;
+  }
+
+  .credential-form {
+    margin-top: 4px;
+  }
+
+  .credential-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .text-muted {
+    color: var(--el-text-color-placeholder);
+  }
+
+  .text-warning {
+    color: var(--el-color-warning);
+  }
+
+  .text-success {
+    color: var(--el-color-success);
+  }
+
+  .challenge-card {
+    padding: 12px;
+    margin-bottom: 12px;
+    background: var(--el-fill-color-light);
+    border-radius: 8px;
+  }
+
+  .challenge-domain {
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 13px;
+
+    span {
+      flex-shrink: 0;
+      width: 64px;
+      color: var(--el-text-color-secondary);
+    }
+
+    code {
+      flex: 1;
+      word-break: break-all;
+    }
+
+    .record-value {
+      font-size: 12px;
+    }
+  }
+
+  .zone-tip {
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+  }
+
+  .order-status {
+    margin-top: 16px;
+  }
+
+  .error-text {
+    margin-top: 8px;
+    color: var(--el-color-danger);
+  }
+}

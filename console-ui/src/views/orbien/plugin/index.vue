@@ -45,6 +45,7 @@
             v-if="currentPageComponent && proxyId"
             :key="`${proxyId}-${activeMenu}`"
             :proxy-id="proxyId"
+            :proxy-name="proxyName"
             :protocol="protocol"
         />
         <ElEmpty v-else description="功能开发中"/>

@@ -29,7 +29,18 @@ public class AcmeProperties {
 
     private String credentialMasterKey = "orbien-default-credential-key-32bytes!!";
     private int dnsPollIntervalSeconds = 15;
-    private int dnsPollMaxAttempts = 40;
+    /**
+     * DNS TXT 传播等待（本地探测）
+     */
+    private int dnsPropagationMaxAttempts = 20;
+    /**
+     * 连续 DNS 解析失败多少次后提前结束（域名不存在等）
+     */
+    private int dnsPropagationFailFastAttempts = 3;
+    /**
+     * CA 授权轮询
+     */
+    private int dnsPollMaxAttempts = 20;
 
     public enum Environment {
         STAGING,

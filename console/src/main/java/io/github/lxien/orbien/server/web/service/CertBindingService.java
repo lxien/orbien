@@ -18,7 +18,6 @@
 
 package io.github.lxien.orbien.server.web.service;
 
-import io.github.lxien.orbien.server.web.dto.binding.*;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindPreviewItemDTO;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindResultDTO;
 import io.github.lxien.orbien.server.web.dto.binding.CertUsageDTO;
@@ -50,8 +49,6 @@ public interface CertBindingService {
     void rebind(Long bindingId, CertRebindParam param);
 
     void redeploy(Long bindingId);
-
-    void disableAllByProxy(String proxyId);
 
     CertBindResultDTO bindMatchingDomainsForProxy(String certId, String proxyId, boolean override);
 }

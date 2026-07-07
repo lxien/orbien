@@ -88,10 +88,4 @@ public class CertBindingController {
         certBindingService.redeploy(bindingId);
         return Ajax.success();
     }
-
-    @PutMapping("/proxy/{proxyId}/disable-all")
-    public Ajax disableAllByProxy(@PathVariable String proxyId) {
-        certBindingService.disableAllByProxy(proxyId);
-        return Ajax.success();
-    }
 }

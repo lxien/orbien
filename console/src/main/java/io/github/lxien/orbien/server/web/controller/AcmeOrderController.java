@@ -4,6 +4,7 @@ import io.github.lxien.orbien.server.web.common.message.Ajax;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.param.acme.AcmeOrderCreateParam;
 import io.github.lxien.orbien.server.web.service.AcmeOrderService;
+import io.github.lxien.orbien.server.web.service.acme.AcmeDomainSourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,17 @@ import java.util.List;
 public class AcmeOrderController {
 
     private final AcmeOrderService acmeOrderService;
+    private final AcmeDomainSourceService acmeDomainSourceService;
+
+    @GetMapping("/https-proxy-options")
+    public Ajax listHttpsProxyOptions() {
+        return Ajax.success(acmeDomainSourceService.listHttpsProxyOptions());
+    }
+
+    @GetMapping("/https-proxy-options/{proxyId}/domains")
+    public Ajax listHttpsProxyDomains(@PathVariable String proxyId) {
+        return Ajax.success(acmeDomainSourceService.listDomainsByProxyId(proxyId));
+    }
 
     @PostMapping("/create")
     public Ajax create(@RequestBody @Validated AcmeOrderCreateParam param) {

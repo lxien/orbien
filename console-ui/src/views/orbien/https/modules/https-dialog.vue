@@ -348,7 +348,7 @@ const buildDomainPayload = () => {
   const domainType = parseInt(formData.domainType, 10)
   if (domainType === DomainType.SUBDOMAIN) {
     return {
-      subdomainBindings: buildSubdomainBindingsPayload(formData.subdomainBindings)
+      subdomainBindings: buildSubdomainBindingsPayload(formData.subdomainBindings, rootDomains.value)
     }
   }
   if (domainType === DomainType.CUSTOM_DOMAIN) {
@@ -372,7 +372,7 @@ const handleSubmit = async () => {
 
   const subdomainResult =
       formData.domainType === String(DomainType.SUBDOMAIN)
-          ? validateSubdomainBindings(formData.subdomainBindings)
+          ? validateSubdomainBindings(formData.subdomainBindings, rootDomains.value)
           : {valid: true, errorIndexes: [] as number[]}
 
   if (!subdomainResult.valid) {

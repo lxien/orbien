@@ -254,12 +254,23 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
     private void processVerification(Long orderId) {
         try {
             AcmeCertOrderDO order = requireOrder(orderId);
+            if (order.getStatus().isTerminal() || order.getStatus() == AcmeOrderStatus.CANCELLED) {
+                return;
+            }
             order.setStatus(AcmeOrderStatus.VALIDATING);
             acmeCertOrderRepository.save(order);
 
-            List<AcmeDnsChallengeDO> challenges = acmeDnsChallengeRepository.findByOrderId(orderId);
-            if (!waitForDnsPropagation(challenges)) {
-                markFailed(order, "DNS 记录在超时时间内未生效，请检查 TXT 记录");
+            PropagationWaitResult propagationResult = waitForDnsPropagation(orderId, order.getValidationMode());
+            if (!propagationResult.success()) {
+                AcmeCertOrderDO latest = requireOrder(orderId);
+                if (latest.getStatus() != AcmeOrderStatus.CANCELLED) {
+                    markFailed(latest, propagationResult.errorMessage());
+                }
+                return;
+            }
+
+            order = requireOrder(orderId);
+            if (order.getStatus().isTerminal() || order.getStatus() == AcmeOrderStatus.CANCELLED) {
                 return;
             }
 
@@ -317,31 +328,92 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
         return e.getMessage() != null ? e.getMessage() : "ACME 验证失败";
     }
 
-    private boolean waitForDnsPropagation(List<AcmeDnsChallengeDO> challenges) {
-        for (int i = 0; i < acmeProperties.getDnsPollMaxAttempts(); i++) {
+    private record PropagationWaitResult(boolean success, String errorMessage) {
+        static PropagationWaitResult ok() {
+            return new PropagationWaitResult(true, null);
+        }
+
+        static PropagationWaitResult fail(String errorMessage) {
+            return new PropagationWaitResult(false, errorMessage);
+        }
+    }
+
+    private PropagationWaitResult waitForDnsPropagation(Long orderId, AcmeValidationMode validationMode) {
+        int maxAttempts = Math.max(1, acmeProperties.getDnsPropagationMaxAttempts());
+        int failFastAttempts = Math.max(1, acmeProperties.getDnsPropagationFailFastAttempts());
+        int consecutiveUnavailable = 0;
+
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            AcmeCertOrderDO order = acmeCertOrderRepository.findById(orderId).orElse(null);
+            if (order == null || order.getStatus().isTerminal() || order.getStatus() == AcmeOrderStatus.CANCELLED) {
+                return PropagationWaitResult.fail("申请已取消或已结束");
+            }
+
+            List<AcmeDnsChallengeDO> challenges = acmeDnsChallengeRepository.findByOrderId(orderId);
+            if (CollectionUtils.isEmpty(challenges)) {
+                return PropagationWaitResult.fail("未找到 DNS 验证记录");
+            }
+
             boolean allReady = true;
+            boolean anyUnavailable = false;
             for (AcmeDnsChallengeDO challenge : challenges) {
-                if (dnsPropagationChecker.txtExists(challenge.getRecordName(), challenge.getRecordValue())) {
-                    challenge.setStatus(AcmeChallengeStatus.VALIDATED);
-                    challenge.setValidatedAt(LocalDateTime.now());
-                    acmeDnsChallengeRepository.save(challenge);
+                if (challenge.getStatus() == AcmeChallengeStatus.VALIDATED) {
+                    continue;
+                }
+                DnsPropagationChecker.TxtCheckStatus checkStatus = dnsPropagationChecker.checkTxt(
+                        challenge.getRecordName(),
+                        challenge.getRecordValue());
+                if (checkStatus == DnsPropagationChecker.TxtCheckStatus.MATCHED) {
+                    if (challenge.getStatus() != AcmeChallengeStatus.VALIDATED) {
+                        challenge.setStatus(AcmeChallengeStatus.VALIDATED);
+                        challenge.setValidatedAt(LocalDateTime.now());
+                        acmeDnsChallengeRepository.save(challenge);
+                    }
                 } else {
-                    challenge.setStatus(AcmeChallengeStatus.PROPAGATING);
-                    acmeDnsChallengeRepository.save(challenge);
                     allReady = false;
+                    if (checkStatus == DnsPropagationChecker.TxtCheckStatus.LOOKUP_UNAVAILABLE) {
+                        anyUnavailable = true;
+                    }
+                    AcmeChallengeStatus waitingStatus = validationMode == AcmeValidationMode.DNS_API
+                            ? AcmeChallengeStatus.PROPAGATING
+                            : AcmeChallengeStatus.PENDING;
+                    updateChallengeStatus(challenge, waitingStatus);
                 }
             }
             if (allReady) {
-                return true;
+                return PropagationWaitResult.ok();
             }
-            try {
-                Thread.sleep(acmeProperties.getDnsPollIntervalSeconds() * 1000L);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                return false;
+
+            if (anyUnavailable) {
+                consecutiveUnavailable++;
+                if (consecutiveUnavailable >= failFastAttempts) {
+                    return PropagationWaitResult.fail("域名 DNS 无法解析，请检查域名是否正确或 TXT 记录是否已配置");
+                }
+            } else {
+                consecutiveUnavailable = 0;
+            }
+
+            if (attempt < maxAttempts - 1) {
+                sleepInterval();
             }
         }
-        return false;
+        return PropagationWaitResult.fail("DNS 记录在超时时间内未生效，请检查 TXT 记录后重试");
+    }
+
+    private void updateChallengeStatus(AcmeDnsChallengeDO challenge, AcmeChallengeStatus status) {
+        if (challenge.getStatus() == status) {
+            return;
+        }
+        challenge.setStatus(status);
+        acmeDnsChallengeRepository.save(challenge);
+    }
+
+    private void sleepInterval() {
+        try {
+            Thread.sleep(acmeProperties.getDnsPollIntervalSeconds() * 1000L);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void cleanupDnsRecords(Long orderId) {
@@ -387,6 +459,17 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
         order.setErrorCode("ACME_FAILED");
         order.setErrorMessage(message);
         acmeCertOrderRepository.save(order);
+        markChallengesFailed(order.getId());
+    }
+
+    private void markChallengesFailed(Long orderId) {
+        for (AcmeDnsChallengeDO challenge : acmeDnsChallengeRepository.findByOrderId(orderId)) {
+            if (challenge.getStatus() == AcmeChallengeStatus.VALIDATED
+                    || challenge.getStatus() == AcmeChallengeStatus.CLEANED) {
+                continue;
+            }
+            updateChallengeStatus(challenge, AcmeChallengeStatus.FAILED);
+        }
     }
 
     private AcmeCertOrderDO requireOrder(Long orderId) {
@@ -461,10 +544,10 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
         dto.setHostRecord(StringUtils.hasText(challenge.getHostRecord())
                 ? challenge.getHostRecord()
                 : DnsNameHelper.buildHostRecord(
-                        challenge.getRecordName(),
-                        StringUtils.hasText(challenge.getDnsZone())
-                                ? challenge.getDnsZone()
-                                : DnsNameHelper.guessZone(challenge.getDomain())));
+                challenge.getRecordName(),
+                StringUtils.hasText(challenge.getDnsZone())
+                ? challenge.getDnsZone()
+                : DnsNameHelper.guessZone(challenge.getDomain())));
         dto.setDnsZone(StringUtils.hasText(challenge.getDnsZone())
                 ? challenge.getDnsZone()
                 : DnsNameHelper.guessZone(challenge.getDomain()));

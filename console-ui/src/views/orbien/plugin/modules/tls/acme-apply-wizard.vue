@@ -1,10 +1,11 @@
 <template>
   <ElDialog
       v-model="dialogVisible"
-      title="申请免费 TLS 证书"
+      title="为当前代理申请证书"
       width="760px"
       align-center
       destroy-on-close
+      append-to-body
       :close-on-click-modal="false"
   >
     <ElSteps :active="currentStep" finish-status="success" align-center class="acme-wizard wizard-steps">
@@ -14,10 +15,11 @@
     </ElSteps>
 
     <div class="acme-wizard wizard-body" v-loading="submitting" element-loading-text="正在提交申请，请稍候...">
-      <AcmeApplyStepDomainGlobal
+      <AcmeApplyStepDomainProxy
           v-show="currentStep === 0"
-          ref="domainStepRef"
           :visible="dialogVisible"
+          :proxy-id="proxyId"
+          :proxy-name="proxyName"
           v-model:cert-brand="certBrand"
           v-model:selected-domains="selectedDomains"
           v-model:extra-domain-text="extraDomainText"
@@ -55,7 +57,7 @@
       >
         开始验证
       </ElButton>
-      <ElButton v-else-if="currentStep === 2" :loading="refreshing" @click="refreshOrder">刷新状态</ElButton>
+      <ElButton v-else-if="currentStep === 2" :loading="refreshing" @click="handleVerifyDone">刷新状态</ElButton>
     </template>
   </ElDialog>
 
@@ -63,17 +65,21 @@
 </template>
 
 <script setup lang="ts">
-import {computed, ref, toRef} from 'vue'
-import {ElMessage} from 'element-plus'
-import DnsCredentialDialog from './dns-credential-dialog.vue'
-import AcmeApplyStepDomainGlobal from './acme/acme-apply-step-domain-global.vue'
-import AcmeApplyStepValidation from './acme/acme-apply-step-validation.vue'
-import AcmeApplyStepDnsVerify from './acme/acme-apply-step-dns-verify.vue'
-import {useAcmeApplyWizard} from './acme/use-acme-apply-wizard'
+import {computed, toRef} from 'vue'
+import DnsCredentialDialog from '@/views/orbien/tls/modules/dns-credential-dialog.vue'
+import AcmeApplyStepDomainProxy from '@/views/orbien/tls/modules/acme/acme-apply-step-domain-proxy.vue'
+import AcmeApplyStepValidation from '@/views/orbien/tls/modules/acme/acme-apply-step-validation.vue'
+import AcmeApplyStepDnsVerify from '@/views/orbien/tls/modules/acme/acme-apply-step-dns-verify.vue'
+import {useAcmeApplyWizard} from '@/views/orbien/tls/modules/acme/use-acme-apply-wizard'
 
-defineOptions({name: 'AcmeApplyWizard'})
+defineOptions({name: 'PluginAcmeApplyWizard'})
 
-const props = defineProps<{ visible: boolean }>()
+const props = defineProps<{
+  visible: boolean
+  proxyId: string
+  proxyName?: string
+}>()
+
 const emit = defineEmits<{
   (e: 'update:visible', value: boolean): void
   (e: 'success'): void
@@ -83,8 +89,6 @@ const dialogVisible = computed({
   get: () => props.visible,
   set: (value) => emit('update:visible', value)
 })
-
-const domainStepRef = ref<InstanceType<typeof AcmeApplyStepDomainGlobal>>()
 
 const {
   currentStep,
@@ -104,7 +108,7 @@ const {
   canManualVerify,
   openDnsDialog,
   handleDnsCredentialSaved,
-  validateDomainStep,
+  goNextFromDomain,
   handleSubmit,
   refreshOrder,
   handleVerify,
@@ -115,15 +119,14 @@ const {
 })
 
 const handleNext = () => {
-  if (domainStepRef.value && !domainStepRef.value.validate()) {
-    ElMessage.warning('请选择 HTTPS 隧道')
-    return
-  }
-  if (!validateDomainStep()) return
-  currentStep.value++
+  goNextFromDomain()
+}
+
+const handleVerifyDone = async () => {
+  await refreshOrder()
 }
 </script>
 
 <style lang="scss">
-@use './acme/acme-apply-shared.scss';
+@use '@/views/orbien/tls/modules/acme/acme-apply-shared.scss';
 </style>
