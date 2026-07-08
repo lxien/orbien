@@ -2,7 +2,7 @@
   <ElDialog
       v-model="dialogVisible"
       :title="dialogType === 'add' ? '添加 SOCKS5 代理' : '编辑 SOCKS5 代理'"
-      width="720px"
+      width="650px"
       align-center
   >
     <ElForm

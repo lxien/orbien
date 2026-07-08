@@ -83,7 +83,7 @@ public class ProxyRuntimeSyncService {
         }
         ProxyConfig config = ext.getProxyConfig();
         if (config.isSocks5()) {
-            logger.debug("跳过客户端同步，SOCKS5 代理由服务端独立处理: {}", proxyId);
+            logger.debug("跳过sockes5运行配置同步", proxyId);
             return;
         }
         if (!config.getStatus().isOpen()) {
