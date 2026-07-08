@@ -22,7 +22,6 @@ import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.*;
-import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
 import jakarta.annotation.PostConstruct;
@@ -58,6 +57,10 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     private BasicAuthRepository basicAuthRepository;
     @Autowired
     private BasicUserRepository basicUserRepository;
+    @Autowired
+    private Socks5AuthRepository socks5AuthRepository;
+    @Autowired
+    private Socks5UserRepository socks5UserRepository;
     @Autowired
     private HealthCheckRepository healthCheckRepository;
     @Autowired
@@ -108,6 +111,10 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
             proxyDomainRepository.deleteByProxyId(proxyId);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
+        }
+        if (proxyDO.getProtocol().isSocks5()) {
+            socks5AuthRepository.deleteByProxyIdIn(ids);
+            socks5UserRepository.deleteByProxyIdIn(ids);
         }
 
         metricsService.deleteByProxyId(proxyId);

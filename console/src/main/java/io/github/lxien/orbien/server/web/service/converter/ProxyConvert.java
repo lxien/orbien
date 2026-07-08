@@ -21,6 +21,7 @@ import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TlsCertSummaryDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
@@ -36,6 +37,9 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", imports = {ProtocolType.class, DomainType.class, TransportProtocol.class})
 public interface ProxyConvert {
+    @Mapping(target = "transportProtocol", ignore = true)
+    Socks5ProxyListDTO toSocks5ListDTO(ProxyDO proxy);
+
     @Mapping(target = "transportProtocol", ignore = true)
     TcpProxyListDTO toTcpListDTO(ProxyDO proxy);
 

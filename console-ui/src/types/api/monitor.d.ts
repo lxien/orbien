@@ -58,5 +58,6 @@ declare namespace Api.Monitor {
     httpsCount: number
     tcpCount: number
     udpCount: number
+    socks5Count: number
   }
 }

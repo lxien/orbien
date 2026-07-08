@@ -18,7 +18,6 @@ package io.github.lxien.orbien.server.web.proxy.repository.assembler;
 
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
-import io.github.lxien.orbien.server.web.entity.*;
 
 import java.util.List;
 
@@ -30,9 +29,11 @@ public record ProxyRelations(
         List<AccessControlRuleDO> accessControlRules,
         List<ProxyDomainDO> domains,
         List<BasicUserDO> basicUsers,
-        HealthCheckDO healthCheck
+        HealthCheckDO healthCheck,
+        Socks5AuthDO socks5Auth,
+        List<Socks5UserDO> socks5Users
 ) {
     public static ProxyRelations empty() {
-        return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null);
+        return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null, null, List.of());
     }
 }

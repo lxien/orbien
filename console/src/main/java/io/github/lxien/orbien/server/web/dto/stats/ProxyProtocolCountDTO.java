@@ -43,4 +43,8 @@ public class ProxyProtocolCountDTO implements Serializable {
      * UDP 代理数量
      */
     private Long udpCount;
+    /**
+     * SOCKS5 代理数量
+     */
+    private Long socks5Count;
 }

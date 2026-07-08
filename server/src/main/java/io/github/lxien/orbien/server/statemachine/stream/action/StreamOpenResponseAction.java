@@ -13,8 +13,12 @@ import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
-import io.github.lxien.orbien.server.statemachine.stream.*;
-import io.github.lxien.orbien.server.statemachine.stream.*;
+import io.github.lxien.orbien.server.statemachine.stream.StreamConstants;
+import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
+import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
+import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
+import io.github.lxien.orbien.server.statemachine.stream.StreamState;
+import io.github.lxien.orbien.server.transport.socks5.Socks5ReplyHelper;
 import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
@@ -157,6 +161,10 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         if (context.getProtocol().isHttp()) {
             relayHttpFirstPackage(context, visitor, tunnelBridge);
             flushPendingUploads(context, tunnelBridge);
+        }
+        if (context.getProtocol().isSocks5() && context.hasVariable(StreamConstants.SOCKS5_AWAIT_REPLY)) {
+            context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
+            Socks5ReplyHelper.sendConnectSuccess(visitor);
         }
         visitor.config().setOption(ChannelOption.AUTO_READ, true);
         visitor.read();

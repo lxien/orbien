@@ -17,6 +17,7 @@ import java.util.List;
 
 /**
  * 首包探测 HA PROXY v1/v2 获取真实来源IP地址
+ *
  * @author lxien
  */
 public class ProxyProtocolDetectHandler extends ByteToMessageDecoder {
@@ -31,6 +32,13 @@ public class ProxyProtocolDetectHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        // Netty detectProtocol() 在 readableBytes < 12 时一律返回 NEEDS_MORE_DATA。
+        // SOCKS5 方法协商仅 3 字节，HTTP/TLS 首包也常小于 12 字节，不能盲等满 12 字节。
+        if (in.isReadable() && !mayStartProxyHeader(in)) {
+            forwardAsDirect(ctx, in, out);
+            return;
+        }
+
         ProtocolDetectionResult<HAProxyProtocolVersion> result = HAProxyMessageDecoder.detectProtocol(in);
         if (result.state() == ProtocolDetectionState.NEEDS_MORE_DATA) {
             return;
@@ -43,10 +51,7 @@ public class ProxyProtocolDetectHandler extends ByteToMessageDecoder {
                 ctx.close();
                 return;
             }
-            // 直连调试：去掉探测 handler，原样转发 HTTP/TCP
-            pipeline.remove(this);
-            out.add(in.readRetainedSlice(in.readableBytes()));
-            logger.debug("[HAProxy] 非 PROXY 连接，按直连处理 peer={}", ctx.channel().remoteAddress());
+            forwardAsDirect(ctx, in, out);
             return;
         }
 
@@ -56,5 +61,19 @@ public class ProxyProtocolDetectHandler extends ByteToMessageDecoder {
                 new HAProxyVisitorAddressHandler(config));
         pipeline.remove(this);
         ctx.fireChannelRead(in.retain());
+    }
+
+    private void forwardAsDirect(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        ctx.pipeline().remove(this);
+        out.add(in.readRetainedSlice(in.readableBytes()));
+        logger.debug("[HAProxy] 非 PROXY 连接，按直连处理 peer={}", ctx.channel().remoteAddress());
+    }
+
+    /**
+     * PROXY v1 以 {@code P} 开头，v2 以 {@code 0x0D} 开头；其余协议（SOCKS5/HTTP/TLS 等）不应等待凑满 12 字节。
+     */
+    private static boolean mayStartProxyHeader(ByteBuf in) {
+        byte first = in.getByte(in.readerIndex());
+        return first == (byte) 0x0D || first == 'P';
     }
 }

@@ -59,8 +59,13 @@ public class ProxyConfigAssembler {
                 assembleBasicAuthUsers(config, relations.basicUsers());
             }
         }
+        if (config.isSocks5()) {
+            assembleSocks5Auth(config, relations.socks5Auth(), relations.socks5Users());
+        }
 
-        assembleHealthCheck(config, relations.healthCheck());
+        if (!config.isSocks5()) {
+            assembleHealthCheck(config, relations.healthCheck());
+        }
         return ProxyConfigExt.of(config, toDomainInfos(relations.domains()));
     }
 
@@ -96,6 +101,17 @@ public class ProxyConfigAssembler {
             config.setBasicAuth(proxyModelConvert.toBasicAuthConfig(basicAuthDO));
         }
         return config;
+    }
+
+    public void assembleSocks5Auth(ProxyConfig config, Socks5AuthDO socks5AuthDO, List<Socks5UserDO> users) {
+        if (socks5AuthDO == null) {
+            return;
+        }
+        Socks5AuthConfig authConfig = proxyModelConvert.toSocks5AuthConfig(socks5AuthDO);
+        if (!CollectionUtils.isEmpty(users)) {
+            authConfig.addUsers(proxyModelConvert.toSocks5UserConfig(users));
+        }
+        config.setSocks5Auth(authConfig);
     }
 
     public void assembleTransport(ProxyConfig config, ProxyDO proxyDO) {

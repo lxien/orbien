@@ -69,6 +69,9 @@ public class AgentInitAction extends AgentBaseAction {
                     } else if (config.isTcp()) {
                         proxyManager.registerTcp(config.getAgentId(), config.getProxyId(), config.getListenPort());
                         logger.debug("注册TCP代理: {}", config.getName());
+                    } else if (config.isSocks5()) {
+                        proxyManager.registerSocks5(config.getAgentId(), config.getProxyId(), config.getListenPort());
+                        logger.debug("注册SOCKS5代理: {}", config.getName());
                     }
                 }
             });

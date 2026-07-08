@@ -77,6 +77,23 @@ public class ProxyConfigAssembler {
                     proxyBuilder.setRemotePort(config.getRemotePort());
                 }
                 break;
+            case SOCKS5:
+                if (config.getRemotePort() != null) {
+                    proxyBuilder.setRemotePort(config.getRemotePort());
+                }
+                if (config.hasSocks5Auth()) {
+                    Socks5AuthConfig socks5Auth = config.getSocks5Auth();
+                    Message.Socks5Auth.Builder authBuilder = Message.Socks5Auth.newBuilder()
+                            .setEnabled(socks5Auth.isEnabled());
+                    for (Socks5AuthConfig.Socks5User user : socks5Auth.getUsers()) {
+                        authBuilder.addUsers(Message.Socks5User.newBuilder()
+                                .setUsername(user.getUsername())
+                                .setPassword(user.getPassword())
+                                .build());
+                    }
+                    proxyBuilder.setSocks5Auth(authBuilder);
+                }
+                break;
             case HTTP:
             case HTTPS:
                 //域名配置

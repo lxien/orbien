@@ -16,7 +16,8 @@ public enum ProtocolType {
     TCP(1, "tcp"),
     HTTP(2, "http"),
     HTTPS(3, "https"),
-    UDP(4, "udp");
+    UDP(4, "udp"),
+    SOCKS5(5, "socks5");
     private static final Map<Integer, ProtocolType> TYPE_MAP;
     private static final Map<String, ProtocolType> NAME_MAP;
 
@@ -71,6 +72,10 @@ public enum ProtocolType {
         return protocolType == UDP;
     }
 
+    public static boolean isSocks5(ProtocolType protocolType) {
+        return protocolType == SOCKS5;
+    }
+
     public static boolean isHttp(ProtocolType protocolType) {
         return protocolType == HTTP;
     }
@@ -104,6 +109,11 @@ public enum ProtocolType {
         return protocolType == UDP;
     }
 
+    public static boolean isSocks5(String protocol) {
+        ProtocolType protocolType = fromName(protocol);
+        return protocolType == SOCKS5;
+    }
+
     public boolean isHttpOrHttps() {
         return this == HTTP || this == HTTPS;
     }
@@ -124,6 +134,10 @@ public enum ProtocolType {
     }
     public boolean isUdp() {
         return this == UDP;
+    }
+
+    public boolean isSocks5() {
+        return this == SOCKS5;
     }
 
     public int getCode() {

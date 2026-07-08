@@ -130,7 +130,7 @@ public final class RuntimeInfoSupport {
             builder.addAllRemoteAddr(remoteAddrs);
         }
 
-        if (!config.isUdp()) {
+        if (!config.isUdp() && !config.isSocks5()) {
             Message.HealthCheck healthCheck = toHealthCheckProto(config.getHealthCheck());
             if (healthCheck != null) {
                 builder.setHealthCheck(healthCheck);

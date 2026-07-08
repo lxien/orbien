@@ -6,6 +6,7 @@ enum ProtocolType {
   HTTP = 1;
   HTTPS = 2;
   UDP = 3;
+  SOCKS5 = 4;
 }
 
 enum AgentType {
@@ -91,6 +92,16 @@ message BasicAuth {
   repeated HttpUser http_users = 2;
 }
 
+message Socks5User {
+  string username = 1;
+  string password = 2;
+}
+
+message Socks5Auth {
+  bool enabled = 1;
+  repeated Socks5User users = 2;
+}
+
 message Bandwidth {
   optional string limit = 1;
   optional string limit_in = 2;
@@ -145,6 +156,7 @@ message Proxy {
   optional Transport transport = 13;
   optional TlsCert tls_cert = 14;
   optional HealthCheck health_check = 15;
+  optional Socks5Auth socks5_auth = 16;
 }
 
 message RuntimeInfo {

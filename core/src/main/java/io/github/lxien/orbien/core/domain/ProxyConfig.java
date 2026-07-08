@@ -120,6 +120,12 @@ public class ProxyConfig implements Serializable {
     private HealthCheckConfig healthCheck;
 
     /**
+     * SOCKS5 认证配置
+     */
+    @Setter
+    private Socks5AuthConfig socks5Auth;
+
+    /**
      * 是否启用 HTTP 请求抓包（Inspector）
      */
     @Setter
@@ -159,6 +165,10 @@ public class ProxyConfig implements Serializable {
         return basicAuth != null;
     }
 
+    public boolean hasSocks5Auth() {
+        return socks5Auth != null;
+    }
+
     /**
      * 是否是 HTTP 协议
      */
@@ -196,6 +206,10 @@ public class ProxyConfig implements Serializable {
      */
     public boolean isUdp() {
         return ProtocolType.isUdp(protocol);
+    }
+
+    public boolean isSocks5() {
+        return ProtocolType.isSocks5(protocol);
     }
 
     public boolean hasRemotePort() {

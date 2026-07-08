@@ -136,12 +136,12 @@ final class AppConfigBuilder {
 
         ProxyConfig proxyConfig = new ProxyConfig();
         proxyConfig.setName(appName);
-        proxyConfig.setProtocol(proxy.getProtocol());
+        proxyConfig.setProtocol(proxy.getProtocol().toProtocolType());
         proxyConfig.setRemotePort(proxy.getRemotePort());
         proxyConfig.setStatus(ProxyStatus.OPEN);
         proxyConfig.addTarget(new Target(proxy.getLocalIp(), localPort, 1, appName));
 
-        if (proxy.getProtocol() != null && proxy.getProtocol().isHttps()) {
+        if (proxy.getProtocol() == WebProxyProtocol.HTTPS) {
             Boolean forceHttps = proxy.getForceHttps();
             proxyConfig.setForceHttps(forceHttps == null || forceHttps);
         } else {

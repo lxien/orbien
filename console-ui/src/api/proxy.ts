@@ -35,6 +35,16 @@ export function fetchGetUdpProxyList(params: Api.Common.CommonSearchParams) {
 }
 
 /**
+ * 获取 SOCKS5 代理列表（分页）
+ */
+export function fetchGetSocks5ProxyList(params: Api.Common.CommonSearchParams) {
+    return request.get<Api.Common.PaginatedResponse<Api.Proxy.Socks5ProxyListDTO>>({
+        url: '/api/proxies/socks5',
+        params
+    })
+}
+
+/**
  * 获取 HTTP 代理详情
  * @param id 代理 ID
  * @returns HTTP 代理详情
@@ -89,6 +99,15 @@ export function fetchGetUdpProxyById(id: string) {
 }
 
 /**
+ * 获取 SOCKS5 代理详情
+ */
+export function fetchGetSocks5ProxyById(id: string) {
+    return request.get<Api.Proxy.Socks5ProxyDetailDTO>({
+        url: `/api/proxies/socks5/${id}`
+    })
+}
+
+/**
  * 创建 HTTP 代理
  * @param data 创建参数
  * @returns 响应结果
@@ -139,6 +158,17 @@ export function fetchCreateUdpProxy(data: Api.Proxy.UdpProxyCreateParam) {
 }
 
 /**
+ * 创建 SOCKS5 代理
+ */
+export function fetchCreateSocks5Proxy(data: Api.Proxy.Socks5ProxyCreateParam) {
+    return request.post({
+        url: '/api/proxies/socks5',
+        data,
+        showSuccessMessage: true
+    })
+}
+
+/**
  * 更新 HTTP 代理
  * @param data 更新参数
  * @returns 响应结果
@@ -183,6 +213,17 @@ export function fetchUpdateTcpProxy(data: Api.Proxy.TcpProxyUpdateParam) {
 export function fetchUpdateUdpProxy(data: Api.Proxy.UdpProxyUpdateParam) {
     return request.put({
         url: '/api/proxies/udp',
+        data,
+        showSuccessMessage: true
+    })
+}
+
+/**
+ * 更新 SOCKS5 代理
+ */
+export function fetchUpdateSocks5Proxy(data: Api.Proxy.Socks5ProxyUpdateParam) {
+    return request.put({
+        url: '/api/proxies/socks5',
         data,
         showSuccessMessage: true
     })

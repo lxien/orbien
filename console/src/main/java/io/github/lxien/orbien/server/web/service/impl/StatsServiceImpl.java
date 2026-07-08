@@ -55,9 +55,10 @@ public class StatsServiceImpl implements StatsService {
                 ProtocolType.HTTP,
                 ProtocolType.HTTPS,
                 ProtocolType.TCP,
-                ProtocolType.UDP);
+                ProtocolType.UDP,
+                ProtocolType.SOCKS5);
         if (stats == null) {
-            return new ProxyProtocolCountDTO(0L, 0L, 0L, 0L);
+            return new ProxyProtocolCountDTO(0L, 0L, 0L, 0L, 0L);
         }
         return stats;
     }

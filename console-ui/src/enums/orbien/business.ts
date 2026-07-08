@@ -4,7 +4,8 @@ export enum ProtocolType {
     TCP = 1,
     HTTP = 2,
     HTTPS = 3,
-    UDP = 4
+    UDP = 4,
+    SOCKS5 = 5
 }
 
 export enum PortPoolType {
@@ -104,6 +105,8 @@ export function getProtocolLabel(protocol?: number) {
             return 'HTTPS'
         case ProtocolType.UDP:
             return 'UDP'
+        case ProtocolType.SOCKS5:
+            return 'SOCKS5'
         default:
             return ''
     }

@@ -1,37 +1,43 @@
 <template>
-  <div class="tcp-page art-full-height">
-    <ElCard class="art-table-card">
+  <div class="tls-page art-full-height">
+    <ElCard class="art-table-card tls-table-card">
       <ElTabs v-model="activeTab" class="tls-tabs" type="card">
         <ElTabPane label="证书列表" name="certs">
-          <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
-            <template #left>
-              <ElSpace wrap>
-                <ElButton type="primary" @click="wizardVisible = true" v-ripple>免费申请</ElButton>
-                <ElButton v-ripple @click="handleAdd">上传证书</ElButton>
-                <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">
-                  批量删除
-                </ElButton>
-              </ElSpace>
-            </template>
-          </ArtTableHeader>
+          <div class="tab-panel-content">
+            <ArtTableHeader v-model:columns="columnChecks" :loading="loading" @refresh="refreshData">
+              <template #left>
+                <ElSpace wrap>
+                  <ElButton type="primary" @click="wizardVisible = true" v-ripple>免费申请</ElButton>
+                  <ElButton v-ripple @click="handleAdd">上传证书</ElButton>
+                  <ElButton @click="handleBatchDelete" v-ripple :disabled="selectedRows.length === 0">
+                    批量删除
+                  </ElButton>
+                </ElSpace>
+              </template>
+            </ArtTableHeader>
 
-          <ArtTable
-              :loading="loading"
-              :data="data"
-              :columns="columns"
-              :pagination="pagination"
-              @selection-change="handleSelectionChange"
-              @pagination:size-change="handleSizeChange"
-              @pagination:current-change="handleCurrentChange"
-          />
+            <ArtTable
+                :loading="loading"
+                :data="data"
+                :columns="columns"
+                :pagination="pagination"
+                @selection-change="handleSelectionChange"
+                @pagination:size-change="handleSizeChange"
+                @pagination:current-change="handleCurrentChange"
+            />
+          </div>
         </ElTabPane>
 
         <ElTabPane label="申请记录" name="orders">
-          <AcmeOrderPanel ref="orderPanelRef" @apply="wizardVisible = true"/>
+          <div class="tab-panel-content">
+            <AcmeOrderPanel ref="orderPanelRef" @apply="wizardVisible = true"/>
+          </div>
         </ElTabPane>
 
         <ElTabPane label="DNS 密钥" name="dns">
-          <DnsCredentialPanel ref="dnsPanelRef"/>
+          <div class="tab-panel-content">
+            <DnsCredentialPanel ref="dnsPanelRef"/>
+          </div>
         </ElTabPane>
       </ElTabs>
     </ElCard>
@@ -122,11 +128,13 @@ const {
       },
       {
         prop: 'org',
-        label: '证书分类'
+        label: '证书分类',
+        minWidth: 100
       },
       {
         prop: 'issuer',
-        label: '证书品牌'
+        label: '证书品牌',
+        minWidth: 120
       },
       {
         prop: 'boundDomainCount',
@@ -137,6 +145,7 @@ const {
       {
         prop: 'notAfter',
         label: '到期时间',
+        minWidth: 110,
         formatter: (row: TlsItem) => getExpireDays(row)
       },
       {
@@ -291,9 +300,54 @@ const handleDelete = async (row: TlsItem) => {
 </script>
 
 <style lang="scss" scoped>
+.tls-table-card {
+  :deep(.el-card__body) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
 .tls-tabs {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+
   :deep(.el-tabs__header) {
+    flex-shrink: 0;
     margin-bottom: 16px;
+  }
+
+  :deep(.el-tabs__content) {
+    flex: 1;
+    min-height: 0;
+  }
+
+  :deep(.el-tab-pane) {
+    height: 100%;
+  }
+}
+
+.tab-panel-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+
+  :deep(.acme-order-panel),
+  :deep(.dns-credential-panel) {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  :deep(.art-table) {
+    flex: 1;
+    min-height: 0;
   }
 }
 

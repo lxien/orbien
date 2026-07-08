@@ -87,7 +87,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
                 COALESCE(SUM(CASE WHEN p.protocol = :http THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN p.protocol = :https THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END), 0),
-                COALESCE(SUM(CASE WHEN p.protocol = :udp THEN 1 ELSE 0 END), 0)
+                COALESCE(SUM(CASE WHEN p.protocol = :udp THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN p.protocol = :socks5 THEN 1 ELSE 0 END), 0)
             )
             FROM ProxyDO p
             """)
@@ -95,7 +96,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             @Param("http") ProtocolType http,
             @Param("https") ProtocolType https,
             @Param("tcp") ProtocolType tcp,
-            @Param("udp") ProtocolType udp
+            @Param("udp") ProtocolType udp,
+            @Param("socks5") ProtocolType socks5
     );
 
     void deleteByIdIn(List<String> ids);

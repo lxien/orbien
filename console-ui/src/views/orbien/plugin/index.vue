@@ -118,7 +118,6 @@ const dialogTitle = computed(() => {
 
 const pageComponents: Record<string, Component> = {
   access: AccessControlPage,
-  auth: BasicAuthPage,
   load: ClusterPage,
   trans: TransportPage,
   limit: RateLimitPolicyPage,
@@ -158,7 +157,12 @@ const handleMenuSelect = (key: string) => {
   activeMenu.value = key
 }
 
-const currentPageComponent = computed(() => pageComponents[activeMenu.value])
+const currentPageComponent = computed(() => {
+  if (activeMenu.value === 'auth') {
+    return BasicAuthPage
+  }
+  return pageComponents[activeMenu.value]
+})
 </script>
 
 <style lang="scss" scoped>

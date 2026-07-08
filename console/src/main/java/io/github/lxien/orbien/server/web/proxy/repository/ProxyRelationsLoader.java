@@ -45,6 +45,10 @@ public class ProxyRelationsLoader {
     private BasicUserRepository basicUserRepository;
     @Autowired
     private HealthCheckRepository healthCheckRepository;
+    @Autowired
+    private Socks5AuthRepository socks5AuthRepository;
+    @Autowired
+    private Socks5UserRepository socks5UserRepository;
 
     public ProxyRelations loadOne(String proxyId) {
         return new ProxyRelations(
@@ -52,7 +56,9 @@ public class ProxyRelationsLoader {
                 accessControlRuleRepository.findByProxyId(proxyId),
                 proxyDomainRepository.findByProxyId(proxyId),
                 basicUserRepository.findByProxyId(proxyId),
-                healthCheckRepository.findById(proxyId).orElse(null)
+                healthCheckRepository.findById(proxyId).orElse(null),
+                socks5AuthRepository.findById(proxyId).orElse(null),
+                socks5UserRepository.findByProxyId(proxyId)
         );
     }
 
@@ -72,6 +78,10 @@ public class ProxyRelationsLoader {
                 basicUserRepository.findByProxyIdIn(ids), BasicUserDO::getProxyId);
         Map<String, HealthCheckDO> healthCheckMap = healthCheckRepository.findByProxyIdIn(ids).stream()
                 .collect(Collectors.toMap(HealthCheckDO::getProxyId, Function.identity()));
+        Map<String, Socks5AuthDO> socks5AuthMap = socks5AuthRepository.findByProxyIdIn(ids).stream()
+                .collect(Collectors.toMap(Socks5AuthDO::getProxyId, Function.identity()));
+        Map<String, List<Socks5UserDO>> socks5UsersMap = groupByProxyId(
+                socks5UserRepository.findByProxyIdIn(ids), Socks5UserDO::getProxyId);
 
         return ids.stream().collect(Collectors.toMap(
                 Function.identity(),
@@ -80,7 +90,9 @@ public class ProxyRelationsLoader {
                         rulesMap.getOrDefault(id, List.of()),
                         domainsMap.getOrDefault(id, List.of()),
                         usersMap.getOrDefault(id, List.of()),
-                        healthCheckMap.get(id)
+                        healthCheckMap.get(id),
+                        socks5AuthMap.get(id),
+                        socks5UsersMap.getOrDefault(id, List.of())
                 )
         ));
     }

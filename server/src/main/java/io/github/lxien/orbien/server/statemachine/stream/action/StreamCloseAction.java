@@ -2,6 +2,7 @@ package io.github.lxien.orbien.server.statemachine.stream.action;
 
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.socks5.Socks5Constants;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
@@ -14,11 +15,13 @@ import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.loadbalance.LeastConnHooks;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
+import io.github.lxien.orbien.server.statemachine.stream.StreamConstants;
+import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
-import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.transport.http.HttpKeepAliveHelper;
+import io.github.lxien.orbien.server.transport.socks5.Socks5ReplyHelper;
 import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
 import io.netty.buffer.ByteBuf;
@@ -83,6 +86,10 @@ public class StreamCloseAction extends StreamBaseAction {
         if (!context.isDatagram()) {
             if (context.getProtocol().isHttpOrHttps()) {
                 HttpKeepAliveHelper.prepareForNextRequest(visitor);
+            } else if (context.getProtocol().isSocks5()
+                    && context.hasVariable(StreamConstants.SOCKS5_AWAIT_REPLY)) {
+                context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
+                Socks5ReplyHelper.sendConnectFailure(visitor, Socks5Constants.REP_GENERAL_FAILURE);
             } else {
                 ChannelUtils.closeOnFlush(visitor);
             }

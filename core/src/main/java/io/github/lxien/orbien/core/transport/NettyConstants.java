@@ -11,6 +11,8 @@ public interface NettyConstants {
     String TCP_VISITOR_HANDLER = "tcpVisitorHandler";
     String UDP_VISITOR_HANDLER = "udpVisitorHandler";
     String HTTP_VISITOR_HANDLER = "httpVisitorHandler";
+    String SOCKS5_HANDSHAKE_HANDLER = "socks5HandshakeHandler";
+    String SOCKS5_RELAY_HANDLER = "socks5RelayHandler";
     String HAPROXY_DETECT_HANDLER = "haproxyDetectHandler";
     String HAPROXY_DECODER = "haproxyDecoder";
     String HAPROXY_ADDRESS_HANDLER = "haproxyAddressHandler";

@@ -41,6 +41,21 @@ public interface ProxyModelConvert {
 
     BasicAuthConfig toBasicAuthConfig(BasicAuthDO basicAuthDO);
 
+    Socks5AuthConfig toSocks5AuthConfig(Socks5AuthDO socks5AuthDO);
+
+    default List<Socks5AuthConfig.Socks5User> toSocks5UserConfig(List<Socks5UserDO> users) {
+        return mapSocks5Users(users);
+    }
+
+    default List<Socks5AuthConfig.Socks5User> mapSocks5Users(List<Socks5UserDO> users) {
+        if (users == null || users.isEmpty()) {
+            return List.of();
+        }
+        return users.stream()
+                .map(user -> new Socks5AuthConfig.Socks5User(user.getUsername(), user.getPassword()))
+                .toList();
+    }
+
     Set<HttpUser> toBasicUserDomains(List<BasicUserDO> basicUsers);
 
     @Mapping(target = "proxyId", source = "id")

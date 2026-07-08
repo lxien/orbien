@@ -23,6 +23,8 @@ import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyDetailDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyDetailDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
 import io.github.lxien.orbien.server.web.param.proxy.*;
@@ -32,6 +34,8 @@ public interface ProxyService {
      * 创建 TCP 代理
      */
     void createTcpProxy(TcpProxyCreateParam param);
+
+    void createSocks5Proxy(Socks5ProxyCreateParam param);
 
     void createUdpProxy(UdpProxyCreateParam param);
 
@@ -52,6 +56,8 @@ public interface ProxyService {
 
     void updateUdpProxy(UdpProxyUpdateParam param);
 
+    void updateSocks5Proxy(Socks5ProxyUpdateParam param);
+
     /**
      * 更新 HTTP 代理
      */
@@ -69,6 +75,8 @@ public interface ProxyService {
 
     UdpProxyDetailDTO getUdpProxyById(String id);
 
+    Socks5ProxyDetailDTO getSocks5ProxyById(String id);
+
     HttpProxyDetailDTO getHttpProxyById(String id);
 
     HttpsProxyDetailDTO getHttpsProxyById(String id);
@@ -80,6 +88,8 @@ public interface ProxyService {
     PageResult<TcpProxyListDTO> findTcpProxies(PageQuery pageQuery);
 
     PageResult<UdpProxyListDTO> findUdpProxies(PageQuery pageQuery);
+
+    PageResult<Socks5ProxyListDTO> findSocks5Proxies(PageQuery pageQuery);
 
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 

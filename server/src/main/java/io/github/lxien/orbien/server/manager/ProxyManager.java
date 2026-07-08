@@ -72,16 +72,28 @@ public class ProxyManager {
     private final Lock writeLock = rwLock.writeLock();
 
     public void registerTcp(String agentId, String proxyId, Integer listenPort) throws OrbienException {
+        registerPort(agentId, proxyId, listenPort, false);
+    }
+
+    public void registerSocks5(String agentId, String proxyId, Integer listenPort) throws OrbienException {
+        registerPort(agentId, proxyId, listenPort, true);
+    }
+
+    private void registerPort(String agentId, String proxyId, Integer listenPort, boolean socks5) throws OrbienException {
         if (agentId == null || proxyId == null || listenPort == null) {
             throw new IllegalArgumentException("无效输入参数");
         }
-        logger.debug("激活TCP代理: {}", proxyId);
+        logger.debug("激活{}代理: {}", socks5 ? "SOCKS5" : "TCP", proxyId);
         writeLock.lock();
         try {
             proxyAgentMap.put(proxyId, agentId);
             agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
             portMap.put(proxyId, listenPort);
-            portAcceptor.bindPort(listenPort);
+            if (socks5) {
+                portAcceptor.bindSocks5Port(listenPort);
+            } else {
+                portAcceptor.bindPort(listenPort);
+            }
         } finally {
             writeLock.unlock();
         }

@@ -28,9 +28,7 @@ import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.dto.proxy.*;
-import io.github.lxien.orbien.server.web.entity.*;
-import io.github.lxien.orbien.server.web.param.proxy.*;
-import io.github.lxien.orbien.server.web.dto.proxy.*;
+import io.github.lxien.orbien.server.web.dto.socks5auth.Socks5UserDTO;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -55,6 +53,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -78,6 +77,12 @@ public class ProxyServiceImpl implements ProxyService {
     private BasicAuthRepository basicAuthRepository;
     @Autowired
     private BasicUserRepository basicUserRepository;
+    @Autowired
+    private Socks5AuthRepository socks5AuthRepository;
+    @Autowired
+    private Socks5UserRepository socks5UserRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Autowired
     private AccessControlRepository accessControlRepository;
     @Autowired
@@ -375,6 +380,112 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void createSocks5Proxy(Socks5ProxyCreateParam param) {
+        if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyDO proxyDO = buildSocks5ProxyDO(param.getAgentId(), param.getName(), proxyId);
+        applyTcpListenPort(proxyDO, param.getRemotePort(), null, null);
+        applyTcpLimitTotal(proxyDO, param.getLimitTotal());
+        proxyRepository.save(proxyDO);
+        accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        saveSocks5AuthConfig(proxyId, param.getAuthEnabled(), param.getAuthUsers(), true);
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
+        logger.debug("SOCKS5 代理创建成功：{}", proxyDO.getName());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateSocks5Proxy(Socks5ProxyUpdateParam param) {
+        String proxyId = param.getId();
+        ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        if (!existsProxyDO.getProtocol().isSocks5()) {
+            throw new BizException("仅支持 SOCKS5 代理");
+        }
+        if (proxyRepository.existsByAgentIdAndNameAndIdNot(
+                existsProxyDO.getAgentId(), param.getName(), proxyId)) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        Integer existsListenPort = existsProxyDO.getListenPort();
+        Integer existsRemotePort = existsProxyDO.getRemotePort();
+        existsProxyDO.setName(param.getName());
+        applyTcpListenPort(existsProxyDO, param.getRemotePort(), existsListenPort, existsRemotePort);
+        applyTcpLimitTotal(existsProxyDO, param.getLimitTotal());
+        proxyRepository.save(existsProxyDO);
+        if (param.getAuthEnabled() != null || !CollectionUtils.isEmpty(param.getAuthUsers())) {
+            Boolean enabled = param.getAuthEnabled();
+            if (enabled == null) {
+                enabled = socks5AuthRepository.findById(proxyId)
+                        .map(Socks5AuthDO::getEnabled)
+                        .orElse(Boolean.FALSE);
+            }
+            saveSocks5AuthConfig(proxyId, enabled, param.getAuthUsers(), false);
+        }
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
+        logger.debug("SOCKS5 代理更新成功：{}", existsProxyDO.getName());
+    }
+
+    @Override
+    public Socks5ProxyDetailDTO getSocks5ProxyById(String id) {
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isSocks5())
+                .orElseThrow(() -> new BizException("SOCKS5 代理不存在"));
+        Socks5ProxyDetailDTO dto = new Socks5ProxyDetailDTO();
+        dto.setId(proxyDO.getId());
+        dto.setAgentId(proxyDO.getAgentId());
+        dto.setName(proxyDO.getName());
+        dto.setRemotePort(proxyDO.getRemotePort());
+        dto.setListenPort(proxyDO.getListenPort());
+        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setCreatedAt(proxyDO.getCreatedAt());
+        dto.setUpdatedAt(proxyDO.getUpdatedAt());
+        socks5AuthRepository.findById(id).ifPresent(authDO -> {
+            dto.setAuthEnabled(Boolean.TRUE.equals(authDO.getEnabled()));
+            List<Socks5UserDTO> users = socks5UserRepository.findByProxyId(id).stream()
+                    .map(user -> {
+                        Socks5UserDTO userDTO = new Socks5UserDTO();
+                        userDTO.setId(user.getId());
+                        userDTO.setUsername(user.getUsername());
+                        return userDTO;
+                    })
+                    .toList();
+            dto.setAuthUsers(users);
+        });
+        if (dto.getAuthEnabled() == null) {
+            dto.setAuthEnabled(false);
+        }
+        return dto;
+    }
+
+    @Override
+    public PageResult<Socks5ProxyListDTO> findSocks5Proxies(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        Page<ProxyDO> resultPage = proxyRepository.findByProtocolOrderByUpdatedAtDesc(ProtocolType.SOCKS5, pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+        List<ProxyDO> content = resultPage.getContent();
+        List<String> proxyIds = content.stream().map(ProxyDO::getId).toList();
+        Map<String, Socks5AuthDO> authMap = socks5AuthRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.toMap(Socks5AuthDO::getProxyId, a -> a));
+        Map<String, Long> userCountMap = socks5UserRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.groupingBy(Socks5UserDO::getProxyId, Collectors.counting()));
+        List<Socks5ProxyListDTO> res = new ArrayList<>();
+        for (ProxyDO proxyDO : content) {
+            Socks5ProxyListDTO dto = proxyConvert.toSocks5ListDTO(proxyDO);
+            Socks5AuthDO authDO = authMap.get(proxyDO.getId());
+            dto.setAuthEnabled(authDO != null && Boolean.TRUE.equals(authDO.getEnabled()));
+            dto.setAuthUserCount(userCountMap.getOrDefault(proxyDO.getId(), 0L).intValue());
+            res.add(dto);
+        }
+        return PageResult.wrap(resultPage, res);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createUdpProxy(UdpProxyCreateParam param) {
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
@@ -586,6 +697,17 @@ public class ProxyServiceImpl implements ProxyService {
         target.setName(param.getName());
         target.setWeight(1);
         return target;
+    }
+
+    private ProxyDO buildSocks5ProxyDO(String agentId, String name, String proxyId) {
+        ProxyDO proxyDO = new ProxyDO();
+        proxyDO.setId(proxyId);
+        proxyDO.setAgentId(agentId);
+        proxyDO.setName(name);
+        proxyDO.setProtocol(ProtocolType.SOCKS5);
+        proxyDO.setStatus(ProxyStatus.OPEN);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
+        return proxyDO;
     }
 
     private ProxyDO buildTcpProxyDO(String agentId, String name, String proxyId) {
@@ -1017,6 +1139,10 @@ public class ProxyServiceImpl implements ProxyService {
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
         }
+        if (protocolType.isSocks5()) {
+            socks5AuthRepository.deleteByProxyIdIn(ids);
+            socks5UserRepository.deleteByProxyIdIn(ids);
+        }
         //删除流量统计数据
         ids.forEach(proxyId -> metricsService.deleteByProxyId(proxyId));
         //删除基础信息
@@ -1064,7 +1190,9 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     /**
-     * 刷新服务端运行时注册（域名/端口监听）并推送到在线客户端。
+     * 刷新服务端运行时注册（域名/端口监听）；非 SOCKS5 代理额外推送到在线客户端。
+     * <p>
+     * SOCKS5 的认证、监听与动态目标解析均在服务端完成，客户端仅按流打开消息连接目标，无需同步配置。
      */
     private void refreshRuntimeProxy(String proxyId, boolean newlyCreated) {
         ProxyDO proxyDO = proxyRepository.findById(proxyId).orElse(null);
@@ -1078,6 +1206,9 @@ public class ProxyServiceImpl implements ProxyService {
         }
         proxyManager.deactivate(proxyId);
         activateProxy(proxyDO);
+        if (proxyDO.getProtocol().isSocks5()) {
+            return;
+        }
         if (newlyCreated) {
             proxyRuntimeSyncService.syncProxyCreated(proxyId);
         } else {
@@ -1106,6 +1237,86 @@ public class ProxyServiceImpl implements ProxyService {
             proxyManager.registerUdp(agentId, proxyId, proxyDO.getListenPort());
             return;
         }
+        if (protocol.isSocks5()) {
+            proxyManager.registerSocks5(agentId, proxyId, proxyDO.getListenPort());
+            return;
+        }
         proxyManager.registerTcp(agentId, proxyId, proxyDO.getListenPort());
+    }
+
+    private void saveSocks5AuthConfig(String proxyId, Boolean authEnabled,
+                                      List<Socks5AuthUserParam> authUsers, boolean creating) {
+        boolean enabled = Boolean.TRUE.equals(authEnabled);
+        if (creating && enabled) {
+            validateSocks5AuthUsers(authUsers, true);
+        }
+        if (!creating && enabled && !CollectionUtils.isEmpty(authUsers)) {
+            validateSocks5AuthUsers(authUsers, false);
+        }
+
+        Socks5AuthDO authDO = socks5AuthRepository.findById(proxyId).orElse(new Socks5AuthDO(proxyId, false));
+        authDO.setEnabled(enabled);
+        socks5AuthRepository.save(authDO);
+
+        if (!enabled || CollectionUtils.isEmpty(authUsers)) {
+            return;
+        }
+
+        List<Socks5UserDO> existingUsers = socks5UserRepository.findByProxyId(proxyId);
+        Set<Long> incomingIds = authUsers.stream()
+                .map(Socks5AuthUserParam::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        existingUsers.stream()
+                .filter(user -> !incomingIds.contains(user.getId()))
+                .forEach(user -> socks5UserRepository.deleteById(user.getId()));
+
+        for (Socks5AuthUserParam userParam : authUsers) {
+            if (!StringUtils.hasText(userParam.getUsername())) {
+                throw new BizException("认证用户名不能为空");
+            }
+            if (userParam.getId() != null) {
+                Socks5UserDO userDO = socks5UserRepository.findById(userParam.getId())
+                        .orElseThrow(() -> new BizException("认证用户不存在"));
+                if (!Objects.equals(userDO.getProxyId(), proxyId)) {
+                    throw new BizException("认证用户不属于当前代理");
+                }
+                if (!Objects.equals(userParam.getUsername(), userDO.getUsername())
+                        && socks5UserRepository.existsByProxyIdAndUsernameAndIdNot(
+                        proxyId, userParam.getUsername(), userParam.getId())) {
+                    throw new BizException("用户名已存在: " + userParam.getUsername());
+                }
+                userDO.setUsername(userParam.getUsername());
+                if (StringUtils.hasText(userParam.getPassword())) {
+                    userDO.setPassword(passwordEncoder.encode(userParam.getPassword()));
+                } else if (creating) {
+                    throw new BizException("认证密码不能为空");
+                }
+                socks5UserRepository.save(userDO);
+                continue;
+            }
+            if (!StringUtils.hasText(userParam.getPassword())) {
+                throw new BizException("认证密码不能为空");
+            }
+            if (socks5UserRepository.existsByProxyIdAndUsername(proxyId, userParam.getUsername())) {
+                throw new BizException("用户名已存在: " + userParam.getUsername());
+            }
+            socks5UserRepository.save(new Socks5UserDO(
+                    proxyId, userParam.getUsername(), passwordEncoder.encode(userParam.getPassword())));
+        }
+    }
+
+    private void validateSocks5AuthUsers(List<Socks5AuthUserParam> authUsers, boolean requirePassword) {
+        if (CollectionUtils.isEmpty(authUsers)) {
+            throw new BizException("启用认证时必须至少添加一个用户");
+        }
+        for (Socks5AuthUserParam userParam : authUsers) {
+            if (!StringUtils.hasText(userParam.getUsername())) {
+                throw new BizException("认证用户名不能为空");
+            }
+            if (requirePassword && userParam.getId() == null && !StringUtils.hasText(userParam.getPassword())) {
+                throw new BizException("认证密码不能为空");
+            }
+        }
     }
 }

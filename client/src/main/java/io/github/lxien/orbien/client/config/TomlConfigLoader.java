@@ -197,26 +197,46 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setRemotePort(remotePortValue.intValue());
                 }
 
-                //解析目标服务
-                List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
-                        .map(item -> {
-                            Map<String, Object> map = (Map) item;
-                            String host = (String) map.getOrDefault("host", "127.0.0.1");
-                            Long port = (Long) map.get("port");
-                            Long weight = (Long) map.getOrDefault("weight", 1L);
-                            Object nameV = map.get("name");
-                            if (port == null) {
-                                throw new IllegalArgumentException("目标端口不能为空");
+                //解析目标服务（SOCKS5 无需固定 targets）
+                if (!protocolType.isSocks5()) {
+                    List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
+                            .map(item -> {
+                                Map<String, Object> map = (Map) item;
+                                String host = (String) map.getOrDefault("host", "127.0.0.1");
+                                Long port = (Long) map.get("port");
+                                Long weight = (Long) map.getOrDefault("weight", 1L);
+                                Object nameV = map.get("name");
+                                if (port == null) {
+                                    throw new IllegalArgumentException("目标端口不能为空");
+                                }
+                                return new Target(host, port.intValue(), weight.intValue(), nameV != null ? String.valueOf(nameV) : null);
+                            }).collect(Collectors.toList());
+                    if (localPortValue != null) {
+                        targets.add(new Target(localIp, localPortValue.intValue(), 1, name));
+                    }
+                    if (targets.isEmpty()) {
+                        throw new IllegalArgumentException("至少配置一个目标内网服务");
+                    }
+                    proxyConfig.addTargets(targets);
+                }
+
+                if (protocolType.isSocks5()) {
+                    Toml socks5Auth = proxyTable.getTable("socks5_auth");
+                    if (socks5Auth != null) {
+                        Boolean enabled = socks5Auth.getBoolean("enabled", false);
+                        Socks5AuthConfig authConfig = new Socks5AuthConfig();
+                        authConfig.setEnabled(enabled);
+                        List<HashMap> users = socks5Auth.getList("users");
+                        if (users != null && !users.isEmpty()) {
+                            for (HashMap map : users) {
+                                String user = (String) map.getOrDefault("user", "");
+                                String pass = (String) map.getOrDefault("pass", "");
+                                authConfig.addUser(new Socks5AuthConfig.Socks5User(user, pass));
                             }
-                            return new Target(host, port.intValue(), weight.intValue(), nameV != null ? String.valueOf(nameV) : null);
-                        }).collect(Collectors.toList());
-                if (localPortValue != null) {
-                    targets.add(new Target(localIp, localPortValue.intValue(), 1, name));
+                        }
+                        proxyConfig.setSocks5Auth(authConfig);
+                    }
                 }
-                if (targets.isEmpty()) {
-                    throw new IllegalArgumentException("至少配置一个目标内网服务");
-                }
-                proxyConfig.addTargets(targets);
 
                 //解析HTTP(S)协议域名配置
                 if (proxyConfig.isHttpOrHttps()) {

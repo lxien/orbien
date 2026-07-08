@@ -87,6 +87,9 @@ public class ProxyConfigService {
             if (config.isTcp() && config.getListenPort() != null) {
                 proxyIdCache.invalidate(portCacheKey(ProtocolType.TCP, config.getListenPort()));
             }
+            if (config.isSocks5() && config.getListenPort() != null) {
+                proxyIdCache.invalidate(portCacheKey(ProtocolType.SOCKS5, config.getListenPort()));
+            }
             if (config.isUdp() && config.getListenPort() != null) {
                 proxyIdCache.invalidate(portCacheKey(ProtocolType.UDP, config.getListenPort()));
             }
@@ -123,6 +126,9 @@ public class ProxyConfigService {
         proxyIdCache.put(agentNameKey, proxyId);
         if (config.isTcp() && config.getListenPort() != null) {
             proxyIdCache.put(portCacheKey(ProtocolType.TCP, config.getListenPort()), proxyId);
+        }
+        if (config.isSocks5() && config.getListenPort() != null) {
+            proxyIdCache.put(portCacheKey(ProtocolType.SOCKS5, config.getListenPort()), proxyId);
         }
         if (config.isUdp() && config.getListenPort() != null) {
             proxyIdCache.put(portCacheKey(ProtocolType.UDP, config.getListenPort()), proxyId);

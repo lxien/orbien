@@ -88,6 +88,13 @@ declare namespace Api.Proxy {
         listenPort: number
     }
 
+    /** SOCKS5 代理列表 */
+    interface Socks5ProxyListDTO extends ProxyListDTO {
+        listenPort: number
+        authEnabled: boolean
+        authUserCount: number
+    }
+
     /** 代理详情基础信息 */
     interface ProxyDetailDTO {
         id: string
@@ -174,6 +181,33 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         limitTotal: number | null
+        createdAt: string
+        updatedAt: string
+    }
+
+    /** SOCKS5 认证用户（详情展示，不含密码） */
+    interface Socks5AuthUserDTO {
+        id: number
+        username: string
+    }
+
+    /** SOCKS5 认证用户 */
+    interface Socks5AuthUserParam {
+        id?: number
+        username: string
+        password?: string
+    }
+
+    /** SOCKS5 代理详情 */
+    interface Socks5ProxyDetailDTO {
+        id: string
+        agentId: string
+        name: string
+        remotePort: number | null
+        listenPort: number
+        limitTotal: number | null
+        authEnabled?: boolean
+        authUsers?: Socks5AuthUserDTO[]
         createdAt: string
         updatedAt: string
     }
@@ -293,6 +327,26 @@ declare namespace Api.Proxy {
         localPort: number
         remotePort?: number
         limitTotal?: number
+    }
+
+    /** SOCKS5 代理创建参数 */
+    interface Socks5ProxyCreateParam {
+        agentId: string
+        name: string
+        remotePort?: number
+        limitTotal?: number
+        authEnabled?: boolean
+        authUsers?: Socks5AuthUserParam[]
+    }
+
+    /** SOCKS5 代理更新参数 */
+    interface Socks5ProxyUpdateParam {
+        id: string
+        name: string
+        remotePort?: number
+        limitTotal?: number
+        authEnabled?: boolean
+        authUsers?: Socks5AuthUserParam[]
     }
 
     /** 批量删除参数 */

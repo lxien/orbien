@@ -48,7 +48,7 @@ public class ProxyReportConvert {
         proxyDO.setSourceType(ProxySourceType.AGENT);
         proxyDO.setLoadBalanceStrategy(toLoadBalanceType(proxy));
 
-        if (protocol.isTcpOrUdp()) {
+        if (protocol.isTcpOrUdp() || protocol.isSocks5()) {
             applyPorts(proxyDO, proxy, event.getListenPort());
         }
 
@@ -152,6 +152,14 @@ public class ProxyReportConvert {
         healthCheckDO.setMaxFailed(resolvePositive(healthCheck.getMaxFailed(), HealthCheckConfig.DEFAULT_MAX_FAILED));
         healthCheckDO.setPath(resolveHealthCheckPath(healthCheck));
         return healthCheckDO;
+    }
+
+    public List<Socks5UserDO> toSocks5UserDOList(Message.Socks5Auth socks5Auth, String proxyId) {
+        List<Socks5UserDO> users = new ArrayList<>();
+        for (Message.Socks5User user : socks5Auth.getUsersList()) {
+            users.add(new Socks5UserDO(proxyId, user.getUsername(), user.getPassword()));
+        }
+        return users;
     }
 
     public List<BasicUserDO> toBasicUserDOList(Message.BasicAuth basicAuth, String proxyId) {

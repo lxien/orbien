@@ -57,6 +57,10 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
         for (Integer port : tcpPorts) {
             portPoolManager.markAllocated(PortPoolType.TCP, port);
         }
+        List<Integer> socks5Ports = proxyConfigService.getListenPorts(ProtocolType.SOCKS5);
+        for (Integer port : socks5Ports) {
+            portPoolManager.markAllocated(PortPoolType.TCP, port);
+        }
         List<Integer> udpPorts = proxyConfigService.getListenPorts(ProtocolType.UDP);
         for (Integer port : udpPorts) {
             portPoolManager.markAllocated(PortPoolType.UDP, port);

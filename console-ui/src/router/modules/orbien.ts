@@ -42,6 +42,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'SOCKS5',
+    path: '/socks5',
+    component: '/orbien/socks5',
+    meta: {
+      title: 'menus.orbien.socks5',
+      icon: 'ri:shield-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'Agent',
     path: '/agent',
     component: '/orbien/agent',

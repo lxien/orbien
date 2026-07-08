@@ -63,11 +63,23 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setAgentContext(gentContextOpt.get());
             context.setProxyConfig(config);
             context.setAgentContext(gentContextOpt.get());
-            Target selectedTarget = selectTarget(config);
-            if (selectedTarget == null) {
-                logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
-                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
-                return;
+
+            Target selectedTarget;
+            if (config.isSocks5()) {
+                selectedTarget = context.getTarget();
+                if (selectedTarget == null) {
+                    logger.warn("SOCKS5 缺少动态目标，关闭流: streamId={}", context.getStreamId());
+                    context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                    return;
+                }
+            } else {
+                selectedTarget = selectTarget(config);
+                if (selectedTarget == null) {
+                    logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
+                    context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                    return;
+                }
+                context.setTarget(selectedTarget);
             }
             BandwidthConfig bandwidth = config.getBandwidth();
             if (bandwidth != null) {
@@ -91,7 +103,6 @@ public class TargetResolverAction extends StreamBaseAction {
             if (config.isUdp()) {
                 context.setDatagram(true);
             }
-            context.setTarget(selectedTarget);
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
             logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
@@ -141,6 +152,9 @@ public class TargetResolverAction extends StreamBaseAction {
         } else if (context.getProtocol().isUdp()) {
             int remotePort = context.getListenerPort();
             return proxyConfigService.findByListenPort(remotePort, ProtocolType.UDP);
+        } else if (context.getProtocol().isSocks5()) {
+            int remotePort = context.getListenerPort();
+            return proxyConfigService.findByListenPort(remotePort, ProtocolType.SOCKS5);
         }
         return null;
     }

@@ -9,6 +9,7 @@ export type ProxyConfigProtocol =
   | ProtocolType.UDP
   | ProtocolType.HTTP
   | ProtocolType.HTTPS
+  | ProtocolType.SOCKS5
 
 export interface ProxyConfigMenuItem {
   key: string
@@ -57,6 +58,11 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     commonMenus.health,
     commonMenus.trans,
     commonMenus.limit
+  ],
+  [ProtocolType.SOCKS5]: [
+    commonMenus.access,
+    commonMenus.trans,
+    commonMenus.limit
   ]
 }
 
@@ -65,7 +71,8 @@ export const protocolTitleMap: Record<ProxyConfigProtocol, string> = {
   [ProtocolType.TCP]: 'TCP 代理配置',
   [ProtocolType.UDP]: 'UDP 代理配置',
   [ProtocolType.HTTP]: 'HTTP 代理配置',
-  [ProtocolType.HTTPS]: 'HTTPS 代理配置'
+  [ProtocolType.HTTPS]: 'HTTPS 代理配置',
+  [ProtocolType.SOCKS5]: 'SOCKS5 代理配置'
 }
 
 export function getProtocolMenus(protocol: ProxyConfigProtocol): ProxyConfigMenuItem[] {

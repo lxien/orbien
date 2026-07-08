@@ -179,6 +179,32 @@ remote_port = 9060
 
 [proxies.transport]
 multiplex = true
+
+[[proxies]]
+name = "socks5-proxy"
+protocol = "socks5"
+remote_port = 9070
+
+[proxies.socks5_auth]
+enabled = true
+users = [
+    { user = "demo", pass = "demo123" }
+]
+
+[proxies.access_control]
+enabled = false
+mode = "allow"
+
+[proxies.transport]
+multiplex = true
+encrypt = false
+compress = false
+
+[[proxies]]
+name = "socks5-proxy2"
+protocol = "socks5"
+remote_port = 9071
+
 ########################################################################################################################
 
 [log]

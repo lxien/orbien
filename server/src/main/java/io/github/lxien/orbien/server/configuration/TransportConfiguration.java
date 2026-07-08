@@ -10,13 +10,17 @@ import io.github.lxien.orbien.server.transport.http.HttpProxyServer;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
 import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.transport.https.HttpsProxyServer;
+import io.github.lxien.orbien.server.transport.tcp.TcpIpCheckHandler;
+import io.github.lxien.orbien.server.transport.tcp.TcpVisitorHandler;
 import io.github.lxien.orbien.server.transport.tcp.TcpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.udp.UdpVisitorHandler;
 import io.github.lxien.orbien.server.transport.ControlFrameHandler;
-import io.github.lxien.orbien.server.transport.tcp.TcpIpCheckHandler;
-import io.github.lxien.orbien.server.transport.tcp.TcpVisitorHandler;
+import io.github.lxien.orbien.server.transport.socks5.Socks5HandshakeHandler;
+import io.github.lxien.orbien.server.transport.socks5.Socks5IpCheckHandler;
+import io.github.lxien.orbien.server.transport.socks5.Socks5ProxyServer;
+import io.github.lxien.orbien.server.transport.socks5.Socks5RelayHandler;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +40,13 @@ public class TransportConfiguration {
     @Bean
     public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler) {
         return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, config);
+    }
+
+    @Bean
+    public Socks5ProxyServer socks5ProxyServer(Socks5HandshakeHandler handshakeHandler,
+                                               Socks5RelayHandler relayHandler,
+                                               Socks5IpCheckHandler ipCheckHandler) {
+        return new Socks5ProxyServer(handshakeHandler, relayHandler, ipCheckHandler, config);
     }
 
     @Bean

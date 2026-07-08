@@ -47,6 +47,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>UDP = 3;</code>
      */
     UDP(3),
+    /**
+     * <code>SOCKS5 = 4;</code>
+     */
+    SOCKS5(4),
     UNRECOGNIZED(-1),
     ;
 
@@ -75,6 +79,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>UDP = 3;</code>
      */
     public static final int UDP_VALUE = 3;
+    /**
+     * <code>SOCKS5 = 4;</code>
+     */
+    public static final int SOCKS5_VALUE = 4;
 
 
     public final int getNumber() {
@@ -105,6 +113,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         case 1: return HTTP;
         case 2: return HTTPS;
         case 3: return UDP;
+        case 4: return SOCKS5;
         default: return null;
       }
     }
@@ -8224,6 +8233,1477 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface Socks5UserOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Socks5User)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string username = 1;</code>
+     * @return The username.
+     */
+    java.lang.String getUsername();
+    /**
+     * <code>string username = 1;</code>
+     * @return The bytes for username.
+     */
+    com.google.protobuf.ByteString
+        getUsernameBytes();
+
+    /**
+     * <code>string password = 2;</code>
+     * @return The password.
+     */
+    java.lang.String getPassword();
+    /**
+     * <code>string password = 2;</code>
+     * @return The bytes for password.
+     */
+    com.google.protobuf.ByteString
+        getPasswordBytes();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.Socks5User}
+   */
+  public static final class Socks5User extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.Socks5User)
+      Socks5UserOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "Socks5User");
+    }
+    // Use Socks5User.newBuilder() to construct.
+    private Socks5User(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private Socks5User() {
+      username_ = "";
+      password_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5User_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.Socks5User.class, io.github.lxien.orbien.core.message.Message.Socks5User.Builder.class);
+    }
+
+    public static final int USERNAME_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object username_ = "";
+    /**
+     * <code>string username = 1;</code>
+     * @return The username.
+     */
+    @java.lang.Override
+    public java.lang.String getUsername() {
+      java.lang.Object ref = username_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        username_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string username = 1;</code>
+     * @return The bytes for username.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUsernameBytes() {
+      java.lang.Object ref = username_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        username_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PASSWORD_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object password_ = "";
+    /**
+     * <code>string password = 2;</code>
+     * @return The password.
+     */
+    @java.lang.Override
+    public java.lang.String getPassword() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        password_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string password = 2;</code>
+     * @return The bytes for password.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPasswordBytes() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        password_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(username_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, username_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(password_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, password_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(username_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, username_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(password_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, password_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.Socks5User)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.Socks5User other = (io.github.lxien.orbien.core.message.Message.Socks5User) obj;
+
+      if (!getUsername()
+          .equals(other.getUsername())) return false;
+      if (!getPassword()
+          .equals(other.getPassword())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+      hash = (53 * hash) + getUsername().hashCode();
+      hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
+      hash = (53 * hash) + getPassword().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5User parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.Socks5User prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.Socks5User}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.Socks5User)
+        io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5User_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.Socks5User.class, io.github.lxien.orbien.core.message.Message.Socks5User.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.Socks5User.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        username_ = "";
+        password_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5User getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.Socks5User.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5User build() {
+        io.github.lxien.orbien.core.message.Message.Socks5User result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5User buildPartial() {
+        io.github.lxien.orbien.core.message.Message.Socks5User result = new io.github.lxien.orbien.core.message.Message.Socks5User(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.Socks5User result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.username_ = username_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.password_ = password_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.Socks5User) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.Socks5User)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.Socks5User other) {
+        if (other == io.github.lxien.orbien.core.message.Message.Socks5User.getDefaultInstance()) return this;
+        if (!other.getUsername().isEmpty()) {
+          username_ = other.username_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getPassword().isEmpty()) {
+          password_ = other.password_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                username_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                password_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object username_ = "";
+      /**
+       * <code>string username = 1;</code>
+       * @return The username.
+       */
+      public java.lang.String getUsername() {
+        java.lang.Object ref = username_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          username_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @return The bytes for username.
+       */
+      public com.google.protobuf.ByteString
+          getUsernameBytes() {
+        java.lang.Object ref = username_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          username_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @param value The username to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUsername(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        username_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUsername() {
+        username_ = getDefaultInstance().getUsername();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @param value The bytes for username to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUsernameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        username_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object password_ = "";
+      /**
+       * <code>string password = 2;</code>
+       * @return The password.
+       */
+      public java.lang.String getPassword() {
+        java.lang.Object ref = password_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          password_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @return The bytes for password.
+       */
+      public com.google.protobuf.ByteString
+          getPasswordBytes() {
+        java.lang.Object ref = password_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          password_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @param value The password to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPassword(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        password_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPassword() {
+        password_ = getDefaultInstance().getPassword();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @param value The bytes for password to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPasswordBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        password_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.Socks5User)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.Socks5User)
+    private static final io.github.lxien.orbien.core.message.Message.Socks5User DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.Socks5User();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5User getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Socks5User>
+        PARSER = new com.google.protobuf.AbstractParser<Socks5User>() {
+      @java.lang.Override
+      public Socks5User parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<Socks5User> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Socks5User> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5User getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface Socks5AuthOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Socks5Auth)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bool enabled = 1;</code>
+     * @return The enabled.
+     */
+    boolean getEnabled();
+
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User> 
+        getUsersList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.Socks5User getUsers(int index);
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    int getUsersCount();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    java.util.List<? extends io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder> 
+        getUsersOrBuilderList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder getUsersOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.Socks5Auth}
+   */
+  public static final class Socks5Auth extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.Socks5Auth)
+      Socks5AuthOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "Socks5Auth");
+    }
+    // Use Socks5Auth.newBuilder() to construct.
+    private Socks5Auth(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private Socks5Auth() {
+      users_ = java.util.Collections.emptyList();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5Auth_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.Socks5Auth.class, io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder.class);
+    }
+
+    public static final int ENABLED_FIELD_NUMBER = 1;
+    private boolean enabled_ = false;
+    /**
+     * <code>bool enabled = 1;</code>
+     * @return The enabled.
+     */
+    @java.lang.Override
+    public boolean getEnabled() {
+      return enabled_;
+    }
+
+    public static final int USERS_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User> users_;
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User> getUsersList() {
+      return users_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder> 
+        getUsersOrBuilderList() {
+      return users_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    @java.lang.Override
+    public int getUsersCount() {
+      return users_.size();
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5User getUsers(int index) {
+      return users_.get(index);
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder getUsersOrBuilder(
+        int index) {
+      return users_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (enabled_ != false) {
+        output.writeBool(1, enabled_);
+      }
+      for (int i = 0; i < users_.size(); i++) {
+        output.writeMessage(2, users_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (enabled_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, enabled_);
+      }
+      for (int i = 0; i < users_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, users_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.Socks5Auth)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.Socks5Auth other = (io.github.lxien.orbien.core.message.Message.Socks5Auth) obj;
+
+      if (getEnabled()
+          != other.getEnabled()) return false;
+      if (!getUsersList()
+          .equals(other.getUsersList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ENABLED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnabled());
+      if (getUsersCount() > 0) {
+        hash = (37 * hash) + USERS_FIELD_NUMBER;
+        hash = (53 * hash) + getUsersList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.Socks5Auth prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.Socks5Auth}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.Socks5Auth)
+        io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5Auth_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.Socks5Auth.class, io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.Socks5Auth.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        enabled_ = false;
+        if (usersBuilder_ == null) {
+          users_ = java.util.Collections.emptyList();
+        } else {
+          users_ = null;
+          usersBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5Auth getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5Auth build() {
+        io.github.lxien.orbien.core.message.Message.Socks5Auth result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.Socks5Auth buildPartial() {
+        io.github.lxien.orbien.core.message.Message.Socks5Auth result = new io.github.lxien.orbien.core.message.Message.Socks5Auth(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(io.github.lxien.orbien.core.message.Message.Socks5Auth result) {
+        if (usersBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            users_ = java.util.Collections.unmodifiableList(users_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.users_ = users_;
+        } else {
+          result.users_ = usersBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.Socks5Auth result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.enabled_ = enabled_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.Socks5Auth) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.Socks5Auth)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.Socks5Auth other) {
+        if (other == io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance()) return this;
+        if (other.getEnabled() != false) {
+          setEnabled(other.getEnabled());
+        }
+        if (usersBuilder_ == null) {
+          if (!other.users_.isEmpty()) {
+            if (users_.isEmpty()) {
+              users_ = other.users_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureUsersIsMutable();
+              users_.addAll(other.users_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.users_.isEmpty()) {
+            if (usersBuilder_.isEmpty()) {
+              usersBuilder_.dispose();
+              usersBuilder_ = null;
+              users_ = other.users_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              usersBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   internalGetUsersFieldBuilder() : null;
+            } else {
+              usersBuilder_.addAllMessages(other.users_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                enabled_ = input.readBool();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 18: {
+                io.github.lxien.orbien.core.message.Message.Socks5User m =
+                    input.readMessage(
+                        io.github.lxien.orbien.core.message.Message.Socks5User.parser(),
+                        extensionRegistry);
+                if (usersBuilder_ == null) {
+                  ensureUsersIsMutable();
+                  users_.add(m);
+                } else {
+                  usersBuilder_.addMessage(m);
+                }
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private boolean enabled_ ;
+      /**
+       * <code>bool enabled = 1;</code>
+       * @return The enabled.
+       */
+      @java.lang.Override
+      public boolean getEnabled() {
+        return enabled_;
+      }
+      /**
+       * <code>bool enabled = 1;</code>
+       * @param value The enabled to set.
+       * @return This builder for chaining.
+       */
+      public Builder setEnabled(boolean value) {
+
+        enabled_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool enabled = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearEnabled() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        enabled_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User> users_ =
+        java.util.Collections.emptyList();
+      private void ensureUsersIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          users_ = new java.util.ArrayList<io.github.lxien.orbien.core.message.Message.Socks5User>(users_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Socks5User, io.github.lxien.orbien.core.message.Message.Socks5User.Builder, io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder> usersBuilder_;
+
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User> getUsersList() {
+        if (usersBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(users_);
+        } else {
+          return usersBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public int getUsersCount() {
+        if (usersBuilder_ == null) {
+          return users_.size();
+        } else {
+          return usersBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5User getUsers(int index) {
+        if (usersBuilder_ == null) {
+          return users_.get(index);
+        } else {
+          return usersBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder setUsers(
+          int index, io.github.lxien.orbien.core.message.Message.Socks5User value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.set(index, value);
+          onChanged();
+        } else {
+          usersBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder setUsers(
+          int index, io.github.lxien.orbien.core.message.Message.Socks5User.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder addUsers(io.github.lxien.orbien.core.message.Message.Socks5User value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.add(value);
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder addUsers(
+          int index, io.github.lxien.orbien.core.message.Message.Socks5User value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.add(index, value);
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder addUsers(
+          io.github.lxien.orbien.core.message.Message.Socks5User.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.add(builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder addUsers(
+          int index, io.github.lxien.orbien.core.message.Message.Socks5User.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder addAllUsers(
+          java.lang.Iterable<? extends io.github.lxien.orbien.core.message.Message.Socks5User> values) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, users_);
+          onChanged();
+        } else {
+          usersBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder clearUsers() {
+        if (usersBuilder_ == null) {
+          users_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          usersBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public Builder removeUsers(int index) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.remove(index);
+          onChanged();
+        } else {
+          usersBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5User.Builder getUsersBuilder(
+          int index) {
+        return internalGetUsersFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder getUsersOrBuilder(
+          int index) {
+        if (usersBuilder_ == null) {
+          return users_.get(index);  } else {
+          return usersBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public java.util.List<? extends io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder> 
+           getUsersOrBuilderList() {
+        if (usersBuilder_ != null) {
+          return usersBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(users_);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5User.Builder addUsersBuilder() {
+        return internalGetUsersFieldBuilder().addBuilder(
+            io.github.lxien.orbien.core.message.Message.Socks5User.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5User.Builder addUsersBuilder(
+          int index) {
+        return internalGetUsersFieldBuilder().addBuilder(
+            index, io.github.lxien.orbien.core.message.Message.Socks5User.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.Socks5User users = 2;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.Socks5User.Builder> 
+           getUsersBuilderList() {
+        return internalGetUsersFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Socks5User, io.github.lxien.orbien.core.message.Message.Socks5User.Builder, io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder> 
+          internalGetUsersFieldBuilder() {
+        if (usersBuilder_ == null) {
+          usersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.Socks5User, io.github.lxien.orbien.core.message.Message.Socks5User.Builder, io.github.lxien.orbien.core.message.Message.Socks5UserOrBuilder>(
+                  users_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          users_ = null;
+        }
+        return usersBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.Socks5Auth)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.Socks5Auth)
+    private static final io.github.lxien.orbien.core.message.Message.Socks5Auth DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.Socks5Auth();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.Socks5Auth getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Socks5Auth>
+        PARSER = new com.google.protobuf.AbstractParser<Socks5Auth>() {
+      @java.lang.Override
+      public Socks5Auth parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<Socks5Auth> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Socks5Auth> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5Auth getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BandwidthOrBuilder extends
       // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Bandwidth)
       com.google.protobuf.MessageOrBuilder {
@@ -13467,6 +14947,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>optional .io.github.lxien.orbien.core.message.HealthCheck health_check = 15;</code>
      */
     io.github.lxien.orbien.core.message.Message.HealthCheckOrBuilder getHealthCheckOrBuilder();
+
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     * @return Whether the socks5Auth field is set.
+     */
+    boolean hasSocks5Auth();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     * @return The socks5Auth.
+     */
+    io.github.lxien.orbien.core.message.Message.Socks5Auth getSocks5Auth();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder getSocks5AuthOrBuilder();
   }
   /**
    * Protobuf type {@code io.github.lxien.orbien.core.message.Proxy}
@@ -13896,6 +15391,32 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return healthCheck_ == null ? io.github.lxien.orbien.core.message.Message.HealthCheck.getDefaultInstance() : healthCheck_;
     }
 
+    public static final int SOCKS5_AUTH_FIELD_NUMBER = 16;
+    private io.github.lxien.orbien.core.message.Message.Socks5Auth socks5Auth_;
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     * @return Whether the socks5Auth field is set.
+     */
+    @java.lang.Override
+    public boolean hasSocks5Auth() {
+      return ((bitField0_ & 0x00000200) != 0);
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     * @return The socks5Auth.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5Auth getSocks5Auth() {
+      return socks5Auth_ == null ? io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance() : socks5Auth_;
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder getSocks5AuthOrBuilder() {
+      return socks5Auth_ == null ? io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance() : socks5Auth_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13954,6 +15475,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000100) != 0)) {
         output.writeMessage(15, getHealthCheck());
+      }
+      if (((bitField0_ & 0x00000200) != 0)) {
+        output.writeMessage(16, getSocks5Auth());
       }
       getUnknownFields().writeTo(output);
     }
@@ -14021,6 +15545,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000100) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(15, getHealthCheck());
+      }
+      if (((bitField0_ & 0x00000200) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(16, getSocks5Auth());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -14092,6 +15620,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getHealthCheck()
             .equals(other.getHealthCheck())) return false;
       }
+      if (hasSocks5Auth() != other.hasSocks5Auth()) return false;
+      if (hasSocks5Auth()) {
+        if (!getSocks5Auth()
+            .equals(other.getSocks5Auth())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -14154,6 +15687,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasHealthCheck()) {
         hash = (37 * hash) + HEALTH_CHECK_FIELD_NUMBER;
         hash = (53 * hash) + getHealthCheck().hashCode();
+      }
+      if (hasSocks5Auth()) {
+        hash = (37 * hash) + SOCKS5_AUTH_FIELD_NUMBER;
+        hash = (53 * hash) + getSocks5Auth().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -14293,6 +15830,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetTransportFieldBuilder();
           internalGetTlsCertFieldBuilder();
           internalGetHealthCheckFieldBuilder();
+          internalGetSocks5AuthFieldBuilder();
         }
       }
       @java.lang.Override
@@ -14347,6 +15885,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (healthCheckBuilder_ != null) {
           healthCheckBuilder_.dispose();
           healthCheckBuilder_ = null;
+        }
+        socks5Auth_ = null;
+        if (socks5AuthBuilder_ != null) {
+          socks5AuthBuilder_.dispose();
+          socks5AuthBuilder_ = null;
         }
         return this;
       }
@@ -14460,6 +16003,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               : healthCheckBuilder_.build();
           to_bitField0_ |= 0x00000100;
         }
+        if (((from_bitField0_ & 0x00008000) != 0)) {
+          result.socks5Auth_ = socks5AuthBuilder_ == null
+              ? socks5Auth_
+              : socks5AuthBuilder_.build();
+          to_bitField0_ |= 0x00000200;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -14546,6 +16095,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.hasHealthCheck()) {
           mergeHealthCheck(other.getHealthCheck());
+        }
+        if (other.hasSocks5Auth()) {
+          mergeSocks5Auth(other.getSocks5Auth());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -14670,6 +16222,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00004000;
                 break;
               } // case 122
+              case 130: {
+                input.readMessage(
+                    internalGetSocks5AuthFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00008000;
+                break;
+              } // case 130
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -16129,6 +17688,127 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           healthCheck_ = null;
         }
         return healthCheckBuilder_;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.Socks5Auth socks5Auth_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Socks5Auth, io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder, io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder> socks5AuthBuilder_;
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       * @return Whether the socks5Auth field is set.
+       */
+      public boolean hasSocks5Auth() {
+        return ((bitField0_ & 0x00008000) != 0);
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       * @return The socks5Auth.
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5Auth getSocks5Auth() {
+        if (socks5AuthBuilder_ == null) {
+          return socks5Auth_ == null ? io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance() : socks5Auth_;
+        } else {
+          return socks5AuthBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public Builder setSocks5Auth(io.github.lxien.orbien.core.message.Message.Socks5Auth value) {
+        if (socks5AuthBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          socks5Auth_ = value;
+        } else {
+          socks5AuthBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00008000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public Builder setSocks5Auth(
+          io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder builderForValue) {
+        if (socks5AuthBuilder_ == null) {
+          socks5Auth_ = builderForValue.build();
+        } else {
+          socks5AuthBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00008000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public Builder mergeSocks5Auth(io.github.lxien.orbien.core.message.Message.Socks5Auth value) {
+        if (socks5AuthBuilder_ == null) {
+          if (((bitField0_ & 0x00008000) != 0) &&
+            socks5Auth_ != null &&
+            socks5Auth_ != io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance()) {
+            getSocks5AuthBuilder().mergeFrom(value);
+          } else {
+            socks5Auth_ = value;
+          }
+        } else {
+          socks5AuthBuilder_.mergeFrom(value);
+        }
+        if (socks5Auth_ != null) {
+          bitField0_ |= 0x00008000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public Builder clearSocks5Auth() {
+        bitField0_ = (bitField0_ & ~0x00008000);
+        socks5Auth_ = null;
+        if (socks5AuthBuilder_ != null) {
+          socks5AuthBuilder_.dispose();
+          socks5AuthBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder getSocks5AuthBuilder() {
+        bitField0_ |= 0x00008000;
+        onChanged();
+        return internalGetSocks5AuthFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder getSocks5AuthOrBuilder() {
+        if (socks5AuthBuilder_ != null) {
+          return socks5AuthBuilder_.getMessageOrBuilder();
+        } else {
+          return socks5Auth_ == null ?
+              io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance() : socks5Auth_;
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Socks5Auth, io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder, io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder> 
+          internalGetSocks5AuthFieldBuilder() {
+        if (socks5AuthBuilder_ == null) {
+          socks5AuthBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.Socks5Auth, io.github.lxien.orbien.core.message.Message.Socks5Auth.Builder, io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder>(
+                  getSocks5Auth(),
+                  getParentForChildren(),
+                  isClean());
+          socks5Auth_ = null;
+        }
+        return socks5AuthBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.Proxy)
@@ -22849,6 +24529,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_io_github_lxien_orbien_core_message_BasicAuth_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_Socks5User_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_Socks5Auth_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -22952,85 +24642,92 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "ername\030\001 \001(\t\022\020\n\010password\030\002 \001(\t\"_\n\tBasicA" +
       "uth\022\017\n\007enabled\030\001 \001(\010\022A\n\nhttp_users\030\002 \003(\013" +
       "2-.io.github.lxien.orbien.core.message.H" +
-      "ttpUser\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001" +
-      "\022\025\n\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001" +
-      "(\tH\002\210\001\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_limit" +
-      "_out\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001" +
-      "(\r\022\021\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210" +
-      "\001\001B\007\n\005_nameB\t\n\007_weight\"_\n\006Domain\022\030\n\013auto" +
-      "_domain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003" +
-      "(\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_domain\"" +
-      ":\n\007TlsCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016c" +
-      "ert_chain_pem\030\002 \001(\t\"\233\001\n\tTransport\022\026\n\tmul" +
-      "tiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022" +
-      "\025\n\010compress\030\003 \001(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\t" +
-      "H\003\210\001\001B\014\n\n_multiplexB\n\n\010_encryptB\013\n\t_comp" +
-      "ressB\013\n\t_protocol\"\247\001\n\013HealthCheck\022B\n\004typ" +
-      "e\030\001 \001(\01624.io.github.lxien.orbien.core.me" +
-      "ssage.HealthCheckType\022\020\n\010interval\030\002 \001(\005\022" +
-      "\017\n\007timeout\030\003 \001(\005\022\022\n\nmax_failed\030\004 \001(\005\022\014\n\004" +
-      "path\030\005 \001(\t\022\017\n\007enabled\030\006 \001(\010\"\326\007\n\005Proxy\022\017\n" +
-      "\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022C\n\010protocol" +
-      "\030\003 \001(\01621.io.github.lxien.orbien.core.mes" +
-      "sage.ProtocolType\022\017\n\007enabled\030\004 \001(\010\022<\n\007ta" +
-      "rgets\030\005 \003(\0132+.io.github.lxien.orbien.cor" +
-      "e.message.Target\022\023\n\013force_https\030\006 \001(\010\022\030\n" +
-      "\013remote_port\030\007 \001(\rH\000\210\001\001\022@\n\006domain\030\010 \001(\0132" +
-      "+.io.github.lxien.orbien.core.message.Do" +
-      "mainH\001\210\001\001\022O\n\016access_control\030\t \001(\01322.io.g" +
-      "ithub.lxien.orbien.core.message.AccessCo" +
-      "ntrolH\002\210\001\001\022G\n\nbasic_auth\030\n \001(\0132..io.gith" +
-      "ub.lxien.orbien.core.message.BasicAuthH\003" +
-      "\210\001\001\022F\n\tbandwidth\030\013 \001(\0132..io.github.lxien" +
-      ".orbien.core.message.BandwidthH\004\210\001\001\022\\\n\025l" +
-      "oad_balance_strategy\030\014 \001(\01628.io.github.l" +
-      "xien.orbien.core.message.LoadBalanceStra" +
-      "tegyH\005\210\001\001\022F\n\ttransport\030\r \001(\0132..io.github" +
-      ".lxien.orbien.core.message.TransportH\006\210\001" +
-      "\001\022C\n\010tls_cert\030\016 \001(\0132,.io.github.lxien.or" +
-      "bien.core.message.TlsCertH\007\210\001\001\022K\n\014health" +
-      "_check\030\017 \001(\01320.io.github.lxien.orbien.co" +
-      "re.message.HealthCheckH\010\210\001\001B\016\n\014_remote_p" +
-      "ortB\t\n\007_domainB\021\n\017_access_controlB\r\n\013_ba" +
-      "sic_authB\014\n\n_bandwidthB\030\n\026_load_balance_" +
-      "strategyB\014\n\n_transportB\013\n\t_tls_certB\017\n\r_" +
-      "health_check\"\263\002\n\013RuntimeInfo\022\017\n\007proxyId\030" +
-      "\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.i" +
+      "ttpUser\"0\n\nSocks5User\022\020\n\010username\030\001 \001(\t\022" +
+      "\020\n\010password\030\002 \001(\t\"]\n\nSocks5Auth\022\017\n\007enabl" +
+      "ed\030\001 \001(\010\022>\n\005users\030\002 \003(\0132/.io.github.lxie" +
+      "n.orbien.core.message.Socks5User\"s\n\tBand" +
+      "width\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_in\030\002 " +
+      "\001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006_lim" +
+      "itB\013\n\t_limit_inB\014\n\n_limit_out\"`\n\006Target\022" +
+      "\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030\003 \001(" +
+      "\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210\001\001B\007\n\005_nameB\t\n\007" +
+      "_weight\"_\n\006Domain\022\030\n\013auto_domain\030\001 \001(\010H\000" +
+      "\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023\n\013sub_domai" +
+      "ns\030\003 \003(\tB\016\n\014_auto_domain\":\n\007TlsCert\022\027\n\017p" +
+      "rivate_key_pem\030\001 \001(\t\022\026\n\016cert_chain_pem\030\002" +
+      " \001(\t\"\233\001\n\tTransport\022\026\n\tmultiplex\030\001 \001(\010H\000\210" +
+      "\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022\025\n\010compress\030\003 \001" +
+      "(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\tH\003\210\001\001B\014\n\n_multi" +
+      "plexB\n\n\010_encryptB\013\n\t_compressB\013\n\t_protoc" +
+      "ol\"\247\001\n\013HealthCheck\022B\n\004type\030\001 \001(\01624.io.gi" +
+      "thub.lxien.orbien.core.message.HealthChe" +
+      "ckType\022\020\n\010interval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(" +
+      "\005\022\022\n\nmax_failed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007e" +
+      "nabled\030\006 \001(\010\"\261\010\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022" +
+      "\014\n\004name\030\002 \001(\t\022C\n\010protocol\030\003 \001(\01621.io.git" +
+      "hub.lxien.orbien.core.message.ProtocolTy" +
+      "pe\022\017\n\007enabled\030\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.i" +
       "o.github.lxien.orbien.core.message.Targe" +
-      "t\022\023\n\013remote_addr\030\004 \003(\t\022K\n\014health_check\030\005" +
-      " \001(\01320.io.github.lxien.orbien.core.messa" +
-      "ge.HealthCheckH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132." +
-      ".io.github.lxien.orbien.core.message.Tra" +
-      "nsportH\001\210\001\001B\017\n\r_health_checkB\014\n\n_transpo" +
-      "rt\"X\n\031BatchCreateProxiesRequest\022;\n\007proxi" +
-      "es\030\001 \003(\0132*.io.github.lxien.orbien.core.m" +
-      "essage.Proxy\"\232\001\n\032BatchCreateProxiesRespo" +
-      "nse\022?\n\005items\030\001 \003(\01320.io.github.lxien.orb" +
-      "ien.core.message.RuntimeInfo\022;\n\006status\030\002" +
-      " \001(\0132+.io.github.lxien.orbien.core.messa" +
-      "ge.Status\"\264\001\n\021ProxySyncResponse\022K\n\017proxy" +
-      "_sync_type\030\001 \001(\01622.io.github.lxien.orbie" +
-      "n.core.message.ProxySyncType\022?\n\005items\030\002 " +
-      "\003(\01320.io.github.lxien.orbien.core.messag" +
-      "e.RuntimeInfo\022\021\n\tproxy_ids\030\003 \003(\t\"\230\001\n\rSer" +
-      "viceHealth\022\020\n\010proxy_id\030\001 \001(\t\022\014\n\004host\030\002 \001" +
-      "(\t\022\014\n\004port\030\003 \001(\r\022A\n\006status\030\004 \001(\01621.io.gi" +
-      "thub.lxien.orbien.core.message.HealthSta" +
-      "tus\022\026\n\016responseTimeMs\030\005 \001(\004\"d\n\037BatchRepo" +
-      "rtServiceHealthRequest\022A\n\005items\030\001 \003(\01322." +
-      "io.github.lxien.orbien.core.message.Serv" +
-      "iceHealth\"D\n\005Error\022;\n\006status\030\001 \001(\0132+.io." +
-      "github.lxien.orbien.core.message.Status*" +
-      "5\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HT" +
-      "TPS\020\002\022\007\n\003UDP\020\003*$\n\tAgentType\022\n\n\006BINARY\020\000\022" +
-      "\013\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n" +
-      "\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017\n\013ROUND_" +
-      "ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST" +
-      "_CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002" +
-      "UP\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022\010\n\004FULL\020" +
-      "\000\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003*H\n\017He" +
-      "althCheckType\022\031\n\025HEALTH_CHECK_TYPE_TCP\020\000" +
-      "\022\032\n\026HEALTH_CHECK_TYPE_HTTP\020\001b\006proto3"
+      "t\022\023\n\013force_https\030\006 \001(\010\022\030\n\013remote_port\030\007 " +
+      "\001(\rH\000\210\001\001\022@\n\006domain\030\010 \001(\0132+.io.github.lxi" +
+      "en.orbien.core.message.DomainH\001\210\001\001\022O\n\016ac" +
+      "cess_control\030\t \001(\01322.io.github.lxien.orb" +
+      "ien.core.message.AccessControlH\002\210\001\001\022G\n\nb" +
+      "asic_auth\030\n \001(\0132..io.github.lxien.orbien" +
+      ".core.message.BasicAuthH\003\210\001\001\022F\n\tbandwidt" +
+      "h\030\013 \001(\0132..io.github.lxien.orbien.core.me" +
+      "ssage.BandwidthH\004\210\001\001\022\\\n\025load_balance_str" +
+      "ategy\030\014 \001(\01628.io.github.lxien.orbien.cor" +
+      "e.message.LoadBalanceStrategyH\005\210\001\001\022F\n\ttr" +
+      "ansport\030\r \001(\0132..io.github.lxien.orbien.c" +
+      "ore.message.TransportH\006\210\001\001\022C\n\010tls_cert\030\016" +
+      " \001(\0132,.io.github.lxien.orbien.core.messa" +
+      "ge.TlsCertH\007\210\001\001\022K\n\014health_check\030\017 \001(\01320." +
+      "io.github.lxien.orbien.core.message.Heal" +
+      "thCheckH\010\210\001\001\022I\n\013socks5_auth\030\020 \001(\0132/.io.g" +
+      "ithub.lxien.orbien.core.message.Socks5Au" +
+      "thH\t\210\001\001B\016\n\014_remote_portB\t\n\007_domainB\021\n\017_a" +
+      "ccess_controlB\r\n\013_basic_authB\014\n\n_bandwid" +
+      "thB\030\n\026_load_balance_strategyB\014\n\n_transpo" +
+      "rtB\013\n\t_tls_certB\017\n\r_health_checkB\016\n\014_soc" +
+      "ks5_auth\"\263\002\n\013RuntimeInfo\022\017\n\007proxyId\030\001 \001(" +
+      "\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.io.gi" +
+      "thub.lxien.orbien.core.message.Target\022\023\n" +
+      "\013remote_addr\030\004 \003(\t\022K\n\014health_check\030\005 \001(\013" +
+      "20.io.github.lxien.orbien.core.message.H" +
+      "ealthCheckH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132..io." +
+      "github.lxien.orbien.core.message.Transpo" +
+      "rtH\001\210\001\001B\017\n\r_health_checkB\014\n\n_transport\"X" +
+      "\n\031BatchCreateProxiesRequest\022;\n\007proxies\030\001" +
+      " \003(\0132*.io.github.lxien.orbien.core.messa" +
+      "ge.Proxy\"\232\001\n\032BatchCreateProxiesResponse\022" +
+      "?\n\005items\030\001 \003(\01320.io.github.lxien.orbien." +
+      "core.message.RuntimeInfo\022;\n\006status\030\002 \001(\013" +
+      "2+.io.github.lxien.orbien.core.message.S" +
+      "tatus\"\264\001\n\021ProxySyncResponse\022K\n\017proxy_syn" +
+      "c_type\030\001 \001(\01622.io.github.lxien.orbien.co" +
+      "re.message.ProxySyncType\022?\n\005items\030\002 \003(\0132" +
+      "0.io.github.lxien.orbien.core.message.Ru" +
+      "ntimeInfo\022\021\n\tproxy_ids\030\003 \003(\t\"\230\001\n\rService" +
+      "Health\022\020\n\010proxy_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014" +
+      "\n\004port\030\003 \001(\r\022A\n\006status\030\004 \001(\01621.io.github" +
+      ".lxien.orbien.core.message.HealthStatus\022" +
+      "\026\n\016responseTimeMs\030\005 \001(\004\"d\n\037BatchReportSe" +
+      "rviceHealthRequest\022A\n\005items\030\001 \003(\01322.io.g" +
+      "ithub.lxien.orbien.core.message.ServiceH" +
+      "ealth\"D\n\005Error\022;\n\006status\030\001 \001(\0132+.io.gith" +
+      "ub.lxien.orbien.core.message.Status*A\n\014P" +
+      "rotocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020" +
+      "\002\022\007\n\003UDP\020\003\022\n\n\006SOCKS5\020\004*$\n\tAgentType\022\n\n\006B" +
+      "INARY\020\000\022\013\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005AL" +
+      "LOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017" +
+      "\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022" +
+      "\016\n\nLEAST_CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNO" +
+      "WN\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022" +
+      "\010\n\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE" +
+      "\020\003*H\n\017HealthCheckType\022\031\n\025HEALTH_CHECK_TY" +
+      "PE_TCP\020\000\022\032\n\026HEALTH_CHECK_TYPE_HTTP\020\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -23090,86 +24787,98 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BasicAuth_descriptor,
         new java.lang.String[] { "Enabled", "HttpUsers", });
-    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor =
+    internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor =
       getDescriptor().getMessageType(9);
+    internal_static_io_github_lxien_orbien_core_message_Socks5User_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_Socks5User_descriptor,
+        new java.lang.String[] { "Username", "Password", });
+    internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor =
+      getDescriptor().getMessageType(10);
+    internal_static_io_github_lxien_orbien_core_message_Socks5Auth_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor,
+        new java.lang.String[] { "Enabled", "Users", });
+    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor =
+      getDescriptor().getMessageType(11);
     internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor,
         new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
     internal_static_io_github_lxien_orbien_core_message_Target_descriptor =
-      getDescriptor().getMessageType(10);
+      getDescriptor().getMessageType(12);
     internal_static_io_github_lxien_orbien_core_message_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Target_descriptor,
         new java.lang.String[] { "Host", "Port", "Name", "Weight", });
     internal_static_io_github_lxien_orbien_core_message_Domain_descriptor =
-      getDescriptor().getMessageType(11);
+      getDescriptor().getMessageType(13);
     internal_static_io_github_lxien_orbien_core_message_Domain_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Domain_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(14);
     internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor,
         new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
     internal_static_io_github_lxien_orbien_core_message_Transport_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(15);
     internal_static_io_github_lxien_orbien_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Transport_descriptor,
         new java.lang.String[] { "Multiplex", "Encrypt", "Compress", "Protocol", });
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(16);
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor,
         new java.lang.String[] { "Type", "Interval", "Timeout", "MaxFailed", "Path", "Enabled", });
     internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(17);
     internal_static_io_github_lxien_orbien_core_message_Proxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor,
-        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", });
+        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", "Socks5Auth", });
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(18);
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor,
         new java.lang.String[] { "ProxyId", "Name", "Targets", "RemoteAddr", "HealthCheck", "Transport", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor =
-      getDescriptor().getMessageType(17);
+      getDescriptor().getMessageType(19);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor,
         new java.lang.String[] { "Proxies", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor =
-      getDescriptor().getMessageType(18);
+      getDescriptor().getMessageType(20);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor,
         new java.lang.String[] { "Items", "Status", });
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor =
-      getDescriptor().getMessageType(19);
+      getDescriptor().getMessageType(21);
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor,
         new java.lang.String[] { "ProxySyncType", "Items", "ProxyIds", });
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor =
-      getDescriptor().getMessageType(20);
+      getDescriptor().getMessageType(22);
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor,
         new java.lang.String[] { "ProxyId", "Host", "Port", "Status", "ResponseTimeMs", });
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor =
-      getDescriptor().getMessageType(21);
+      getDescriptor().getMessageType(23);
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor,
         new java.lang.String[] { "Items", });
     internal_static_io_github_lxien_orbien_core_message_Error_descriptor =
-      getDescriptor().getMessageType(22);
+      getDescriptor().getMessageType(24);
     internal_static_io_github_lxien_orbien_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Error_descriptor,

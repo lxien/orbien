@@ -16,7 +16,6 @@
 
 package io.github.lxien.orbien.autoconfigure;
 
-import io.github.lxien.orbien.core.enums.ProtocolType;
 import lombok.Data;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 
@@ -38,9 +37,9 @@ public class ProxyProperties implements Serializable {
     private String localIp = "127.0.0.1";
 
     /**
-     * 协议
+     * 代理协议，仅支持 HTTP / HTTPS（对应内嵌 Web 容器）
      */
-    private ProtocolType protocol = ProtocolType.HTTP;
+    private WebProxyProtocol protocol = WebProxyProtocol.HTTP;
     private Boolean forceHttps = false;
 
     /**

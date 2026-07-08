@@ -60,15 +60,17 @@ public class ProxyConfigSyncAction extends AgentBaseAction {
         if (CollectionUtils.isEmpty(proxies)) {
             return;
         }
-        List<Message.RuntimeInfo> list = proxies.stream().map(p -> {
-            ProxyConfig config = p.getProxyConfig();
-            List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
-                    p.getDomains(),
-                    config.getProtocol(),
-                    appConfig.getHttpProxyPort(),
-                    appConfig.getHttpsProxyPort());
-            return RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
-        }).toList();
+        List<Message.RuntimeInfo> list = proxies.stream()
+                .filter(p -> !p.getProxyConfig().isSocks5())
+                .map(p -> {
+                    ProxyConfig config = p.getProxyConfig();
+                    List<String> remoteAddrs = RuntimeInfoSupport.buildRemoteAddrs(
+                            p.getDomains(),
+                            config.getProtocol(),
+                            appConfig.getHttpProxyPort(),
+                            appConfig.getHttpsProxyPort());
+                    return RuntimeInfoSupport.buildRuntimeInfo(config, remoteAddrs);
+                }).toList();
         Message.ProxySyncResponse.Builder builder = Message.ProxySyncResponse.newBuilder();
         builder.setProxySyncType(Message.ProxySyncType.FULL);
         builder.addAllItems(list);

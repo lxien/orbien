@@ -51,6 +51,8 @@ public abstract class IpCheckHandler extends ChannelInboundHandlerAdapter {
                 });
             } else if (protocol.isTcp()) {
                 ChannelUtils.closeOnFlush(visitor);
+            } else if (protocol.isSocks5()) {
+                ChannelUtils.closeOnFlush(visitor);
             }
             //尝试关闭流，可能之前已经建立过连接，后来权限发生变化
             streamManager.getStreamContext(visitor).ifPresent(context -> {

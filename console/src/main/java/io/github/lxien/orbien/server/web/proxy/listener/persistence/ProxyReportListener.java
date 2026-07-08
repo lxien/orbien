@@ -69,6 +69,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     @Autowired
     private HealthCheckRepository healthCheckRepository;
     @Autowired
+    private Socks5AuthRepository socks5AuthRepository;
+    @Autowired
+    private Socks5UserRepository socks5UserRepository;
+    @Autowired
     private ProxyReportConvert proxyReportConvert;
     @Autowired
     private TransactionTemplate transactionTemplate;
@@ -107,13 +111,20 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         }
 
         proxyRepository.save(proxyDO);
-        persistTargets(proxyId, proxy);
+        if (!protocol.isSocks5()) {
+            persistTargets(proxyId, proxy);
+        }
         persistAccessControl(proxyId, proxy);
-        persistHealthCheck(proxyId, proxy);
+        if (!protocol.isSocks5()) {
+            persistHealthCheck(proxyId, proxy);
+        }
 
         if (protocol.isHttpOrHttps()) {
             persistBasicAuth(proxyId, proxy);
             persistDomains(proxyId, event.getDomains());
+        }
+        if (protocol.isSocks5()) {
+            persistSocks5Auth(proxyId, proxy);
         }
 
         logger.debug("代理配置信息已保存到数据库: agentId={}, proxyId={}, name={}, protocol={}",
@@ -180,6 +191,21 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         }
 
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
+    }
+
+    private void persistSocks5Auth(String proxyId, Message.Proxy proxy) {
+        socks5UserRepository.deleteByProxyIdIn(List.of(proxyId));
+        if (proxy.hasSocks5Auth()) {
+            Message.Socks5Auth socks5Auth = proxy.getSocks5Auth();
+            socks5AuthRepository.save(new Socks5AuthDO(proxyId, socks5Auth.getEnabled()));
+            if (!socks5Auth.getUsersList().isEmpty()) {
+                List<Socks5UserDO> users = proxyReportConvert.toSocks5UserDOList(socks5Auth, proxyId);
+                users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
+                socks5UserRepository.saveAll(users);
+            }
+            return;
+        }
+        socks5AuthRepository.save(new Socks5AuthDO(proxyId, false));
     }
 
     private void persistDomains(String proxyId, List<DomainInfo> domains) {

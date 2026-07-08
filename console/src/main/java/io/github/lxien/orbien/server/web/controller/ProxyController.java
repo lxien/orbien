@@ -18,14 +18,7 @@ package io.github.lxien.orbien.server.web.controller;
 import io.github.lxien.orbien.server.web.common.message.Ajax;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
-import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyDetailDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyDetailDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyDetailDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyDetailDTO;
-import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyListDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.service.ProxyService;
@@ -52,6 +45,12 @@ public class ProxyController {
         return Ajax.success();
     }
 
+    @PostMapping("socks5")
+    public Ajax createSocks5Proxy(@RequestBody @Validated Socks5ProxyCreateParam param) {
+        proxyService.createSocks5Proxy(param);
+        return Ajax.success();
+    }
+
     @PostMapping("udp")
     public Ajax createUdpProxy(@RequestBody @Validated UdpProxyCreateParam param) {
         proxyService.createUdpProxy(param);
@@ -71,6 +70,12 @@ public class ProxyController {
     @PutMapping("tcp")
     public Ajax updateTcpProxy(@RequestBody @Validated TcpProxyUpdateParam param) {
         proxyService.updateTcpProxy(param);
+        return Ajax.success();
+    }
+
+    @PutMapping("socks5")
+    public Ajax updateSocks5Proxy(@RequestBody @Validated Socks5ProxyUpdateParam param) {
+        proxyService.updateSocks5Proxy(param);
         return Ajax.success();
     }
 
@@ -96,6 +101,12 @@ public class ProxyController {
         return Ajax.success(proxy);
     }
 
+    @GetMapping("socks5/{id}")
+    public Ajax getSocks5ProxyDetailById(@PathVariable String id) {
+        Socks5ProxyDetailDTO proxy = proxyService.getSocks5ProxyById(id);
+        return Ajax.success(proxy);
+    }
+
     @GetMapping("udp/{id}")
     public Ajax getUdpProxyDetailById(@PathVariable String id) {
         UdpProxyDetailDTO proxy = proxyService.getUdpProxyById(id);
@@ -115,6 +126,12 @@ public class ProxyController {
     @GetMapping("tcp")
     public Ajax findTcpProxies(@ModelAttribute PageQuery pageQuery) {
         PageResult<TcpProxyListDTO> proxies = proxyService.findTcpProxies(pageQuery);
+        return Ajax.success(proxies);
+    }
+
+    @GetMapping("socks5")
+    public Ajax findSocks5Proxies(@ModelAttribute PageQuery pageQuery) {
+        PageResult<Socks5ProxyListDTO> proxies = proxyService.findSocks5Proxies(pageQuery);
         return Ajax.success(proxies);
     }
 
