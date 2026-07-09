@@ -18,6 +18,7 @@ package io.github.lxien.orbien.server.web.proxy.repository;
 
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.enums.ProtocolType;
+import io.github.lxien.orbien.core.enums.ProxyStatus;
 import io.github.lxien.orbien.server.service.repository.ProxyQueryRepository;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyDetailQueryResult;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyListQueryResult;
@@ -101,6 +102,16 @@ public class ProxyQueryRepositoryImpl implements ProxyQueryRepository {
     @Override
     public List<ProxyConfigExt> findByAgentId(String agentId) {
         List<ProxyDO> proxies = proxyRepository.findByAgentId(agentId);
+        return assembleMany(proxies);
+    }
+
+    @Override
+    public List<ProxyConfigExt> findAllOpen() {
+        List<ProxyDO> proxies = proxyRepository.findByStatus(ProxyStatus.OPEN);
+        return assembleMany(proxies);
+    }
+
+    private List<ProxyConfigExt> assembleMany(List<ProxyDO> proxies) {
         if (CollectionUtils.isEmpty(proxies)) {
             return List.of();
         }

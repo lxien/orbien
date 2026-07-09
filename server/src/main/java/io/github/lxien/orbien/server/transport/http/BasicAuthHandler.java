@@ -40,6 +40,10 @@ public class BasicAuthHandler extends ChannelInboundHandlerAdapter {
         String domain = visitor.attr(AttributeKeys.VISIT_DOMAIN).get();
         String proxyId = domainRegistry.getProxyIdByDomain(domain);
         ProxyConfigExt ext = proxyConfigService.findById(proxyId);
+        if (ext != null && ext.getProxyConfig().isFile()) {
+            ctx.fireChannelRead(msg);
+            return;
+        }
         if (ext != null) {
             ProxyConfig config = ext.getProxyConfig();
             String basicAuthHeader = visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).get();

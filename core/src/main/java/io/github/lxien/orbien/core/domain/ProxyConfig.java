@@ -126,6 +126,18 @@ public class ProxyConfig implements Serializable {
     private Socks5AuthConfig socks5Auth;
 
     /**
+     * 文件共享认证配置
+     */
+    @Setter
+    private FileShareAuthConfig fileShareAuth;
+
+    /**
+     * 文件共享限制配置
+     */
+    @Setter
+    private FileShareLimitsConfig fileShareLimits;
+
+    /**
      * 是否启用 HTTP 请求抓包（Inspector）
      */
     @Setter
@@ -169,6 +181,14 @@ public class ProxyConfig implements Serializable {
         return socks5Auth != null;
     }
 
+    public boolean hasFileShareAuth() {
+        return fileShareAuth != null;
+    }
+
+    public boolean hasFileShareLimits() {
+        return fileShareLimits != null;
+    }
+
     /**
      * 是否是 HTTP 协议
      */
@@ -210,6 +230,10 @@ public class ProxyConfig implements Serializable {
 
     public boolean isSocks5() {
         return ProtocolType.isSocks5(protocol);
+    }
+
+    public boolean isFile() {
+        return ProtocolType.isFile(protocol);
     }
 
     public boolean hasRemotePort() {

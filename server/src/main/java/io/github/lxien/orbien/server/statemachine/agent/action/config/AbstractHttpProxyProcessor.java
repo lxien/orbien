@@ -151,6 +151,11 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
                 int httpsPort = appConfig.getHttpsProxyPort();
                 port = httpsPort == 443 ? "" : ":" + httpsPort;
                 break;
+            case FILE:
+                prefix = "https://";
+                int filePort = appConfig.getHttpsProxyPort();
+                port = filePort == 443 ? "" : ":" + filePort;
+                break;
             default:
                 prefix = "";
                 port = "";

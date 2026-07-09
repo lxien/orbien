@@ -51,6 +51,12 @@ public class ProxyController {
         return Ajax.success();
     }
 
+    @PostMapping("file")
+    public Ajax createFileShare(@RequestBody @Validated FileShareCreateParam param) {
+        proxyService.createFileShare(param);
+        return Ajax.success();
+    }
+
     @PostMapping("udp")
     public Ajax createUdpProxy(@RequestBody @Validated UdpProxyCreateParam param) {
         proxyService.createUdpProxy(param);
@@ -76,6 +82,12 @@ public class ProxyController {
     @PutMapping("socks5")
     public Ajax updateSocks5Proxy(@RequestBody @Validated Socks5ProxyUpdateParam param) {
         proxyService.updateSocks5Proxy(param);
+        return Ajax.success();
+    }
+
+    @PutMapping("file")
+    public Ajax updateFileShare(@RequestBody @Validated FileShareUpdateParam param) {
+        proxyService.updateFileShare(param);
         return Ajax.success();
     }
 
@@ -107,6 +119,12 @@ public class ProxyController {
         return Ajax.success(proxy);
     }
 
+    @GetMapping("file/{id}")
+    public Ajax getFileShareDetailById(@PathVariable String id) {
+        FileShareDetailDTO proxy = proxyService.getFileShareById(id);
+        return Ajax.success(proxy);
+    }
+
     @GetMapping("udp/{id}")
     public Ajax getUdpProxyDetailById(@PathVariable String id) {
         UdpProxyDetailDTO proxy = proxyService.getUdpProxyById(id);
@@ -132,6 +150,12 @@ public class ProxyController {
     @GetMapping("socks5")
     public Ajax findSocks5Proxies(@ModelAttribute PageQuery pageQuery) {
         PageResult<Socks5ProxyListDTO> proxies = proxyService.findSocks5Proxies(pageQuery);
+        return Ajax.success(proxies);
+    }
+
+    @GetMapping("file")
+    public Ajax findFileShares(@ModelAttribute PageQuery pageQuery) {
+        PageResult<FileShareListDTO> proxies = proxyService.findFileShares(pageQuery);
         return Ajax.success(proxies);
     }
 

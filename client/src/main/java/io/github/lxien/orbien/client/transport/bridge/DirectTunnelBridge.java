@@ -51,6 +51,9 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        if (payload == null || !payload.isReadable()) {
+            return;
+        }
         if (!server.isActive()) {
             logger.error("目标服务连接已断开，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
@@ -65,6 +68,9 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
+        if (payload == null || !payload.isReadable()) {
+            return;
+        }
         if (!tunnel.isActive()) {
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);

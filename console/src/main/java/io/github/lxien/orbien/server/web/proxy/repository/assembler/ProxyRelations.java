@@ -31,9 +31,12 @@ public record ProxyRelations(
         List<BasicUserDO> basicUsers,
         HealthCheckDO healthCheck,
         Socks5AuthDO socks5Auth,
-        List<Socks5UserDO> socks5Users
+        List<Socks5UserDO> socks5Users,
+        FileShareAuthDO fileShareAuth,
+        List<FileShareUserDO> fileShareUsers,
+        FileShareLimitsDO fileShareLimits
 ) {
     public static ProxyRelations empty() {
-        return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null, null, List.of());
+        return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null, null, List.of(), null, List.of(), null);
     }
 }

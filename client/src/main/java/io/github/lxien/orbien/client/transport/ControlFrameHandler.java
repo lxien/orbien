@@ -100,6 +100,14 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 agentContext.fireEvent(AgentEvent.PROXY_CONFIG_SYNC);
                 break;
             }
+            case TMSP.MSG_FILE_LIST_REQ:
+            case TMSP.MSG_FILE_TRANSFER_INIT:
+            case TMSP.MSG_FILE_CHUNK:
+            case TMSP.MSG_FILE_TRANSFER_DONE:
+            case TMSP.MSG_FILE_OP_REQ:
+                logger.debug("收到文件传输控制消息 msgType={}", msgType);
+                agentContext.getFileTransferControlHandler().handle(ctx.channel(), frame);
+                break;
             //********************Tunnel***********************//
             case TMSP.MSG_CONNECTION_CREATE_RESP: {
                 ByteBuf payload = frame.getPayload();
@@ -137,15 +145,16 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_STREAM_DATA: {
                 int streamId = frame.getStreamId();
-                io.github.lxien.orbien.core.enums.TransportProtocol protocol =
-                        ctx.channel().attr(io.github.lxien.orbien.core.transport.AttributeKeys.TRANSPORT_PROTOCOL).get();
-                logger.debug("[传输] 收到远程流数据 streamId={} protocol={} bytes={} channelClass={}",
-                        streamId, protocol != null ? protocol.getName() : "unknown",
-                        frame.getPayload() != null ? frame.getPayload().readableBytes() : 0,
-                        ctx.channel().getClass().getSimpleName());
+                ByteBuf payload = frame.getPayload();
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
+                    if (payload == null || !payload.isReadable()) {
+                        return;
+                    }
                     if (streamContext.getState() == StreamState.OPENED) {
-                        streamContext.forwardToLocal(frame.getPayload());
+                        streamContext.forwardToLocal(payload);
+                    } else if (streamContext.getState() == StreamState.OPENING) {
+                        logger.debug("[传输] 流打开中，缓存远程数据 streamId={} bytes={}", streamId, payload.readableBytes());
+                        streamContext.enqueue(payload.retain());
                     }
                 });
                 break;
@@ -184,6 +193,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 });
                 break;
             }
+            default:
+                logger.warn("未处理的控制消息类型: {}", msgType);
+                break;
         }
     }
 

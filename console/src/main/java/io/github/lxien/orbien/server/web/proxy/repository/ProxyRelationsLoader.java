@@ -49,6 +49,12 @@ public class ProxyRelationsLoader {
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
+    @Autowired
+    private FileShareAuthRepository fileShareAuthRepository;
+    @Autowired
+    private FileShareUserRepository fileShareUserRepository;
+    @Autowired
+    private FileShareLimitsRepository fileShareLimitsRepository;
 
     public ProxyRelations loadOne(String proxyId) {
         return new ProxyRelations(
@@ -58,7 +64,10 @@ public class ProxyRelationsLoader {
                 basicUserRepository.findByProxyId(proxyId),
                 healthCheckRepository.findById(proxyId).orElse(null),
                 socks5AuthRepository.findById(proxyId).orElse(null),
-                socks5UserRepository.findByProxyId(proxyId)
+                socks5UserRepository.findByProxyId(proxyId),
+                fileShareAuthRepository.findById(proxyId).orElse(null),
+                fileShareUserRepository.findByProxyId(proxyId),
+                fileShareLimitsRepository.findById(proxyId).orElse(null)
         );
     }
 
@@ -82,6 +91,12 @@ public class ProxyRelationsLoader {
                 .collect(Collectors.toMap(Socks5AuthDO::getProxyId, Function.identity()));
         Map<String, List<Socks5UserDO>> socks5UsersMap = groupByProxyId(
                 socks5UserRepository.findByProxyIdIn(ids), Socks5UserDO::getProxyId);
+        Map<String, FileShareAuthDO> fileShareAuthMap = fileShareAuthRepository.findByProxyIdIn(ids).stream()
+                .collect(Collectors.toMap(FileShareAuthDO::getProxyId, Function.identity()));
+        Map<String, List<FileShareUserDO>> fileShareUsersMap = groupByProxyId(
+                fileShareUserRepository.findByProxyIdIn(ids), FileShareUserDO::getProxyId);
+        Map<String, FileShareLimitsDO> fileShareLimitsMap = fileShareLimitsRepository.findByProxyIdIn(ids).stream()
+                .collect(Collectors.toMap(FileShareLimitsDO::getProxyId, Function.identity()));
 
         return ids.stream().collect(Collectors.toMap(
                 Function.identity(),
@@ -92,7 +107,10 @@ public class ProxyRelationsLoader {
                         usersMap.getOrDefault(id, List.of()),
                         healthCheckMap.get(id),
                         socks5AuthMap.get(id),
-                        socks5UsersMap.getOrDefault(id, List.of())
+                        socks5UsersMap.getOrDefault(id, List.of()),
+                        fileShareAuthMap.get(id),
+                        fileShareUsersMap.getOrDefault(id, List.of()),
+                        fileShareLimitsMap.get(id)
                 )
         ));
     }

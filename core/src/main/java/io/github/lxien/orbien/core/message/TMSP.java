@@ -33,6 +33,14 @@ public class TMSP {
     public static final byte MSG_STREAM_PAUSE = 0x25;
     public static final byte MSG_STREAM_RESUME = 0x26;
 
+    public static final byte MSG_FILE_LIST_REQ = 0x30;
+    public static final byte MSG_FILE_LIST_RESP = 0x31;
+    public static final byte MSG_FILE_TRANSFER_INIT = 0x34;
+    public static final byte MSG_FILE_CHUNK = 0x35;
+    public static final byte MSG_FILE_TRANSFER_DONE = 0x37;
+    public static final byte MSG_FILE_OP_REQ = 0x38;
+    public static final byte MSG_FILE_OP_RESP = 0x39;
+
     // flags 位掩码
     public static final byte FLAG_COMPRESSED = 0x01;  // 0000 0001 加密
     public static final byte FLAG_ENCRYPTED = 0x02;   // 0000 0010 压缩

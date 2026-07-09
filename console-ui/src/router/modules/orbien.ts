@@ -52,6 +52,16 @@ export const penetrationRoutes: AppRouteRecord[] = [
     }
   },
   {
+    name: 'FileShare',
+    path: '/file-share',
+    component: '/orbien/file-share',
+    meta: {
+      title: 'menus.orbien.fileShare',
+      icon: 'ri:folder-shared-line',
+      roles: ['R_SUPER']
+    }
+  },
+  {
     name: 'Agent',
     path: '/agent',
     component: '/orbien/agent',

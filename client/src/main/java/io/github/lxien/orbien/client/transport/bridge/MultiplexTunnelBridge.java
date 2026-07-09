@@ -36,6 +36,10 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        if (payload == null || !payload.isReadable()) {
+            logger.debug("[传输] 忽略空载荷 streamId={}", streamContext.getStreamId());
+            return;
+        }
         int streamId = streamContext.getStreamId();
         if (!server.isActive()) {
             logger.debug("[传输] 内网通道未激活，关闭流 streamId={}", streamId);

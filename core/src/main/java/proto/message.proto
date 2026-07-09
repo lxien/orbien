@@ -7,6 +7,7 @@ enum ProtocolType {
   HTTPS = 2;
   UDP = 3;
   SOCKS5 = 4;
+  FILE = 5;
 }
 
 enum AgentType {
@@ -102,6 +103,79 @@ message Socks5Auth {
   repeated Socks5User users = 2;
 }
 
+message FileShareUser {
+  string username = 1;
+  string password = 2;
+  string permission = 3;
+}
+
+message FileShareAuth {
+  bool enabled = 1;
+  repeated FileShareUser users = 2;
+}
+
+message FileShareLimits {
+  string root_path = 1;
+  int64 max_upload_size = 2;
+  bool allow_upload = 3;
+  bool allow_delete = 4;
+  bool allow_mkdir = 5;
+}
+
+message FileListRequest {
+  string request_id = 1;
+  string proxy_id = 2;
+  string path = 3;
+}
+
+message FileEntry {
+  string name = 1;
+  bool directory = 2;
+  int64 size = 3;
+  int64 modified_time = 4;
+}
+
+message FileListResponse {
+  string request_id = 1;
+  string current_path = 2;
+  string parent_path = 3;
+  repeated FileEntry entries = 4;
+  Status status = 5;
+}
+
+message FileTransferInit {
+  string request_id = 1;
+  string proxy_id = 2;
+  string path = 3;
+  int64 total_size = 4;
+  bool upload = 5;
+}
+
+message FileChunk {
+  string request_id = 1;
+  int64 offset = 2;
+  bytes data = 3;
+  bool last = 4;
+}
+
+message FileTransferDone {
+  string request_id = 1;
+  Status status = 2;
+}
+
+message FileOpRequest {
+  string request_id = 1;
+  string proxy_id = 2;
+  string op = 3;
+  string path = 4;
+  string name = 5;
+}
+
+message FileOpResponse {
+  string request_id = 1;
+  Status status = 2;
+}
+
 message Bandwidth {
   optional string limit = 1;
   optional string limit_in = 2;
@@ -157,6 +231,8 @@ message Proxy {
   optional TlsCert tls_cert = 14;
   optional HealthCheck health_check = 15;
   optional Socks5Auth socks5_auth = 16;
+  optional FileShareAuth file_auth = 17;
+  optional FileShareLimits file_limits = 18;
 }
 
 message RuntimeInfo {
@@ -166,6 +242,7 @@ message RuntimeInfo {
   repeated string remote_addr = 4;
   optional HealthCheck health_check = 5;
   optional Transport transport = 6;
+  optional FileShareLimits file_limits = 7;
 }
 message BatchCreateProxiesRequest {
   repeated Proxy proxies = 1;

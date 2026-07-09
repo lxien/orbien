@@ -1,4 +1,5 @@
 package io.github.lxien.orbien.client.config;
+import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.domain.*;
@@ -198,7 +199,7 @@ public class TomlConfigLoader implements ConfigSource {
                 }
 
                 //解析目标服务（SOCKS5 无需固定 targets）
-                if (!protocolType.isSocks5()) {
+                if (!protocolType.isSocks5() && !protocolType.isFile()) {
                     List<Target> targets = proxyTable.getList("targets", new ArrayList<>()).stream()
                             .map(item -> {
                                 Map<String, Object> map = (Map) item;
@@ -238,8 +239,53 @@ public class TomlConfigLoader implements ConfigSource {
                     }
                 }
 
-                //解析HTTP(S)协议域名配置
-                if (proxyConfig.isHttpOrHttps()) {
+                if (protocolType.isFile()) {
+                    Toml fileAuth = proxyTable.getTable("file_auth");
+                    if (fileAuth != null) {
+                        Boolean enabled = fileAuth.getBoolean("enabled", true);
+                        FileShareAuthConfig authConfig = new FileShareAuthConfig();
+                        authConfig.setEnabled(enabled);
+                        List<HashMap> users = fileAuth.getList("users");
+                        if (users != null) {
+                            for (HashMap map : users) {
+                                String user = (String) map.getOrDefault("user", "");
+                                String pass = (String) map.getOrDefault("pass", "");
+                                String permission = (String) map.getOrDefault("permission", FileTransferConstants.PERMISSION_READ_WRITE);
+                                FileShareAuthConfig.FileShareUser shareUser = new FileShareAuthConfig.FileShareUser(user, pass, permission);
+                                authConfig.addUser(shareUser);
+                            }
+                        }
+                        proxyConfig.setFileShareAuth(authConfig);
+                    }
+                    FileShareLimitsConfig limitsConfig = new FileShareLimitsConfig();
+                    String rootPath = proxyTable.getString("root_path");
+                    Toml fileLimits = proxyTable.getTable("file_limits");
+                    if (fileLimits != null) {
+                        if (!StringUtils.hasText(rootPath)) {
+                            rootPath = fileLimits.getString("root_path");
+                        }
+                        Long maxUpload = fileLimits.getLong("max_upload_size_bytes");
+                        if (maxUpload == null) {
+                            String maxUploadStr = fileLimits.getString("max_upload_size");
+                            if (StringUtils.hasText(maxUploadStr)) {
+                                limitsConfig.setMaxUploadSize(parseSize(maxUploadStr));
+                            }
+                        } else {
+                            limitsConfig.setMaxUploadSize(maxUpload);
+                        }
+                        limitsConfig.setAllowUpload(fileLimits.getBoolean("allow_upload", true));
+                        limitsConfig.setAllowDelete(fileLimits.getBoolean("allow_delete", true));
+                        limitsConfig.setAllowMkdir(fileLimits.getBoolean("allow_mkdir", true));
+                    }
+                    if (!StringUtils.hasText(rootPath)) {
+                        throw new IllegalArgumentException("file 协议必须配置 root_path");
+                    }
+                    limitsConfig.setRootPath(rootPath.trim());
+                    proxyConfig.setFileShareLimits(limitsConfig);
+                }
+
+                //解析HTTP(S)/FILE 协议域名配置
+                if (proxyConfig.isHttpOrHttps() || proxyConfig.isFile()) {
                     Boolean autoDomain = proxyTable.getBoolean("auto_domain", true);
                     List<String> customDomains = proxyTable.getList("custom_domains");
                     List<String> subDomains = proxyTable.getList("sub_domains");
@@ -508,5 +554,26 @@ public class TomlConfigLoader implements ConfigSource {
         }
         transportConfig.setTlsConfig(
                 TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
+    }
+
+    private long parseSize(String value) {
+        if (!StringUtils.hasText(value)) {
+            return FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
+        }
+        String v = value.trim().toUpperCase();
+        try {
+            if (v.endsWith("MB")) {
+                return Long.parseLong(v.substring(0, v.length() - 2).trim()) * 1024 * 1024;
+            }
+            if (v.endsWith("KB")) {
+                return Long.parseLong(v.substring(0, v.length() - 2).trim()) * 1024;
+            }
+            if (v.endsWith("GB")) {
+                return Long.parseLong(v.substring(0, v.length() - 2).trim()) * 1024 * 1024 * 1024;
+            }
+            return Long.parseLong(v);
+        } catch (NumberFormatException e) {
+            return FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.alibaba.cola.statemachine.StateMachine;
 import io.github.lxien.orbien.client.TunnelClient;
 import io.github.lxien.orbien.client.config.AppConfig;
 import io.github.lxien.orbien.client.identity.AgentIdentity;
+import io.github.lxien.orbien.client.filetransfer.FileTransferControlHandler;
 import io.github.lxien.orbien.client.transport.ControlFrameHandler;
 import io.github.lxien.orbien.client.transport.connection.TransportPoolManager;
 import io.github.lxien.orbien.core.enums.AgentType;
@@ -34,6 +35,7 @@ public class AgentContext extends AbstractAgentContext {
     private TunnelClient tunnelClient;
     private TransportPoolManager poolManager = new TransportPoolManager();
     private ControlFrameHandler controlFrameHandler;
+    private FileTransferControlHandler fileTransferControlHandler = new FileTransferControlHandler();
     private AgentIdentity agentIdentity;
     private final AtomicInteger retryCount = new AtomicInteger(0);
     private StateMachine<AgentState, AgentEvent, AgentContext> stateMachine;

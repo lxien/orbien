@@ -58,23 +58,27 @@ public class TransportConfiguration {
     public HttpProxyServer httpProxyServer(HttpVisitorHandler httpVisitorHandler,
                                            HttpIpCheckHandler httpIpCheckHandler,
                                            BasicAuthHandler basicAuthHandler,
-                                           ForceHttpsRedirectHandler forceHttpsRedirectHandler) {
+                                           ForceHttpsRedirectHandler forceHttpsRedirectHandler,
+                                           io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler) {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                forceHttpsRedirectHandler
+                forceHttpsRedirectHandler,
+                fileShareDispatchHandler
         );
     }
     @Bean
     public HttpsProxyServer httpsProxyServer(HttpVisitorHandler httpVisitorHandler,
                                              HttpIpCheckHandler httpIpCheckHandler,
                                              BasicAuthHandler basicAuthHandler,
-                                             TlsCertificateManager tlsCertificateManager) {
+                                             TlsCertificateManager tlsCertificateManager,
+                                             io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler) {
         return new HttpsProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
-                tlsCertificateManager);
+                tlsCertificateManager,
+                fileShareDispatchHandler);
     }
 }

@@ -52,7 +52,10 @@ public class StreamStateMachineBuilder {
                     .to(StreamState.OPENED)
                     .on(StreamEvent.STREAM_OPEN_SUCCESS)
                     .when(ctx -> true)
-                    .perform((from, to, event, context) -> context.setState(to));
+                    .perform((from, to, event, context) -> {
+                        context.setState(to);
+                        context.flushPendingToLocal();
+                    });
             // 暂停流
             builder.externalTransition()
                     .from(StreamState.OPENED)

@@ -146,7 +146,24 @@ public class ProxyManager {
             proxyAgentMap.put(proxyId, agentId);
             agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
             domainRegistry.register(proxyId, domains);
-            //todo tlsCertificateManager.addDeployedDomains(domains);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void registerFile(String agentId, String proxyId, Set<String> domains) throws OrbienException {
+        if (agentId == null || proxyId == null) {
+            throw new IllegalArgumentException("无效输入参数");
+        }
+        if (CollectionUtils.isEmpty(domains)) {
+            throw new IllegalArgumentException("至少配置一个域名");
+        }
+        logger.debug("激活文件共享: {}", proxyId);
+        writeLock.lock();
+        try {
+            proxyAgentMap.put(proxyId, agentId);
+            agentProxyMap.computeIfAbsent(agentId, k -> ConcurrentHashMap.newKeySet()).add(proxyId);
+            domainRegistry.register(proxyId, domains);
         } finally {
             writeLock.unlock();
         }
@@ -177,7 +194,6 @@ public class ProxyManager {
         // HTTP(S)协议
         Set<String> domains = domainRegistry.getDomainsByProxyId(proxyId);
         for (String domain : domains) {
-           //todo  tlsCertificateManager.cancelDeploy(domain);// HTTPS协议
             streamManager.fireCloseByDomain(domain);
         }
         //从注册中心删除域名

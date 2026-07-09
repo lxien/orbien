@@ -59,5 +59,6 @@ declare namespace Api.Monitor {
     tcpCount: number
     udpCount: number
     socks5Count: number
+    fileCount: number
   }
 }

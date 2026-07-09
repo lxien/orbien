@@ -94,6 +94,37 @@ public class ProxyConfigAssembler {
                     proxyBuilder.setSocks5Auth(authBuilder);
                 }
                 break;
+            case FILE:
+                if (config.hasFileShareAuth()) {
+                    FileShareAuthConfig fileAuth = config.getFileShareAuth();
+                    Message.FileShareAuth.Builder authBuilder = Message.FileShareAuth.newBuilder()
+                            .setEnabled(fileAuth.isEnabled());
+                    for (FileShareAuthConfig.FileShareUser user : fileAuth.getUsers()) {
+                        Message.FileShareUser.Builder ub = Message.FileShareUser.newBuilder()
+                                .setUsername(user.getUsername())
+                                .setPassword(user.getPassword());
+                        if (StringUtils.hasText(user.getPermission())) {
+                            ub.setPermission(user.getPermission());
+                        }
+                        authBuilder.addUsers(ub.build());
+                    }
+                    proxyBuilder.setFileAuth(authBuilder);
+                }
+                if (config.hasFileShareLimits()) {
+                    Message.FileShareLimits limits = RuntimeInfoSupport.toFileShareLimitsProto(config.getFileShareLimits());
+                    if (limits != null) {
+                        proxyBuilder.setFileLimits(limits);
+                    }
+                }
+                RouteConfig fileDomain = config.getRouteConfig();
+                if (fileDomain != null) {
+                    Message.Domain domainReq = Message.Domain.newBuilder()
+                            .setAutoDomain(fileDomain.getAutoDomain())
+                            .addAllCustomDomains(fileDomain.getCustomDomains())
+                            .addAllSubDomains(fileDomain.getSubDomains()).build();
+                    proxyBuilder.setDomain(domainReq);
+                }
+                break;
             case HTTP:
             case HTTPS:
                 //域名配置

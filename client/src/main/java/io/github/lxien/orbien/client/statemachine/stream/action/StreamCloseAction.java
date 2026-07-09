@@ -57,6 +57,7 @@ public class StreamCloseAction extends StreamBaseAction {
         }
         ChannelUtils.closeOnFlush(server);
 
+        context.discardPending();
         StreamManager.removeStreamContext(streamId);
         if (event == StreamEvent.STREAM_LOCAL_CLOSE) {
             logger.debug("通知对端关闭流 {}", context.getStreamId());

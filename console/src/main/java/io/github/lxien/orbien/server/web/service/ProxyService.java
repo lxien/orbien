@@ -23,6 +23,8 @@ import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.TcpProxyDetailDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.FileShareDetailDTO;
+import io.github.lxien.orbien.server.web.dto.proxy.FileShareListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyDetailDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.Socks5ProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.UdpProxyDetailDTO;
@@ -36,6 +38,8 @@ public interface ProxyService {
     void createTcpProxy(TcpProxyCreateParam param);
 
     void createSocks5Proxy(Socks5ProxyCreateParam param);
+
+    void createFileShare(FileShareCreateParam param);
 
     void createUdpProxy(UdpProxyCreateParam param);
 
@@ -58,6 +62,8 @@ public interface ProxyService {
 
     void updateSocks5Proxy(Socks5ProxyUpdateParam param);
 
+    void updateFileShare(FileShareUpdateParam param);
+
     /**
      * 更新 HTTP 代理
      */
@@ -77,6 +83,8 @@ public interface ProxyService {
 
     Socks5ProxyDetailDTO getSocks5ProxyById(String id);
 
+    FileShareDetailDTO getFileShareById(String id);
+
     HttpProxyDetailDTO getHttpProxyById(String id);
 
     HttpsProxyDetailDTO getHttpsProxyById(String id);
@@ -90,6 +98,8 @@ public interface ProxyService {
     PageResult<UdpProxyListDTO> findUdpProxies(PageQuery pageQuery);
 
     PageResult<Socks5ProxyListDTO> findSocks5Proxies(PageQuery pageQuery);
+
+    PageResult<FileShareListDTO> findFileShares(PageQuery pageQuery);
 
     PageResult<HttpProxyListDTO> findHttpProxies(PageQuery pageQuery);
 

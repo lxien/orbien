@@ -37,4 +37,6 @@ public interface ProxyQueryRepository {
     ProxyConfigExt findByListenPort(int listenPort, ProtocolType protocolType);
 
     List<ProxyConfigExt> findByAgentId(String agentId);
+
+    List<ProxyConfigExt> findAllOpen();
 }

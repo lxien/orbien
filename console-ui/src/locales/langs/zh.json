@@ -251,6 +251,7 @@
       "tcp": "TCP",
       "udp": "UDP",
       "socks5": "SOCKS5",
+      "fileShare": "文件共享",
       "portPool": "端口池",
       "agent": "客户端",
       "domain": "域名管理",

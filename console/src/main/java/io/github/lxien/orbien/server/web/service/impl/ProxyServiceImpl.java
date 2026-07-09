@@ -24,6 +24,8 @@ import io.github.lxien.orbien.server.port.PortPoolManager;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.vhost.DomainGenerator;
 import io.github.lxien.orbien.core.domain.DomainInfo;
+import io.github.lxien.orbien.core.domain.FileShareLimitsConfig;
+import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
@@ -81,6 +83,12 @@ public class ProxyServiceImpl implements ProxyService {
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
+    @Autowired
+    private FileShareAuthRepository fileShareAuthRepository;
+    @Autowired
+    private FileShareUserRepository fileShareUserRepository;
+    @Autowired
+    private FileShareLimitsRepository fileShareLimitsRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     @Autowired
@@ -486,6 +494,128 @@ public class ProxyServiceImpl implements ProxyService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void createFileShare(FileShareCreateParam param) {
+        DomainType domainType = DomainType.fromCode(param.getDomainType());
+        validateHttpDomainInput(domainType, param.getSubdomainBindings(), param.getCustomDomains());
+        if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        String proxyId = uidGenerator.getUIDAsString();
+        ProxyDO proxyDO = buildFileShareProxyDO(param.getAgentId(), param.getName(), proxyId, domainType);
+        applyHttpLimitTotal(proxyDO, param.getLimitTotal());
+        proxyRepository.save(proxyDO);
+        saveHttpDomains(proxyId, domainType, param.getSubdomainBindings(), param.getCustomDomains(), null);
+        saveFileShareLimits(proxyId, param.getRootPath(), param.getMaxUploadSize(),
+                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir());
+        accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        saveFileShareAuthConfig(proxyId, param.getAuthEnabled(), param.getAuthUsers(), true);
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
+        logger.debug("文件共享创建成功：{}", proxyDO.getName());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateFileShare(FileShareUpdateParam param) {
+        String proxyId = param.getId();
+        ProxyDO existsProxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        assertFileProtocol(existsProxyDO);
+        if (proxyRepository.existsByAgentIdAndNameAndIdNot(
+                existsProxyDO.getAgentId(), param.getName(), proxyId)) {
+            throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
+        }
+        DomainType existsDomainType = existsProxyDO.getDomainType();
+        DomainType requestDomainType = DomainType.fromCode(param.getDomainType());
+        validateHttpDomainInput(requestDomainType, param.getSubdomainBindings(), param.getCustomDomains());
+
+        existsProxyDO.setName(param.getName());
+        existsProxyDO.setDomainType(requestDomainType);
+        applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
+        proxyRepository.save(existsProxyDO);
+
+        if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
+            // 自动域名类型未变化，保留已有域名
+        } else {
+            proxyDomainRepository.deleteByProxyId(proxyId);
+            saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
+        }
+
+        saveFileShareLimits(proxyId, param.getRootPath(), param.getMaxUploadSize(),
+                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir());
+
+        if (param.getAuthEnabled() != null || !CollectionUtils.isEmpty(param.getAuthUsers())) {
+            Boolean enabled = param.getAuthEnabled();
+            if (enabled == null) {
+                enabled = fileShareAuthRepository.findById(proxyId)
+                        .map(FileShareAuthDO::getEnabled)
+                        .orElse(Boolean.FALSE);
+            }
+            saveFileShareAuthConfig(proxyId, enabled, param.getAuthUsers(), false);
+        }
+
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
+        logger.debug("文件共享更新成功：{}", existsProxyDO.getName());
+    }
+
+    @Override
+    public FileShareDetailDTO getFileShareById(String id) {
+        ProxyDO proxyDO = proxyRepository.findById(id)
+                .filter(proxy -> proxy.getProtocol().isFile())
+                .orElseThrow(() -> new BizException("文件共享不存在"));
+        return buildFileShareDetailDTO(proxyDO);
+    }
+
+    @Override
+    public PageResult<FileShareListDTO> findFileShares(PageQuery pageQuery) {
+        int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        int httpsProxyPort = appConfig.getHttpsProxyPort();
+
+        Page<ProxyListQueryResult> resultPage = proxyRepository.findProxiesWithAssociations(ProtocolType.FILE, pageable);
+        if (resultPage.isEmpty()) {
+            return PageResult.empty(pageQuery.getCurrent(), pageQuery.getSize());
+        }
+
+        List<ProxyListQueryResult> content = resultPage.getContent();
+        List<String> proxyIds = content.stream()
+                .map(ProxyListQueryResult::getProxyDO)
+                .map(ProxyDO::getId)
+                .toList();
+
+        Map<String, List<String>> domainsMap = proxyDomainRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.groupingBy(
+                        ProxyDomainDO::getProxyId,
+                        Collectors.mapping(ProxyDomainDO::getFullDomain, Collectors.toList())));
+        Map<String, FileShareAuthDO> authMap = fileShareAuthRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.toMap(FileShareAuthDO::getProxyId, a -> a));
+        Map<String, Long> userCountMap = fileShareUserRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.groupingBy(FileShareUserDO::getProxyId, Collectors.counting()));
+        Map<String, FileShareLimitsDO> limitsMap = fileShareLimitsRepository.findByProxyIdIn(proxyIds).stream()
+                .collect(Collectors.toMap(FileShareLimitsDO::getProxyId, l -> l));
+
+        List<FileShareListDTO> res = new ArrayList<>();
+        for (ProxyListQueryResult r : content) {
+            ProxyDO proxyDO = r.getProxyDO();
+            FileShareListDTO dto = proxyConvert.toFileShareListDTO(proxyDO);
+            proxyConvert.enrichAgentType(dto, r.getAgentDO());
+            List<String> domains = domainsMap.getOrDefault(proxyDO.getId(), Collections.emptyList());
+            dto.setDomains(domains);
+            dto.setAccessUrls(buildFileShareAccessUrls(domains, httpsProxyPort));
+            dto.setHttpsProxyPort(httpsProxyPort);
+            FileShareLimitsDO limitsDO = limitsMap.get(proxyDO.getId());
+            if (limitsDO != null) {
+                dto.setRootPath(limitsDO.getRootPath());
+            }
+            FileShareAuthDO authDO = authMap.get(proxyDO.getId());
+            dto.setAuthEnabled(authDO != null && Boolean.TRUE.equals(authDO.getEnabled()));
+            dto.setAuthUserCount(userCountMap.getOrDefault(proxyDO.getId(), 0L).intValue());
+            res.add(dto);
+        }
+        return PageResult.wrap(resultPage, res);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void createUdpProxy(UdpProxyCreateParam param) {
         if (proxyRepository.existsByAgentIdAndName(param.getAgentId(), param.getName())) {
             throw new BizException("该客户端下已存在同名代理名称: " + param.getName());
@@ -707,6 +837,20 @@ public class ProxyServiceImpl implements ProxyService {
         proxyDO.setProtocol(ProtocolType.SOCKS5);
         proxyDO.setStatus(ProxyStatus.OPEN);
         proxyDO.setSourceType(ProxySourceType.MANUAL);
+        return proxyDO;
+    }
+
+    private ProxyDO buildFileShareProxyDO(String agentId, String name, String proxyId, DomainType domainType) {
+        ProxyDO proxyDO = new ProxyDO();
+        proxyDO.setId(proxyId);
+        proxyDO.setAgentId(agentId);
+        proxyDO.setName(name);
+        proxyDO.setProtocol(ProtocolType.FILE);
+        proxyDO.setStatus(ProxyStatus.OPEN);
+        proxyDO.setSourceType(ProxySourceType.MANUAL);
+        proxyDO.setDomainType(domainType);
+        proxyDO.setMultiplex(true);
+        proxyDO.setEncrypt(false);
         return proxyDO;
     }
 
@@ -1038,13 +1182,23 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private void fillHttpDomainFields(HttpProxyDetailDTO dto, DomainType domainType, List<ProxyDomainDO> domainRecords) {
+        fillDomainFields(dto::setSubdomainBindings, dto::setCustomDomains, domainType, domainRecords);
+    }
+
+    private void fillHttpDomainFields(FileShareDetailDTO dto, DomainType domainType, List<ProxyDomainDO> domainRecords) {
+        fillDomainFields(dto::setSubdomainBindings, dto::setCustomDomains, domainType, domainRecords);
+    }
+
+    private void fillDomainFields(java.util.function.Consumer<List<SubdomainBindingDTO>> subdomainSetter,
+                                  java.util.function.Consumer<List<String>> customDomainSetter,
+                                  DomainType domainType, List<ProxyDomainDO> domainRecords) {
         if (domainType == null || CollectionUtils.isEmpty(domainRecords)) {
             return;
         }
         if (domainType.isSubdomain()) {
             Map<String, Integer> rootDomainIdMap = domainRepository.findAll().stream()
                     .collect(Collectors.toMap(DomainDO::getDomain, DomainDO::getId, (left, right) -> left));
-            dto.setSubdomainBindings(domainRecords.stream().map(record -> {
+            subdomainSetter.accept(domainRecords.stream().map(record -> {
                 SubdomainBindingDTO binding = new SubdomainBindingDTO();
                 binding.setPrefix(record.getDomain());
                 binding.setRootDomain(record.getRootDomain());
@@ -1056,7 +1210,7 @@ public class ProxyServiceImpl implements ProxyService {
             return;
         }
         if (domainType.isCustomDomain()) {
-            dto.setCustomDomains(domainRecords.stream().map(ProxyDomainDO::getDomain).toList());
+            customDomainSetter.accept(domainRecords.stream().map(ProxyDomainDO::getDomain).toList());
         }
     }
 
@@ -1143,6 +1297,12 @@ public class ProxyServiceImpl implements ProxyService {
             socks5AuthRepository.deleteByProxyIdIn(ids);
             socks5UserRepository.deleteByProxyIdIn(ids);
         }
+        if (protocolType.isFile()) {
+            proxyDomainRepository.deleteByProxyIdIn(ids);
+            fileShareAuthRepository.deleteByProxyIdIn(ids);
+            fileShareUserRepository.deleteByProxyIdIn(ids);
+            fileShareLimitsRepository.deleteByProxyIdIn(ids);
+        }
         //删除流量统计数据
         ids.forEach(proxyId -> metricsService.deleteByProxyId(proxyId));
         //删除基础信息
@@ -1173,7 +1333,7 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private void validateProxyCanActivate(ProxyDO proxyDO) {
-        if (proxyDO.getProtocol().isHttpOrHttps()) {
+        if (proxyDO.getProtocol().isHttpOrHttps() || proxyDO.getProtocol().isFile()) {
             List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyId(proxyDO.getId());
             if (CollectionUtils.isEmpty(domains)) {
                 throw new BizException("代理未配置可用域名，无法启用");
@@ -1231,6 +1391,14 @@ public class ProxyServiceImpl implements ProxyService {
             } else {
                 proxyManager.registerHttps(agentId, proxyId, domains);
             }
+            return;
+        }
+        if (protocol.isFile()) {
+            Set<String> domains = proxyDomainRepository.findByProxyId(proxyId).stream()
+                    .map(ProxyDomainDO::getFullDomain)
+                    .filter(StringUtils::hasText)
+                    .collect(Collectors.toSet());
+            proxyManager.registerFile(agentId, proxyId, domains);
             return;
         }
         if (protocol.isUdp()) {
@@ -1318,5 +1486,170 @@ public class ProxyServiceImpl implements ProxyService {
                 throw new BizException("认证密码不能为空");
             }
         }
+    }
+
+    private void assertFileProtocol(ProxyDO proxyDO) {
+        if (!proxyDO.getProtocol().isFile()) {
+            throw new BizException("仅支持文件共享");
+        }
+    }
+
+    private FileShareDetailDTO buildFileShareDetailDTO(ProxyDO proxyDO) {
+        String proxyId = proxyDO.getId();
+        List<ProxyDomainDO> domainRecords = proxyDomainRepository.findByProxyId(proxyId);
+        List<String> domains = domainRecords.stream().map(ProxyDomainDO::getFullDomain).toList();
+        int httpsProxyPort = appConfig.getHttpsProxyPort();
+
+        FileShareDetailDTO dto = new FileShareDetailDTO();
+        dto.setId(proxyId);
+        dto.setAgentId(proxyDO.getAgentId());
+        dto.setName(proxyDO.getName());
+        dto.setDomainType(domainTypeToCode(proxyDO.getDomainType()));
+        fillHttpDomainFields(dto, proxyDO.getDomainType(), domainRecords);
+        dto.setDomains(domains);
+        dto.setAccessUrls(buildFileShareAccessUrls(domains, httpsProxyPort));
+        dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setCreatedAt(proxyDO.getCreatedAt());
+        dto.setUpdatedAt(proxyDO.getUpdatedAt());
+
+        fileShareLimitsRepository.findById(proxyId).ifPresent(limitsDO -> {
+            dto.setRootPath(limitsDO.getRootPath());
+            dto.setMaxUploadSize(limitsDO.getMaxUploadSize());
+            dto.setAllowUpload(limitsDO.getAllowUpload());
+            dto.setAllowDelete(limitsDO.getAllowDelete());
+            dto.setAllowMkdir(limitsDO.getAllowMkdir());
+        });
+
+        fileShareAuthRepository.findById(proxyId).ifPresent(authDO -> {
+            dto.setAuthEnabled(Boolean.TRUE.equals(authDO.getEnabled()));
+            List<FileShareUserDTO> users = fileShareUserRepository.findByProxyId(proxyId).stream()
+                    .map(user -> {
+                        FileShareUserDTO userDTO = new FileShareUserDTO();
+                        userDTO.setId(user.getId());
+                        userDTO.setUsername(user.getUsername());
+                        userDTO.setPermission(user.getPermission());
+                        return userDTO;
+                    })
+                    .toList();
+            dto.setAuthUsers(users);
+        });
+        if (dto.getAuthEnabled() == null) {
+            dto.setAuthEnabled(false);
+        }
+        return dto;
+    }
+
+    private List<String> buildFileShareAccessUrls(List<String> domains, int httpsProxyPort) {
+        if (CollectionUtils.isEmpty(domains)) {
+            return List.of();
+        }
+        return domains.stream()
+                .map(domain -> RuntimeInfoSupport.buildRemoteAddr(domain, ProtocolType.FILE, 0, httpsProxyPort))
+                .toList();
+    }
+
+    private void saveFileShareLimits(String proxyId, String rootPath, Long maxUploadSize,
+                                     Boolean allowUpload, Boolean allowDelete, Boolean allowMkdir) {
+        if (!StringUtils.hasText(rootPath)) {
+            throw new BizException("根目录不能为空");
+        }
+        FileShareLimitsDO limitsDO = fileShareLimitsRepository.findById(proxyId).orElse(new FileShareLimitsDO(proxyId));
+        limitsDO.setProxyId(proxyId);
+        limitsDO.setRootPath(rootPath.trim());
+        limitsDO.setMaxUploadSize(maxUploadSize != null ? maxUploadSize : FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE);
+        limitsDO.setAllowUpload(allowUpload == null || Boolean.TRUE.equals(allowUpload));
+        limitsDO.setAllowDelete(allowDelete == null || Boolean.TRUE.equals(allowDelete));
+        limitsDO.setAllowMkdir(allowMkdir == null || Boolean.TRUE.equals(allowMkdir));
+        fileShareLimitsRepository.save(limitsDO);
+    }
+
+    private void saveFileShareAuthConfig(String proxyId, Boolean authEnabled,
+                                         List<FileShareAuthUserParam> authUsers, boolean creating) {
+        boolean enabled = Boolean.TRUE.equals(authEnabled);
+        if (creating && enabled) {
+            validateFileShareAuthUsers(authUsers, true);
+        }
+        if (!creating && enabled && !CollectionUtils.isEmpty(authUsers)) {
+            validateFileShareAuthUsers(authUsers, false);
+        }
+
+        FileShareAuthDO authDO = fileShareAuthRepository.findById(proxyId).orElse(new FileShareAuthDO(proxyId, false));
+        authDO.setEnabled(enabled);
+        fileShareAuthRepository.save(authDO);
+
+        if (!enabled || CollectionUtils.isEmpty(authUsers)) {
+            return;
+        }
+
+        List<FileShareUserDO> existingUsers = fileShareUserRepository.findByProxyId(proxyId);
+        Set<Long> incomingIds = authUsers.stream()
+                .map(FileShareAuthUserParam::getId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        existingUsers.stream()
+                .filter(user -> !incomingIds.contains(user.getId()))
+                .forEach(user -> fileShareUserRepository.deleteById(user.getId()));
+
+        for (FileShareAuthUserParam userParam : authUsers) {
+            if (!StringUtils.hasText(userParam.getUsername())) {
+                throw new BizException("认证用户名不能为空");
+            }
+            String permission = normalizeFileSharePermission(userParam.getPermission());
+            if (userParam.getId() != null) {
+                FileShareUserDO userDO = fileShareUserRepository.findById(userParam.getId())
+                        .orElseThrow(() -> new BizException("认证用户不存在"));
+                if (!Objects.equals(userDO.getProxyId(), proxyId)) {
+                    throw new BizException("认证用户不属于当前代理");
+                }
+                if (!Objects.equals(userParam.getUsername(), userDO.getUsername())
+                        && fileShareUserRepository.existsByProxyIdAndUsernameAndIdNot(
+                        proxyId, userParam.getUsername(), userParam.getId())) {
+                    throw new BizException("用户名已存在: " + userParam.getUsername());
+                }
+                userDO.setUsername(userParam.getUsername());
+                userDO.setPermission(permission);
+                if (StringUtils.hasText(userParam.getPassword())) {
+                    userDO.setPassword(passwordEncoder.encode(userParam.getPassword()));
+                } else if (creating) {
+                    throw new BizException("认证密码不能为空");
+                }
+                fileShareUserRepository.save(userDO);
+                continue;
+            }
+            if (!StringUtils.hasText(userParam.getPassword())) {
+                throw new BizException("认证密码不能为空");
+            }
+            if (fileShareUserRepository.existsByProxyIdAndUsername(proxyId, userParam.getUsername())) {
+                throw new BizException("用户名已存在: " + userParam.getUsername());
+            }
+            fileShareUserRepository.save(new FileShareUserDO(
+                    proxyId, userParam.getUsername(), passwordEncoder.encode(userParam.getPassword()), permission));
+        }
+    }
+
+    private void validateFileShareAuthUsers(List<FileShareAuthUserParam> authUsers, boolean requirePassword) {
+        if (CollectionUtils.isEmpty(authUsers)) {
+            throw new BizException("启用认证时必须至少添加一个用户");
+        }
+        for (FileShareAuthUserParam userParam : authUsers) {
+            if (!StringUtils.hasText(userParam.getUsername())) {
+                throw new BizException("认证用户名不能为空");
+            }
+            normalizeFileSharePermission(userParam.getPermission());
+            if (requirePassword && userParam.getId() == null && !StringUtils.hasText(userParam.getPassword())) {
+                throw new BizException("认证密码不能为空");
+            }
+        }
+    }
+
+    private String normalizeFileSharePermission(String permission) {
+        if (!StringUtils.hasText(permission)) {
+            return "read_write";
+        }
+        String normalized = permission.trim().toLowerCase();
+        if (!"read".equals(normalized) && !"read_write".equals(normalized)) {
+            throw new BizException("无效的权限类型: " + permission);
+        }
+        return normalized;
     }
 }

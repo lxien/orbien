@@ -19,6 +19,7 @@ package io.github.lxien.orbien.core.transport;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.statemachine.context.ProcessContextImpl;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -62,15 +63,35 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
         return !multiplex;
     }
 
-    public boolean isDatagram() {
-        return datagram;
-    }
-
     public void enqueue(ByteBuf byteBuf) {
         pendingQueue.offer(byteBuf);
     }
 
     public ByteBuf pollPending() {
         return pendingQueue.poll();
+    }
+
+    public void flushPendingToLocal() {
+        if (tunnelBridge == null) {
+            discardPending();
+            return;
+        }
+        ByteBuf pending;
+        while ((pending = pollPending()) != null) {
+            try {
+                if (pending.isReadable()) {
+                    forwardToLocal(pending);
+                }
+            } finally {
+                ReferenceCountUtil.release(pending);
+            }
+        }
+    }
+
+    public void discardPending() {
+        ByteBuf pending;
+        while ((pending = pollPending()) != null) {
+            ReferenceCountUtil.release(pending);
+        }
     }
 }

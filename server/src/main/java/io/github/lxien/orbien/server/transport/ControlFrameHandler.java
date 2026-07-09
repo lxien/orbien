@@ -24,6 +24,7 @@ import io.github.lxien.orbien.core.transport.ChannelType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
+import io.github.lxien.orbien.server.filetransfer.FileTransferCoordinator;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.agent.command.ConnectionCreateCmd;
@@ -66,6 +67,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private StreamOpenResponseAction streamOpenResponseAction;
+    @Autowired
+    private FileTransferCoordinator fileTransferCoordinator;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TMSPFrame frame) {
@@ -253,6 +256,22 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             Message.BatchReportServiceHealthRequest.parser());
                     agentContext.setVariable(AgentConstants.BATCH_REPORT_SERVICE_HEALTH_REQUEST, healthReq);
                     agentContext.fireEvent(AgentEvent.SERVICE_HEALTH_REPORT);
+                }
+                case TMSP.MSG_FILE_LIST_RESP -> {
+                    Message.FileListResponse resp = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileListResponse.parser());
+                    fileTransferCoordinator.onListResp(resp);
+                }
+                case TMSP.MSG_FILE_OP_RESP -> {
+                    Message.FileOpResponse resp = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileOpResponse.parser());
+                    fileTransferCoordinator.onOpResp(resp);
+                }
+                case TMSP.MSG_FILE_TRANSFER_DONE -> {
+                    Message.FileTransferDone done = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileTransferDone.parser());
+                    fileTransferCoordinator.onTransferDone(done);
+                }
+                case TMSP.MSG_FILE_CHUNK -> {
+                    Message.FileChunk chunk = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileChunk.parser());
+                    fileTransferCoordinator.onChunk(chunk);
                 }
             }
         } catch (Exception e) {

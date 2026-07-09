@@ -162,6 +162,15 @@ public class ProxyReportConvert {
         return users;
     }
 
+    public List<FileShareUserDO> toFileShareUserDOList(Message.FileShareAuth fileAuth, String proxyId) {
+        List<FileShareUserDO> users = new ArrayList<>();
+        for (Message.FileShareUser user : fileAuth.getUsersList()) {
+            String permission = StringUtils.hasText(user.getPermission()) ? user.getPermission() : "read_write";
+            users.add(new FileShareUserDO(proxyId, user.getUsername(), user.getPassword(), permission));
+        }
+        return users;
+    }
+
     public List<BasicUserDO> toBasicUserDOList(Message.BasicAuth basicAuth, String proxyId) {
         List<BasicUserDO> users = new ArrayList<>();
         for (Message.HttpUser httpUser : basicAuth.getHttpUsersList()) {

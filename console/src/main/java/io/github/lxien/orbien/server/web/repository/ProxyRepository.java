@@ -88,7 +88,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
                 COALESCE(SUM(CASE WHEN p.protocol = :https THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN p.protocol = :tcp THEN 1 ELSE 0 END), 0),
                 COALESCE(SUM(CASE WHEN p.protocol = :udp THEN 1 ELSE 0 END), 0),
-                COALESCE(SUM(CASE WHEN p.protocol = :socks5 THEN 1 ELSE 0 END), 0)
+                COALESCE(SUM(CASE WHEN p.protocol = :socks5 THEN 1 ELSE 0 END), 0),
+                COALESCE(SUM(CASE WHEN p.protocol = :file THEN 1 ELSE 0 END), 0)
             )
             FROM ProxyDO p
             """)
@@ -97,7 +98,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
             @Param("https") ProtocolType https,
             @Param("tcp") ProtocolType tcp,
             @Param("udp") ProtocolType udp,
-            @Param("socks5") ProtocolType socks5
+            @Param("socks5") ProtocolType socks5,
+            @Param("file") ProtocolType file
     );
 
     void deleteByIdIn(List<String> ids);
@@ -106,6 +108,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     List<Integer> findAllListenPorts();
 
     List<ProxyDO> findByAgentId(String agentId);
+
+    List<ProxyDO> findByStatus(ProxyStatus status);
 
     List<ProxyDO> findByProtocol(ProtocolType protocol);
 

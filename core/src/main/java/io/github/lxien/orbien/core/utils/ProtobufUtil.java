@@ -27,11 +27,13 @@ public class ProtobufUtil {
         if (payload == null || !payload.isReadable()) {
             throw new IllegalArgumentException("payload 为空");
         }
+        int readerIndex = payload.readerIndex();
         try {
-            return parser.parseFrom(new ByteBufInputStream(payload,false));
+            return parser.parseFrom(new ByteBufInputStream(payload, false));
         } catch (InvalidProtocolBufferException e) {
-            ReferenceCountUtil.release(payload);
             throw new RuntimeException("解析 Protobuf 失败", e);
+        } finally {
+            payload.readerIndex(readerIndex);
         }
     }
 }

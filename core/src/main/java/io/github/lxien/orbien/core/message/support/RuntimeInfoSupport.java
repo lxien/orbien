@@ -1,6 +1,7 @@
 package io.github.lxien.orbien.core.message.support;
 
 import io.github.lxien.orbien.core.domain.DomainInfo;
+import io.github.lxien.orbien.core.domain.FileShareLimitsConfig;
 import io.github.lxien.orbien.core.domain.HealthCheckConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.Target;
@@ -130,7 +131,7 @@ public final class RuntimeInfoSupport {
             builder.addAllRemoteAddr(remoteAddrs);
         }
 
-        if (!config.isUdp() && !config.isSocks5()) {
+        if (!config.isUdp() && !config.isSocks5() && !config.isFile()) {
             Message.HealthCheck healthCheck = toHealthCheckProto(config.getHealthCheck());
             if (healthCheck != null) {
                 builder.setHealthCheck(healthCheck);
@@ -138,6 +139,42 @@ public final class RuntimeInfoSupport {
         }
 
         applyTransport(builder, config);
+        applyFileShareLimits(builder, config);
+        return builder.build();
+    }
+
+    public static void applyFileShareLimits(Message.RuntimeInfo.Builder builder, ProxyConfig config) {
+        if (config == null || !config.isFile() || !config.hasFileShareLimits()) {
+            return;
+        }
+        FileShareLimitsConfig limits = config.getFileShareLimits();
+        Message.FileShareLimits.Builder lb = Message.FileShareLimits.newBuilder();
+        if (limits.getRootPath() != null) {
+            lb.setRootPath(limits.getRootPath());
+        }
+        if (limits.getMaxUploadSize() != null) {
+            lb.setMaxUploadSize(limits.getMaxUploadSize());
+        }
+        lb.setAllowUpload(limits.isAllowUpload());
+        lb.setAllowDelete(limits.isAllowDelete());
+        lb.setAllowMkdir(limits.isAllowMkdir());
+        builder.setFileLimits(lb.build());
+    }
+
+    public static Message.FileShareLimits toFileShareLimitsProto(FileShareLimitsConfig config) {
+        if (config == null) {
+            return null;
+        }
+        Message.FileShareLimits.Builder builder = Message.FileShareLimits.newBuilder();
+        if (config.getRootPath() != null) {
+            builder.setRootPath(config.getRootPath());
+        }
+        if (config.getMaxUploadSize() != null) {
+            builder.setMaxUploadSize(config.getMaxUploadSize());
+        }
+        builder.setAllowUpload(config.isAllowUpload());
+        builder.setAllowDelete(config.isAllowDelete());
+        builder.setAllowMkdir(config.isAllowMkdir());
         return builder.build();
     }
 
@@ -165,6 +202,10 @@ public final class RuntimeInfoSupport {
                 port = httpProxyPort == 80 ? "" : ":" + httpProxyPort;
             }
             case HTTPS -> {
+                prefix = "https://";
+                port = httpsProxyPort == 443 ? "" : ":" + httpsProxyPort;
+            }
+            case FILE -> {
                 prefix = "https://";
                 port = httpsProxyPort == 443 ? "" : ":" + httpsProxyPort;
             }

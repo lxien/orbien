@@ -45,6 +45,9 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf payload) {
+        if (!payload.isReadable()) {
+            return;
+        }
         logger.debug("进入上传限流处理器");
         Channel visitor = ctx.channel();
         Optional<StreamContext> streamContextOpt = streamManager.getStreamContext(visitor);

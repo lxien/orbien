@@ -27,6 +27,7 @@ import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
 import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
+import io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler;
 import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.transport.http.HeaderInjectDecoder;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
@@ -58,13 +59,15 @@ public class HttpsProxyServer implements Lifecycle {
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
     private final TlsCertificateManager tlsCertificateManager;
+    private final FileShareDispatchHandler fileShareDispatchHandler;
 
-    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, TlsCertificateManager tlsCertificateManager) {
+    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, TlsCertificateManager tlsCertificateManager, FileShareDispatchHandler fileShareDispatchHandler) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.tlsCertificateManager = tlsCertificateManager;
+        this.fileShareDispatchHandler = fileShareDispatchHandler;
     }
 
     @Override
@@ -93,6 +96,7 @@ public class HttpsProxyServer implements Lifecycle {
                             pipeline.addLast(httpIpCheckHandler);
                             //   pipeline.addLast(uploadRateLimitHandler);
                             pipeline.addLast(basicAuthHandler);
+                            pipeline.addLast(fileShareDispatchHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

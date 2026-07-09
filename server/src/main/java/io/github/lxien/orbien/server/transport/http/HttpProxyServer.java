@@ -25,6 +25,7 @@ import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
+import io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -51,13 +52,15 @@ public class HttpProxyServer implements Lifecycle {
     private final HttpIpCheckHandler httpIpCheckHandler;
     private final BasicAuthHandler basicAuthHandler;
     private final ForceHttpsRedirectHandler forceHttpsRedirectHandler;
+    private final FileShareDispatchHandler fileShareDispatchHandler;
 
-    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, ForceHttpsRedirectHandler forceHttpsRedirectHandler) {
+    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, ForceHttpsRedirectHandler forceHttpsRedirectHandler, FileShareDispatchHandler fileShareDispatchHandler) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.forceHttpsRedirectHandler = forceHttpsRedirectHandler;
+        this.fileShareDispatchHandler = fileShareDispatchHandler;
     }
 
     @Override
@@ -86,6 +89,7 @@ public class HttpProxyServer implements Lifecycle {
                             pipeline.addLast(httpIpCheckHandler);
                             pipeline.addLast(uploadRateLimitHandler);
                             pipeline.addLast(basicAuthHandler);
+                            pipeline.addLast(fileShareDispatchHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);
                         }
                     });

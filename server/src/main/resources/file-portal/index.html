@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>文件共享</title>
+    <link rel="stylesheet" href="/css/app.css"/>
+    <script>
+        (() => {
+            const theme = localStorage.getItem('orbien-file-theme');
+            if (theme === 'dark' || theme === 'light') {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
+        })();
+    </script>
+</head>
+<body>
+<div id="loginView" class="login-wrap">
+    <div class="login-toolbar">
+        <button id="btnThemeLogin" class="icon-btn" type="button" title="切换主题">黑夜</button>
+    </div>
+    <div class="login-brand">
+        <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
+        <h2>文件共享登录</h2>
+    </div>
+    <div class="field">
+        <label for="username">用户名</label>
+        <input id="username" type="text" autocomplete="username"/>
+    </div>
+    <div class="field">
+        <label for="password">密码</label>
+        <input id="password" type="password" autocomplete="current-password"/>
+    </div>
+    <button id="btnLogin" class="primary btn-block">登录</button>
+    <p id="loginError" class="login-error"></p>
+</div>
+
+<div id="appView" class="hidden">
+    <div class="header">
+        <div class="header-brand">
+            <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
+            <strong id="shareTitle">文件共享</strong>
+        </div>
+        <div class="user-info">
+            <button id="btnTheme" class="icon-btn" type="button" title="切换主题">黑夜</button>
+            <span id="currentUser"></span>
+            <span id="permissionBadge" class="permission-badge hidden"></span>
+            <button id="btnLogout" class="hidden">退出</button>
+        </div>
+    </div>
+    <div class="main">
+        <div id="readonlyTip" class="readonly-tip hidden">当前为只读权限，无法上传、新建或删除文件</div>
+        <div class="breadcrumb" id="breadcrumb"></div>
+        <div id="summary" class="summary"></div>
+        <div class="toolbar">
+            <button class="primary" id="btnUpload">上传</button>
+            <button id="btnDownload">下载</button>
+            <button id="btnMkdir">新建文件夹</button>
+            <button id="btnDelete">删除</button>
+        </div>
+        <input type="file" id="fileInput" multiple class="hidden"/>
+        <table>
+            <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"/></th>
+                <th>名称</th>
+                <th>修改时间</th>
+                <th>类型</th>
+                <th>大小</th>
+            </tr>
+            </thead>
+            <tbody id="fileList"></tbody>
+        </table>
+        <div id="emptyState" class="empty hidden">
+            <p>点击 <a href="#" id="emptyUploadLink">上传</a> 添加本地文件 或点击 <a href="#"
+                                                                                     id="emptyMkdirLink">新建文件夹</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="progress-panel" id="progressPanel">
+    <div class="progress-title">文件上传 · 共 <span id="uploadCount">0</span> 项</div>
+    <div id="progressList"></div>
+    <button id="btnHideProgress" class="btn-block">收起</button>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>

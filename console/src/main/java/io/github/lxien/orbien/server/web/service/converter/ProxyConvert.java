@@ -18,6 +18,7 @@ package io.github.lxien.orbien.server.web.service.converter;
 import io.github.lxien.orbien.core.enums.DomainType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.server.web.dto.proxy.FileShareListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.HttpsProxyListDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyListDTO;
@@ -39,6 +40,9 @@ import java.util.List;
 public interface ProxyConvert {
     @Mapping(target = "transportProtocol", ignore = true)
     Socks5ProxyListDTO toSocks5ListDTO(ProxyDO proxy);
+
+    @Mapping(target = "transportProtocol", ignore = true)
+    FileShareListDTO toFileShareListDTO(ProxyDO proxy);
 
     @Mapping(target = "transportProtocol", ignore = true)
     TcpProxyListDTO toTcpListDTO(ProxyDO proxy);

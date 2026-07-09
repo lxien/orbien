@@ -47,4 +47,8 @@ public class ProxyProtocolCountDTO implements Serializable {
      * SOCKS5 代理数量
      */
     private Long socks5Count;
+    /**
+     * 文件共享数量
+     */
+    private Long fileCount;
 }

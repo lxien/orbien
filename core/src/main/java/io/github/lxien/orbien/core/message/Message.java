@@ -51,6 +51,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>SOCKS5 = 4;</code>
      */
     SOCKS5(4),
+    /**
+     * <code>FILE = 5;</code>
+     */
+    FILE(5),
     UNRECOGNIZED(-1),
     ;
 
@@ -83,6 +87,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>SOCKS5 = 4;</code>
      */
     public static final int SOCKS5_VALUE = 4;
+    /**
+     * <code>FILE = 5;</code>
+     */
+    public static final int FILE_VALUE = 5;
 
 
     public final int getNumber() {
@@ -114,6 +122,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         case 2: return HTTPS;
         case 3: return UDP;
         case 4: return SOCKS5;
+        case 5: return FILE;
         default: return null;
       }
     }
@@ -9704,6 +9713,9574 @@ public final class Message extends com.google.protobuf.GeneratedFile {
 
   }
 
+  public interface FileShareUserOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileShareUser)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string username = 1;</code>
+     * @return The username.
+     */
+    java.lang.String getUsername();
+    /**
+     * <code>string username = 1;</code>
+     * @return The bytes for username.
+     */
+    com.google.protobuf.ByteString
+        getUsernameBytes();
+
+    /**
+     * <code>string password = 2;</code>
+     * @return The password.
+     */
+    java.lang.String getPassword();
+    /**
+     * <code>string password = 2;</code>
+     * @return The bytes for password.
+     */
+    com.google.protobuf.ByteString
+        getPasswordBytes();
+
+    /**
+     * <code>string permission = 3;</code>
+     * @return The permission.
+     */
+    java.lang.String getPermission();
+    /**
+     * <code>string permission = 3;</code>
+     * @return The bytes for permission.
+     */
+    com.google.protobuf.ByteString
+        getPermissionBytes();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareUser}
+   */
+  public static final class FileShareUser extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileShareUser)
+      FileShareUserOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileShareUser");
+    }
+    // Use FileShareUser.newBuilder() to construct.
+    private FileShareUser(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileShareUser() {
+      username_ = "";
+      password_ = "";
+      permission_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareUser_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileShareUser.class, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder.class);
+    }
+
+    public static final int USERNAME_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object username_ = "";
+    /**
+     * <code>string username = 1;</code>
+     * @return The username.
+     */
+    @java.lang.Override
+    public java.lang.String getUsername() {
+      java.lang.Object ref = username_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        username_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string username = 1;</code>
+     * @return The bytes for username.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getUsernameBytes() {
+      java.lang.Object ref = username_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        username_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PASSWORD_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object password_ = "";
+    /**
+     * <code>string password = 2;</code>
+     * @return The password.
+     */
+    @java.lang.Override
+    public java.lang.String getPassword() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        password_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string password = 2;</code>
+     * @return The bytes for password.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPasswordBytes() {
+      java.lang.Object ref = password_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        password_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PERMISSION_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object permission_ = "";
+    /**
+     * <code>string permission = 3;</code>
+     * @return The permission.
+     */
+    @java.lang.Override
+    public java.lang.String getPermission() {
+      java.lang.Object ref = permission_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        permission_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string permission = 3;</code>
+     * @return The bytes for permission.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPermissionBytes() {
+      java.lang.Object ref = permission_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        permission_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(username_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, username_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(password_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, password_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(permission_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, permission_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(username_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, username_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(password_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, password_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(permission_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, permission_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileShareUser)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileShareUser other = (io.github.lxien.orbien.core.message.Message.FileShareUser) obj;
+
+      if (!getUsername()
+          .equals(other.getUsername())) return false;
+      if (!getPassword()
+          .equals(other.getPassword())) return false;
+      if (!getPermission()
+          .equals(other.getPermission())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + USERNAME_FIELD_NUMBER;
+      hash = (53 * hash) + getUsername().hashCode();
+      hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
+      hash = (53 * hash) + getPassword().hashCode();
+      hash = (37 * hash) + PERMISSION_FIELD_NUMBER;
+      hash = (53 * hash) + getPermission().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileShareUser prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareUser}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileShareUser)
+        io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareUser_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileShareUser.class, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileShareUser.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        username_ = "";
+        password_ = "";
+        permission_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareUser getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileShareUser.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareUser build() {
+        io.github.lxien.orbien.core.message.Message.FileShareUser result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareUser buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileShareUser result = new io.github.lxien.orbien.core.message.Message.FileShareUser(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileShareUser result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.username_ = username_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.password_ = password_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.permission_ = permission_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileShareUser) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileShareUser)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileShareUser other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileShareUser.getDefaultInstance()) return this;
+        if (!other.getUsername().isEmpty()) {
+          username_ = other.username_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getPassword().isEmpty()) {
+          password_ = other.password_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getPermission().isEmpty()) {
+          permission_ = other.permission_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                username_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                password_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                permission_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object username_ = "";
+      /**
+       * <code>string username = 1;</code>
+       * @return The username.
+       */
+      public java.lang.String getUsername() {
+        java.lang.Object ref = username_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          username_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @return The bytes for username.
+       */
+      public com.google.protobuf.ByteString
+          getUsernameBytes() {
+        java.lang.Object ref = username_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          username_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @param value The username to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUsername(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        username_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUsername() {
+        username_ = getDefaultInstance().getUsername();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string username = 1;</code>
+       * @param value The bytes for username to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUsernameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        username_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object password_ = "";
+      /**
+       * <code>string password = 2;</code>
+       * @return The password.
+       */
+      public java.lang.String getPassword() {
+        java.lang.Object ref = password_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          password_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @return The bytes for password.
+       */
+      public com.google.protobuf.ByteString
+          getPasswordBytes() {
+        java.lang.Object ref = password_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          password_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @param value The password to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPassword(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        password_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPassword() {
+        password_ = getDefaultInstance().getPassword();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string password = 2;</code>
+       * @param value The bytes for password to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPasswordBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        password_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object permission_ = "";
+      /**
+       * <code>string permission = 3;</code>
+       * @return The permission.
+       */
+      public java.lang.String getPermission() {
+        java.lang.Object ref = permission_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          permission_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string permission = 3;</code>
+       * @return The bytes for permission.
+       */
+      public com.google.protobuf.ByteString
+          getPermissionBytes() {
+        java.lang.Object ref = permission_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          permission_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string permission = 3;</code>
+       * @param value The permission to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPermission(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        permission_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string permission = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPermission() {
+        permission_ = getDefaultInstance().getPermission();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string permission = 3;</code>
+       * @param value The bytes for permission to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPermissionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        permission_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileShareUser)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileShareUser)
+    private static final io.github.lxien.orbien.core.message.Message.FileShareUser DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileShareUser();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareUser getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileShareUser>
+        PARSER = new com.google.protobuf.AbstractParser<FileShareUser>() {
+      @java.lang.Override
+      public FileShareUser parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileShareUser> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileShareUser> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareUser getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileShareAuthOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileShareAuth)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>bool enabled = 1;</code>
+     * @return The enabled.
+     */
+    boolean getEnabled();
+
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser> 
+        getUsersList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareUser getUsers(int index);
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    int getUsersCount();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder> 
+        getUsersOrBuilderList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder getUsersOrBuilder(
+        int index);
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareAuth}
+   */
+  public static final class FileShareAuth extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileShareAuth)
+      FileShareAuthOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileShareAuth");
+    }
+    // Use FileShareAuth.newBuilder() to construct.
+    private FileShareAuth(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileShareAuth() {
+      users_ = java.util.Collections.emptyList();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareAuth_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileShareAuth.class, io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder.class);
+    }
+
+    public static final int ENABLED_FIELD_NUMBER = 1;
+    private boolean enabled_ = false;
+    /**
+     * <code>bool enabled = 1;</code>
+     * @return The enabled.
+     */
+    @java.lang.Override
+    public boolean getEnabled() {
+      return enabled_;
+    }
+
+    public static final int USERS_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser> users_;
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser> getUsersList() {
+      return users_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder> 
+        getUsersOrBuilderList() {
+      return users_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    @java.lang.Override
+    public int getUsersCount() {
+      return users_.size();
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareUser getUsers(int index) {
+      return users_.get(index);
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder getUsersOrBuilder(
+        int index) {
+      return users_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (enabled_ != false) {
+        output.writeBool(1, enabled_);
+      }
+      for (int i = 0; i < users_.size(); i++) {
+        output.writeMessage(2, users_.get(i));
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (enabled_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, enabled_);
+      }
+      for (int i = 0; i < users_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, users_.get(i));
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileShareAuth)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileShareAuth other = (io.github.lxien.orbien.core.message.Message.FileShareAuth) obj;
+
+      if (getEnabled()
+          != other.getEnabled()) return false;
+      if (!getUsersList()
+          .equals(other.getUsersList())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ENABLED_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnabled());
+      if (getUsersCount() > 0) {
+        hash = (37 * hash) + USERS_FIELD_NUMBER;
+        hash = (53 * hash) + getUsersList().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileShareAuth prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareAuth}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileShareAuth)
+        io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareAuth_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileShareAuth.class, io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileShareAuth.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        enabled_ = false;
+        if (usersBuilder_ == null) {
+          users_ = java.util.Collections.emptyList();
+        } else {
+          users_ = null;
+          usersBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000002);
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareAuth getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareAuth build() {
+        io.github.lxien.orbien.core.message.Message.FileShareAuth result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareAuth buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileShareAuth result = new io.github.lxien.orbien.core.message.Message.FileShareAuth(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(io.github.lxien.orbien.core.message.Message.FileShareAuth result) {
+        if (usersBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0)) {
+            users_ = java.util.Collections.unmodifiableList(users_);
+            bitField0_ = (bitField0_ & ~0x00000002);
+          }
+          result.users_ = users_;
+        } else {
+          result.users_ = usersBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileShareAuth result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.enabled_ = enabled_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileShareAuth) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileShareAuth)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileShareAuth other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance()) return this;
+        if (other.getEnabled() != false) {
+          setEnabled(other.getEnabled());
+        }
+        if (usersBuilder_ == null) {
+          if (!other.users_.isEmpty()) {
+            if (users_.isEmpty()) {
+              users_ = other.users_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+            } else {
+              ensureUsersIsMutable();
+              users_.addAll(other.users_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.users_.isEmpty()) {
+            if (usersBuilder_.isEmpty()) {
+              usersBuilder_.dispose();
+              usersBuilder_ = null;
+              users_ = other.users_;
+              bitField0_ = (bitField0_ & ~0x00000002);
+              usersBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   internalGetUsersFieldBuilder() : null;
+            } else {
+              usersBuilder_.addAllMessages(other.users_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 8: {
+                enabled_ = input.readBool();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 8
+              case 18: {
+                io.github.lxien.orbien.core.message.Message.FileShareUser m =
+                    input.readMessage(
+                        io.github.lxien.orbien.core.message.Message.FileShareUser.parser(),
+                        extensionRegistry);
+                if (usersBuilder_ == null) {
+                  ensureUsersIsMutable();
+                  users_.add(m);
+                } else {
+                  usersBuilder_.addMessage(m);
+                }
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private boolean enabled_ ;
+      /**
+       * <code>bool enabled = 1;</code>
+       * @return The enabled.
+       */
+      @java.lang.Override
+      public boolean getEnabled() {
+        return enabled_;
+      }
+      /**
+       * <code>bool enabled = 1;</code>
+       * @param value The enabled to set.
+       * @return This builder for chaining.
+       */
+      public Builder setEnabled(boolean value) {
+
+        enabled_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool enabled = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearEnabled() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        enabled_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser> users_ =
+        java.util.Collections.emptyList();
+      private void ensureUsersIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          users_ = new java.util.ArrayList<io.github.lxien.orbien.core.message.Message.FileShareUser>(users_);
+          bitField0_ |= 0x00000002;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareUser, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder, io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder> usersBuilder_;
+
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser> getUsersList() {
+        if (usersBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(users_);
+        } else {
+          return usersBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public int getUsersCount() {
+        if (usersBuilder_ == null) {
+          return users_.size();
+        } else {
+          return usersBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareUser getUsers(int index) {
+        if (usersBuilder_ == null) {
+          return users_.get(index);
+        } else {
+          return usersBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder setUsers(
+          int index, io.github.lxien.orbien.core.message.Message.FileShareUser value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.set(index, value);
+          onChanged();
+        } else {
+          usersBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder setUsers(
+          int index, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder addUsers(io.github.lxien.orbien.core.message.Message.FileShareUser value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.add(value);
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder addUsers(
+          int index, io.github.lxien.orbien.core.message.Message.FileShareUser value) {
+        if (usersBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureUsersIsMutable();
+          users_.add(index, value);
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder addUsers(
+          io.github.lxien.orbien.core.message.Message.FileShareUser.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.add(builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder addUsers(
+          int index, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder builderForValue) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          usersBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder addAllUsers(
+          java.lang.Iterable<? extends io.github.lxien.orbien.core.message.Message.FileShareUser> values) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, users_);
+          onChanged();
+        } else {
+          usersBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder clearUsers() {
+        if (usersBuilder_ == null) {
+          users_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000002);
+          onChanged();
+        } else {
+          usersBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public Builder removeUsers(int index) {
+        if (usersBuilder_ == null) {
+          ensureUsersIsMutable();
+          users_.remove(index);
+          onChanged();
+        } else {
+          usersBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareUser.Builder getUsersBuilder(
+          int index) {
+        return internalGetUsersFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder getUsersOrBuilder(
+          int index) {
+        if (usersBuilder_ == null) {
+          return users_.get(index);  } else {
+          return usersBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder> 
+           getUsersOrBuilderList() {
+        if (usersBuilder_ != null) {
+          return usersBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(users_);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareUser.Builder addUsersBuilder() {
+        return internalGetUsersFieldBuilder().addBuilder(
+            io.github.lxien.orbien.core.message.Message.FileShareUser.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareUser.Builder addUsersBuilder(
+          int index) {
+        return internalGetUsersFieldBuilder().addBuilder(
+            index, io.github.lxien.orbien.core.message.Message.FileShareUser.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileShareUser users = 2;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.FileShareUser.Builder> 
+           getUsersBuilderList() {
+        return internalGetUsersFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareUser, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder, io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder> 
+          internalGetUsersFieldBuilder() {
+        if (usersBuilder_ == null) {
+          usersBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.FileShareUser, io.github.lxien.orbien.core.message.Message.FileShareUser.Builder, io.github.lxien.orbien.core.message.Message.FileShareUserOrBuilder>(
+                  users_,
+                  ((bitField0_ & 0x00000002) != 0),
+                  getParentForChildren(),
+                  isClean());
+          users_ = null;
+        }
+        return usersBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileShareAuth)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileShareAuth)
+    private static final io.github.lxien.orbien.core.message.Message.FileShareAuth DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileShareAuth();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareAuth getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileShareAuth>
+        PARSER = new com.google.protobuf.AbstractParser<FileShareAuth>() {
+      @java.lang.Override
+      public FileShareAuth parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileShareAuth> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileShareAuth> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareAuth getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileShareLimitsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileShareLimits)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string root_path = 1;</code>
+     * @return The rootPath.
+     */
+    java.lang.String getRootPath();
+    /**
+     * <code>string root_path = 1;</code>
+     * @return The bytes for rootPath.
+     */
+    com.google.protobuf.ByteString
+        getRootPathBytes();
+
+    /**
+     * <code>int64 max_upload_size = 2;</code>
+     * @return The maxUploadSize.
+     */
+    long getMaxUploadSize();
+
+    /**
+     * <code>bool allow_upload = 3;</code>
+     * @return The allowUpload.
+     */
+    boolean getAllowUpload();
+
+    /**
+     * <code>bool allow_delete = 4;</code>
+     * @return The allowDelete.
+     */
+    boolean getAllowDelete();
+
+    /**
+     * <code>bool allow_mkdir = 5;</code>
+     * @return The allowMkdir.
+     */
+    boolean getAllowMkdir();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareLimits}
+   */
+  public static final class FileShareLimits extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileShareLimits)
+      FileShareLimitsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileShareLimits");
+    }
+    // Use FileShareLimits.newBuilder() to construct.
+    private FileShareLimits(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileShareLimits() {
+      rootPath_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareLimits_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileShareLimits.class, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder.class);
+    }
+
+    public static final int ROOT_PATH_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object rootPath_ = "";
+    /**
+     * <code>string root_path = 1;</code>
+     * @return The rootPath.
+     */
+    @java.lang.Override
+    public java.lang.String getRootPath() {
+      java.lang.Object ref = rootPath_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        rootPath_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string root_path = 1;</code>
+     * @return The bytes for rootPath.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRootPathBytes() {
+      java.lang.Object ref = rootPath_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        rootPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int MAX_UPLOAD_SIZE_FIELD_NUMBER = 2;
+    private long maxUploadSize_ = 0L;
+    /**
+     * <code>int64 max_upload_size = 2;</code>
+     * @return The maxUploadSize.
+     */
+    @java.lang.Override
+    public long getMaxUploadSize() {
+      return maxUploadSize_;
+    }
+
+    public static final int ALLOW_UPLOAD_FIELD_NUMBER = 3;
+    private boolean allowUpload_ = false;
+    /**
+     * <code>bool allow_upload = 3;</code>
+     * @return The allowUpload.
+     */
+    @java.lang.Override
+    public boolean getAllowUpload() {
+      return allowUpload_;
+    }
+
+    public static final int ALLOW_DELETE_FIELD_NUMBER = 4;
+    private boolean allowDelete_ = false;
+    /**
+     * <code>bool allow_delete = 4;</code>
+     * @return The allowDelete.
+     */
+    @java.lang.Override
+    public boolean getAllowDelete() {
+      return allowDelete_;
+    }
+
+    public static final int ALLOW_MKDIR_FIELD_NUMBER = 5;
+    private boolean allowMkdir_ = false;
+    /**
+     * <code>bool allow_mkdir = 5;</code>
+     * @return The allowMkdir.
+     */
+    @java.lang.Override
+    public boolean getAllowMkdir() {
+      return allowMkdir_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(rootPath_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, rootPath_);
+      }
+      if (maxUploadSize_ != 0L) {
+        output.writeInt64(2, maxUploadSize_);
+      }
+      if (allowUpload_ != false) {
+        output.writeBool(3, allowUpload_);
+      }
+      if (allowDelete_ != false) {
+        output.writeBool(4, allowDelete_);
+      }
+      if (allowMkdir_ != false) {
+        output.writeBool(5, allowMkdir_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(rootPath_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, rootPath_);
+      }
+      if (maxUploadSize_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, maxUploadSize_);
+      }
+      if (allowUpload_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, allowUpload_);
+      }
+      if (allowDelete_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, allowDelete_);
+      }
+      if (allowMkdir_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, allowMkdir_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileShareLimits)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileShareLimits other = (io.github.lxien.orbien.core.message.Message.FileShareLimits) obj;
+
+      if (!getRootPath()
+          .equals(other.getRootPath())) return false;
+      if (getMaxUploadSize()
+          != other.getMaxUploadSize()) return false;
+      if (getAllowUpload()
+          != other.getAllowUpload()) return false;
+      if (getAllowDelete()
+          != other.getAllowDelete()) return false;
+      if (getAllowMkdir()
+          != other.getAllowMkdir()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ROOT_PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getRootPath().hashCode();
+      hash = (37 * hash) + MAX_UPLOAD_SIZE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getMaxUploadSize());
+      hash = (37 * hash) + ALLOW_UPLOAD_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getAllowUpload());
+      hash = (37 * hash) + ALLOW_DELETE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getAllowDelete());
+      hash = (37 * hash) + ALLOW_MKDIR_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getAllowMkdir());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileShareLimits prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileShareLimits}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileShareLimits)
+        io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareLimits_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileShareLimits.class, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileShareLimits.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        rootPath_ = "";
+        maxUploadSize_ = 0L;
+        allowUpload_ = false;
+        allowDelete_ = false;
+        allowMkdir_ = false;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits build() {
+        io.github.lxien.orbien.core.message.Message.FileShareLimits result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileShareLimits result = new io.github.lxien.orbien.core.message.Message.FileShareLimits(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileShareLimits result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.rootPath_ = rootPath_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.maxUploadSize_ = maxUploadSize_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.allowUpload_ = allowUpload_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.allowDelete_ = allowDelete_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.allowMkdir_ = allowMkdir_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileShareLimits) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileShareLimits)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileShareLimits other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance()) return this;
+        if (!other.getRootPath().isEmpty()) {
+          rootPath_ = other.rootPath_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getMaxUploadSize() != 0L) {
+          setMaxUploadSize(other.getMaxUploadSize());
+        }
+        if (other.getAllowUpload() != false) {
+          setAllowUpload(other.getAllowUpload());
+        }
+        if (other.getAllowDelete() != false) {
+          setAllowDelete(other.getAllowDelete());
+        }
+        if (other.getAllowMkdir() != false) {
+          setAllowMkdir(other.getAllowMkdir());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                rootPath_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                maxUploadSize_ = input.readInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                allowUpload_ = input.readBool();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                allowDelete_ = input.readBool();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 40: {
+                allowMkdir_ = input.readBool();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object rootPath_ = "";
+      /**
+       * <code>string root_path = 1;</code>
+       * @return The rootPath.
+       */
+      public java.lang.String getRootPath() {
+        java.lang.Object ref = rootPath_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          rootPath_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string root_path = 1;</code>
+       * @return The bytes for rootPath.
+       */
+      public com.google.protobuf.ByteString
+          getRootPathBytes() {
+        java.lang.Object ref = rootPath_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          rootPath_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string root_path = 1;</code>
+       * @param value The rootPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRootPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        rootPath_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string root_path = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRootPath() {
+        rootPath_ = getDefaultInstance().getRootPath();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string root_path = 1;</code>
+       * @param value The bytes for rootPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRootPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        rootPath_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private long maxUploadSize_ ;
+      /**
+       * <code>int64 max_upload_size = 2;</code>
+       * @return The maxUploadSize.
+       */
+      @java.lang.Override
+      public long getMaxUploadSize() {
+        return maxUploadSize_;
+      }
+      /**
+       * <code>int64 max_upload_size = 2;</code>
+       * @param value The maxUploadSize to set.
+       * @return This builder for chaining.
+       */
+      public Builder setMaxUploadSize(long value) {
+
+        maxUploadSize_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 max_upload_size = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearMaxUploadSize() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        maxUploadSize_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private boolean allowUpload_ ;
+      /**
+       * <code>bool allow_upload = 3;</code>
+       * @return The allowUpload.
+       */
+      @java.lang.Override
+      public boolean getAllowUpload() {
+        return allowUpload_;
+      }
+      /**
+       * <code>bool allow_upload = 3;</code>
+       * @param value The allowUpload to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAllowUpload(boolean value) {
+
+        allowUpload_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool allow_upload = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAllowUpload() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        allowUpload_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean allowDelete_ ;
+      /**
+       * <code>bool allow_delete = 4;</code>
+       * @return The allowDelete.
+       */
+      @java.lang.Override
+      public boolean getAllowDelete() {
+        return allowDelete_;
+      }
+      /**
+       * <code>bool allow_delete = 4;</code>
+       * @param value The allowDelete to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAllowDelete(boolean value) {
+
+        allowDelete_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool allow_delete = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAllowDelete() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        allowDelete_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean allowMkdir_ ;
+      /**
+       * <code>bool allow_mkdir = 5;</code>
+       * @return The allowMkdir.
+       */
+      @java.lang.Override
+      public boolean getAllowMkdir() {
+        return allowMkdir_;
+      }
+      /**
+       * <code>bool allow_mkdir = 5;</code>
+       * @param value The allowMkdir to set.
+       * @return This builder for chaining.
+       */
+      public Builder setAllowMkdir(boolean value) {
+
+        allowMkdir_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool allow_mkdir = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearAllowMkdir() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        allowMkdir_ = false;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileShareLimits)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileShareLimits)
+    private static final io.github.lxien.orbien.core.message.Message.FileShareLimits DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileShareLimits();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileShareLimits getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileShareLimits>
+        PARSER = new com.google.protobuf.AbstractParser<FileShareLimits>() {
+      @java.lang.Override
+      public FileShareLimits parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileShareLimits> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileShareLimits> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareLimits getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileListRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileListRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    java.lang.String getProxyId();
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    com.google.protobuf.ByteString
+        getProxyIdBytes();
+
+    /**
+     * <code>string path = 3;</code>
+     * @return The path.
+     */
+    java.lang.String getPath();
+    /**
+     * <code>string path = 3;</code>
+     * @return The bytes for path.
+     */
+    com.google.protobuf.ByteString
+        getPathBytes();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileListRequest}
+   */
+  public static final class FileListRequest extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileListRequest)
+      FileListRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileListRequest");
+    }
+    // Use FileListRequest.newBuilder() to construct.
+    private FileListRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileListRequest() {
+      requestId_ = "";
+      proxyId_ = "";
+      path_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileListRequest.class, io.github.lxien.orbien.core.message.Message.FileListRequest.Builder.class);
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PROXY_ID_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object proxyId_ = "";
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    @java.lang.Override
+    public java.lang.String getProxyId() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PATH_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object path_ = "";
+    /**
+     * <code>string path = 3;</code>
+     * @return The path.
+     */
+    @java.lang.Override
+    public java.lang.String getPath() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        path_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string path = 3;</code>
+     * @return The bytes for path.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPathBytes() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, path_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, path_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileListRequest)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileListRequest other = (io.github.lxien.orbien.core.message.Message.FileListRequest) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getPath()
+          .equals(other.getPath())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (37 * hash) + PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getPath().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileListRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileListRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileListRequest)
+        io.github.lxien.orbien.core.message.Message.FileListRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileListRequest.class, io.github.lxien.orbien.core.message.Message.FileListRequest.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileListRequest.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        proxyId_ = "";
+        path_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListRequest getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileListRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListRequest build() {
+        io.github.lxien.orbien.core.message.Message.FileListRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListRequest buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileListRequest result = new io.github.lxien.orbien.core.message.Message.FileListRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileListRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.proxyId_ = proxyId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.path_ = path_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileListRequest) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileListRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileListRequest other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileListRequest.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getPath().isEmpty()) {
+          path_ = other.path_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                path_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object proxyId_ = "";
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The proxyId.
+       */
+      public java.lang.String getProxyId() {
+        java.lang.Object ref = proxyId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The bytes for proxyId.
+       */
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        java.lang.Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object path_ = "";
+      /**
+       * <code>string path = 3;</code>
+       * @return The path.
+       */
+      public java.lang.String getPath() {
+        java.lang.Object ref = path_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @return The bytes for path.
+       */
+      public com.google.protobuf.ByteString
+          getPathBytes() {
+        java.lang.Object ref = path_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          path_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @param value The path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        path_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPath() {
+        path_ = getDefaultInstance().getPath();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @param value The bytes for path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        path_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileListRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileListRequest)
+    private static final io.github.lxien.orbien.core.message.Message.FileListRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileListRequest();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileListRequest>
+        PARSER = new com.google.protobuf.AbstractParser<FileListRequest>() {
+      @java.lang.Override
+      public FileListRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileListRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileListRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileListRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileEntryOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileEntry)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string name = 1;</code>
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <code>string name = 1;</code>
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+
+    /**
+     * <code>bool directory = 2;</code>
+     * @return The directory.
+     */
+    boolean getDirectory();
+
+    /**
+     * <code>int64 size = 3;</code>
+     * @return The size.
+     */
+    long getSize();
+
+    /**
+     * <code>int64 modified_time = 4;</code>
+     * @return The modifiedTime.
+     */
+    long getModifiedTime();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileEntry}
+   */
+  public static final class FileEntry extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileEntry)
+      FileEntryOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileEntry");
+    }
+    // Use FileEntry.newBuilder() to construct.
+    private FileEntry(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileEntry() {
+      name_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileEntry_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileEntry.class, io.github.lxien.orbien.core.message.Message.FileEntry.Builder.class);
+    }
+
+    public static final int NAME_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <code>string name = 1;</code>
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string name = 1;</code>
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DIRECTORY_FIELD_NUMBER = 2;
+    private boolean directory_ = false;
+    /**
+     * <code>bool directory = 2;</code>
+     * @return The directory.
+     */
+    @java.lang.Override
+    public boolean getDirectory() {
+      return directory_;
+    }
+
+    public static final int SIZE_FIELD_NUMBER = 3;
+    private long size_ = 0L;
+    /**
+     * <code>int64 size = 3;</code>
+     * @return The size.
+     */
+    @java.lang.Override
+    public long getSize() {
+      return size_;
+    }
+
+    public static final int MODIFIED_TIME_FIELD_NUMBER = 4;
+    private long modifiedTime_ = 0L;
+    /**
+     * <code>int64 modified_time = 4;</code>
+     * @return The modifiedTime.
+     */
+    @java.lang.Override
+    public long getModifiedTime() {
+      return modifiedTime_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, name_);
+      }
+      if (directory_ != false) {
+        output.writeBool(2, directory_);
+      }
+      if (size_ != 0L) {
+        output.writeInt64(3, size_);
+      }
+      if (modifiedTime_ != 0L) {
+        output.writeInt64(4, modifiedTime_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, name_);
+      }
+      if (directory_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, directory_);
+      }
+      if (size_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(3, size_);
+      }
+      if (modifiedTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(4, modifiedTime_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileEntry)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileEntry other = (io.github.lxien.orbien.core.message.Message.FileEntry) obj;
+
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (getDirectory()
+          != other.getDirectory()) return false;
+      if (getSize()
+          != other.getSize()) return false;
+      if (getModifiedTime()
+          != other.getModifiedTime()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + DIRECTORY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getDirectory());
+      hash = (37 * hash) + SIZE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getSize());
+      hash = (37 * hash) + MODIFIED_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getModifiedTime());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileEntry parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileEntry prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileEntry}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileEntry)
+        io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileEntry_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileEntry.class, io.github.lxien.orbien.core.message.Message.FileEntry.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileEntry.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        name_ = "";
+        directory_ = false;
+        size_ = 0L;
+        modifiedTime_ = 0L;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileEntry getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileEntry.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileEntry build() {
+        io.github.lxien.orbien.core.message.Message.FileEntry result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileEntry buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileEntry result = new io.github.lxien.orbien.core.message.Message.FileEntry(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileEntry result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.name_ = name_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.directory_ = directory_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.size_ = size_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.modifiedTime_ = modifiedTime_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileEntry) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileEntry)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileEntry other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileEntry.getDefaultInstance()) return this;
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getDirectory() != false) {
+          setDirectory(other.getDirectory());
+        }
+        if (other.getSize() != 0L) {
+          setSize(other.getSize());
+        }
+        if (other.getModifiedTime() != 0L) {
+          setModifiedTime(other.getModifiedTime());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                name_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                directory_ = input.readBool();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 24: {
+                size_ = input.readInt64();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 24
+              case 32: {
+                modifiedTime_ = input.readInt64();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>string name = 1;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string name = 1;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string name = 1;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 1;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private boolean directory_ ;
+      /**
+       * <code>bool directory = 2;</code>
+       * @return The directory.
+       */
+      @java.lang.Override
+      public boolean getDirectory() {
+        return directory_;
+      }
+      /**
+       * <code>bool directory = 2;</code>
+       * @param value The directory to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDirectory(boolean value) {
+
+        directory_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool directory = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDirectory() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        directory_ = false;
+        onChanged();
+        return this;
+      }
+
+      private long size_ ;
+      /**
+       * <code>int64 size = 3;</code>
+       * @return The size.
+       */
+      @java.lang.Override
+      public long getSize() {
+        return size_;
+      }
+      /**
+       * <code>int64 size = 3;</code>
+       * @param value The size to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSize(long value) {
+
+        size_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 size = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSize() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        size_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long modifiedTime_ ;
+      /**
+       * <code>int64 modified_time = 4;</code>
+       * @return The modifiedTime.
+       */
+      @java.lang.Override
+      public long getModifiedTime() {
+        return modifiedTime_;
+      }
+      /**
+       * <code>int64 modified_time = 4;</code>
+       * @param value The modifiedTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setModifiedTime(long value) {
+
+        modifiedTime_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 modified_time = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearModifiedTime() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        modifiedTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileEntry)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileEntry)
+    private static final io.github.lxien.orbien.core.message.Message.FileEntry DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileEntry();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileEntry getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileEntry>
+        PARSER = new com.google.protobuf.AbstractParser<FileEntry>() {
+      @java.lang.Override
+      public FileEntry parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileEntry> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileEntry> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileEntry getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileListResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileListResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>string current_path = 2;</code>
+     * @return The currentPath.
+     */
+    java.lang.String getCurrentPath();
+    /**
+     * <code>string current_path = 2;</code>
+     * @return The bytes for currentPath.
+     */
+    com.google.protobuf.ByteString
+        getCurrentPathBytes();
+
+    /**
+     * <code>string parent_path = 3;</code>
+     * @return The parentPath.
+     */
+    java.lang.String getParentPath();
+    /**
+     * <code>string parent_path = 3;</code>
+     * @return The bytes for parentPath.
+     */
+    com.google.protobuf.ByteString
+        getParentPathBytes();
+
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry> 
+        getEntriesList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileEntry getEntries(int index);
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    int getEntriesCount();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder> 
+        getEntriesOrBuilderList();
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder getEntriesOrBuilder(
+        int index);
+
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     * @return Whether the status field is set.
+     */
+    boolean hasStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     * @return The status.
+     */
+    io.github.lxien.orbien.core.message.Message.Status getStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileListResponse}
+   */
+  public static final class FileListResponse extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileListResponse)
+      FileListResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileListResponse");
+    }
+    // Use FileListResponse.newBuilder() to construct.
+    private FileListResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileListResponse() {
+      requestId_ = "";
+      currentPath_ = "";
+      parentPath_ = "";
+      entries_ = java.util.Collections.emptyList();
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileListResponse.class, io.github.lxien.orbien.core.message.Message.FileListResponse.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CURRENT_PATH_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object currentPath_ = "";
+    /**
+     * <code>string current_path = 2;</code>
+     * @return The currentPath.
+     */
+    @java.lang.Override
+    public java.lang.String getCurrentPath() {
+      java.lang.Object ref = currentPath_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        currentPath_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string current_path = 2;</code>
+     * @return The bytes for currentPath.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getCurrentPathBytes() {
+      java.lang.Object ref = currentPath_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        currentPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PARENT_PATH_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object parentPath_ = "";
+    /**
+     * <code>string parent_path = 3;</code>
+     * @return The parentPath.
+     */
+    @java.lang.Override
+    public java.lang.String getParentPath() {
+      java.lang.Object ref = parentPath_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        parentPath_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string parent_path = 3;</code>
+     * @return The bytes for parentPath.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getParentPathBytes() {
+      java.lang.Object ref = parentPath_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        parentPath_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ENTRIES_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry> entries_;
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    @java.lang.Override
+    public java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry> getEntriesList() {
+      return entries_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    @java.lang.Override
+    public java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder> 
+        getEntriesOrBuilderList() {
+      return entries_;
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    @java.lang.Override
+    public int getEntriesCount() {
+      return entries_.size();
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileEntry getEntries(int index) {
+      return entries_.get(index);
+    }
+    /**
+     * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder getEntriesOrBuilder(
+        int index) {
+      return entries_.get(index);
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 5;
+    private io.github.lxien.orbien.core.message.Message.Status status_;
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     * @return Whether the status field is set.
+     */
+    @java.lang.Override
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     * @return The status.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(currentPath_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, currentPath_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(parentPath_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, parentPath_);
+      }
+      for (int i = 0; i < entries_.size(); i++) {
+        output.writeMessage(4, entries_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(5, getStatus());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(currentPath_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, currentPath_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(parentPath_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, parentPath_);
+      }
+      for (int i = 0; i < entries_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, entries_.get(i));
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getStatus());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileListResponse)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileListResponse other = (io.github.lxien.orbien.core.message.Message.FileListResponse) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getCurrentPath()
+          .equals(other.getCurrentPath())) return false;
+      if (!getParentPath()
+          .equals(other.getParentPath())) return false;
+      if (!getEntriesList()
+          .equals(other.getEntriesList())) return false;
+      if (hasStatus() != other.hasStatus()) return false;
+      if (hasStatus()) {
+        if (!getStatus()
+            .equals(other.getStatus())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (37 * hash) + CURRENT_PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getCurrentPath().hashCode();
+      hash = (37 * hash) + PARENT_PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getParentPath().hashCode();
+      if (getEntriesCount() > 0) {
+        hash = (37 * hash) + ENTRIES_FIELD_NUMBER;
+        hash = (53 * hash) + getEntriesList().hashCode();
+      }
+      if (hasStatus()) {
+        hash = (37 * hash) + STATUS_FIELD_NUMBER;
+        hash = (53 * hash) + getStatus().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileListResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileListResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileListResponse)
+        io.github.lxien.orbien.core.message.Message.FileListResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileListResponse.class, io.github.lxien.orbien.core.message.Message.FileListResponse.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileListResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage
+                .alwaysUseFieldBuilders) {
+          internalGetEntriesFieldBuilder();
+          internalGetStatusFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        currentPath_ = "";
+        parentPath_ = "";
+        if (entriesBuilder_ == null) {
+          entries_ = java.util.Collections.emptyList();
+        } else {
+          entries_ = null;
+          entriesBuilder_.clear();
+        }
+        bitField0_ = (bitField0_ & ~0x00000008);
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListResponse getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileListResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListResponse build() {
+        io.github.lxien.orbien.core.message.Message.FileListResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileListResponse buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileListResponse result = new io.github.lxien.orbien.core.message.Message.FileListResponse(this);
+        buildPartialRepeatedFields(result);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartialRepeatedFields(io.github.lxien.orbien.core.message.Message.FileListResponse result) {
+        if (entriesBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0)) {
+            entries_ = java.util.Collections.unmodifiableList(entries_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.entries_ = entries_;
+        } else {
+          result.entries_ = entriesBuilder_.build();
+        }
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileListResponse result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.currentPath_ = currentPath_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.parentPath_ = parentPath_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.status_ = statusBuilder_ == null
+              ? status_
+              : statusBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileListResponse) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileListResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileListResponse other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileListResponse.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getCurrentPath().isEmpty()) {
+          currentPath_ = other.currentPath_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getParentPath().isEmpty()) {
+          parentPath_ = other.parentPath_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (entriesBuilder_ == null) {
+          if (!other.entries_.isEmpty()) {
+            if (entries_.isEmpty()) {
+              entries_ = other.entries_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+            } else {
+              ensureEntriesIsMutable();
+              entries_.addAll(other.entries_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.entries_.isEmpty()) {
+            if (entriesBuilder_.isEmpty()) {
+              entriesBuilder_.dispose();
+              entriesBuilder_ = null;
+              entries_ = other.entries_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              entriesBuilder_ = 
+                com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders ?
+                   internalGetEntriesFieldBuilder() : null;
+            } else {
+              entriesBuilder_.addAllMessages(other.entries_);
+            }
+          }
+        }
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                currentPath_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                parentPath_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                io.github.lxien.orbien.core.message.Message.FileEntry m =
+                    input.readMessage(
+                        io.github.lxien.orbien.core.message.Message.FileEntry.parser(),
+                        extensionRegistry);
+                if (entriesBuilder_ == null) {
+                  ensureEntriesIsMutable();
+                  entries_.add(m);
+                } else {
+                  entriesBuilder_.addMessage(m);
+                }
+                break;
+              } // case 34
+              case 42: {
+                input.readMessage(
+                    internalGetStatusFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object currentPath_ = "";
+      /**
+       * <code>string current_path = 2;</code>
+       * @return The currentPath.
+       */
+      public java.lang.String getCurrentPath() {
+        java.lang.Object ref = currentPath_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          currentPath_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string current_path = 2;</code>
+       * @return The bytes for currentPath.
+       */
+      public com.google.protobuf.ByteString
+          getCurrentPathBytes() {
+        java.lang.Object ref = currentPath_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          currentPath_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string current_path = 2;</code>
+       * @param value The currentPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCurrentPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        currentPath_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string current_path = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCurrentPath() {
+        currentPath_ = getDefaultInstance().getCurrentPath();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string current_path = 2;</code>
+       * @param value The bytes for currentPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCurrentPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        currentPath_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object parentPath_ = "";
+      /**
+       * <code>string parent_path = 3;</code>
+       * @return The parentPath.
+       */
+      public java.lang.String getParentPath() {
+        java.lang.Object ref = parentPath_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          parentPath_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string parent_path = 3;</code>
+       * @return The bytes for parentPath.
+       */
+      public com.google.protobuf.ByteString
+          getParentPathBytes() {
+        java.lang.Object ref = parentPath_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          parentPath_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string parent_path = 3;</code>
+       * @param value The parentPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setParentPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        parentPath_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string parent_path = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearParentPath() {
+        parentPath_ = getDefaultInstance().getParentPath();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string parent_path = 3;</code>
+       * @param value The bytes for parentPath to set.
+       * @return This builder for chaining.
+       */
+      public Builder setParentPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        parentPath_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry> entries_ =
+        java.util.Collections.emptyList();
+      private void ensureEntriesIsMutable() {
+        if (!((bitField0_ & 0x00000008) != 0)) {
+          entries_ = new java.util.ArrayList<io.github.lxien.orbien.core.message.Message.FileEntry>(entries_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileEntry, io.github.lxien.orbien.core.message.Message.FileEntry.Builder, io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder> entriesBuilder_;
+
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry> getEntriesList() {
+        if (entriesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(entries_);
+        } else {
+          return entriesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public int getEntriesCount() {
+        if (entriesBuilder_ == null) {
+          return entries_.size();
+        } else {
+          return entriesBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileEntry getEntries(int index) {
+        if (entriesBuilder_ == null) {
+          return entries_.get(index);
+        } else {
+          return entriesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder setEntries(
+          int index, io.github.lxien.orbien.core.message.Message.FileEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.set(index, value);
+          onChanged();
+        } else {
+          entriesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder setEntries(
+          int index, io.github.lxien.orbien.core.message.Message.FileEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder addEntries(io.github.lxien.orbien.core.message.Message.FileEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.add(value);
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder addEntries(
+          int index, io.github.lxien.orbien.core.message.Message.FileEntry value) {
+        if (entriesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureEntriesIsMutable();
+          entries_.add(index, value);
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder addEntries(
+          io.github.lxien.orbien.core.message.Message.FileEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.add(builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder addEntries(
+          int index, io.github.lxien.orbien.core.message.Message.FileEntry.Builder builderForValue) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          entriesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder addAllEntries(
+          java.lang.Iterable<? extends io.github.lxien.orbien.core.message.Message.FileEntry> values) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, entries_);
+          onChanged();
+        } else {
+          entriesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder clearEntries() {
+        if (entriesBuilder_ == null) {
+          entries_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+          onChanged();
+        } else {
+          entriesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public Builder removeEntries(int index) {
+        if (entriesBuilder_ == null) {
+          ensureEntriesIsMutable();
+          entries_.remove(index);
+          onChanged();
+        } else {
+          entriesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileEntry.Builder getEntriesBuilder(
+          int index) {
+        return internalGetEntriesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder getEntriesOrBuilder(
+          int index) {
+        if (entriesBuilder_ == null) {
+          return entries_.get(index);  } else {
+          return entriesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public java.util.List<? extends io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder> 
+           getEntriesOrBuilderList() {
+        if (entriesBuilder_ != null) {
+          return entriesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(entries_);
+        }
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileEntry.Builder addEntriesBuilder() {
+        return internalGetEntriesFieldBuilder().addBuilder(
+            io.github.lxien.orbien.core.message.Message.FileEntry.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileEntry.Builder addEntriesBuilder(
+          int index) {
+        return internalGetEntriesFieldBuilder().addBuilder(
+            index, io.github.lxien.orbien.core.message.Message.FileEntry.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .io.github.lxien.orbien.core.message.FileEntry entries = 4;</code>
+       */
+      public java.util.List<io.github.lxien.orbien.core.message.Message.FileEntry.Builder> 
+           getEntriesBuilderList() {
+        return internalGetEntriesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileEntry, io.github.lxien.orbien.core.message.Message.FileEntry.Builder, io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder> 
+          internalGetEntriesFieldBuilder() {
+        if (entriesBuilder_ == null) {
+          entriesBuilder_ = new com.google.protobuf.RepeatedFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.FileEntry, io.github.lxien.orbien.core.message.Message.FileEntry.Builder, io.github.lxien.orbien.core.message.Message.FileEntryOrBuilder>(
+                  entries_,
+                  ((bitField0_ & 0x00000008) != 0),
+                  getParentForChildren(),
+                  isClean());
+          entries_ = null;
+        }
+        return entriesBuilder_;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.Status status_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> statusBuilder_;
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       * @return Whether the status field is set.
+       */
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000010) != 0);
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       * @return The status.
+       */
+      public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public Builder setStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public Builder setStatus(
+          io.github.lxien.orbien.core.message.Message.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public Builder mergeStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000010) != 0) &&
+            status_ != null &&
+            status_ != io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance()) {
+            getStatusBuilder().mergeFrom(value);
+          } else {
+            status_ = value;
+          }
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        if (status_ != null) {
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public Builder clearStatus() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return internalGetStatusFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_ == null ?
+              io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> 
+          internalGetStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder>(
+                  getStatus(),
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileListResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileListResponse)
+    private static final io.github.lxien.orbien.core.message.Message.FileListResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileListResponse();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileListResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileListResponse>
+        PARSER = new com.google.protobuf.AbstractParser<FileListResponse>() {
+      @java.lang.Override
+      public FileListResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileListResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileListResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileListResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileTransferInitOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileTransferInit)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    java.lang.String getProxyId();
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    com.google.protobuf.ByteString
+        getProxyIdBytes();
+
+    /**
+     * <code>string path = 3;</code>
+     * @return The path.
+     */
+    java.lang.String getPath();
+    /**
+     * <code>string path = 3;</code>
+     * @return The bytes for path.
+     */
+    com.google.protobuf.ByteString
+        getPathBytes();
+
+    /**
+     * <code>int64 total_size = 4;</code>
+     * @return The totalSize.
+     */
+    long getTotalSize();
+
+    /**
+     * <code>bool upload = 5;</code>
+     * @return The upload.
+     */
+    boolean getUpload();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileTransferInit}
+   */
+  public static final class FileTransferInit extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileTransferInit)
+      FileTransferInitOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileTransferInit");
+    }
+    // Use FileTransferInit.newBuilder() to construct.
+    private FileTransferInit(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileTransferInit() {
+      requestId_ = "";
+      proxyId_ = "";
+      path_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferInit_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileTransferInit.class, io.github.lxien.orbien.core.message.Message.FileTransferInit.Builder.class);
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PROXY_ID_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object proxyId_ = "";
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    @java.lang.Override
+    public java.lang.String getProxyId() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PATH_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object path_ = "";
+    /**
+     * <code>string path = 3;</code>
+     * @return The path.
+     */
+    @java.lang.Override
+    public java.lang.String getPath() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        path_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string path = 3;</code>
+     * @return The bytes for path.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPathBytes() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int TOTAL_SIZE_FIELD_NUMBER = 4;
+    private long totalSize_ = 0L;
+    /**
+     * <code>int64 total_size = 4;</code>
+     * @return The totalSize.
+     */
+    @java.lang.Override
+    public long getTotalSize() {
+      return totalSize_;
+    }
+
+    public static final int UPLOAD_FIELD_NUMBER = 5;
+    private boolean upload_ = false;
+    /**
+     * <code>bool upload = 5;</code>
+     * @return The upload.
+     */
+    @java.lang.Override
+    public boolean getUpload() {
+      return upload_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, path_);
+      }
+      if (totalSize_ != 0L) {
+        output.writeInt64(4, totalSize_);
+      }
+      if (upload_ != false) {
+        output.writeBool(5, upload_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, path_);
+      }
+      if (totalSize_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(4, totalSize_);
+      }
+      if (upload_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, upload_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileTransferInit)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileTransferInit other = (io.github.lxien.orbien.core.message.Message.FileTransferInit) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getPath()
+          .equals(other.getPath())) return false;
+      if (getTotalSize()
+          != other.getTotalSize()) return false;
+      if (getUpload()
+          != other.getUpload()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (37 * hash) + PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getPath().hashCode();
+      hash = (37 * hash) + TOTAL_SIZE_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getTotalSize());
+      hash = (37 * hash) + UPLOAD_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getUpload());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileTransferInit prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileTransferInit}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileTransferInit)
+        io.github.lxien.orbien.core.message.Message.FileTransferInitOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferInit_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileTransferInit.class, io.github.lxien.orbien.core.message.Message.FileTransferInit.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileTransferInit.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        proxyId_ = "";
+        path_ = "";
+        totalSize_ = 0L;
+        upload_ = false;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferInit getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileTransferInit.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferInit build() {
+        io.github.lxien.orbien.core.message.Message.FileTransferInit result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferInit buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileTransferInit result = new io.github.lxien.orbien.core.message.Message.FileTransferInit(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileTransferInit result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.proxyId_ = proxyId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.path_ = path_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.totalSize_ = totalSize_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.upload_ = upload_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileTransferInit) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileTransferInit)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileTransferInit other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileTransferInit.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getPath().isEmpty()) {
+          path_ = other.path_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (other.getTotalSize() != 0L) {
+          setTotalSize(other.getTotalSize());
+        }
+        if (other.getUpload() != false) {
+          setUpload(other.getUpload());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                path_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 32: {
+                totalSize_ = input.readInt64();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              case 40: {
+                upload_ = input.readBool();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object proxyId_ = "";
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The proxyId.
+       */
+      public java.lang.String getProxyId() {
+        java.lang.Object ref = proxyId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The bytes for proxyId.
+       */
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        java.lang.Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object path_ = "";
+      /**
+       * <code>string path = 3;</code>
+       * @return The path.
+       */
+      public java.lang.String getPath() {
+        java.lang.Object ref = path_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @return The bytes for path.
+       */
+      public com.google.protobuf.ByteString
+          getPathBytes() {
+        java.lang.Object ref = path_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          path_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @param value The path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        path_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPath() {
+        path_ = getDefaultInstance().getPath();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 3;</code>
+       * @param value The bytes for path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        path_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private long totalSize_ ;
+      /**
+       * <code>int64 total_size = 4;</code>
+       * @return The totalSize.
+       */
+      @java.lang.Override
+      public long getTotalSize() {
+        return totalSize_;
+      }
+      /**
+       * <code>int64 total_size = 4;</code>
+       * @param value The totalSize to set.
+       * @return This builder for chaining.
+       */
+      public Builder setTotalSize(long value) {
+
+        totalSize_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 total_size = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearTotalSize() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        totalSize_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private boolean upload_ ;
+      /**
+       * <code>bool upload = 5;</code>
+       * @return The upload.
+       */
+      @java.lang.Override
+      public boolean getUpload() {
+        return upload_;
+      }
+      /**
+       * <code>bool upload = 5;</code>
+       * @param value The upload to set.
+       * @return This builder for chaining.
+       */
+      public Builder setUpload(boolean value) {
+
+        upload_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool upload = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearUpload() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        upload_ = false;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileTransferInit)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileTransferInit)
+    private static final io.github.lxien.orbien.core.message.Message.FileTransferInit DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileTransferInit();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferInit getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileTransferInit>
+        PARSER = new com.google.protobuf.AbstractParser<FileTransferInit>() {
+      @java.lang.Override
+      public FileTransferInit parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileTransferInit> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileTransferInit> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileTransferInit getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileChunkOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileChunk)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>int64 offset = 2;</code>
+     * @return The offset.
+     */
+    long getOffset();
+
+    /**
+     * <code>bytes data = 3;</code>
+     * @return The data.
+     */
+    com.google.protobuf.ByteString getData();
+
+    /**
+     * <code>bool last = 4;</code>
+     * @return The last.
+     */
+    boolean getLast();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileChunk}
+   */
+  public static final class FileChunk extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileChunk)
+      FileChunkOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileChunk");
+    }
+    // Use FileChunk.newBuilder() to construct.
+    private FileChunk(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileChunk() {
+      requestId_ = "";
+      data_ = com.google.protobuf.ByteString.EMPTY;
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileChunk_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileChunk.class, io.github.lxien.orbien.core.message.Message.FileChunk.Builder.class);
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OFFSET_FIELD_NUMBER = 2;
+    private long offset_ = 0L;
+    /**
+     * <code>int64 offset = 2;</code>
+     * @return The offset.
+     */
+    @java.lang.Override
+    public long getOffset() {
+      return offset_;
+    }
+
+    public static final int DATA_FIELD_NUMBER = 3;
+    private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+    /**
+     * <code>bytes data = 3;</code>
+     * @return The data.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString getData() {
+      return data_;
+    }
+
+    public static final int LAST_FIELD_NUMBER = 4;
+    private boolean last_ = false;
+    /**
+     * <code>bool last = 4;</code>
+     * @return The last.
+     */
+    @java.lang.Override
+    public boolean getLast() {
+      return last_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (offset_ != 0L) {
+        output.writeInt64(2, offset_);
+      }
+      if (!data_.isEmpty()) {
+        output.writeBytes(3, data_);
+      }
+      if (last_ != false) {
+        output.writeBool(4, last_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (offset_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, offset_);
+      }
+      if (!data_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, data_);
+      }
+      if (last_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, last_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileChunk)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileChunk other = (io.github.lxien.orbien.core.message.Message.FileChunk) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (getOffset()
+          != other.getOffset()) return false;
+      if (!getData()
+          .equals(other.getData())) return false;
+      if (getLast()
+          != other.getLast()) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (37 * hash) + OFFSET_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getOffset());
+      hash = (37 * hash) + DATA_FIELD_NUMBER;
+      hash = (53 * hash) + getData().hashCode();
+      hash = (37 * hash) + LAST_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getLast());
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileChunk parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileChunk prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileChunk}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileChunk)
+        io.github.lxien.orbien.core.message.Message.FileChunkOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileChunk_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileChunk.class, io.github.lxien.orbien.core.message.Message.FileChunk.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileChunk.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        offset_ = 0L;
+        data_ = com.google.protobuf.ByteString.EMPTY;
+        last_ = false;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileChunk getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileChunk.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileChunk build() {
+        io.github.lxien.orbien.core.message.Message.FileChunk result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileChunk buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileChunk result = new io.github.lxien.orbien.core.message.Message.FileChunk(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileChunk result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.offset_ = offset_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.data_ = data_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.last_ = last_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileChunk) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileChunk)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileChunk other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileChunk.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.getOffset() != 0L) {
+          setOffset(other.getOffset());
+        }
+        if (!other.getData().isEmpty()) {
+          setData(other.getData());
+        }
+        if (other.getLast() != false) {
+          setLast(other.getLast());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 16: {
+                offset_ = input.readInt64();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 16
+              case 26: {
+                data_ = input.readBytes();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 32: {
+                last_ = input.readBool();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 32
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private long offset_ ;
+      /**
+       * <code>int64 offset = 2;</code>
+       * @return The offset.
+       */
+      @java.lang.Override
+      public long getOffset() {
+        return offset_;
+      }
+      /**
+       * <code>int64 offset = 2;</code>
+       * @param value The offset to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOffset(long value) {
+
+        offset_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 offset = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearOffset() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        offset_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString data_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <code>bytes data = 3;</code>
+       * @return The data.
+       */
+      @java.lang.Override
+      public com.google.protobuf.ByteString getData() {
+        return data_;
+      }
+      /**
+       * <code>bytes data = 3;</code>
+       * @param value The data to set.
+       * @return This builder for chaining.
+       */
+      public Builder setData(com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        data_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bytes data = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearData() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        data_ = getDefaultInstance().getData();
+        onChanged();
+        return this;
+      }
+
+      private boolean last_ ;
+      /**
+       * <code>bool last = 4;</code>
+       * @return The last.
+       */
+      @java.lang.Override
+      public boolean getLast() {
+        return last_;
+      }
+      /**
+       * <code>bool last = 4;</code>
+       * @param value The last to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLast(boolean value) {
+
+        last_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool last = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLast() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        last_ = false;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileChunk)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileChunk)
+    private static final io.github.lxien.orbien.core.message.Message.FileChunk DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileChunk();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileChunk getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileChunk>
+        PARSER = new com.google.protobuf.AbstractParser<FileChunk>() {
+      @java.lang.Override
+      public FileChunk parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileChunk> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileChunk> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileChunk getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileTransferDoneOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileTransferDone)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return Whether the status field is set.
+     */
+    boolean hasStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return The status.
+     */
+    io.github.lxien.orbien.core.message.Message.Status getStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileTransferDone}
+   */
+  public static final class FileTransferDone extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileTransferDone)
+      FileTransferDoneOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileTransferDone");
+    }
+    // Use FileTransferDone.newBuilder() to construct.
+    private FileTransferDone(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileTransferDone() {
+      requestId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferDone_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileTransferDone.class, io.github.lxien.orbien.core.message.Message.FileTransferDone.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 2;
+    private io.github.lxien.orbien.core.message.Message.Status status_;
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return Whether the status field is set.
+     */
+    @java.lang.Override
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return The status.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getStatus());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getStatus());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileTransferDone)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileTransferDone other = (io.github.lxien.orbien.core.message.Message.FileTransferDone) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (hasStatus() != other.hasStatus()) return false;
+      if (hasStatus()) {
+        if (!getStatus()
+            .equals(other.getStatus())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      if (hasStatus()) {
+        hash = (37 * hash) + STATUS_FIELD_NUMBER;
+        hash = (53 * hash) + getStatus().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileTransferDone prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileTransferDone}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileTransferDone)
+        io.github.lxien.orbien.core.message.Message.FileTransferDoneOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferDone_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileTransferDone.class, io.github.lxien.orbien.core.message.Message.FileTransferDone.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileTransferDone.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage
+                .alwaysUseFieldBuilders) {
+          internalGetStatusFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferDone getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileTransferDone.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferDone build() {
+        io.github.lxien.orbien.core.message.Message.FileTransferDone result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileTransferDone buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileTransferDone result = new io.github.lxien.orbien.core.message.Message.FileTransferDone(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileTransferDone result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.status_ = statusBuilder_ == null
+              ? status_
+              : statusBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileTransferDone) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileTransferDone)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileTransferDone other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileTransferDone.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                input.readMessage(
+                    internalGetStatusFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.Status status_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> statusBuilder_;
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       * @return Whether the status field is set.
+       */
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       * @return The status.
+       */
+      public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder setStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder setStatus(
+          io.github.lxien.orbien.core.message.Message.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder mergeStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            status_ != null &&
+            status_ != io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance()) {
+            getStatusBuilder().mergeFrom(value);
+          } else {
+            status_ = value;
+          }
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        if (status_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder clearStatus() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return internalGetStatusFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_ == null ?
+              io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> 
+          internalGetStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder>(
+                  getStatus(),
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileTransferDone)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileTransferDone)
+    private static final io.github.lxien.orbien.core.message.Message.FileTransferDone DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileTransferDone();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileTransferDone getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileTransferDone>
+        PARSER = new com.google.protobuf.AbstractParser<FileTransferDone>() {
+      @java.lang.Override
+      public FileTransferDone parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileTransferDone> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileTransferDone> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileTransferDone getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileOpRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileOpRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    java.lang.String getProxyId();
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    com.google.protobuf.ByteString
+        getProxyIdBytes();
+
+    /**
+     * <code>string op = 3;</code>
+     * @return The op.
+     */
+    java.lang.String getOp();
+    /**
+     * <code>string op = 3;</code>
+     * @return The bytes for op.
+     */
+    com.google.protobuf.ByteString
+        getOpBytes();
+
+    /**
+     * <code>string path = 4;</code>
+     * @return The path.
+     */
+    java.lang.String getPath();
+    /**
+     * <code>string path = 4;</code>
+     * @return The bytes for path.
+     */
+    com.google.protobuf.ByteString
+        getPathBytes();
+
+    /**
+     * <code>string name = 5;</code>
+     * @return The name.
+     */
+    java.lang.String getName();
+    /**
+     * <code>string name = 5;</code>
+     * @return The bytes for name.
+     */
+    com.google.protobuf.ByteString
+        getNameBytes();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileOpRequest}
+   */
+  public static final class FileOpRequest extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileOpRequest)
+      FileOpRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileOpRequest");
+    }
+    // Use FileOpRequest.newBuilder() to construct.
+    private FileOpRequest(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileOpRequest() {
+      requestId_ = "";
+      proxyId_ = "";
+      op_ = "";
+      path_ = "";
+      name_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileOpRequest.class, io.github.lxien.orbien.core.message.Message.FileOpRequest.Builder.class);
+    }
+
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PROXY_ID_FIELD_NUMBER = 2;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object proxyId_ = "";
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The proxyId.
+     */
+    @java.lang.Override
+    public java.lang.String getProxyId() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        proxyId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string proxy_id = 2;</code>
+     * @return The bytes for proxyId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getProxyIdBytes() {
+      java.lang.Object ref = proxyId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        proxyId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OP_FIELD_NUMBER = 3;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object op_ = "";
+    /**
+     * <code>string op = 3;</code>
+     * @return The op.
+     */
+    @java.lang.Override
+    public java.lang.String getOp() {
+      java.lang.Object ref = op_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        op_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string op = 3;</code>
+     * @return The bytes for op.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getOpBytes() {
+      java.lang.Object ref = op_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        op_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int PATH_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object path_ = "";
+    /**
+     * <code>string path = 4;</code>
+     * @return The path.
+     */
+    @java.lang.Override
+    public java.lang.String getPath() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        path_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string path = 4;</code>
+     * @return The bytes for path.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getPathBytes() {
+      java.lang.Object ref = path_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        path_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int NAME_FIELD_NUMBER = 5;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object name_ = "";
+    /**
+     * <code>string name = 5;</code>
+     * @return The name.
+     */
+    @java.lang.Override
+    public java.lang.String getName() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        name_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string name = 5;</code>
+     * @return The bytes for name.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getNameBytes() {
+      java.lang.Object ref = name_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        name_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(op_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 3, op_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, path_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 5, name_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(proxyId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(2, proxyId_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(op_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(3, op_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, path_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(name_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(5, name_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileOpRequest)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileOpRequest other = (io.github.lxien.orbien.core.message.Message.FileOpRequest) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (!getProxyId()
+          .equals(other.getProxyId())) return false;
+      if (!getOp()
+          .equals(other.getOp())) return false;
+      if (!getPath()
+          .equals(other.getPath())) return false;
+      if (!getName()
+          .equals(other.getName())) return false;
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      hash = (37 * hash) + PROXY_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getProxyId().hashCode();
+      hash = (37 * hash) + OP_FIELD_NUMBER;
+      hash = (53 * hash) + getOp().hashCode();
+      hash = (37 * hash) + PATH_FIELD_NUMBER;
+      hash = (53 * hash) + getPath().hashCode();
+      hash = (37 * hash) + NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getName().hashCode();
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileOpRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileOpRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileOpRequest)
+        io.github.lxien.orbien.core.message.Message.FileOpRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileOpRequest.class, io.github.lxien.orbien.core.message.Message.FileOpRequest.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileOpRequest.newBuilder()
+      private Builder() {
+
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        proxyId_ = "";
+        op_ = "";
+        path_ = "";
+        name_ = "";
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpRequest getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileOpRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpRequest build() {
+        io.github.lxien.orbien.core.message.Message.FileOpRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpRequest buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileOpRequest result = new io.github.lxien.orbien.core.message.Message.FileOpRequest(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileOpRequest result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.proxyId_ = proxyId_;
+        }
+        if (((from_bitField0_ & 0x00000004) != 0)) {
+          result.op_ = op_;
+        }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.path_ = path_;
+        }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.name_ = name_;
+        }
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileOpRequest) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileOpRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileOpRequest other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileOpRequest.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (!other.getProxyId().isEmpty()) {
+          proxyId_ = other.proxyId_;
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        if (!other.getOp().isEmpty()) {
+          op_ = other.op_;
+          bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getPath().isEmpty()) {
+          path_ = other.path_;
+          bitField0_ |= 0x00000008;
+          onChanged();
+        }
+        if (!other.getName().isEmpty()) {
+          name_ = other.name_;
+          bitField0_ |= 0x00000010;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                proxyId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              case 26: {
+                op_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000004;
+                break;
+              } // case 26
+              case 34: {
+                path_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
+              case 42: {
+                name_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 42
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object proxyId_ = "";
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The proxyId.
+       */
+      public java.lang.String getProxyId() {
+        java.lang.Object ref = proxyId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          proxyId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return The bytes for proxyId.
+       */
+      public com.google.protobuf.ByteString
+          getProxyIdBytes() {
+        java.lang.Object ref = proxyId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          proxyId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearProxyId() {
+        proxyId_ = getDefaultInstance().getProxyId();
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string proxy_id = 2;</code>
+       * @param value The bytes for proxyId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setProxyIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        proxyId_ = value;
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object op_ = "";
+      /**
+       * <code>string op = 3;</code>
+       * @return The op.
+       */
+      public java.lang.String getOp() {
+        java.lang.Object ref = op_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          op_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string op = 3;</code>
+       * @return The bytes for op.
+       */
+      public com.google.protobuf.ByteString
+          getOpBytes() {
+        java.lang.Object ref = op_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          op_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string op = 3;</code>
+       * @param value The op to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOp(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        op_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string op = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearOp() {
+        op_ = getDefaultInstance().getOp();
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string op = 3;</code>
+       * @param value The bytes for op to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOpBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        op_ = value;
+        bitField0_ |= 0x00000004;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object path_ = "";
+      /**
+       * <code>string path = 4;</code>
+       * @return The path.
+       */
+      public java.lang.String getPath() {
+        java.lang.Object ref = path_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          path_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string path = 4;</code>
+       * @return The bytes for path.
+       */
+      public com.google.protobuf.ByteString
+          getPathBytes() {
+        java.lang.Object ref = path_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          path_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string path = 4;</code>
+       * @param value The path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPath(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        path_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearPath() {
+        path_ = getDefaultInstance().getPath();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string path = 4;</code>
+       * @param value The bytes for path to set.
+       * @return This builder for chaining.
+       */
+      public Builder setPathBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        path_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object name_ = "";
+      /**
+       * <code>string name = 5;</code>
+       * @return The name.
+       */
+      public java.lang.String getName() {
+        java.lang.Object ref = name_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          name_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string name = 5;</code>
+       * @return The bytes for name.
+       */
+      public com.google.protobuf.ByteString
+          getNameBytes() {
+        java.lang.Object ref = name_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          name_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string name = 5;</code>
+       * @param value The name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setName(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        name_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearName() {
+        name_ = getDefaultInstance().getName();
+        bitField0_ = (bitField0_ & ~0x00000010);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string name = 5;</code>
+       * @param value The bytes for name to set.
+       * @return This builder for chaining.
+       */
+      public Builder setNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        name_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileOpRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileOpRequest)
+    private static final io.github.lxien.orbien.core.message.Message.FileOpRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileOpRequest();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileOpRequest>
+        PARSER = new com.google.protobuf.AbstractParser<FileOpRequest>() {
+      @java.lang.Override
+      public FileOpRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileOpRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileOpRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileOpRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface FileOpResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.FileOpResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    java.lang.String getRequestId();
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    com.google.protobuf.ByteString
+        getRequestIdBytes();
+
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return Whether the status field is set.
+     */
+    boolean hasStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return The status.
+     */
+    io.github.lxien.orbien.core.message.Message.Status getStatus();
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder();
+  }
+  /**
+   * Protobuf type {@code io.github.lxien.orbien.core.message.FileOpResponse}
+   */
+  public static final class FileOpResponse extends
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:io.github.lxien.orbien.core.message.FileOpResponse)
+      FileOpResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    static {
+      com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
+        com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
+        /* major= */ 4,
+        /* minor= */ 33,
+        /* patch= */ 4,
+        /* suffix= */ "",
+        "FileOpResponse");
+    }
+    // Use FileOpResponse.newBuilder() to construct.
+    private FileOpResponse(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+    }
+    private FileOpResponse() {
+      requestId_ = "";
+    }
+
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              io.github.lxien.orbien.core.message.Message.FileOpResponse.class, io.github.lxien.orbien.core.message.Message.FileOpResponse.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int REQUEST_ID_FIELD_NUMBER = 1;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object requestId_ = "";
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The requestId.
+     */
+    @java.lang.Override
+    public java.lang.String getRequestId() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        requestId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string request_id = 1;</code>
+     * @return The bytes for requestId.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getRequestIdBytes() {
+      java.lang.Object ref = requestId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        requestId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int STATUS_FIELD_NUMBER = 2;
+    private io.github.lxien.orbien.core.message.Message.Status status_;
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return Whether the status field is set.
+     */
+    @java.lang.Override
+    public boolean hasStatus() {
+      return ((bitField0_ & 0x00000001) != 0);
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     * @return The status.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+    /**
+     * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+      return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 1, requestId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        output.writeMessage(2, getStatus());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(requestId_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(1, requestId_);
+      }
+      if (((bitField0_ & 0x00000001) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getStatus());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof io.github.lxien.orbien.core.message.Message.FileOpResponse)) {
+        return super.equals(obj);
+      }
+      io.github.lxien.orbien.core.message.Message.FileOpResponse other = (io.github.lxien.orbien.core.message.Message.FileOpResponse) obj;
+
+      if (!getRequestId()
+          .equals(other.getRequestId())) return false;
+      if (hasStatus() != other.hasStatus()) return false;
+      if (hasStatus()) {
+        if (!getStatus()
+            .equals(other.getStatus())) return false;
+      }
+      if (!getUnknownFields().equals(other.getUnknownFields())) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REQUEST_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getRequestId().hashCode();
+      if (hasStatus()) {
+        hash = (37 * hash) + STATUS_FIELD_NUMBER;
+        hash = (53 * hash) + getStatus().hashCode();
+      }
+      hash = (29 * hash) + getUnknownFields().hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input);
+    }
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessage
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(io.github.lxien.orbien.core.message.Message.FileOpResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code io.github.lxien.orbien.core.message.FileOpResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:io.github.lxien.orbien.core.message.FileOpResponse)
+        io.github.lxien.orbien.core.message.Message.FileOpResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                io.github.lxien.orbien.core.message.Message.FileOpResponse.class, io.github.lxien.orbien.core.message.Message.FileOpResponse.Builder.class);
+      }
+
+      // Construct using io.github.lxien.orbien.core.message.Message.FileOpResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage
+                .alwaysUseFieldBuilders) {
+          internalGetStatusFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        bitField0_ = 0;
+        requestId_ = "";
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return io.github.lxien.orbien.core.message.Message.internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpResponse getDefaultInstanceForType() {
+        return io.github.lxien.orbien.core.message.Message.FileOpResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpResponse build() {
+        io.github.lxien.orbien.core.message.Message.FileOpResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public io.github.lxien.orbien.core.message.Message.FileOpResponse buildPartial() {
+        io.github.lxien.orbien.core.message.Message.FileOpResponse result = new io.github.lxien.orbien.core.message.Message.FileOpResponse(this);
+        if (bitField0_ != 0) { buildPartial0(result); }
+        onBuilt();
+        return result;
+      }
+
+      private void buildPartial0(io.github.lxien.orbien.core.message.Message.FileOpResponse result) {
+        int from_bitField0_ = bitField0_;
+        if (((from_bitField0_ & 0x00000001) != 0)) {
+          result.requestId_ = requestId_;
+        }
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000002) != 0)) {
+          result.status_ = statusBuilder_ == null
+              ? status_
+              : statusBuilder_.build();
+          to_bitField0_ |= 0x00000001;
+        }
+        result.bitField0_ |= to_bitField0_;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof io.github.lxien.orbien.core.message.Message.FileOpResponse) {
+          return mergeFrom((io.github.lxien.orbien.core.message.Message.FileOpResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(io.github.lxien.orbien.core.message.Message.FileOpResponse other) {
+        if (other == io.github.lxien.orbien.core.message.Message.FileOpResponse.getDefaultInstance()) return this;
+        if (!other.getRequestId().isEmpty()) {
+          requestId_ = other.requestId_;
+          bitField0_ |= 0x00000001;
+          onChanged();
+        }
+        if (other.hasStatus()) {
+          mergeStatus(other.getStatus());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        if (extensionRegistry == null) {
+          throw new java.lang.NullPointerException();
+        }
+        try {
+          boolean done = false;
+          while (!done) {
+            int tag = input.readTag();
+            switch (tag) {
+              case 0:
+                done = true;
+                break;
+              case 10: {
+                requestId_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000001;
+                break;
+              } // case 10
+              case 18: {
+                input.readMessage(
+                    internalGetStatusFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000002;
+                break;
+              } // case 18
+              default: {
+                if (!super.parseUnknownField(input, extensionRegistry, tag)) {
+                  done = true; // was an endgroup tag
+                }
+                break;
+              } // default:
+            } // switch (tag)
+          } // while (!done)
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.unwrapIOException();
+        } finally {
+          onChanged();
+        } // finally
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object requestId_ = "";
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The requestId.
+       */
+      public java.lang.String getRequestId() {
+        java.lang.Object ref = requestId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          requestId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return The bytes for requestId.
+       */
+      public com.google.protobuf.ByteString
+          getRequestIdBytes() {
+        java.lang.Object ref = requestId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          requestId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestId(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearRequestId() {
+        requestId_ = getDefaultInstance().getRequestId();
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string request_id = 1;</code>
+       * @param value The bytes for requestId to set.
+       * @return This builder for chaining.
+       */
+      public Builder setRequestIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        requestId_ = value;
+        bitField0_ |= 0x00000001;
+        onChanged();
+        return this;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.Status status_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> statusBuilder_;
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       * @return Whether the status field is set.
+       */
+      public boolean hasStatus() {
+        return ((bitField0_ & 0x00000002) != 0);
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       * @return The status.
+       */
+      public io.github.lxien.orbien.core.message.Message.Status getStatus() {
+        if (statusBuilder_ == null) {
+          return status_ == null ? io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        } else {
+          return statusBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder setStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          status_ = value;
+        } else {
+          statusBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder setStatus(
+          io.github.lxien.orbien.core.message.Message.Status.Builder builderForValue) {
+        if (statusBuilder_ == null) {
+          status_ = builderForValue.build();
+        } else {
+          statusBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder mergeStatus(io.github.lxien.orbien.core.message.Message.Status value) {
+        if (statusBuilder_ == null) {
+          if (((bitField0_ & 0x00000002) != 0) &&
+            status_ != null &&
+            status_ != io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance()) {
+            getStatusBuilder().mergeFrom(value);
+          } else {
+            status_ = value;
+          }
+        } else {
+          statusBuilder_.mergeFrom(value);
+        }
+        if (status_ != null) {
+          bitField0_ |= 0x00000002;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public Builder clearStatus() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        status_ = null;
+        if (statusBuilder_ != null) {
+          statusBuilder_.dispose();
+          statusBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.Status.Builder getStatusBuilder() {
+        bitField0_ |= 0x00000002;
+        onChanged();
+        return internalGetStatusFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.StatusOrBuilder getStatusOrBuilder() {
+        if (statusBuilder_ != null) {
+          return statusBuilder_.getMessageOrBuilder();
+        } else {
+          return status_ == null ?
+              io.github.lxien.orbien.core.message.Message.Status.getDefaultInstance() : status_;
+        }
+      }
+      /**
+       * <code>.io.github.lxien.orbien.core.message.Status status = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder> 
+          internalGetStatusFieldBuilder() {
+        if (statusBuilder_ == null) {
+          statusBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.Status, io.github.lxien.orbien.core.message.Message.Status.Builder, io.github.lxien.orbien.core.message.Message.StatusOrBuilder>(
+                  getStatus(),
+                  getParentForChildren(),
+                  isClean());
+          status_ = null;
+        }
+        return statusBuilder_;
+      }
+
+      // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileOpResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:io.github.lxien.orbien.core.message.FileOpResponse)
+    private static final io.github.lxien.orbien.core.message.Message.FileOpResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new io.github.lxien.orbien.core.message.Message.FileOpResponse();
+    }
+
+    public static io.github.lxien.orbien.core.message.Message.FileOpResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FileOpResponse>
+        PARSER = new com.google.protobuf.AbstractParser<FileOpResponse>() {
+      @java.lang.Override
+      public FileOpResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        Builder builder = newBuilder();
+        try {
+          builder.mergeFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          throw e.setUnfinishedMessage(builder.buildPartial());
+        } catch (com.google.protobuf.UninitializedMessageException e) {
+          throw e.asInvalidProtocolBufferException().setUnfinishedMessage(builder.buildPartial());
+        } catch (java.io.IOException e) {
+          throw new com.google.protobuf.InvalidProtocolBufferException(e)
+              .setUnfinishedMessage(builder.buildPartial());
+        }
+        return builder.buildPartial();
+      }
+    };
+
+    public static com.google.protobuf.Parser<FileOpResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FileOpResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileOpResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BandwidthOrBuilder extends
       // @@protoc_insertion_point(interface_extends:io.github.lxien.orbien.core.message.Bandwidth)
       com.google.protobuf.MessageOrBuilder {
@@ -14962,6 +24539,36 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>optional .io.github.lxien.orbien.core.message.Socks5Auth socks5_auth = 16;</code>
      */
     io.github.lxien.orbien.core.message.Message.Socks5AuthOrBuilder getSocks5AuthOrBuilder();
+
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     * @return Whether the fileAuth field is set.
+     */
+    boolean hasFileAuth();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     * @return The fileAuth.
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareAuth getFileAuth();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder getFileAuthOrBuilder();
+
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     * @return Whether the fileLimits field is set.
+     */
+    boolean hasFileLimits();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     * @return The fileLimits.
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder();
   }
   /**
    * Protobuf type {@code io.github.lxien.orbien.core.message.Proxy}
@@ -15417,6 +25024,58 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return socks5Auth_ == null ? io.github.lxien.orbien.core.message.Message.Socks5Auth.getDefaultInstance() : socks5Auth_;
     }
 
+    public static final int FILE_AUTH_FIELD_NUMBER = 17;
+    private io.github.lxien.orbien.core.message.Message.FileShareAuth fileAuth_;
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     * @return Whether the fileAuth field is set.
+     */
+    @java.lang.Override
+    public boolean hasFileAuth() {
+      return ((bitField0_ & 0x00000400) != 0);
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     * @return The fileAuth.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareAuth getFileAuth() {
+      return fileAuth_ == null ? io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance() : fileAuth_;
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder getFileAuthOrBuilder() {
+      return fileAuth_ == null ? io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance() : fileAuth_;
+    }
+
+    public static final int FILE_LIMITS_FIELD_NUMBER = 18;
+    private io.github.lxien.orbien.core.message.Message.FileShareLimits fileLimits_;
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     * @return Whether the fileLimits field is set.
+     */
+    @java.lang.Override
+    public boolean hasFileLimits() {
+      return ((bitField0_ & 0x00000800) != 0);
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     * @return The fileLimits.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits() {
+      return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder() {
+      return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15478,6 +25137,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000200) != 0)) {
         output.writeMessage(16, getSocks5Auth());
+      }
+      if (((bitField0_ & 0x00000400) != 0)) {
+        output.writeMessage(17, getFileAuth());
+      }
+      if (((bitField0_ & 0x00000800) != 0)) {
+        output.writeMessage(18, getFileLimits());
       }
       getUnknownFields().writeTo(output);
     }
@@ -15549,6 +25214,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (((bitField0_ & 0x00000200) != 0)) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(16, getSocks5Auth());
+      }
+      if (((bitField0_ & 0x00000400) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(17, getFileAuth());
+      }
+      if (((bitField0_ & 0x00000800) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, getFileLimits());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -15625,6 +25298,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getSocks5Auth()
             .equals(other.getSocks5Auth())) return false;
       }
+      if (hasFileAuth() != other.hasFileAuth()) return false;
+      if (hasFileAuth()) {
+        if (!getFileAuth()
+            .equals(other.getFileAuth())) return false;
+      }
+      if (hasFileLimits() != other.hasFileLimits()) return false;
+      if (hasFileLimits()) {
+        if (!getFileLimits()
+            .equals(other.getFileLimits())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -15691,6 +25374,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasSocks5Auth()) {
         hash = (37 * hash) + SOCKS5_AUTH_FIELD_NUMBER;
         hash = (53 * hash) + getSocks5Auth().hashCode();
+      }
+      if (hasFileAuth()) {
+        hash = (37 * hash) + FILE_AUTH_FIELD_NUMBER;
+        hash = (53 * hash) + getFileAuth().hashCode();
+      }
+      if (hasFileLimits()) {
+        hash = (37 * hash) + FILE_LIMITS_FIELD_NUMBER;
+        hash = (53 * hash) + getFileLimits().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -15831,6 +25522,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetTlsCertFieldBuilder();
           internalGetHealthCheckFieldBuilder();
           internalGetSocks5AuthFieldBuilder();
+          internalGetFileAuthFieldBuilder();
+          internalGetFileLimitsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -15890,6 +25583,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (socks5AuthBuilder_ != null) {
           socks5AuthBuilder_.dispose();
           socks5AuthBuilder_ = null;
+        }
+        fileAuth_ = null;
+        if (fileAuthBuilder_ != null) {
+          fileAuthBuilder_.dispose();
+          fileAuthBuilder_ = null;
+        }
+        fileLimits_ = null;
+        if (fileLimitsBuilder_ != null) {
+          fileLimitsBuilder_.dispose();
+          fileLimitsBuilder_ = null;
         }
         return this;
       }
@@ -16009,6 +25712,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               : socks5AuthBuilder_.build();
           to_bitField0_ |= 0x00000200;
         }
+        if (((from_bitField0_ & 0x00010000) != 0)) {
+          result.fileAuth_ = fileAuthBuilder_ == null
+              ? fileAuth_
+              : fileAuthBuilder_.build();
+          to_bitField0_ |= 0x00000400;
+        }
+        if (((from_bitField0_ & 0x00020000) != 0)) {
+          result.fileLimits_ = fileLimitsBuilder_ == null
+              ? fileLimits_
+              : fileLimitsBuilder_.build();
+          to_bitField0_ |= 0x00000800;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -16098,6 +25813,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.hasSocks5Auth()) {
           mergeSocks5Auth(other.getSocks5Auth());
+        }
+        if (other.hasFileAuth()) {
+          mergeFileAuth(other.getFileAuth());
+        }
+        if (other.hasFileLimits()) {
+          mergeFileLimits(other.getFileLimits());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -16229,6 +25950,20 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00008000;
                 break;
               } // case 130
+              case 138: {
+                input.readMessage(
+                    internalGetFileAuthFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00010000;
+                break;
+              } // case 138
+              case 146: {
+                input.readMessage(
+                    internalGetFileLimitsFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00020000;
+                break;
+              } // case 146
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -17811,6 +27546,248 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return socks5AuthBuilder_;
       }
 
+      private io.github.lxien.orbien.core.message.Message.FileShareAuth fileAuth_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareAuth, io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder, io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder> fileAuthBuilder_;
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       * @return Whether the fileAuth field is set.
+       */
+      public boolean hasFileAuth() {
+        return ((bitField0_ & 0x00010000) != 0);
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       * @return The fileAuth.
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareAuth getFileAuth() {
+        if (fileAuthBuilder_ == null) {
+          return fileAuth_ == null ? io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance() : fileAuth_;
+        } else {
+          return fileAuthBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public Builder setFileAuth(io.github.lxien.orbien.core.message.Message.FileShareAuth value) {
+        if (fileAuthBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          fileAuth_ = value;
+        } else {
+          fileAuthBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00010000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public Builder setFileAuth(
+          io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder builderForValue) {
+        if (fileAuthBuilder_ == null) {
+          fileAuth_ = builderForValue.build();
+        } else {
+          fileAuthBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00010000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public Builder mergeFileAuth(io.github.lxien.orbien.core.message.Message.FileShareAuth value) {
+        if (fileAuthBuilder_ == null) {
+          if (((bitField0_ & 0x00010000) != 0) &&
+            fileAuth_ != null &&
+            fileAuth_ != io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance()) {
+            getFileAuthBuilder().mergeFrom(value);
+          } else {
+            fileAuth_ = value;
+          }
+        } else {
+          fileAuthBuilder_.mergeFrom(value);
+        }
+        if (fileAuth_ != null) {
+          bitField0_ |= 0x00010000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public Builder clearFileAuth() {
+        bitField0_ = (bitField0_ & ~0x00010000);
+        fileAuth_ = null;
+        if (fileAuthBuilder_ != null) {
+          fileAuthBuilder_.dispose();
+          fileAuthBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder getFileAuthBuilder() {
+        bitField0_ |= 0x00010000;
+        onChanged();
+        return internalGetFileAuthFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder getFileAuthOrBuilder() {
+        if (fileAuthBuilder_ != null) {
+          return fileAuthBuilder_.getMessageOrBuilder();
+        } else {
+          return fileAuth_ == null ?
+              io.github.lxien.orbien.core.message.Message.FileShareAuth.getDefaultInstance() : fileAuth_;
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareAuth file_auth = 17;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareAuth, io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder, io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder> 
+          internalGetFileAuthFieldBuilder() {
+        if (fileAuthBuilder_ == null) {
+          fileAuthBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.FileShareAuth, io.github.lxien.orbien.core.message.Message.FileShareAuth.Builder, io.github.lxien.orbien.core.message.Message.FileShareAuthOrBuilder>(
+                  getFileAuth(),
+                  getParentForChildren(),
+                  isClean());
+          fileAuth_ = null;
+        }
+        return fileAuthBuilder_;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.FileShareLimits fileLimits_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder> fileLimitsBuilder_;
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       * @return Whether the fileLimits field is set.
+       */
+      public boolean hasFileLimits() {
+        return ((bitField0_ & 0x00020000) != 0);
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       * @return The fileLimits.
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits() {
+        if (fileLimitsBuilder_ == null) {
+          return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+        } else {
+          return fileLimitsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public Builder setFileLimits(io.github.lxien.orbien.core.message.Message.FileShareLimits value) {
+        if (fileLimitsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          fileLimits_ = value;
+        } else {
+          fileLimitsBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00020000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public Builder setFileLimits(
+          io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder builderForValue) {
+        if (fileLimitsBuilder_ == null) {
+          fileLimits_ = builderForValue.build();
+        } else {
+          fileLimitsBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00020000;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public Builder mergeFileLimits(io.github.lxien.orbien.core.message.Message.FileShareLimits value) {
+        if (fileLimitsBuilder_ == null) {
+          if (((bitField0_ & 0x00020000) != 0) &&
+            fileLimits_ != null &&
+            fileLimits_ != io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance()) {
+            getFileLimitsBuilder().mergeFrom(value);
+          } else {
+            fileLimits_ = value;
+          }
+        } else {
+          fileLimitsBuilder_.mergeFrom(value);
+        }
+        if (fileLimits_ != null) {
+          bitField0_ |= 0x00020000;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public Builder clearFileLimits() {
+        bitField0_ = (bitField0_ & ~0x00020000);
+        fileLimits_ = null;
+        if (fileLimitsBuilder_ != null) {
+          fileLimitsBuilder_.dispose();
+          fileLimitsBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder getFileLimitsBuilder() {
+        bitField0_ |= 0x00020000;
+        onChanged();
+        return internalGetFileLimitsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder() {
+        if (fileLimitsBuilder_ != null) {
+          return fileLimitsBuilder_.getMessageOrBuilder();
+        } else {
+          return fileLimits_ == null ?
+              io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 18;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder> 
+          internalGetFileLimitsFieldBuilder() {
+        if (fileLimitsBuilder_ == null) {
+          fileLimitsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder>(
+                  getFileLimits(),
+                  getParentForChildren(),
+                  isClean());
+          fileLimits_ = null;
+        }
+        return fileLimitsBuilder_;
+      }
+
       // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.Proxy)
     }
 
@@ -17968,6 +27945,21 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * <code>optional .io.github.lxien.orbien.core.message.Transport transport = 6;</code>
      */
     io.github.lxien.orbien.core.message.Message.TransportOrBuilder getTransportOrBuilder();
+
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     * @return Whether the fileLimits field is set.
+     */
+    boolean hasFileLimits();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     * @return The fileLimits.
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits();
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     */
+    io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder();
   }
   /**
    * Protobuf type {@code io.github.lxien.orbien.core.message.RuntimeInfo}
@@ -18220,6 +28212,32 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return transport_ == null ? io.github.lxien.orbien.core.message.Message.Transport.getDefaultInstance() : transport_;
     }
 
+    public static final int FILE_LIMITS_FIELD_NUMBER = 7;
+    private io.github.lxien.orbien.core.message.Message.FileShareLimits fileLimits_;
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     * @return Whether the fileLimits field is set.
+     */
+    @java.lang.Override
+    public boolean hasFileLimits() {
+      return ((bitField0_ & 0x00000004) != 0);
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     * @return The fileLimits.
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits() {
+      return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+    }
+    /**
+     * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+     */
+    @java.lang.Override
+    public io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder() {
+      return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -18251,6 +28269,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (((bitField0_ & 0x00000002) != 0)) {
         output.writeMessage(6, getTransport());
+      }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        output.writeMessage(7, getFileLimits());
       }
       getUnknownFields().writeTo(output);
     }
@@ -18287,6 +28308,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, getTransport());
       }
+      if (((bitField0_ & 0x00000004) != 0)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(7, getFileLimits());
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -18320,6 +28345,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!getTransport()
             .equals(other.getTransport())) return false;
       }
+      if (hasFileLimits() != other.hasFileLimits()) return false;
+      if (hasFileLimits()) {
+        if (!getFileLimits()
+            .equals(other.getFileLimits())) return false;
+      }
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -18350,6 +28380,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (hasTransport()) {
         hash = (37 * hash) + TRANSPORT_FIELD_NUMBER;
         hash = (53 * hash) + getTransport().hashCode();
+      }
+      if (hasFileLimits()) {
+        hash = (37 * hash) + FILE_LIMITS_FIELD_NUMBER;
+        hash = (53 * hash) + getFileLimits().hashCode();
       }
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
@@ -18484,6 +28518,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           internalGetTargetsFieldBuilder();
           internalGetHealthCheckFieldBuilder();
           internalGetTransportFieldBuilder();
+          internalGetFileLimitsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -18510,6 +28545,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (transportBuilder_ != null) {
           transportBuilder_.dispose();
           transportBuilder_ = null;
+        }
+        fileLimits_ = null;
+        if (fileLimitsBuilder_ != null) {
+          fileLimitsBuilder_.dispose();
+          fileLimitsBuilder_ = null;
         }
         return this;
       }
@@ -18580,6 +28620,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
               : transportBuilder_.build();
           to_bitField0_ |= 0x00000002;
         }
+        if (((from_bitField0_ & 0x00000040) != 0)) {
+          result.fileLimits_ = fileLimitsBuilder_ == null
+              ? fileLimits_
+              : fileLimitsBuilder_.build();
+          to_bitField0_ |= 0x00000004;
+        }
         result.bitField0_ |= to_bitField0_;
       }
 
@@ -18646,6 +28692,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.hasTransport()) {
           mergeTransport(other.getTransport());
+        }
+        if (other.hasFileLimits()) {
+          mergeFileLimits(other.getFileLimits());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -18716,6 +28765,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00000020;
                 break;
               } // case 50
+              case 58: {
+                input.readMessage(
+                    internalGetFileLimitsFieldBuilder().getBuilder(),
+                    extensionRegistry);
+                bitField0_ |= 0x00000040;
+                break;
+              } // case 58
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -19468,6 +29524,127 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           transport_ = null;
         }
         return transportBuilder_;
+      }
+
+      private io.github.lxien.orbien.core.message.Message.FileShareLimits fileLimits_;
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder> fileLimitsBuilder_;
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       * @return Whether the fileLimits field is set.
+       */
+      public boolean hasFileLimits() {
+        return ((bitField0_ & 0x00000040) != 0);
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       * @return The fileLimits.
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits getFileLimits() {
+        if (fileLimitsBuilder_ == null) {
+          return fileLimits_ == null ? io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+        } else {
+          return fileLimitsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public Builder setFileLimits(io.github.lxien.orbien.core.message.Message.FileShareLimits value) {
+        if (fileLimitsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          fileLimits_ = value;
+        } else {
+          fileLimitsBuilder_.setMessage(value);
+        }
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public Builder setFileLimits(
+          io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder builderForValue) {
+        if (fileLimitsBuilder_ == null) {
+          fileLimits_ = builderForValue.build();
+        } else {
+          fileLimitsBuilder_.setMessage(builderForValue.build());
+        }
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public Builder mergeFileLimits(io.github.lxien.orbien.core.message.Message.FileShareLimits value) {
+        if (fileLimitsBuilder_ == null) {
+          if (((bitField0_ & 0x00000040) != 0) &&
+            fileLimits_ != null &&
+            fileLimits_ != io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance()) {
+            getFileLimitsBuilder().mergeFrom(value);
+          } else {
+            fileLimits_ = value;
+          }
+        } else {
+          fileLimitsBuilder_.mergeFrom(value);
+        }
+        if (fileLimits_ != null) {
+          bitField0_ |= 0x00000040;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public Builder clearFileLimits() {
+        bitField0_ = (bitField0_ & ~0x00000040);
+        fileLimits_ = null;
+        if (fileLimitsBuilder_ != null) {
+          fileLimitsBuilder_.dispose();
+          fileLimitsBuilder_ = null;
+        }
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder getFileLimitsBuilder() {
+        bitField0_ |= 0x00000040;
+        onChanged();
+        return internalGetFileLimitsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      public io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder getFileLimitsOrBuilder() {
+        if (fileLimitsBuilder_ != null) {
+          return fileLimitsBuilder_.getMessageOrBuilder();
+        } else {
+          return fileLimits_ == null ?
+              io.github.lxien.orbien.core.message.Message.FileShareLimits.getDefaultInstance() : fileLimits_;
+        }
+      }
+      /**
+       * <code>optional .io.github.lxien.orbien.core.message.FileShareLimits file_limits = 7;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilder<
+          io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder> 
+          internalGetFileLimitsFieldBuilder() {
+        if (fileLimitsBuilder_ == null) {
+          fileLimitsBuilder_ = new com.google.protobuf.SingleFieldBuilder<
+              io.github.lxien.orbien.core.message.Message.FileShareLimits, io.github.lxien.orbien.core.message.Message.FileShareLimits.Builder, io.github.lxien.orbien.core.message.Message.FileShareLimitsOrBuilder>(
+                  getFileLimits(),
+                  getParentForChildren(),
+                  isClean());
+          fileLimits_ = null;
+        }
+        return fileLimitsBuilder_;
       }
 
       // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.RuntimeInfo)
@@ -24539,6 +34716,61 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_io_github_lxien_orbien_core_message_Socks5Auth_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileShareUser_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileShareAuth_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileShareLimits_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileListRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileListResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileTransferInit_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileChunk_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileTransferDone_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileOpRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_io_github_lxien_orbien_core_message_FileOpResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -24645,89 +34877,125 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "ttpUser\"0\n\nSocks5User\022\020\n\010username\030\001 \001(\t\022" +
       "\020\n\010password\030\002 \001(\t\"]\n\nSocks5Auth\022\017\n\007enabl" +
       "ed\030\001 \001(\010\022>\n\005users\030\002 \003(\0132/.io.github.lxie" +
-      "n.orbien.core.message.Socks5User\"s\n\tBand" +
-      "width\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_in\030\002 " +
-      "\001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006_lim" +
-      "itB\013\n\t_limit_inB\014\n\n_limit_out\"`\n\006Target\022" +
-      "\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030\003 \001(" +
-      "\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210\001\001B\007\n\005_nameB\t\n\007" +
-      "_weight\"_\n\006Domain\022\030\n\013auto_domain\030\001 \001(\010H\000" +
-      "\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022\023\n\013sub_domai" +
-      "ns\030\003 \003(\tB\016\n\014_auto_domain\":\n\007TlsCert\022\027\n\017p" +
-      "rivate_key_pem\030\001 \001(\t\022\026\n\016cert_chain_pem\030\002" +
-      " \001(\t\"\233\001\n\tTransport\022\026\n\tmultiplex\030\001 \001(\010H\000\210" +
-      "\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022\025\n\010compress\030\003 \001" +
-      "(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\tH\003\210\001\001B\014\n\n_multi" +
-      "plexB\n\n\010_encryptB\013\n\t_compressB\013\n\t_protoc" +
-      "ol\"\247\001\n\013HealthCheck\022B\n\004type\030\001 \001(\01624.io.gi" +
-      "thub.lxien.orbien.core.message.HealthChe" +
-      "ckType\022\020\n\010interval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(" +
-      "\005\022\022\n\nmax_failed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007e" +
-      "nabled\030\006 \001(\010\"\261\010\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022" +
-      "\014\n\004name\030\002 \001(\t\022C\n\010protocol\030\003 \001(\01621.io.git" +
-      "hub.lxien.orbien.core.message.ProtocolTy" +
-      "pe\022\017\n\007enabled\030\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.i" +
-      "o.github.lxien.orbien.core.message.Targe" +
-      "t\022\023\n\013force_https\030\006 \001(\010\022\030\n\013remote_port\030\007 " +
-      "\001(\rH\000\210\001\001\022@\n\006domain\030\010 \001(\0132+.io.github.lxi" +
-      "en.orbien.core.message.DomainH\001\210\001\001\022O\n\016ac" +
-      "cess_control\030\t \001(\01322.io.github.lxien.orb" +
-      "ien.core.message.AccessControlH\002\210\001\001\022G\n\nb" +
-      "asic_auth\030\n \001(\0132..io.github.lxien.orbien" +
-      ".core.message.BasicAuthH\003\210\001\001\022F\n\tbandwidt" +
-      "h\030\013 \001(\0132..io.github.lxien.orbien.core.me" +
-      "ssage.BandwidthH\004\210\001\001\022\\\n\025load_balance_str" +
-      "ategy\030\014 \001(\01628.io.github.lxien.orbien.cor" +
-      "e.message.LoadBalanceStrategyH\005\210\001\001\022F\n\ttr" +
-      "ansport\030\r \001(\0132..io.github.lxien.orbien.c" +
-      "ore.message.TransportH\006\210\001\001\022C\n\010tls_cert\030\016" +
-      " \001(\0132,.io.github.lxien.orbien.core.messa" +
-      "ge.TlsCertH\007\210\001\001\022K\n\014health_check\030\017 \001(\01320." +
-      "io.github.lxien.orbien.core.message.Heal" +
-      "thCheckH\010\210\001\001\022I\n\013socks5_auth\030\020 \001(\0132/.io.g" +
-      "ithub.lxien.orbien.core.message.Socks5Au" +
-      "thH\t\210\001\001B\016\n\014_remote_portB\t\n\007_domainB\021\n\017_a" +
-      "ccess_controlB\r\n\013_basic_authB\014\n\n_bandwid" +
-      "thB\030\n\026_load_balance_strategyB\014\n\n_transpo" +
-      "rtB\013\n\t_tls_certB\017\n\r_health_checkB\016\n\014_soc" +
-      "ks5_auth\"\263\002\n\013RuntimeInfo\022\017\n\007proxyId\030\001 \001(" +
-      "\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.io.gi" +
-      "thub.lxien.orbien.core.message.Target\022\023\n" +
-      "\013remote_addr\030\004 \003(\t\022K\n\014health_check\030\005 \001(\013" +
-      "20.io.github.lxien.orbien.core.message.H" +
-      "ealthCheckH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132..io." +
-      "github.lxien.orbien.core.message.Transpo" +
-      "rtH\001\210\001\001B\017\n\r_health_checkB\014\n\n_transport\"X" +
-      "\n\031BatchCreateProxiesRequest\022;\n\007proxies\030\001" +
-      " \003(\0132*.io.github.lxien.orbien.core.messa" +
-      "ge.Proxy\"\232\001\n\032BatchCreateProxiesResponse\022" +
-      "?\n\005items\030\001 \003(\01320.io.github.lxien.orbien." +
-      "core.message.RuntimeInfo\022;\n\006status\030\002 \001(\013" +
-      "2+.io.github.lxien.orbien.core.message.S" +
-      "tatus\"\264\001\n\021ProxySyncResponse\022K\n\017proxy_syn" +
-      "c_type\030\001 \001(\01622.io.github.lxien.orbien.co" +
-      "re.message.ProxySyncType\022?\n\005items\030\002 \003(\0132" +
-      "0.io.github.lxien.orbien.core.message.Ru" +
-      "ntimeInfo\022\021\n\tproxy_ids\030\003 \003(\t\"\230\001\n\rService" +
-      "Health\022\020\n\010proxy_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014" +
-      "\n\004port\030\003 \001(\r\022A\n\006status\030\004 \001(\01621.io.github" +
-      ".lxien.orbien.core.message.HealthStatus\022" +
-      "\026\n\016responseTimeMs\030\005 \001(\004\"d\n\037BatchReportSe" +
-      "rviceHealthRequest\022A\n\005items\030\001 \003(\01322.io.g" +
-      "ithub.lxien.orbien.core.message.ServiceH" +
-      "ealth\"D\n\005Error\022;\n\006status\030\001 \001(\0132+.io.gith" +
-      "ub.lxien.orbien.core.message.Status*A\n\014P" +
-      "rotocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020" +
-      "\002\022\007\n\003UDP\020\003\022\n\n\006SOCKS5\020\004*$\n\tAgentType\022\n\n\006B" +
-      "INARY\020\000\022\013\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005AL" +
-      "LOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017" +
-      "\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022" +
-      "\016\n\nLEAST_CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNO" +
-      "WN\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022" +
-      "\010\n\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE" +
-      "\020\003*H\n\017HealthCheckType\022\031\n\025HEALTH_CHECK_TY" +
-      "PE_TCP\020\000\022\032\n\026HEALTH_CHECK_TYPE_HTTP\020\001b\006pr" +
-      "oto3"
+      "n.orbien.core.message.Socks5User\"G\n\rFile" +
+      "ShareUser\022\020\n\010username\030\001 \001(\t\022\020\n\010password\030" +
+      "\002 \001(\t\022\022\n\npermission\030\003 \001(\t\"c\n\rFileShareAu" +
+      "th\022\017\n\007enabled\030\001 \001(\010\022A\n\005users\030\002 \003(\01322.io." +
+      "github.lxien.orbien.core.message.FileSha" +
+      "reUser\"~\n\017FileShareLimits\022\021\n\troot_path\030\001" +
+      " \001(\t\022\027\n\017max_upload_size\030\002 \001(\003\022\024\n\014allow_u" +
+      "pload\030\003 \001(\010\022\024\n\014allow_delete\030\004 \001(\010\022\023\n\013all" +
+      "ow_mkdir\030\005 \001(\010\"E\n\017FileListRequest\022\022\n\nreq" +
+      "uest_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022\014\n\004path\030" +
+      "\003 \001(\t\"Q\n\tFileEntry\022\014\n\004name\030\001 \001(\t\022\021\n\tdire" +
+      "ctory\030\002 \001(\010\022\014\n\004size\030\003 \001(\003\022\025\n\rmodified_ti" +
+      "me\030\004 \001(\003\"\317\001\n\020FileListResponse\022\022\n\nrequest" +
+      "_id\030\001 \001(\t\022\024\n\014current_path\030\002 \001(\t\022\023\n\013paren" +
+      "t_path\030\003 \001(\t\022?\n\007entries\030\004 \003(\0132..io.githu" +
+      "b.lxien.orbien.core.message.FileEntry\022;\n" +
+      "\006status\030\005 \001(\0132+.io.github.lxien.orbien.c" +
+      "ore.message.Status\"j\n\020FileTransferInit\022\022" +
+      "\n\nrequest_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022\014\n\004" +
+      "path\030\003 \001(\t\022\022\n\ntotal_size\030\004 \001(\003\022\016\n\006upload" +
+      "\030\005 \001(\010\"K\n\tFileChunk\022\022\n\nrequest_id\030\001 \001(\t\022" +
+      "\016\n\006offset\030\002 \001(\003\022\014\n\004data\030\003 \001(\014\022\014\n\004last\030\004 " +
+      "\001(\010\"c\n\020FileTransferDone\022\022\n\nrequest_id\030\001 " +
+      "\001(\t\022;\n\006status\030\002 \001(\0132+.io.github.lxien.or" +
+      "bien.core.message.Status\"]\n\rFileOpReques" +
+      "t\022\022\n\nrequest_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022" +
+      "\n\n\002op\030\003 \001(\t\022\014\n\004path\030\004 \001(\t\022\014\n\004name\030\005 \001(\t\"" +
+      "a\n\016FileOpResponse\022\022\n\nrequest_id\030\001 \001(\t\022;\n" +
+      "\006status\030\002 \001(\0132+.io.github.lxien.orbien.c" +
+      "ore.message.Status\"s\n\tBandwidth\022\022\n\005limit" +
+      "\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tli" +
+      "mit_out\030\003 \001(\tH\002\210\001\001B\010\n\006_limitB\013\n\t_limit_i" +
+      "nB\014\n\n_limit_out\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022" +
+      "\014\n\004port\030\002 \001(\r\022\021\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006weig" +
+      "ht\030\004 \001(\005H\001\210\001\001B\007\n\005_nameB\t\n\007_weight\"_\n\006Dom" +
+      "ain\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_" +
+      "domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n\014_a" +
+      "uto_domain\":\n\007TlsCert\022\027\n\017private_key_pem" +
+      "\030\001 \001(\t\022\026\n\016cert_chain_pem\030\002 \001(\t\"\233\001\n\tTrans" +
+      "port\022\026\n\tmultiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030" +
+      "\002 \001(\010H\001\210\001\001\022\025\n\010compress\030\003 \001(\010H\002\210\001\001\022\025\n\010pro" +
+      "tocol\030\004 \001(\tH\003\210\001\001B\014\n\n_multiplexB\n\n\010_encry" +
+      "ptB\013\n\t_compressB\013\n\t_protocol\"\247\001\n\013HealthC" +
+      "heck\022B\n\004type\030\001 \001(\01624.io.github.lxien.orb" +
+      "ien.core.message.HealthCheckType\022\020\n\010inte" +
+      "rval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(\005\022\022\n\nmax_faile" +
+      "d\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007enabled\030\006 \001(\010\"\353" +
+      "\t\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022" +
+      "C\n\010protocol\030\003 \001(\01621.io.github.lxien.orbi" +
+      "en.core.message.ProtocolType\022\017\n\007enabled\030" +
+      "\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.io.github.lxien" +
+      ".orbien.core.message.Target\022\023\n\013force_htt" +
+      "ps\030\006 \001(\010\022\030\n\013remote_port\030\007 \001(\rH\000\210\001\001\022@\n\006do" +
+      "main\030\010 \001(\0132+.io.github.lxien.orbien.core" +
+      ".message.DomainH\001\210\001\001\022O\n\016access_control\030\t" +
+      " \001(\01322.io.github.lxien.orbien.core.messa" +
+      "ge.AccessControlH\002\210\001\001\022G\n\nbasic_auth\030\n \001(" +
+      "\0132..io.github.lxien.orbien.core.message." +
+      "BasicAuthH\003\210\001\001\022F\n\tbandwidth\030\013 \001(\0132..io.g" +
+      "ithub.lxien.orbien.core.message.Bandwidt" +
+      "hH\004\210\001\001\022\\\n\025load_balance_strategy\030\014 \001(\01628." +
+      "io.github.lxien.orbien.core.message.Load" +
+      "BalanceStrategyH\005\210\001\001\022F\n\ttransport\030\r \001(\0132" +
+      "..io.github.lxien.orbien.core.message.Tr" +
+      "ansportH\006\210\001\001\022C\n\010tls_cert\030\016 \001(\0132,.io.gith" +
+      "ub.lxien.orbien.core.message.TlsCertH\007\210\001" +
+      "\001\022K\n\014health_check\030\017 \001(\01320.io.github.lxie" +
+      "n.orbien.core.message.HealthCheckH\010\210\001\001\022I" +
+      "\n\013socks5_auth\030\020 \001(\0132/.io.github.lxien.or" +
+      "bien.core.message.Socks5AuthH\t\210\001\001\022J\n\tfil" +
+      "e_auth\030\021 \001(\01322.io.github.lxien.orbien.co" +
+      "re.message.FileShareAuthH\n\210\001\001\022N\n\013file_li" +
+      "mits\030\022 \001(\01324.io.github.lxien.orbien.core" +
+      ".message.FileShareLimitsH\013\210\001\001B\016\n\014_remote" +
+      "_portB\t\n\007_domainB\021\n\017_access_controlB\r\n\013_" +
+      "basic_authB\014\n\n_bandwidthB\030\n\026_load_balanc" +
+      "e_strategyB\014\n\n_transportB\013\n\t_tls_certB\017\n" +
+      "\r_health_checkB\016\n\014_socks5_authB\014\n\n_file_" +
+      "authB\016\n\014_file_limits\"\223\003\n\013RuntimeInfo\022\017\n\007" +
+      "proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets\030\003" +
+      " \003(\0132+.io.github.lxien.orbien.core.messa" +
+      "ge.Target\022\023\n\013remote_addr\030\004 \003(\t\022K\n\014health" +
+      "_check\030\005 \001(\01320.io.github.lxien.orbien.co" +
+      "re.message.HealthCheckH\000\210\001\001\022F\n\ttransport" +
+      "\030\006 \001(\0132..io.github.lxien.orbien.core.mes" +
+      "sage.TransportH\001\210\001\001\022N\n\013file_limits\030\007 \001(\013" +
+      "24.io.github.lxien.orbien.core.message.F" +
+      "ileShareLimitsH\002\210\001\001B\017\n\r_health_checkB\014\n\n" +
+      "_transportB\016\n\014_file_limits\"X\n\031BatchCreat" +
+      "eProxiesRequest\022;\n\007proxies\030\001 \003(\0132*.io.gi" +
+      "thub.lxien.orbien.core.message.Proxy\"\232\001\n" +
+      "\032BatchCreateProxiesResponse\022?\n\005items\030\001 \003" +
+      "(\01320.io.github.lxien.orbien.core.message" +
+      ".RuntimeInfo\022;\n\006status\030\002 \001(\0132+.io.github" +
+      ".lxien.orbien.core.message.Status\"\264\001\n\021Pr" +
+      "oxySyncResponse\022K\n\017proxy_sync_type\030\001 \001(\016" +
+      "22.io.github.lxien.orbien.core.message.P" +
+      "roxySyncType\022?\n\005items\030\002 \003(\01320.io.github." +
+      "lxien.orbien.core.message.RuntimeInfo\022\021\n" +
+      "\tproxy_ids\030\003 \003(\t\"\230\001\n\rServiceHealth\022\020\n\010pr" +
+      "oxy_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001(\r" +
+      "\022A\n\006status\030\004 \001(\01621.io.github.lxien.orbie" +
+      "n.core.message.HealthStatus\022\026\n\016responseT" +
+      "imeMs\030\005 \001(\004\"d\n\037BatchReportServiceHealthR" +
+      "equest\022A\n\005items\030\001 \003(\01322.io.github.lxien." +
+      "orbien.core.message.ServiceHealth\"D\n\005Err" +
+      "or\022;\n\006status\030\001 \001(\0132+.io.github.lxien.orb" +
+      "ien.core.message.Status*K\n\014ProtocolType\022" +
+      "\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020\002\022\007\n\003UDP\020\003\022\n" +
+      "\n\006SOCKS5\020\004\022\010\n\004FILE\020\005*$\n\tAgentType\022\n\n\006BIN" +
+      "ARY\020\000\022\013\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005ALLO" +
+      "W\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017\n\013" +
+      "ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022\016\n" +
+      "\nLEAST_CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNOWN" +
+      "\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022\010\n" +
+      "\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003" +
+      "*H\n\017HealthCheckType\022\031\n\025HEALTH_CHECK_TYPE" +
+      "_TCP\020\000\022\032\n\026HEALTH_CHECK_TYPE_HTTP\020\001b\006prot" +
+      "o3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -24799,86 +35067,152 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Socks5Auth_descriptor,
         new java.lang.String[] { "Enabled", "Users", });
-    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor =
+    internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor =
       getDescriptor().getMessageType(11);
+    internal_static_io_github_lxien_orbien_core_message_FileShareUser_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileShareUser_descriptor,
+        new java.lang.String[] { "Username", "Password", "Permission", });
+    internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor =
+      getDescriptor().getMessageType(12);
+    internal_static_io_github_lxien_orbien_core_message_FileShareAuth_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileShareAuth_descriptor,
+        new java.lang.String[] { "Enabled", "Users", });
+    internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor =
+      getDescriptor().getMessageType(13);
+    internal_static_io_github_lxien_orbien_core_message_FileShareLimits_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileShareLimits_descriptor,
+        new java.lang.String[] { "RootPath", "MaxUploadSize", "AllowUpload", "AllowDelete", "AllowMkdir", });
+    internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor =
+      getDescriptor().getMessageType(14);
+    internal_static_io_github_lxien_orbien_core_message_FileListRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor,
+        new java.lang.String[] { "RequestId", "ProxyId", "Path", });
+    internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor =
+      getDescriptor().getMessageType(15);
+    internal_static_io_github_lxien_orbien_core_message_FileEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor,
+        new java.lang.String[] { "Name", "Directory", "Size", "ModifiedTime", });
+    internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor =
+      getDescriptor().getMessageType(16);
+    internal_static_io_github_lxien_orbien_core_message_FileListResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor,
+        new java.lang.String[] { "RequestId", "CurrentPath", "ParentPath", "Entries", "Status", });
+    internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor =
+      getDescriptor().getMessageType(17);
+    internal_static_io_github_lxien_orbien_core_message_FileTransferInit_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileTransferInit_descriptor,
+        new java.lang.String[] { "RequestId", "ProxyId", "Path", "TotalSize", "Upload", });
+    internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor =
+      getDescriptor().getMessageType(18);
+    internal_static_io_github_lxien_orbien_core_message_FileChunk_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileChunk_descriptor,
+        new java.lang.String[] { "RequestId", "Offset", "Data", "Last", });
+    internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor =
+      getDescriptor().getMessageType(19);
+    internal_static_io_github_lxien_orbien_core_message_FileTransferDone_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileTransferDone_descriptor,
+        new java.lang.String[] { "RequestId", "Status", });
+    internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor =
+      getDescriptor().getMessageType(20);
+    internal_static_io_github_lxien_orbien_core_message_FileOpRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileOpRequest_descriptor,
+        new java.lang.String[] { "RequestId", "ProxyId", "Op", "Path", "Name", });
+    internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor =
+      getDescriptor().getMessageType(21);
+    internal_static_io_github_lxien_orbien_core_message_FileOpResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_io_github_lxien_orbien_core_message_FileOpResponse_descriptor,
+        new java.lang.String[] { "RequestId", "Status", });
+    internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor =
+      getDescriptor().getMessageType(22);
     internal_static_io_github_lxien_orbien_core_message_Bandwidth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Bandwidth_descriptor,
         new java.lang.String[] { "Limit", "LimitIn", "LimitOut", });
     internal_static_io_github_lxien_orbien_core_message_Target_descriptor =
-      getDescriptor().getMessageType(12);
+      getDescriptor().getMessageType(23);
     internal_static_io_github_lxien_orbien_core_message_Target_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Target_descriptor,
         new java.lang.String[] { "Host", "Port", "Name", "Weight", });
     internal_static_io_github_lxien_orbien_core_message_Domain_descriptor =
-      getDescriptor().getMessageType(13);
+      getDescriptor().getMessageType(24);
     internal_static_io_github_lxien_orbien_core_message_Domain_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Domain_descriptor,
         new java.lang.String[] { "AutoDomain", "CustomDomains", "SubDomains", });
     internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor =
-      getDescriptor().getMessageType(14);
+      getDescriptor().getMessageType(25);
     internal_static_io_github_lxien_orbien_core_message_TlsCert_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_TlsCert_descriptor,
         new java.lang.String[] { "PrivateKeyPem", "CertChainPem", });
     internal_static_io_github_lxien_orbien_core_message_Transport_descriptor =
-      getDescriptor().getMessageType(15);
+      getDescriptor().getMessageType(26);
     internal_static_io_github_lxien_orbien_core_message_Transport_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Transport_descriptor,
         new java.lang.String[] { "Multiplex", "Encrypt", "Compress", "Protocol", });
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor =
-      getDescriptor().getMessageType(16);
+      getDescriptor().getMessageType(27);
     internal_static_io_github_lxien_orbien_core_message_HealthCheck_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_HealthCheck_descriptor,
         new java.lang.String[] { "Type", "Interval", "Timeout", "MaxFailed", "Path", "Enabled", });
     internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor =
-      getDescriptor().getMessageType(17);
+      getDescriptor().getMessageType(28);
     internal_static_io_github_lxien_orbien_core_message_Proxy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Proxy_descriptor,
-        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", "Socks5Auth", });
+        new java.lang.String[] { "ProxyId", "Name", "Protocol", "Enabled", "Targets", "ForceHttps", "RemotePort", "Domain", "AccessControl", "BasicAuth", "Bandwidth", "LoadBalanceStrategy", "Transport", "TlsCert", "HealthCheck", "Socks5Auth", "FileAuth", "FileLimits", });
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor =
-      getDescriptor().getMessageType(18);
+      getDescriptor().getMessageType(29);
     internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_RuntimeInfo_descriptor,
-        new java.lang.String[] { "ProxyId", "Name", "Targets", "RemoteAddr", "HealthCheck", "Transport", });
+        new java.lang.String[] { "ProxyId", "Name", "Targets", "RemoteAddr", "HealthCheck", "Transport", "FileLimits", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor =
-      getDescriptor().getMessageType(19);
+      getDescriptor().getMessageType(30);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesRequest_descriptor,
         new java.lang.String[] { "Proxies", });
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor =
-      getDescriptor().getMessageType(20);
+      getDescriptor().getMessageType(31);
     internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchCreateProxiesResponse_descriptor,
         new java.lang.String[] { "Items", "Status", });
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor =
-      getDescriptor().getMessageType(21);
+      getDescriptor().getMessageType(32);
     internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ProxySyncResponse_descriptor,
         new java.lang.String[] { "ProxySyncType", "Items", "ProxyIds", });
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor =
-      getDescriptor().getMessageType(22);
+      getDescriptor().getMessageType(33);
     internal_static_io_github_lxien_orbien_core_message_ServiceHealth_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_ServiceHealth_descriptor,
         new java.lang.String[] { "ProxyId", "Host", "Port", "Status", "ResponseTimeMs", });
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor =
-      getDescriptor().getMessageType(23);
+      getDescriptor().getMessageType(34);
     internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_BatchReportServiceHealthRequest_descriptor,
         new java.lang.String[] { "Items", });
     internal_static_io_github_lxien_orbien_core_message_Error_descriptor =
-      getDescriptor().getMessageType(24);
+      getDescriptor().getMessageType(35);
     internal_static_io_github_lxien_orbien_core_message_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_Error_descriptor,

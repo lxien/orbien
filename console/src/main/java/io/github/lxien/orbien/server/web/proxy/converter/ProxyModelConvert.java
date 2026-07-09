@@ -43,8 +43,18 @@ public interface ProxyModelConvert {
 
     Socks5AuthConfig toSocks5AuthConfig(Socks5AuthDO socks5AuthDO);
 
+    @Mapping(target = "users", ignore = true)
+    @Mapping(target = "enabled", expression = "java(Boolean.TRUE.equals(fileShareAuthDO.getEnabled()))")
+    FileShareAuthConfig toFileShareAuthConfig(FileShareAuthDO fileShareAuthDO);
+
+    FileShareLimitsConfig toFileShareLimitsConfig(FileShareLimitsDO limitsDO);
+
     default List<Socks5AuthConfig.Socks5User> toSocks5UserConfig(List<Socks5UserDO> users) {
         return mapSocks5Users(users);
+    }
+
+    default List<FileShareAuthConfig.FileShareUser> toFileShareUserConfig(List<FileShareUserDO> users) {
+        return mapFileShareUsers(users);
     }
 
     default List<Socks5AuthConfig.Socks5User> mapSocks5Users(List<Socks5UserDO> users) {
@@ -53,6 +63,16 @@ public interface ProxyModelConvert {
         }
         return users.stream()
                 .map(user -> new Socks5AuthConfig.Socks5User(user.getUsername(), user.getPassword()))
+                .toList();
+    }
+
+    default List<FileShareAuthConfig.FileShareUser> mapFileShareUsers(List<FileShareUserDO> users) {
+        if (users == null || users.isEmpty()) {
+            return List.of();
+        }
+        return users.stream()
+                .map(user -> new FileShareAuthConfig.FileShareUser(
+                        user.getUsername(), user.getPassword(), user.getPermission()))
                 .toList();
     }
 

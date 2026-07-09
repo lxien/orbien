@@ -1,14 +1,11 @@
 package io.github.lxien.orbien.server.utils;
 
-import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.util.CharsetUtil;
 
-
-import io.netty.channel.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * HTTP 工具类
@@ -16,11 +13,7 @@ import io.netty.channel.*;
 public class NettyHttpUtils {
 
     private static ChannelFuture writeAndFlush(Channel channel, ByteBuf buf) {
-        return channel.writeAndFlush(buf).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
-                buf.release();
-            }
-        });
+        return channel.writeAndFlush(buf);
     }
 
     private static ByteBuf buildResponse(Channel channel, String response) {
@@ -65,16 +58,7 @@ public class NettyHttpUtils {
     }
 
     public static ChannelFuture sendHttp200(Channel channel, String content) {
-        int contentLength = content.length();
-
-        String response = String.format("""
-                HTTP/1.1 200 OK\r
-                Content-Type: text/plain\r
-                Content-Length: %d\r
-                \r
-                %s""", contentLength, content);
-
-        return writeAndFlush(channel, buildResponse(channel, response));
+        return sendHttpResponse(channel, 200, "OK", "text/plain; charset=UTF-8", content);
     }
 
     public static ChannelFuture sendHttp404(Channel channel) {
@@ -131,15 +115,28 @@ public class NettyHttpUtils {
             String contentType,
             String content
     ) {
-        int contentLength = content.length();
+        byte[] bodyBytes = content.getBytes(StandardCharsets.UTF_8);
+        return sendHttpBinaryResponse(channel, statusCode, statusMessage, contentType, bodyBytes);
+    }
 
-        String response = String.format("""
+    public static ChannelFuture sendHttpBinaryResponse(
+            Channel channel,
+            int statusCode,
+            String statusMessage,
+            String contentType,
+            byte[] bodyBytes
+    ) {
+        byte[] safeBody = bodyBytes == null ? new byte[0] : bodyBytes;
+        String headers = String.format("""
                 HTTP/1.1 %d %s\r
                 Content-Type: %s\r
                 Content-Length: %d\r
+                Connection: close\r
                 \r
-                %s""", statusCode, statusMessage, contentType, contentLength, content);
-
-        return writeAndFlush(channel, buildResponse(channel, response));
+                """, statusCode, statusMessage, contentType, safeBody.length);
+        ByteBuf buf = channel.alloc().buffer(headers.length() + safeBody.length);
+        buf.writeCharSequence(headers, CharsetUtil.UTF_8);
+        buf.writeBytes(safeBody);
+        return writeAndFlush(channel, buf);
     }
 }

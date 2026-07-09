@@ -59,11 +59,16 @@ public class ProxyConfigAssembler {
                 assembleBasicAuthUsers(config, relations.basicUsers());
             }
         }
+        if (config.isFile()) {
+            assembleDomains(config, relations.domains());
+            assembleFileShareAuth(config, relations.fileShareAuth(), relations.fileShareUsers());
+            assembleFileShareLimits(config, relations.fileShareLimits());
+        }
         if (config.isSocks5()) {
             assembleSocks5Auth(config, relations.socks5Auth(), relations.socks5Users());
         }
 
-        if (!config.isSocks5()) {
+        if (!config.isSocks5() && !config.isFile()) {
             assembleHealthCheck(config, relations.healthCheck());
         }
         return ProxyConfigExt.of(config, toDomainInfos(relations.domains()));
@@ -112,6 +117,26 @@ public class ProxyConfigAssembler {
             authConfig.addUsers(proxyModelConvert.toSocks5UserConfig(users));
         }
         config.setSocks5Auth(authConfig);
+    }
+
+    public void assembleFileShareAuth(ProxyConfig config, FileShareAuthDO fileShareAuthDO, List<FileShareUserDO> users) {
+        if (fileShareAuthDO == null) {
+            return;
+        }
+        FileShareAuthConfig authConfig = proxyModelConvert.toFileShareAuthConfig(fileShareAuthDO);
+        if (!CollectionUtils.isEmpty(users)) {
+            for (FileShareAuthConfig.FileShareUser user : proxyModelConvert.toFileShareUserConfig(users)) {
+                authConfig.addUser(user);
+            }
+        }
+        config.setFileShareAuth(authConfig);
+    }
+
+    public void assembleFileShareLimits(ProxyConfig config, FileShareLimitsDO limitsDO) {
+        if (limitsDO == null) {
+            return;
+        }
+        config.setFileShareLimits(proxyModelConvert.toFileShareLimitsConfig(limitsDO));
     }
 
     public void assembleTransport(ProxyConfig config, ProxyDO proxyDO) {

@@ -38,6 +38,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -72,6 +73,12 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
+    @Autowired
+    private FileShareAuthRepository fileShareAuthRepository;
+    @Autowired
+    private FileShareUserRepository fileShareUserRepository;
+    @Autowired
+    private FileShareLimitsRepository fileShareLimitsRepository;
     @Autowired
     private ProxyReportConvert proxyReportConvert;
     @Autowired
@@ -109,13 +116,16 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         if (protocol.isHttpOrHttps()) {
             applyHttpProxyFields(proxyDO, event);
         }
+        if (protocol.isFile()) {
+            applyFileProxyFields(proxyDO, event);
+        }
 
         proxyRepository.save(proxyDO);
-        if (!protocol.isSocks5()) {
+        if (!protocol.isSocks5() && !protocol.isFile()) {
             persistTargets(proxyId, proxy);
         }
         persistAccessControl(proxyId, proxy);
-        if (!protocol.isSocks5()) {
+        if (!protocol.isSocks5() && !protocol.isFile()) {
             persistHealthCheck(proxyId, proxy);
         }
 
@@ -125,6 +135,11 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         }
         if (protocol.isSocks5()) {
             persistSocks5Auth(proxyId, proxy);
+        }
+        if (protocol.isFile()) {
+            persistFileShareAuth(proxyId, proxy);
+            persistFileShareLimits(proxyId, proxy);
+            persistDomains(proxyId, event.getDomains());
         }
 
         logger.debug("代理配置信息已保存到数据库: agentId={}, proxyId={}, name={}, protocol={}",
@@ -137,6 +152,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
             return;
         }
         proxyDO.setDomainType(domains.getFirst().getDomainType());
+    }
+
+    private void applyFileProxyFields(ProxyDO proxyDO, ProxyAddEvent event) {
+        applyHttpProxyFields(proxyDO, event);
     }
 
     private void persistTargets(String proxyId, Message.Proxy proxy) {
@@ -206,6 +225,39 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
             return;
         }
         socks5AuthRepository.save(new Socks5AuthDO(proxyId, false));
+    }
+
+    private void persistFileShareAuth(String proxyId, Message.Proxy proxy) {
+        fileShareUserRepository.deleteByProxyIdIn(List.of(proxyId));
+        if (proxy.hasFileAuth()) {
+            Message.FileShareAuth fileAuth = proxy.getFileAuth();
+            fileShareAuthRepository.save(new FileShareAuthDO(proxyId, fileAuth.getEnabled()));
+            if (!fileAuth.getUsersList().isEmpty()) {
+                List<FileShareUserDO> users = proxyReportConvert.toFileShareUserDOList(fileAuth, proxyId);
+                users.forEach(user -> user.setPassword(passwordEncoder.encode(user.getPassword())));
+                fileShareUserRepository.saveAll(users);
+            }
+            return;
+        }
+        fileShareAuthRepository.save(new FileShareAuthDO(proxyId, false));
+    }
+
+    private void persistFileShareLimits(String proxyId, Message.Proxy proxy) {
+        if (!proxy.hasFileLimits()) {
+            return;
+        }
+        Message.FileShareLimits limits = proxy.getFileLimits();
+        FileShareLimitsDO limitsDO = new FileShareLimitsDO(proxyId);
+        if (StringUtils.hasText(limits.getRootPath())) {
+            limitsDO.setRootPath(limits.getRootPath());
+        }
+        if (limits.getMaxUploadSize() > 0) {
+            limitsDO.setMaxUploadSize(limits.getMaxUploadSize());
+        }
+        limitsDO.setAllowUpload(limits.getAllowUpload());
+        limitsDO.setAllowDelete(limits.getAllowDelete());
+        limitsDO.setAllowMkdir(limits.getAllowMkdir());
+        fileShareLimitsRepository.save(limitsDO);
     }
 
     private void persistDomains(String proxyId, List<DomainInfo> domains) {

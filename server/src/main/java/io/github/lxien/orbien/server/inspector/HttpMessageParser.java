@@ -5,11 +5,15 @@ import io.netty.util.CharsetUtil;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * HTTP 报文嗅探解析，不消费待转发的 {@link ByteBuf}。
  */
 public final class HttpMessageParser {
+    private static final Set<String> VALID_METHODS = Set.of(
+            "GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT", "TRACE");
+
     private HttpMessageParser() {
     }
 
@@ -49,15 +53,35 @@ public final class HttpMessageParser {
             return null;
         }
         String requestLine = lines[0];
-        int firstSpace = requestLine.indexOf(' ');
-        int secondSpace = requestLine.indexOf(' ', firstSpace + 1);
-        if (firstSpace <= 0 || secondSpace <= firstSpace) {
+        if (!isValidRequestLine(requestLine)) {
             return null;
         }
+        int firstSpace = requestLine.indexOf(' ');
+        int secondSpace = requestLine.indexOf(' ', firstSpace + 1);
         String method = requestLine.substring(0, firstSpace);
         String path = requestLine.substring(firstSpace + 1, secondSpace);
         Map<String, String> headers = parseHeaders(lines, 1);
         return new ParsedRequest(method, path, headers, headerContent);
+    }
+
+    /**
+     * 判断首行是否为合法 HTTP 请求行，避免 multipart body 分片被误判为新请求。
+     */
+    public static boolean isValidRequestLine(String requestLine) {
+        if (requestLine == null || requestLine.isBlank()) {
+            return false;
+        }
+        int firstSpace = requestLine.indexOf(' ');
+        int secondSpace = requestLine.indexOf(' ', firstSpace + 1);
+        if (firstSpace <= 0 || secondSpace <= firstSpace) {
+            return false;
+        }
+        String method = requestLine.substring(0, firstSpace);
+        if (!VALID_METHODS.contains(method)) {
+            return false;
+        }
+        String version = requestLine.substring(secondSpace + 1);
+        return version.startsWith("HTTP/1.");
     }
 
     public static ParsedResponse parseResponse(ByteBuf buf, int maxHeaderSize) {
