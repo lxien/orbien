@@ -29,8 +29,10 @@ import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
+import io.github.lxien.orbien.server.web.dto.bandwidth.BandwidthDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.*;
 import io.github.lxien.orbien.server.web.dto.socks5auth.Socks5UserDTO;
+import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
@@ -531,6 +533,7 @@ public class ProxyServiceImpl implements ProxyService {
         existsProxyDO.setName(param.getName());
         existsProxyDO.setDomainType(requestDomainType);
         applyHttpLimitTotal(existsProxyDO, param.getLimitTotal());
+        applyBandwidthLimits(existsProxyDO, param.getLimitIn(), param.getLimitOut());
         proxyRepository.save(existsProxyDO);
 
         if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
@@ -1029,6 +1032,31 @@ public class ProxyServiceImpl implements ProxyService {
         proxyDO.setLimitTotal(BandwidthUnit.MBPS.toBps(limitTotalMbps));
     }
 
+    private void applyBandwidthLimits(ProxyDO proxyDO, Long limitIn, Long limitOut) {
+        if (limitIn != null) {
+            proxyDO.setLimitIn(limitIn > 0 ? limitIn : null);
+        }
+        if (limitOut != null) {
+            proxyDO.setLimitOut(limitOut > 0 ? limitOut : null);
+        }
+    }
+
+    private TransportDTO buildTransportDTO(ProxyDO proxyDO) {
+        TransportDTO dto = new TransportDTO();
+        dto.setEncrypt(Boolean.TRUE.equals(proxyDO.getEncrypt()));
+        dto.setTunnelType(Boolean.TRUE.equals(proxyDO.getMultiplex())
+                ? TunnelType.MULTIPLEX.getCode()
+                : TunnelType.DIRECT.getCode());
+        return dto;
+    }
+
+    private BandwidthDTO buildBandwidthDTO(ProxyDO proxyDO) {
+        return new BandwidthDTO(
+                proxyDO.getLimitTotal(),
+                proxyDO.getLimitIn(),
+                proxyDO.getLimitOut());
+    }
+
     private void assertHttpLikeProtocol(ProxyDO proxyDO, ProtocolType protocol) {
         if (protocol.isHttp() && !proxyDO.getProtocol().isHttp()) {
             throw new BizException("仅支持 HTTP 代理");
@@ -1509,6 +1537,9 @@ public class ProxyServiceImpl implements ProxyService {
         dto.setDomains(domains);
         dto.setAccessUrls(buildFileShareAccessUrls(domains, httpsProxyPort));
         dto.setLimitTotal(toMbps(proxyDO.getLimitTotal()));
+        dto.setTransportProtocol(ProxyConvert.resolveTransportProtocolCode(proxyDO.getTransportProtocol()));
+        dto.setTransport(buildTransportDTO(proxyDO));
+        dto.setBandwidth(buildBandwidthDTO(proxyDO));
         dto.setCreatedAt(proxyDO.getCreatedAt());
         dto.setUpdatedAt(proxyDO.getUpdatedAt());
 

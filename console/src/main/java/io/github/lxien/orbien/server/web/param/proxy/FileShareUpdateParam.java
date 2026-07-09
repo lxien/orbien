@@ -27,6 +27,8 @@ public class FileShareUpdateParam {
     private String rootPath;
     @Min(value = 1, message = "总带宽限制必须大于0")
     private Integer limitTotal;
+    private Long limitIn;
+    private Long limitOut;
     private Boolean authEnabled;
     private List<FileShareAuthUserParam> authUsers = new ArrayList<>();
     private Long maxUploadSize;

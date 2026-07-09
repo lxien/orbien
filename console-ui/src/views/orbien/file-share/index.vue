@@ -31,6 +31,26 @@
           :proxy-data="currentProxyData"
           @submit="handleDialogSubmit"
       />
+
+      <PluginDialog
+          v-model:visible="pluginDialogVisible"
+          :protocol="ProtocolType.FILE"
+          :proxy-id="currentPluginProxyId"
+          :proxy-name="currentPluginProxyName"
+      />
+
+      <MetricsDialog
+          v-model:visible="metricsDialogVisible"
+          :proxy-id="currentMetricsProxyId"
+          :show-time-range="true"
+          @close="handleMetricsClose"
+      />
+
+      <InspectorDrawer
+          v-model:visible="inspectorDrawerVisible"
+          :proxy-id="currentInspectorProxyId"
+          :proxy-name="currentInspectorProxyName"
+      />
     </ElCard>
   </div>
 </template>
@@ -43,6 +63,10 @@ import {fetchGetFileShareList} from '@/api/file-share'
 import {fetchBatchDeleteProxy} from '@/api/proxy'
 import {fetchGetAgentListAll} from '@/api/agent'
 import FileShareDialog from './modules/file-share-dialog.vue'
+import PluginDialog from '../plugin/index.vue'
+import MetricsDialog from '../common/modules/metrics-dialog/index.vue'
+import InspectorDrawer from '../common/modules/inspector-drawer/index.vue'
+import {renderTransportProtocolTag} from '../common/render-transport-protocol-tag'
 import {useProxyStatusToggle} from '../common/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -57,6 +81,17 @@ const dialogType = ref<DialogType>('add')
 const dialogVisible = ref(false)
 const currentProxyData = ref<Partial<FileShareItem>>({})
 const agentNameMap = ref<Record<string, string>>({})
+
+const pluginDialogVisible = ref(false)
+const currentPluginProxyId = ref('')
+const currentPluginProxyName = ref('')
+
+const metricsDialogVisible = ref(false)
+const currentMetricsProxyId = ref('')
+
+const inspectorDrawerVisible = ref(false)
+const currentInspectorProxyId = ref('')
+const currentInspectorProxyName = ref('')
 
 const {isToggling, handleStatusChange} = useProxyStatusToggle()
 
@@ -92,14 +127,9 @@ const {
       {
         prop: 'name',
         label: '共享名称',
-        minWidth: 100
+        minWidth: 60
       },
-      {
-        prop: 'agentId',
-        label: '客户端',
-        minWidth: 100,
-        formatter: (row: FileShareItem) => resolveAgentName(row.agentId)
-      },
+
       {
         prop: 'rootPath',
         label: '根目录',
@@ -108,7 +138,6 @@ const {
       {
         prop: 'accessUrls',
         label: '访问地址',
-        minWidth: 180,
         formatter: (row: FileShareItem) => {
           const urls = row.accessUrls?.length ? row.accessUrls : (row.domains || [])
           if (!urls.length) {
@@ -133,9 +162,13 @@ const {
         }
       },
       {
+        prop: 'transportProtocol',
+        label: '传输协议',
+        formatter: (row: FileShareItem) => renderTransportProtocolTag(row.transportProtocol)
+      },
+      {
         prop: 'authEnabled',
         label: '认证状态',
-        width: 100,
         formatter: (row: FileShareItem) =>
             h(ElTag, {
               type: row.authEnabled ? 'primary' : 'info',
@@ -157,10 +190,20 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 120,
+        width: 190,
         fixed: 'right',
         formatter: (row: FileShareItem) =>
             h('div', [
+              h(ArtButtonTable, {
+                type: 'link',
+                text: '设置',
+                onClick: () => handleSettings(row)
+              }),
+              h(ArtButtonTable, {
+                type: 'link',
+                text: '统计',
+                onClick: () => handleMetrics(row)
+              }),
               h(ArtButtonTable, {
                 type: 'link',
                 text: '编辑',
@@ -187,6 +230,27 @@ const showDialog = (type: DialogType, row?: FileShareItem): void => {
   nextTick(() => {
     dialogVisible.value = true
   })
+}
+
+const handleSettings = (proxy: FileShareItem) => {
+  currentPluginProxyId.value = proxy.id
+  currentPluginProxyName.value = proxy.name
+  pluginDialogVisible.value = true
+}
+
+const handleMetrics = (proxy: FileShareItem) => {
+  currentMetricsProxyId.value = proxy.id
+  metricsDialogVisible.value = true
+}
+
+const handleMetricsClose = () => {
+  currentMetricsProxyId.value = ''
+}
+
+const handleInspector = (proxy: FileShareItem) => {
+  currentInspectorProxyId.value = proxy.id
+  currentInspectorProxyName.value = proxy.name
+  inspectorDrawerVisible.value = true
 }
 
 const handleDialogSubmit = async () => {
@@ -244,4 +308,15 @@ onMounted(() => {
 })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.orbien-root-path-cell) {
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  color: var(--el-text-color-regular);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+}
+</style>

@@ -73,7 +73,7 @@ public class InspectorService {
         ProxyDO proxy = proxyRepository.findById(proxyId)
                 .orElseThrow(() -> new BizException("代理不存在"));
         if (!ProtocolType.isHttp(proxy.getProtocol()) && !ProtocolType.isHttps(proxy.getProtocol())) {
-            throw new BizException("仅 HTTP/HTTPS 代理支持流量抓包");
+            throw new BizException("仅 HTTP/HTTPS代理支持流量抓包");
         }
         return proxy;
     }

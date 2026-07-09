@@ -57,6 +57,9 @@ declare namespace Api.FileShare {
         allowDelete?: boolean
         allowMkdir?: boolean
         limitTotal?: number
+        transportProtocol?: number
+        transport?: Api.Proxy.TransportDTO
+        bandwidth?: Api.Proxy.BandwidthDTO | null
         authEnabled?: boolean
         authUsers?: FileShareUserDTO[]
         createdAt?: string
@@ -89,6 +92,8 @@ declare namespace Api.FileShare {
         customDomains?: string[]
         rootPath: string
         limitTotal?: number
+        limitIn?: number
+        limitOut?: number
         authEnabled?: boolean
         authUsers?: FileShareAuthUserParam[]
         maxUploadSize?: number

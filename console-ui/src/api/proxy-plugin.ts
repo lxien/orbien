@@ -1,4 +1,4 @@
-import {ProtocolType, getProtocolLabel} from '@/enums/orbien/business'
+import {ProtocolType, getProtocolLabel, BANDWIDTH_UNIT_TO_BPS, BandwidthUnit} from '@/enums/orbien/business'
 import {DomainType} from '@/enums/orbien/business'
 import type {ProxyConfigProtocol} from '@/views/orbien/plugin/menus'
 import {
@@ -12,12 +12,14 @@ import {
     fetchUpdateTcpProxy,
     fetchUpdateUdpProxy
 } from './proxy'
+import {fetchGetFileShareById, fetchUpdateFileShare} from './file-share'
 
 export type ProxyDetail =
     | Api.Proxy.HttpProxyDetailDTO
     | Api.Proxy.HttpsProxyDetailDTO
     | Api.Proxy.TcpProxyDetailDTO
     | Api.Proxy.UdpProxyDetailDTO
+    | Api.FileShare.FileShareDetailDTO
 
 type HttpLikeDetail = Api.Proxy.HttpProxyDetailDTO | Api.Proxy.HttpsProxyDetailDTO
 
@@ -25,15 +27,20 @@ const GET_API = {
     [ProtocolType.HTTP]: fetchGetHttpProxyById,
     [ProtocolType.HTTPS]: fetchGetHttpsProxyById,
     [ProtocolType.TCP]: fetchGetTcpProxyById,
-    [ProtocolType.UDP]: fetchGetUdpProxyById
-}
+    [ProtocolType.UDP]: fetchGetUdpProxyById,
+    [ProtocolType.FILE]: fetchGetFileShareById
+} as const
 
 export function fetchProxyDetail(protocol: ProxyConfigProtocol, id: string) {
-    return GET_API[protocol](id) as Promise<ProxyDetail>
+    const fetcher = GET_API[protocol as keyof typeof GET_API]
+    if (!fetcher) {
+        return Promise.reject(new Error(`${getProtocolLabel(protocol)} 暂不支持读取详情`))
+    }
+    return fetcher(id) as Promise<ProxyDetail>
 }
 
 function isHttpLikeDetail(detail: ProxyDetail): detail is HttpLikeDetail {
-    return 'domainType' in detail
+    return 'localHost' in detail
 }
 
 function buildHttpDomainPayload(detail: HttpLikeDetail) {
@@ -49,6 +56,56 @@ function buildHttpDomainPayload(detail: HttpLikeDetail) {
         return {customDomains: detail.customDomains ?? []}
     }
     return {}
+}
+
+function buildFileShareUpdatePayload(
+    detail: Api.FileShare.FileShareDetailDTO,
+    overrides: Partial<{
+        limitTotal: number | undefined
+        limitIn: number | null
+        limitOut: number | null
+    }> = {}
+): Api.FileShare.FileShareUpdateParam {
+    const payload: Api.FileShare.FileShareUpdateParam = {
+        id: detail.id,
+        name: detail.name,
+        domainType: detail.domainType,
+        rootPath: detail.rootPath,
+        authEnabled: detail.authEnabled,
+        authUsers: detail.authUsers?.map((user) => ({
+            id: user.id,
+            username: user.username,
+            permission: user.permission
+        })),
+        maxUploadSize: detail.maxUploadSize,
+        allowUpload: detail.allowUpload,
+        allowDelete: detail.allowDelete,
+        allowMkdir: detail.allowMkdir
+    }
+
+    if (detail.domainType === DomainType.SUBDOMAIN) {
+        payload.subdomainBindings = (detail.subdomainBindings ?? []).map(({rootDomainId, prefix}) => ({
+            rootDomainId,
+            prefix
+        }))
+    } else if (detail.domainType === DomainType.CUSTOM_DOMAIN) {
+        payload.customDomains = detail.customDomains ?? []
+    }
+
+    if (overrides.limitTotal !== undefined) {
+        payload.limitTotal = overrides.limitTotal
+    } else if (detail.limitTotal != null) {
+        payload.limitTotal = detail.limitTotal
+    }
+
+    if (overrides.limitIn !== undefined) {
+        payload.limitIn = overrides.limitIn ?? undefined
+    }
+    if (overrides.limitOut !== undefined) {
+        payload.limitOut = overrides.limitOut ?? undefined
+    }
+
+    return payload
 }
 
 function buildTcpUpdatePayload(
@@ -153,6 +210,24 @@ export function saveProxyBandwidthConfig(
                 ? Math.round(bandwidth.limitTotal / 1_000_000)
                 : udpDetail.limitTotal ?? undefined
         return fetchUpdateUdpProxy(buildUdpUpdatePayload(udpDetail, limitTotalMbps))
+    }
+
+    if (protocol === ProtocolType.FILE) {
+        const fileDetail = detail as Api.FileShare.FileShareDetailDTO
+        const unit = bandwidth.unit ?? BandwidthUnit.MBPS
+        const toBps = (value?: number | null) =>
+            value != null && value > 0 ? Math.round(value * BANDWIDTH_UNIT_TO_BPS[unit]) : null
+        const limitTotalMbps =
+            bandwidth.limitTotal != null && bandwidth.unit
+                ? Math.round(bandwidth.limitTotal / BANDWIDTH_UNIT_TO_BPS[unit])
+                : fileDetail.limitTotal ?? undefined
+        return fetchUpdateFileShare(
+            buildFileShareUpdatePayload(fileDetail, {
+                limitTotal: limitTotalMbps,
+                limitIn: toBps(bandwidth.limitIn),
+                limitOut: toBps(bandwidth.limitOut)
+            })
+        )
     }
 
     if (!isHttpLikeDetail(detail)) {
