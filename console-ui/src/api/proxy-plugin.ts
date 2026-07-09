@@ -13,6 +13,7 @@ import {
     fetchUpdateUdpProxy
 } from './proxy'
 import {fetchGetFileShareById, fetchUpdateFileShare} from './file-share'
+import {saveProxyTransport} from './proxy-transport'
 
 export type ProxyDetail =
     | Api.Proxy.HttpProxyDetailDTO
@@ -179,14 +180,12 @@ export function saveProxyClusterConfig(
 }
 
 export function saveProxyTransportConfig(
-    protocol: ProxyConfigProtocol,
-    detail: ProxyDetail,
-    _transport: Api.Proxy.TransportSaveParam
+    _protocol: ProxyConfigProtocol,
+    _detail: ProxyDetail,
+    transport: Api.Proxy.TransportSaveParam,
+    proxyId: string
 ) {
-    if (!isHttpLikeDetail(detail)) {
-        return rejectPluginSave(protocol, '传输配置')
-    }
-    return rejectPluginSave(protocol, '传输配置')
+    return saveProxyTransport(proxyId, transport)
 }
 
 export function saveProxyBandwidthConfig(
@@ -217,6 +216,7 @@ export function saveProxyBandwidthConfig(
         const unit = bandwidth.unit ?? BandwidthUnit.MBPS
         const toBps = (value?: number | null) =>
             value != null && value > 0 ? Math.round(value * BANDWIDTH_UNIT_TO_BPS[unit]) : null
+        // @ts-ignore
         const limitTotalMbps =
             bandwidth.limitTotal != null && bandwidth.unit
                 ? Math.round(bandwidth.limitTotal / BANDWIDTH_UNIT_TO_BPS[unit])

@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.server.web.service.impl;
 
-import io.github.lxien.orbien.server.web.common.crypto.CredentialEncryptor;
+import io.github.lxien.orbien.server.web.dns.crypto.CredentialEncryptor;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.common.utils.JsonUtils;
 import io.github.lxien.orbien.server.web.dto.dns.DnsCredentialDTO;

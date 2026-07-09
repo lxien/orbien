@@ -108,27 +108,33 @@ public class StreamCloseAction extends StreamBaseAction {
                     directConnectionPool.release(agentInfo.getAgentId(), tunnelEntry);
                 };
                 if (DirectTunnelLifecycle.isPassthroughActive(tunnel)) {
-                    DirectTunnelLifecycle.restoreControlStack(tunnel, pipeline -> {
-                        if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
-                            pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
-                        }
-                        if (pipeline.get(NettyConstants.CONTROL_IDLE_CHECK_HANDLER) == null) {
-                            pipeline.addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,
-                                    new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS));
-                        }
-                        if (pipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) == null) {
-                            pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
-                        }
-                    }).addListener(f -> {
-                        if (!f.isSuccess()) {
-                            logger.warn("恢复独立隧道控制栈失败 tunnelId={}，关闭隧道",
-                                    tunnelEntry.getTunnelId(), f.cause());
-                            ChannelUtils.closeOnFlush(tunnel);
-                            directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-                        } else {
-                            release.run();
-                        }
-                    });
+                    if (!DirectTunnelLifecycle.canRestoreControlStack(tunnel)) {
+                        logger.debug("独立隧道已关闭或 pipeline 不可用，跳过重栈恢复 tunnelId={}", tunnelEntry.getTunnelId());
+                        directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
+                    } else {
+                        DirectTunnelLifecycle.restoreControlStack(tunnel, pipeline -> {
+                            if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
+                                pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
+                            }
+                            if (pipeline.get(NettyConstants.CONTROL_IDLE_CHECK_HANDLER) == null) {
+                                pipeline.addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,
+                                        new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS));
+                            }
+                            if (pipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) == null) {
+                                pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
+                            }
+                        }).addListener(f -> {
+                            if (!f.isSuccess()) {
+                                logger.warn("恢复独立隧道控制栈失败 tunnelId={}，关闭隧道", tunnelEntry.getTunnelId(), f.cause());
+                                ChannelUtils.closeOnFlush(tunnel);
+                                directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
+                            } else if (tunnel.isActive()) {
+                                release.run();
+                            } else {
+                                directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
+                            }
+                        });
+                    }
                 } else {
                     release.run();
                 }

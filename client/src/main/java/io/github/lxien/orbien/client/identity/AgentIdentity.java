@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.client.identity;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 
 import java.io.*;
 import java.nio.file.Files;

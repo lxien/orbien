@@ -164,8 +164,8 @@ import {
   useRootDomainOptions,
   validateSubdomainBindings,
   buildSubdomainBindingsPayload
-} from '@/views/orbien/common/use-root-domain-options'
-import SubdomainBindingRows from '@/views/orbien/common/subdomain-binding-rows.vue'
+} from '@/views/orbien/proxy/shared/use-root-domain-options'
+import SubdomainBindingRows from '@/views/orbien/proxy/shared/subdomain-binding-rows.vue'
 
 defineOptions({name: 'FileShareDialog'})
 

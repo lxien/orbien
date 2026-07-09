@@ -34,9 +34,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * 将代理配置变更同步推送给在线客户端。
- */
+    /**
+     * 将代理运行时配置推送给在线客户端。
+     */
 @Service
 public class ProxyRuntimeSyncService {
     private final Logger logger = LoggerFactory.getLogger(ProxyRuntimeSyncService.class);
@@ -83,7 +83,7 @@ public class ProxyRuntimeSyncService {
         }
         ProxyConfig config = ext.getProxyConfig();
         if (config.isSocks5()) {
-            logger.debug("跳过sockes5运行配置同步", proxyId);
+            logger.debug("跳过 SOCKES5 运行配置同步", proxyId);
             return;
         }
         if (!config.getStatus().isOpen()) {

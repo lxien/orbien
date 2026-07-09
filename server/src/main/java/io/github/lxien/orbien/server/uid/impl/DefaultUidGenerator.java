@@ -22,9 +22,10 @@ import io.github.lxien.orbien.server.uid.UidGenerator;
 import io.github.lxien.orbien.server.uid.exception.UidGenerateException;
 import io.github.lxien.orbien.server.uid.utils.DateUtils;
 import io.github.lxien.orbien.server.uid.worker.WorkerIdAssigner;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import lombok.Setter;
 import org.springframework.beans.factory.InitializingBean;
 
 import java.util.Date;
@@ -79,7 +80,11 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
     protected long sequence = 0L;
     protected long lastSecond = -1L;
 
-    /** Spring property */
+    /** Spring property
+     * -- SETTER --
+     *  Setters for spring property
+     */
+    @Setter
     protected WorkerIdAssigner workerIdAssigner;
 
     @Override
@@ -188,13 +193,6 @@ public class DefaultUidGenerator implements UidGenerator, InitializingBean {
         }
 
         return currentSecond;
-    }
-
-    /**
-     * Setters for spring property
-     */
-    public void setWorkerIdAssigner(WorkerIdAssigner workerIdAssigner) {
-        this.workerIdAssigner = workerIdAssigner;
     }
 
     public void setTimeBits(int timeBits) {

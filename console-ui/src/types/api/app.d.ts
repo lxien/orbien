@@ -25,5 +25,6 @@ declare namespace Api.App {
     websocketPort?: number
     quicEnabled?: boolean
     quicPort?: number
+    transportTlsEnabled?: boolean
   }
 }

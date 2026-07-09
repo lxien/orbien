@@ -25,7 +25,7 @@ import io.github.lxien.orbien.server.web.common.exception.SystemException;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.utils.DateUtil;
-import io.github.lxien.orbien.server.web.common.utils.TlsCertParser;
+import io.github.lxien.orbien.server.web.tls.TlsCertParser;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindResultDTO;
 import io.github.lxien.orbien.server.web.dto.tls.TlsCertAutoRenewResultDTO;
 import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;

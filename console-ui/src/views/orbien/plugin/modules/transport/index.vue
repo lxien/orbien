@@ -1,65 +1,323 @@
 <template>
   <div class="transport-page" v-loading="loading">
-    <div class="border border-gray-200 rounded p-4">
-      <div class="flex flex-col gap-5">
-        <div class="flex items-center gap-3">
-          <span class="w-24 font-medium shrink-0">TLS 加密</span>
-          <ElSwitch v-model="form.encrypt" />
-          <span class="text-sm text-gray-500">客户端到内网服务之间启用 TLS</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <span class="w-24 font-medium shrink-0">传输隧道</span>
-          <ElRadioGroup v-model="form.tunnelType" :disabled="isUdpProtocol">
-            <ElRadio :label="String(TunnelType.MULTIPLEX)">共享隧道</ElRadio>
-            <ElRadio v-if="!isUdpProtocol" :label="String(TunnelType.DIRECT)">独立隧道</ElRadio>
+    <section class="setting-section">
+      <div class="summary-bar">
+        <span class="summary-label">当前生效</span>
+        <span class="summary-value">{{ summaryText }}</span>
+      </div>
+    </section>
+
+    <section class="setting-section">
+      <div class="protocol-grid">
+        <button
+            v-for="item in protocolOptions"
+            :key="item.value"
+            type="button"
+            class="protocol-card"
+            :class="{
+            'protocol-card--active': form.dataProtocol === item.value,
+            'protocol-card--disabled': !item.available
+          }"
+            :disabled="!item.available"
+            @click="selectProtocol(item.value)"
+        >
+          <span class="protocol-card__name">{{ item.label }}</span>
+          <span class="protocol-card__port">端口 {{ item.port }}</span>
+          <span class="protocol-card__desc">{{ item.desc }}</span>
+          <span v-if="!item.available" class="protocol-card__badge">未启用</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="setting-section">
+      <div class="setting-list">
+        <div v-if="showTunnelMode" class="setting-item">
+          <ElRadioGroup v-model="form.tunnelType">
+            <ElRadio :label="String(TunnelType.MULTIPLEX)">多路复用</ElRadio>
+            <ElRadio :label="String(TunnelType.DIRECT)">独立连接</ElRadio>
           </ElRadioGroup>
-          <span v-if="isUdpProtocol" class="text-sm text-gray-500">UDP 代理仅支持共享隧道</span>
+        </div>
+
+        <div class="setting-item">
+          <span class="setting-name">隧道加密</span>
+          <ElSwitch v-model="form.encrypt" :disabled="!encryptEditable"/>
         </div>
       </div>
+    </section>
+
+    <div>
+      <ElButton type="primary" :loading="saving" @click="handleSave">保存配置</ElButton>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, watch, computed } from 'vue'
-  import { fetchProxyDetail } from '@/api/proxy-plugin'
-  import type { ProxyConfigProtocol } from '../../menus'
-  import { TunnelType, ProtocolType } from '@/enums/orbien/business'
+import {ref, reactive, watch, computed} from 'vue'
+import {ElMessage} from 'element-plus'
+import {fetchProxyTransport, saveProxyTransport} from '@/api/proxy-transport'
+import type {ProxyConfigProtocol} from '../../menus'
+import {
+  TunnelType,
+  ProtocolType,
+  TransportProtocol,
+  getTunnelTypeLabel,
+  getTransportProtocolLabel
+} from '@/enums/orbien/business'
 
-  defineOptions({ name: 'TransportPage' })
+defineOptions({name: 'TransportPage'})
 
-  const props = defineProps<{
-    proxyId: string
-    protocol: ProxyConfigProtocol
-  }>()
+const props = defineProps<{
+  proxyId: string
+  protocol: ProxyConfigProtocol
+}>()
 
-  const loading = ref(false)
-  const form = reactive({
-    encrypt: false,
-    tunnelType: String(TunnelType.MULTIPLEX)
-  })
+const loading = ref(false)
+const saving = ref(false)
+const detail = ref<Api.Proxy.ProxyTransportDetailDTO | null>(null)
 
-  const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
+const form = reactive({
+  dataProtocol: TransportProtocol.TCP,
+  encrypt: true,
+  tunnelType: String(TunnelType.MULTIPLEX)
+})
 
-  const loadData = async () => {
-    loading.value = true
-    try {
-      const detail = await fetchProxyDetail(props.protocol, props.proxyId)
-      form.encrypt = detail.transport?.encrypt ?? false
-      form.tunnelType = detail.transport?.tunnelType?.toString() ?? String(TunnelType.MULTIPLEX)
-      if (props.protocol === ProtocolType.UDP) {
-        form.tunnelType = String(TunnelType.MULTIPLEX)
-      }
-    } finally {
-      loading.value = false
+const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
+const protocolConstraints = computed(() => detail.value?.protocolConstraints)
+const globalTlsEnabled = computed(() => detail.value?.encryptConstraints?.globalTlsEnabled ?? false)
+
+const protocolOptions = computed(() => {
+  const c = protocolConstraints.value
+  const available = new Set(c?.availableProtocols ?? [TransportProtocol.TCP])
+  return [
+    {
+      value: TransportProtocol.TCP,
+      label: 'TCP',
+      port: c?.tcpPort ?? 9527,
+      desc: '默认选项，兼容性最好',
+      available: available.has(TransportProtocol.TCP)
+    },
+    {
+      value: TransportProtocol.WEBSOCKET,
+      label: 'WebSocket',
+      port: c?.websocketPort ?? 9528,
+      desc: '穿透防火墙友好，强制 TLS',
+      available: available.has(TransportProtocol.WEBSOCKET)
+    },
+    {
+      value: TransportProtocol.QUIC,
+      label: 'QUIC',
+      port: c?.quicPort ?? 9529,
+      desc: '低延迟，强制 TLS，多路复用',
+      available: available.has(TransportProtocol.QUIC)
     }
-  }
+  ]
+})
 
-  watch(
+const requiresTlsProtocol = computed(
+    () =>
+        form.dataProtocol === TransportProtocol.WEBSOCKET ||
+        form.dataProtocol === TransportProtocol.QUIC
+)
+
+const multiplexOnly = computed(
+    () => isUdpProtocol.value || form.dataProtocol === TransportProtocol.QUIC
+)
+
+const showTunnelMode = computed(() => !multiplexOnly.value)
+
+const encryptEditable = computed(() => {
+  if (requiresTlsProtocol.value) return false
+  if (form.dataProtocol === TransportProtocol.TCP) {
+    return globalTlsEnabled.value
+  }
+  return true
+})
+
+const summaryText = computed(() => {
+  const protocol = getTransportProtocolLabel(
+      detail.value?.effectiveDataProtocol ?? form.dataProtocol
+  )
+  const tunnel = getTunnelTypeLabel(
+      multiplexOnly.value ? TunnelType.MULTIPLEX : Number(form.tunnelType)
+  )
+  const enc = (requiresTlsProtocol.value ? true : form.encrypt) ? 'TLS 加密' : '明文传输'
+  return `${protocol} · ${tunnel} · ${enc}`
+})
+
+const applyDependentFields = () => {
+  if (requiresTlsProtocol.value) {
+    form.encrypt = true
+  } else if (form.dataProtocol === TransportProtocol.TCP && !globalTlsEnabled.value) {
+    form.encrypt = false
+  }
+  if (multiplexOnly.value) {
+    form.tunnelType = String(TunnelType.MULTIPLEX)
+  }
+}
+
+const selectProtocol = (value: number) => {
+  form.dataProtocol = value
+  applyDependentFields()
+}
+
+const applyDetail = (data: Api.Proxy.ProxyTransportDetailDTO) => {
+  detail.value = data
+  form.dataProtocol = data.effectiveDataProtocol ?? data.dataProtocol ?? TransportProtocol.TCP
+  form.encrypt = data.encrypt
+  const effective = data.effectiveTunnelType ?? data.tunnelType ?? TunnelType.MULTIPLEX
+  form.tunnelType = String(effective)
+  applyDependentFields()
+}
+
+const loadData = async () => {
+  loading.value = true
+  try {
+    const data = await fetchProxyTransport(props.proxyId)
+    applyDetail(data)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleSave = async () => {
+  saving.value = true
+  try {
+    await saveProxyTransport(props.proxyId, {
+      dataProtocol: form.dataProtocol,
+      encrypt: form.encrypt,
+      tunnelType: Number(form.tunnelType)
+    })
+    ElMessage.success('传输配置已保存')
+    await loadData()
+  } finally {
+    saving.value = false
+  }
+}
+
+watch(
     () => [props.proxyId, props.protocol] as const,
     ([proxyId]) => {
       if (proxyId) loadData()
     },
-    { immediate: true }
-  )
+    {immediate: true}
+)
 </script>
+
+<style lang="scss" scoped>
+.transport-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.setting-section {
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--el-fill-color-light);
+  border-radius: 6px;
+}
+
+.summary-label {
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+  flex-shrink: 0;
+}
+
+.summary-value {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.protocol-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--el-border-color);
+  border-radius: 8px;
+  background: var(--el-bg-color);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover:not(:disabled) {
+    border-color: var(--el-color-primary-light-5);
+  }
+
+  &--active {
+    border-color: var(--el-color-primary);
+    box-shadow: 0 0 0 1px var(--el-color-primary-light-7);
+    background: var(--el-color-primary-light-9);
+  }
+
+  &--disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.protocol-card__name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.protocol-card__port {
+  font-size: 11px;
+  color: var(--el-text-color-secondary);
+}
+
+.protocol-card__desc {
+  font-size: 12px;
+  color: var(--el-text-color-regular);
+  line-height: 1.4;
+}
+
+.protocol-card__badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--el-fill-color);
+  color: var(--el-text-color-secondary);
+}
+
+.setting-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.setting-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setting-name {
+  font-weight: 500;
+}
+
+@media (max-width: 720px) {
+  .protocol-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

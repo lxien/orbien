@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.server.transport.http;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.http.ForceHttpsPolicy;

@@ -57,6 +57,9 @@ public class AppServiceImpl implements AppService {
                     dto.setQuicPort(quic.getPort());
                 }
             }
+            if (transportConfig.getTlsConfig() != null) {
+                dto.setTransportTlsEnabled(transportConfig.getTlsConfig().isEnabled());
+            }
         }
         return dto;
     }

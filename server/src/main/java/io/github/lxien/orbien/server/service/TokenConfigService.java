@@ -18,7 +18,7 @@ package io.github.lxien.orbien.server.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.server.service.repository.TokenQueryRepository;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;

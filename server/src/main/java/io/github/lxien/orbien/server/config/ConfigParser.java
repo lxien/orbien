@@ -1,6 +1,5 @@
 package io.github.lxien.orbien.server.config;
 
-import io.github.lxien.orbien.common.PortChecker;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 

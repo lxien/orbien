@@ -36,10 +36,11 @@ public final class TmspPipelineConfigurer {
                                                TlsConfig tlsConfig,
                                                SslContext sslContext,
                                                WebSocketProtocolConfig wsConfig,
-                                               String remoteHost) {
+                                               String remoteHost,
+                                               boolean connectionEncrypt) {
         ChannelPipeline pipeline = channel.pipeline();
         switch (protocol) {
-            case TCP -> addTcpClient(pipeline, tlsConfig, sslContext, remoteHost);
+            case TCP -> addTcpClient(pipeline, tlsConfig, sslContext, remoteHost, connectionEncrypt);
             case WEBSOCKET -> {
                 addWebSocketClient(pipeline, sslContext, wsConfig, remoteHost);
                 pipeline.addLast(NettyConstants.WEBSOCKET_FRAME_CODEC, new WebSocketBinaryFrameCodec());
@@ -74,8 +75,12 @@ public final class TmspPipelineConfigurer {
         channel.attr(AttributeKeys.TRANSPORT_PROTOCOL).set(protocol);
     }
 
-    private static void addTcpClient(ChannelPipeline pipeline, TlsConfig tlsConfig, SslContext sslContext, String remoteHost) {
-        if (shouldUseTls(tlsConfig, sslContext)) {
+    private static void addTcpClient(ChannelPipeline pipeline,
+                                   TlsConfig tlsConfig,
+                                   SslContext sslContext,
+                                   String remoteHost,
+                                   boolean connectionEncrypt) {
+        if (connectionEncrypt && tlsConfig != null && tlsConfig.isEnabled() && sslContext != null) {
             SslHandler sslHandler = sslContext.newHandler(pipeline.channel().alloc(), remoteHost, 443);
             pipeline.addLast(NettyConstants.TLS_HANDLER, sslHandler);
         }
@@ -130,10 +135,4 @@ public final class TmspPipelineConfigurer {
         pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
     }
 
-    private static boolean shouldUseTls(TlsConfig tlsConfig, SslContext sslContext) {
-        if (sslContext == null) {
-            return false;
-        }
-        return tlsConfig == null || tlsConfig.isEnabled();
-    }
 }

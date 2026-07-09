@@ -17,7 +17,7 @@ package io.github.lxien.orbien.server.config;
 
 import io.github.lxien.orbien.common.config.ConfigSource;
 import io.github.lxien.orbien.common.config.ConfigSourceType;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
 import io.github.lxien.orbien.core.domain.PortInterval;

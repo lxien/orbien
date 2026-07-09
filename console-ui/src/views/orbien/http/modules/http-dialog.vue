@@ -101,12 +101,12 @@ import {
   useRootDomainOptions,
   validateSubdomainBindings,
   buildSubdomainBindingsPayload
-} from '@/views/orbien/common/use-root-domain-options'
-import SubdomainBindingRows from '@/views/orbien/common/subdomain-binding-rows.vue'
-import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
-import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
-import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/common/port-presets'
-import {isClusterMode} from '@/views/orbien/common/is-cluster-mode'
+} from '@/views/orbien/proxy/shared/use-root-domain-options'
+import SubdomainBindingRows from '@/views/orbien/proxy/shared/subdomain-binding-rows.vue'
+import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-field.vue'
+import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
+import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
+import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
 defineOptions({name: 'HttpDialog'})
 

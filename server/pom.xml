@@ -15,6 +15,10 @@
             <artifactId>orbien-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.github.lxien</groupId>
+            <artifactId>orbien-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
         </dependency>

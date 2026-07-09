@@ -1,14 +1,14 @@
 package io.github.lxien.orbien.client.statemachine.agent.action;
 
-import io.github.lxien.orbien.client.common.AgentConstants;
-import io.github.lxien.orbien.client.common.OSUtils;
+import io.github.lxien.orbien.client.util.AgentConstants;
+import io.github.lxien.orbien.client.util.OSUtils;
 import io.github.lxien.orbien.client.config.AppConfig;
 import io.github.lxien.orbien.client.config.domain.AuthConfig;
 import io.github.lxien.orbien.client.identity.AgentIdentity;
 import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.client.statemachine.agent.AgentState;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;

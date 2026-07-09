@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.server.config;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.server.config.domain.DashboardConfig;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 

@@ -59,6 +59,10 @@ export enum TunnelType {
     DIRECT = 1
 }
 
+export function getTunnelTypeLabel(tunnelType?: number) {
+    return tunnelType === TunnelType.DIRECT ? '独立连接' : '多路复用'
+}
+
 /** 传输协议 */
 export enum TransportProtocol {
     TCP = 1,
@@ -140,6 +144,18 @@ export function getPortPoolTypeLabel(type: number) {
             return {type: 'warning' as const, text: 'UDP'}
         default:
             return {type: 'info' as const, text: '未知'}
+    }
+}
+
+export function getTransportProtocolLabel(protocol?: number) {
+    switch (protocol) {
+        case TransportProtocol.WEBSOCKET:
+            return 'WebSocket'
+        case TransportProtocol.QUIC:
+            return 'QUIC'
+        case TransportProtocol.TCP:
+        default:
+            return 'TCP'
     }
 }
 

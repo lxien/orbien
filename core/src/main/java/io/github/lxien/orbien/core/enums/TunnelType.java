@@ -21,7 +21,7 @@ import lombok.Getter;
 @Getter
 public enum TunnelType {
     MULTIPLEX(0, "多路复用"),
-    DIRECT(1, "独立隧道");
+    DIRECT(1, "独立连接");
 
     private final Integer code;
     private final String description;

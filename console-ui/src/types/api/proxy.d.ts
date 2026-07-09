@@ -222,8 +222,45 @@ declare namespace Api.Proxy {
 
     /** 传输配置参数 */
     interface TransportSaveParam {
+        dataProtocol: number
         encrypt: boolean
         tunnelType: number
+    }
+
+    interface TransportEncryptConstraints {
+        encryptEditable: boolean
+        encryptLocked: boolean
+        encryptLockedReason?: string
+        globalTlsEnabled: boolean
+        allowedEncryptValues: boolean[]
+    }
+
+    interface TransportTunnelConstraints {
+        tunnelEditable: boolean
+        tunnelLocked: boolean
+        tunnelLockedReason?: string
+        allowedTunnelTypes: number[]
+    }
+
+    interface TransportProtocolConstraints {
+        availableProtocols: number[]
+        websocketEnabled?: boolean
+        websocketPort?: number
+        quicEnabled?: boolean
+        quicPort?: number
+        tcpPort?: number
+    }
+
+    interface ProxyTransportDetailDTO {
+        encrypt: boolean
+        tunnelType: number
+        dataProtocol?: number
+        effectiveDataProtocol?: number
+        effectiveEncrypt: boolean
+        effectiveTunnelType?: number
+        encryptConstraints: TransportEncryptConstraints
+        tunnelConstraints?: TransportTunnelConstraints
+        protocolConstraints?: TransportProtocolConstraints
     }
 
     /** 带宽配置参数 */

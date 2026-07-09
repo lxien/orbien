@@ -3,7 +3,7 @@ import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.domain.*;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
 import io.github.lxien.orbien.common.config.ConfigSource;

@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.client.transport.connection;
 
-import io.github.lxien.orbien.client.common.UUIDGenerator;
+import io.github.lxien.orbien.client.util.UUIDGenerator;
 import io.github.lxien.orbien.core.enums.TunnelType;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.utils.ChannelUtils;

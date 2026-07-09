@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 package io.github.lxien.orbien.server.web.service;
-import io.github.lxien.orbien.server.web.common.monitor.ServerDTO;
+import io.github.lxien.orbien.server.web.monitor.ServerDTO;
 import java.util.Map;
 public interface MonitorService {
     /**

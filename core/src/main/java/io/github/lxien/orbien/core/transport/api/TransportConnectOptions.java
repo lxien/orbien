@@ -21,5 +21,9 @@ public class TransportConnectOptions {
     private final WebSocketProtocolConfig webSocketConfig;
     private final QuicProtocolConfig quicConfig;
     private final TlsConfig tlsConfig;
+    /**
+     * 本次 TCP 数据隧道是否发起 TLS 握手；WS/QUIC 恒为 true。
+     */
+    private final boolean connectionEncrypt;
     private final Consumer<ChannelPipeline> pipelineTailConfigurer;
 }

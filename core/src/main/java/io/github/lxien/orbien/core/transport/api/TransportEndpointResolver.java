@@ -54,7 +54,7 @@ public final class TransportEndpointResolver {
     }
 
     public static boolean normalizeMultiplex(TransportProtocol protocol, boolean multiplex) {
-        if (protocol == TransportProtocol.QUIC) {
+        if (protocol != null && !protocol.isSupportsDirect()) {
             return true;
         }
         return multiplex;

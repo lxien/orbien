@@ -41,7 +41,8 @@ public class WebSocketTransportConnector implements TransportConnector {
                                 options.getTlsConfig(),
                                 options.getSslContext(),
                                 options.getWebSocketConfig(),
-                                endpoint.getHost()
+                                endpoint.getHost(),
+                                true
                         );
                         ch.pipeline().addLast(new WebSocketHandshakeAwaiter(future));
                         if (options.getPipelineTailConfigurer() != null) {

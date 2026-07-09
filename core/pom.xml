@@ -62,8 +62,9 @@
             <artifactId>disruptor</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.github.lxien</groupId>
-            <artifactId>orbien-common</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba.cola</groupId>

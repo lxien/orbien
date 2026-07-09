@@ -113,7 +113,8 @@ public class QuicTransportConnector implements TransportConnector {
                                                     options.getTlsConfig(),
                                                     null,
                                                     null,
-                                                    endpoint.getHost()
+                                                    endpoint.getHost(),
+                                                    true
                                             );
                                             if (options.getPipelineTailConfigurer() != null) {
                                                 options.getPipelineTailConfigurer().accept(streamChannel.pipeline());

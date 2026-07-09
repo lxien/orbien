@@ -1,4 +1,5 @@
 package io.github.lxien.orbien.client.transport;
+
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.AppConfig;
@@ -26,7 +27,7 @@ public final class TransportClientBootstrap {
         TransportConfig transportConfig = config.getTransportConfig();
         TransportProtocol protocol = transportConfig.getProtocol();
         TransportEndpoint endpoint = transportConfig.resolveControlEndpoint(config.getServerAddr(), config.getServerPort());
-        return connect(config, protocol, endpoint, PipelineRole.CONTROL, eventLoopGroup, sslContext, pipelineTail);
+        return connectControlTunnel(config, protocol, endpoint, eventLoopGroup, sslContext, pipelineTail);
     }
 
     public static CompletableFuture<TransportSession> connectTunnel(AppConfig config,
@@ -37,18 +38,38 @@ public final class TransportClientBootstrap {
                                                                     java.util.function.Consumer<io.netty.channel.ChannelPipeline> pipelineTail) {
         TransportConfig transportConfig = config.getTransportConfig();
         TransportEndpoint endpoint = transportConfig.resolveDataEndpoint(config.getServerAddr(), config.getServerPort(), protocol);
-        return connect(config, protocol, endpoint, PipelineRole.TUNNEL, eventLoopGroup, sslContext, pipelineTail);
+        TlsConfig globalTls = transportConfig.getTlsConfig();
+        boolean globalTlsEnabled = globalTls != null && globalTls.isEnabled();
+        boolean connectionEncrypt = TransportEncryptResolver.resolveEffectiveEncrypt(protocol, globalTlsEnabled, encrypt);
+        TlsConfig tlsConfig = TransportTlsConfigFactory.forDataTunnel(globalTls, protocol, connectionEncrypt);
+        return connectTunnel(config, protocol, endpoint, PipelineRole.TUNNEL, eventLoopGroup, sslContext,
+                tlsConfig, connectionEncrypt, pipelineTail);
     }
 
-    private static CompletableFuture<TransportSession> connect(AppConfig config,
-                                                               TransportProtocol protocol,
-                                                               TransportEndpoint endpoint,
-                                                               PipelineRole role,
-                                                               EventLoopGroup eventLoopGroup,
-                                                               SslContext sslContext,
-                                                               java.util.function.Consumer<io.netty.channel.ChannelPipeline> pipelineTail) {
+    private static CompletableFuture<TransportSession> connectControlTunnel(AppConfig config,
+                                                                            TransportProtocol protocol,
+                                                                            TransportEndpoint endpoint,
+                                                                            EventLoopGroup eventLoopGroup,
+                                                                            SslContext sslContext,
+                                                                            java.util.function.Consumer<io.netty.channel.ChannelPipeline> pipelineTail) {
         TransportConfig transportConfig = config.getTransportConfig();
-        TlsConfig tlsConfig = transportConfig.resolveTls(protocol);
+        TlsConfig globalTls = transportConfig.getTlsConfig();
+        TlsConfig tlsConfig = TransportTlsConfigFactory.forControlChannel(globalTls);
+        boolean connectionEncrypt = tlsConfig.isEnabled() && sslContext != null;
+        return connectTunnel(config, protocol, endpoint, PipelineRole.CONTROL, eventLoopGroup, sslContext,
+                tlsConfig, connectionEncrypt, pipelineTail);
+    }
+
+    private static CompletableFuture<TransportSession> connectTunnel(AppConfig config,
+                                                                     TransportProtocol protocol,
+                                                                     TransportEndpoint endpoint,
+                                                                     PipelineRole role,
+                                                                     EventLoopGroup eventLoopGroup,
+                                                                     SslContext sslContext,
+                                                                     TlsConfig tlsConfig,
+                                                                     boolean connectionEncrypt,
+                                                                     java.util.function.Consumer<io.netty.channel.ChannelPipeline> pipelineTail) {
+        TransportConfig transportConfig = config.getTransportConfig();
         TransportConnectOptions options = TransportConnectOptions.builder()
                 .endpoint(endpoint)
                 .role(role)
@@ -57,11 +78,11 @@ public final class TransportClientBootstrap {
                 .webSocketConfig(transportConfig.getWebsocket())
                 .quicConfig(transportConfig.getQuic())
                 .tlsConfig(tlsConfig)
+                .connectionEncrypt(connectionEncrypt)
                 .pipelineTailConfigurer(pipelineTail)
                 .build();
-        logger.debug("[传输] 发起连接 role={} protocol={} endpoint={}:{} tls={}",
-                role, protocol.getName(), endpoint.getHost(), endpoint.getPort(),
-                tlsConfig != null && tlsConfig.isEnabled());
+        logger.debug("[传输] 发起连接 role={} protocol={} endpoint={}:{} connectionEncrypt={}",
+                role, protocol.getName(), endpoint.getHost(), endpoint.getPort(), connectionEncrypt);
         return TransportRegistry.getConnector(protocol).connect(options);
     }
 }

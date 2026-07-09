@@ -43,6 +43,8 @@ public class TargetResolverAction extends StreamBaseAction {
     private ProxyConfigService proxyConfigService;
     @Autowired
     private DomainRegistry domainRegistry;
+    @Resource
+    private AppConfig appConfig;
 
     @Override
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
@@ -88,7 +90,8 @@ public class TargetResolverAction extends StreamBaseAction {
                 streamManager.incrementStreamCount(config.getProxyId());
             }
             context.setCompress(config.isCompress());
-            context.setEncrypt(config.isEncrypt());
+            boolean globalTlsEnabled = appConfig.getTransportConfig().getTlsConfig().isEnabled();
+            context.setEncrypt(config.resolveEffectiveEncrypt(globalTlsEnabled));
             //传输协议
             TransportProtocol transportProtocol = config.getTransportProtocol(TransportProtocol.TCP);
             context.setTransportProtocol(transportProtocol);
@@ -97,7 +100,7 @@ public class TargetResolverAction extends StreamBaseAction {
 
             logger.debug("[传输] 流 {} 代理={} 数据隧道传输协议={} encrypt={} multiplex={}",
                     context.getStreamId(), config.getName(), transportProtocol.getName(),
-                    config.isEncrypt(), context.isMultiplex());
+                    context.isEncrypt(), context.isMultiplex());
 
             if (config.isUdp()) {
                 context.setDatagram(true);

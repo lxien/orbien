@@ -16,7 +16,6 @@
 
 package io.github.lxien.orbien.server.metrics;
 
-import io.github.lxien.orbien.common.message.PageResult;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -95,7 +94,7 @@ public class MetricsCollector {
         return pm != null ? pm.toMetrics() : null;
     }
 
-    public PageResult<Metrics> listAllMetrics(int page, int size) {
+    public MetricsPageResult<Metrics> listAllMetrics(int page, int size) {
         List<Metrics> pageData = PROXY_METRICS.values().stream()
                 .sorted(Comparator.comparingLong(m ->
                         -(m.getTotalReadBytes().sum() + m.getTotalWriteBytes().sum())))
@@ -105,7 +104,7 @@ public class MetricsCollector {
                 .toList();
 
         int pageSize = Math.clamp(size, 1, 100);
-        return new PageResult<>(pageData, (long) PROXY_METRICS.size(),
+        return new MetricsPageResult<>(pageData, (long) PROXY_METRICS.size(),
                 Math.max(0, page), pageSize);
     }
 

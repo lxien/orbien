@@ -16,7 +16,9 @@
 package io.github.lxien.orbien.core.domain;
 
 import io.github.lxien.orbien.core.enums.*;
+import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
 import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+import io.github.lxien.orbien.core.transport.api.TransportEncryptResolver;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import lombok.*;
@@ -159,6 +161,15 @@ public class ProxyConfig implements Serializable {
     }
 
     /**
+     * 结合数据隧道协议与全局 TLS 开关，解析传输层加密最终生效值。
+     */
+    public boolean resolveEffectiveEncrypt(boolean globalTlsEnabled) {
+        TransportProtocol dataProtocol = getTransportProtocol(TransportProtocol.TCP);
+        Boolean requested = transport != null ? transport.getEncrypt() : null;
+        return TransportEncryptResolver.resolveEffectiveEncrypt(dataProtocol, globalTlsEnabled, requested);
+    }
+
+    /**
      * 是否启用压缩
      */
     public boolean isCompress() {
@@ -207,7 +218,7 @@ public class ProxyConfig implements Serializable {
      * HTTPS 代理是否开启 HTTP→HTTPS 强制跳转（未配置时默认 true）。
      */
     public boolean isForceHttpsEnabled() {
-        return io.github.lxien.orbien.core.http.ForceHttpsPolicy.isRedirectEnabled(this);
+        return ForceHttpsPolicy.isRedirectEnabled(this);
     }
 
     public boolean isHttpOrHttps() {
@@ -286,8 +297,5 @@ public class ProxyConfig implements Serializable {
         return isMuxTunnel();
     }
 
-    public DeploymentMode getDeploymentMode() {
-        return targets.size() > 1 ? DeploymentMode.CLUSTER : DeploymentMode.STANDALONE;
-    }
 }
 

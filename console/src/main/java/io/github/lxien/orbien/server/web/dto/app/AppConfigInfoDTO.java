@@ -46,4 +46,8 @@ public class AppConfigInfoDTO implements Serializable {
      * QUIC 监听端口（启用时有效）
      */
     private Integer quicPort;
+    /**
+     * 传输层 TLS 是否启用
+     */
+    private Boolean transportTlsEnabled;
 }

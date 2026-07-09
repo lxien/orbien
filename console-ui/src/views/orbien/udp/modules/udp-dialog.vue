@@ -104,10 +104,10 @@ import {fetchGetAgentListAll} from '@/api/agent'
 import {fetchCreateUdpProxy, fetchUpdateUdpProxy, fetchGetUdpProxyById} from '@/api/proxy'
 import {fetchSuggestAvailablePorts} from '@/api/port-pool'
 import {PortPoolType} from '@/enums/orbien/business'
-import BackendServiceField from '@/views/orbien/common/backend-service-field.vue'
-import LocalPortInput from '@/views/orbien/common/local-port-input.vue'
-import {UDP_LOCAL_PORT_PRESETS} from '@/views/orbien/common/port-presets'
-import {isClusterMode} from '@/views/orbien/common/is-cluster-mode'
+import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-field.vue'
+import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
+import {UDP_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
+import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
 defineOptions({name: 'UdpDialog'})
 

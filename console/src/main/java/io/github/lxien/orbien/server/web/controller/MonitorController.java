@@ -16,7 +16,7 @@
 package io.github.lxien.orbien.server.web.controller;
 
 import io.github.lxien.orbien.server.web.common.message.Ajax;
-import io.github.lxien.orbien.server.web.common.monitor.ServerMonitor;
+import io.github.lxien.orbien.server.web.monitor.ServerMonitor;
 import io.github.lxien.orbien.server.web.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

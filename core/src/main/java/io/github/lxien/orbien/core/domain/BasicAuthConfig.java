@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.core.domain;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 

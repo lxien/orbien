@@ -19,7 +19,7 @@
 package io.github.lxien.orbien.server.statemachine.agent.action.config;
 
 import com.google.protobuf.ProtocolStringList;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.DomainInfo;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;

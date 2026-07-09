@@ -16,14 +16,20 @@
 package io.github.lxien.orbien.server.web.param.transport;
 
 import io.github.lxien.orbien.core.enums.TunnelType;
+import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.server.web.support.validation.EnumValue;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
 public class TransportSaveParam {
+    @NotNull(message = "dataProtocol 不能为空")
+    @EnumValue(enumClass = TransportProtocol.class, message = "传输协议无效")
+    private Integer dataProtocol;
+
     @NotNull(message = "encrypt 不能为空")
     private Boolean encrypt;
+
     @NotNull(message = "tunnelType 不能为空")
     @EnumValue(enumClass = TunnelType.class)
     private Integer tunnelType;

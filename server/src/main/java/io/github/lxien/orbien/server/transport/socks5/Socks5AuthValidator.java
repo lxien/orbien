@@ -16,7 +16,7 @@
 
 package io.github.lxien.orbien.server.transport.socks5;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.Socks5AuthConfig;
 import io.github.lxien.orbien.core.socks5.Socks5Constants;

@@ -5,7 +5,7 @@ import io.github.lxien.orbien.client.config.domain.AuthConfig;
 import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.client.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.client.statemachine.agent.AgentState;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 

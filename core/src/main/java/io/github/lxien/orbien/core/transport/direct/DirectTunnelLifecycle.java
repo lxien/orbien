@@ -45,24 +45,35 @@ public final class DirectTunnelLifecycle {
 
     /**
      * 流关闭后恢复 TMSP 控制栈，以便独立隧道归还连接池后仍可复用。
+     * <p>
+     * 若隧道已关闭或 pipeline 不可恢复（如协议切换并发关闭），静默完成，由调用方回收连接。
      */
     public static Future<Void> restoreControlStack(Channel tunnel, Consumer<ChannelPipeline> tailConfigurer) {
         return toVoidFuture(runOnLoop(tunnel, () -> {
-            ChannelPipeline pipeline = tunnel.pipeline();
-            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
-            if (pipeline.get(NettyConstants.TMSP_CODEC) != null) {
-                tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
+            tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
+            if (tunnel == null || !tunnel.isOpen()) {
                 return;
             }
-            String anchor = sslAnchor(pipeline);
-            pipeline.addAfter(anchor, NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
+            ChannelPipeline pipeline = tunnel.pipeline();
+            if (pipeline.firstContext() == null) {
+                return;
+            }
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            if (pipeline.get(NettyConstants.TMSP_CODEC) != null) {
+                return;
+            }
+            String anchor = findControlStackAnchor(pipeline);
+            if (anchor != null) {
+                pipeline.addAfter(anchor, NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
+            } else {
+                pipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
+            }
             pipeline.addAfter(NettyConstants.SNAPPY_ENCODER, NettyConstants.SNAPPY_DECODER, new SnappyFrameDecoder());
             pipeline.addAfter(NettyConstants.SNAPPY_DECODER, NettyConstants.TMSP_CODEC,
                     TMSPCodec.create(DEFAULT_MAX_FRAME));
             if (tailConfigurer != null) {
                 tailConfigurer.accept(pipeline);
             }
-            tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
         }));
     }
 
@@ -73,6 +84,13 @@ public final class DirectTunnelLifecycle {
         Boolean active = tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).get();
         return Boolean.TRUE.equals(active)
                 || tunnel.pipeline().get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER) != null;
+    }
+
+    /**
+     * 独立隧道是否仍可恢复控制栈（未关闭且 pipeline 可用）。
+     */
+    public static boolean canRestoreControlStack(Channel tunnel) {
+        return tunnel != null && tunnel.isOpen() && tunnel.pipeline().firstContext() != null;
     }
 
     public static void runOnTunnelLoop(Channel tunnel, Runnable task) {
@@ -106,7 +124,16 @@ public final class DirectTunnelLifecycle {
         }
     }
 
-    private static String sslAnchor(ChannelPipeline pipeline) {
+    /**
+     * 在 TLS / WebSocket 解码栈之后挂载 TMSP 控制栈；透传后仅剩 head/tail 时返回 null，改用 addLast。
+     */
+    private static String findControlStackAnchor(ChannelPipeline pipeline) {
+        if (pipeline.get(NettyConstants.WEBSOCKET_FRAME_CODEC) != null) {
+            return NettyConstants.WEBSOCKET_FRAME_CODEC;
+        }
+        if (pipeline.get(NettyConstants.WEBSOCKET_HANDLER) != null) {
+            return NettyConstants.WEBSOCKET_HANDLER;
+        }
         if (pipeline.get(NettyConstants.TLS_HANDLER) != null) {
             return NettyConstants.TLS_HANDLER;
         }
@@ -115,6 +142,16 @@ public final class DirectTunnelLifecycle {
                 return name;
             }
         }
-        return pipeline.firstContext().name();
+        String lastTransport = null;
+        for (String name : pipeline.names()) {
+            if (!isHeadOrTail(name)) {
+                lastTransport = name;
+            }
+        }
+        return lastTransport;
+    }
+
+    private static boolean isHeadOrTail(String name) {
+        return name == null || name.contains("Head") || name.contains("Tail");
     }
 }

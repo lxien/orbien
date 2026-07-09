@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.core.transport.tls;
 
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.TlsConfig;
 
 import java.nio.file.Path;

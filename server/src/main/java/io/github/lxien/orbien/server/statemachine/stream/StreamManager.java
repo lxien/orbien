@@ -1,7 +1,7 @@
 package io.github.lxien.orbien.server.statemachine.stream;
 
 import com.alibaba.cola.statemachine.StateMachine;
-import io.github.lxien.orbien.common.utils.StringUtils;
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.BandwidthConfig;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
