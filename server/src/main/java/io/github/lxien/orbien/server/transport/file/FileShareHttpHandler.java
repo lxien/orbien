@@ -529,6 +529,9 @@ public class FileShareHttpHandler {
             }
             return "static/img/" + imgName;
         }
+        if ("/favicon.ico".equals(path)) {
+            return "static/favicon.ico";
+        }
         return null;
     }
 
@@ -564,6 +567,9 @@ public class FileShareHttpHandler {
         }
         if (lower.endsWith(".webp")) {
             return "image/webp";
+        }
+        if (lower.endsWith(".ico")) {
+            return "image/x-icon";
         }
         return "application/octet-stream";
     }

@@ -19,14 +19,12 @@ html {
     --bg-hover: #fafafa;
     --bg-badge-read: #f4f4f5;
     --bg-badge-write: #ecf5ff;
-    --bg-readonly-tip: #fdf6ec;
     --bg-progress: #ffffff;
     --text-primary: #1f2329;
     --text-secondary: #86909c;
     --text-link: #409eff;
     --text-badge-read: #606266;
     --text-badge-write: #409eff;
-    --text-readonly: #e6a23c;
     --text-error: #f56c6c;
     --border-color: #e5e6eb;
     --border-light: #f0f0f0;
@@ -68,14 +66,12 @@ html {
     --bg-hover: #252932;
     --bg-badge-read: #2b3038;
     --bg-badge-write: #1e3a5f;
-    --bg-readonly-tip: #3d3018;
     --bg-progress: #1a1d24;
     --text-primary: #e5eaf3;
     --text-secondary: #8b949e;
     --text-link: #58a6ff;
     --text-badge-read: #b0b8c4;
     --text-badge-write: #58a6ff;
-    --text-readonly: #e6a23c;
     --text-error: #f78989;
     --border-color: #30363d;
     --border-light: #2b3038;
@@ -1046,16 +1042,6 @@ tr.drop-target,
 .permission-badge.write {
     background: var(--bg-badge-write);
     color: var(--text-badge-write);
-}
-
-.readonly-tip {
-    margin: 0 0 12px;
-    padding: 8px 12px;
-    background: var(--bg-readonly-tip);
-    color: var(--text-readonly);
-    border-radius: 4px;
-    font-size: 13px;
-    flex-shrink: 0;
 }
 
 @media (max-width: 640px) {

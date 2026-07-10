@@ -208,7 +208,12 @@
 
     const formatTime = (ms) => (ms ? new Date(Number(ms)).toLocaleString('zh-CN') : '');
 
-    const permissionLabel = (value) => (value === 'read_write' ? '读写' : '只读');
+    const permissionLabel = () => {
+        if (permission === 'read_write') {
+            return canWrite ? '读写' : '浏览';
+        }
+        return '只读';
+    };
 
     const extractErrorMessage = (data, fallback) => {
         if (!data) return fallback;
@@ -479,21 +484,13 @@
 
     const updatePermissionBadge = () => {
         const badge = $('permissionBadge');
-        const readonlyTip = $('readonlyTip');
         if (!authRequired) {
             badge.classList.add('hidden');
-            readonlyTip.classList.add('hidden');
             return;
         }
         badge.classList.remove('hidden');
-        badge.textContent = permissionLabel(permission);
+        badge.textContent = permissionLabel();
         badge.className = `permission-badge ${canWrite ? 'write' : 'read'}`;
-        readonlyTip.classList.toggle('hidden', canWrite);
-        if (!canWrite && permission === 'read_write') {
-            readonlyTip.textContent = '当前未开启任何文件操作权限，仅可浏览和下载';
-        } else {
-            readonlyTip.textContent = '当前为只读权限，无法上传、新建或删除文件';
-        }
     };
 
     const setActionVisible = (id, visible) => {
@@ -511,6 +508,7 @@
         canRename = data.canRename === true;
         canWrite = data.canWrite === true;
         updateActionControls();
+        updatePermissionBadge();
     };
 
     const updateActionControls = () => {
@@ -653,23 +651,17 @@
 
     async function ensureUploadable() {
         await refreshAuthStatus();
-        if (!canUpload) {
-            throw new Error('当前不允许上传文件');
-        }
+        return canUpload;
     }
 
     async function ensureDeletable() {
         await refreshAuthStatus();
-        if (!canDelete) {
-            throw new Error('当前不允许删除文件');
-        }
+        return canDelete;
     }
 
     async function ensureMkdirable() {
         await refreshAuthStatus();
-        if (!canMkdir) {
-            throw new Error('当前不允许创建目录');
-        }
+        return canMkdir;
     }
 
     const parentPath = (path) => {
@@ -837,7 +829,7 @@
 
         const text = document.createElement('p');
         text.className = 'column-panel-empty-text';
-        text.textContent = (canUpload || canMkdir) ? '此文件夹为空' : '当前目录暂无文件';
+        text.textContent = '此文件夹为空';
         wrap.appendChild(text);
 
         if (canUpload || canMkdir) {
@@ -1049,9 +1041,7 @@
 
     async function ensureRenamable() {
         await refreshAuthStatus();
-        if (!canRename) {
-            throw new Error('当前不允许重命名');
-        }
+        return canRename;
     }
 
     async function moveItems(paths, destDir) {
@@ -1080,7 +1070,9 @@
     }
 
     async function renameSelected() {
-        await ensureRenamable();
+        if (!(await ensureRenamable())) {
+            return;
+        }
         const paths = selectedPaths();
         if (paths.length !== 1) {
             await showAlert('请选择一个文件或文件夹进行重命名', {title: '无法重命名', type: 'warning'});
@@ -1381,8 +1373,9 @@
     });
 
     async function uploadFiles(files) {
-        if (!files.length) return;
-        await ensureUploadable();
+        if (!files.length || !(await ensureUploadable())) {
+            return;
+        }
         $('progressPanel').style.display = 'block';
         $('uploadCount').textContent = String(files.length);
         const list = $('progressList');
@@ -1482,7 +1475,9 @@
     }
 
     async function mkdir() {
-        await ensureMkdirable();
+        if (!(await ensureMkdirable())) {
+            return;
+        }
         const result = await showPrompt({
             title: '新建文件夹',
             message: '请输入文件夹名称',
@@ -1532,7 +1527,9 @@
     };
 
     async function deleteSelected() {
-        await ensureDeletable();
+        if (!(await ensureDeletable())) {
+            return;
+        }
         const paths = selectedPaths();
         if (!paths.length) {
             return;
