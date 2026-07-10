@@ -900,6 +900,266 @@
         }
     };
 
+    const MARQUEE_DRAG_THRESHOLD = 4;
+    const MARQUEE_AUTO_SCROLL_EDGE = 28;
+    const MARQUEE_AUTO_SCROLL_MAX = 18;
+
+    let marqueeState = null;
+
+    const rectsIntersect = (a, b) => !(
+        a.right < b.left
+        || a.left > b.right
+        || a.bottom < b.top
+        || a.top > b.bottom
+    );
+
+    const normalizeClientRect = (x1, y1, x2, y2) => {
+        const left = Math.min(x1, x2);
+        const top = Math.min(y1, y2);
+        return {
+            left,
+            top,
+            right: Math.max(x1, x2),
+            bottom: Math.max(y1, y2),
+            width: Math.abs(x2 - x1),
+            height: Math.abs(y2 - y1)
+        };
+    };
+
+    const isMarqueeBlockedTarget = (target) => {
+        if (!target?.closest) {
+            return true;
+        }
+        if (target.closest('#fileList tr[data-file-path], .icon-item[data-file-path], .column-item[data-file-path]')) {
+            return true;
+        }
+        if (target.closest('button, input, a, label, .name-link, thead, .empty-action')) {
+            return true;
+        }
+        return !target.closest('#fileListWrap');
+    };
+
+    const getMarqueeItems = (panel) => {
+        if (viewMode === 'column' && panel) {
+            return [...panel.querySelectorAll('.column-item[data-file-path]')];
+        }
+        if (viewMode === 'icon') {
+            return [...document.querySelectorAll('#iconGrid .icon-item[data-file-path]')];
+        }
+        return [...document.querySelectorAll('#fileList tr[data-file-path]')];
+    };
+
+    const getMarqueeScrollContainers = (panel) => {
+        const containers = [$('fileListWrap')];
+        if (viewMode === 'column') {
+            const browser = $('columnBrowser');
+            if (browser) {
+                containers.push(browser);
+            }
+            if (panel) {
+                containers.push(panel);
+            }
+        }
+        return containers.filter(Boolean);
+    };
+
+    const resolveMarqueePanel = (clientX, clientY) => {
+        if (viewMode !== 'column') {
+            return null;
+        }
+        const panels = [...document.querySelectorAll('#columnBrowser .column-panel')];
+        for (const panel of panels) {
+            const rect = panel.getBoundingClientRect();
+            if (clientX >= rect.left && clientX <= rect.right
+                && clientY >= rect.top && clientY <= rect.bottom) {
+                return panel;
+            }
+        }
+        return null;
+    };
+
+    const refreshMarqueeAt = (clientX, clientY) => {
+        if (!marqueeState?.active) {
+            return;
+        }
+        marqueeState.currentX = clientX;
+        marqueeState.currentY = clientY;
+        const rect = normalizeClientRect(marqueeState.startX, marqueeState.startY, clientX, clientY);
+        updateMarqueeVisual(rect);
+        applyMarqueeSelection(rect);
+        autoScrollMarquee(clientX, clientY);
+    };
+
+    const tickMarqueeAutoScroll = () => {
+        if (!marqueeState?.active) {
+            marqueeState.rafId = null;
+            return;
+        }
+        refreshMarqueeAt(marqueeState.currentX, marqueeState.currentY);
+        marqueeState.rafId = requestAnimationFrame(tickMarqueeAutoScroll);
+    };
+
+    const startMarqueeAutoScrollLoop = () => {
+        if (!marqueeState || marqueeState.rafId !== null) {
+            return;
+        }
+        marqueeState.rafId = requestAnimationFrame(tickMarqueeAutoScroll);
+    };
+
+    const stopMarqueeAutoScrollLoop = () => {
+        if (marqueeState?.rafId != null) {
+            cancelAnimationFrame(marqueeState.rafId);
+            marqueeState.rafId = null;
+        }
+    };
+
+    const applyMarqueeSelection = (rect) => {
+        if (!marqueeState) {
+            return;
+        }
+        const items = getMarqueeItems(marqueeState.panel);
+        const next = marqueeState.additive ? new Set(marqueeState.baseSelection) : new Set();
+        for (const item of items) {
+            const path = item.dataset.filePath;
+            if (!path) {
+                continue;
+            }
+            if (rectsIntersect(rect, item.getBoundingClientRect())) {
+                next.add(path);
+            }
+        }
+        selectedPathSet.clear();
+        for (const path of next) {
+            selectedPathSet.add(path);
+        }
+        if (next.size > 0) {
+            selectionAnchorPath = [...next][0];
+        }
+        syncSelectionState();
+    };
+
+    const updateMarqueeVisual = (rect) => {
+        const marquee = $('selectionMarquee');
+        if (!marquee) {
+            return;
+        }
+        marquee.classList.remove('hidden');
+        marquee.style.left = `${rect.left}px`;
+        marquee.style.top = `${rect.top}px`;
+        marquee.style.width = `${rect.width}px`;
+        marquee.style.height = `${rect.height}px`;
+    };
+
+    const hideMarqueeVisual = () => {
+        const marquee = $('selectionMarquee');
+        if (marquee) {
+            marquee.classList.add('hidden');
+            marquee.style.width = '0';
+            marquee.style.height = '0';
+        }
+    };
+
+    const autoScrollMarquee = (clientX, clientY) => {
+        if (!marqueeState?.active) {
+            return;
+        }
+        for (const container of getMarqueeScrollContainers(marqueeState.panel)) {
+            const rect = container.getBoundingClientRect();
+            let deltaX = 0;
+            let deltaY = 0;
+            if (clientX < rect.left + MARQUEE_AUTO_SCROLL_EDGE) {
+                deltaX = -Math.min(MARQUEE_AUTO_SCROLL_MAX, rect.left + MARQUEE_AUTO_SCROLL_EDGE - clientX);
+            } else if (clientX > rect.right - MARQUEE_AUTO_SCROLL_EDGE) {
+                deltaX = Math.min(MARQUEE_AUTO_SCROLL_MAX, clientX - (rect.right - MARQUEE_AUTO_SCROLL_EDGE));
+            }
+            if (clientY < rect.top + MARQUEE_AUTO_SCROLL_EDGE) {
+                deltaY = -Math.min(MARQUEE_AUTO_SCROLL_MAX, rect.top + MARQUEE_AUTO_SCROLL_EDGE - clientY);
+            } else if (clientY > rect.bottom - MARQUEE_AUTO_SCROLL_EDGE) {
+                deltaY = Math.min(MARQUEE_AUTO_SCROLL_MAX, clientY - (rect.bottom - MARQUEE_AUTO_SCROLL_EDGE));
+            }
+            if (deltaX !== 0) {
+                container.scrollLeft += deltaX;
+            }
+            if (deltaY !== 0) {
+                container.scrollTop += deltaY;
+            }
+        }
+    };
+
+    const finishMarqueeSelection = () => {
+        stopMarqueeAutoScrollLoop();
+        document.body.classList.remove('is-marquee-selecting');
+        hideMarqueeVisual();
+        marqueeState = null;
+    };
+
+    const onMarqueeMouseMove = (e) => {
+        if (!marqueeState || listLoading) {
+            return;
+        }
+        const dx = Math.abs(e.clientX - marqueeState.startX);
+        const dy = Math.abs(e.clientY - marqueeState.startY);
+        if (!marqueeState.active) {
+            if (dx < MARQUEE_DRAG_THRESHOLD && dy < MARQUEE_DRAG_THRESHOLD) {
+                return;
+            }
+            marqueeState.active = true;
+            document.body.classList.add('is-marquee-selecting');
+            startMarqueeAutoScrollLoop();
+        }
+        marqueeState.moved = true;
+        refreshMarqueeAt(e.clientX, e.clientY);
+    };
+
+    const onMarqueeMouseUp = (e) => {
+        if (!marqueeState) {
+            return;
+        }
+        if (!marqueeState.active && !marqueeState.moved) {
+            if (!isMultiSelectModifier(e) && !isRangeSelectModifier(e)) {
+                clearSelection();
+                syncSelectionState();
+            }
+        }
+        finishMarqueeSelection();
+        document.removeEventListener('mousemove', onMarqueeMouseMove);
+        document.removeEventListener('mouseup', onMarqueeMouseUp);
+    };
+
+    const initMarqueeSelection = () => {
+        const wrap = $('fileListWrap');
+        if (!wrap) {
+            return;
+        }
+        wrap.addEventListener('mousedown', (e) => {
+            if (e.button !== 0 || listLoading || marqueeState) {
+                return;
+            }
+            if (isMarqueeBlockedTarget(e.target)) {
+                return;
+            }
+            const panel = resolveMarqueePanel(e.clientX, e.clientY);
+            if (viewMode === 'column' && !panel) {
+                return;
+            }
+            e.preventDefault();
+            marqueeState = {
+                startX: e.clientX,
+                startY: e.clientY,
+                currentX: e.clientX,
+                currentY: e.clientY,
+                active: false,
+                moved: false,
+                rafId: null,
+                additive: isMultiSelectModifier(e) || isRangeSelectModifier(e),
+                baseSelection: new Set(selectedPathSet),
+                panel
+            };
+            document.addEventListener('mousemove', onMarqueeMouseMove);
+            document.addEventListener('mouseup', onMarqueeMouseUp);
+        });
+    };
+
     const bindEnterDir = (element, name, options = {}) => {
         const {dblclick = false} = options;
         const open = () => enterDir(name);
@@ -1567,6 +1827,7 @@
     async function bootstrap() {
         initTheme();
         initDialog();
+        initMarqueeSelection();
         initViewMode();
         try {
             const status = await refreshAuthStatus();

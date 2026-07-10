@@ -331,6 +331,29 @@ body {
     pointer-events: none;
 }
 
+.selection-marquee {
+    position: fixed;
+    z-index: 1000;
+    border: 1px solid var(--text-link);
+    background: rgba(64, 158, 255, .14);
+    border-radius: 2px;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.selection-marquee.hidden {
+    display: none !important;
+}
+
+body.is-marquee-selecting {
+    user-select: none;
+    cursor: crosshair;
+}
+
+body.is-marquee-selecting .file-browser {
+    cursor: crosshair;
+}
+
 .view-panel {
     min-height: 100%;
 }
