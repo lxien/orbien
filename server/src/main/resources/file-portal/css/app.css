@@ -514,6 +514,11 @@ body.is-marquee-selecting .file-browser {
 
 .view-panel.view-list .name-link {
     gap: 6px;
+    cursor: inherit;
+}
+
+.view-panel.view-list #fileList > tr[data-is-dir="true"] {
+    cursor: pointer;
 }
 
 .view-panel.view-list #fileList > tr:nth-child(even):not(.is-checked) td {

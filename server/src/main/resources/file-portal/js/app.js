@@ -1570,13 +1570,6 @@
             const nameText = document.createElement('span');
             nameText.textContent = name;
             nameSpan.appendChild(nameText);
-            if (entry.directory) {
-                bindEnterDir(nameSpan, name, {dblclick: true});
-            }
-            nameSpan.addEventListener('click', (e) => {
-                e.stopPropagation();
-                applySelectionClick(e, index, itemPath);
-            });
             tdName.appendChild(nameSpan);
 
             const tdTime = document.createElement('td');
@@ -1596,11 +1589,12 @@
                 bindDropTarget(tr, currentPath);
             }
             tr.addEventListener('click', (e) => {
-                if (e.target.closest('.name-link')) {
-                    return;
-                }
                 applySelectionClick(e, index, itemPath);
             });
+            if (entry.directory) {
+                tr.dataset.isDir = 'true';
+                bindEnterDir(tr, name, {dblclick: true});
+            }
             fragment.appendChild(tr);
         });
         tbody.replaceChildren(fragment);
