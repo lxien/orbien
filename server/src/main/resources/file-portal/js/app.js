@@ -208,6 +208,19 @@
 
     const formatTime = (ms) => (ms ? new Date(Number(ms)).toLocaleString('zh-CN') : '');
 
+    const formatUploadDuration = (ms) => {
+        if (!Number.isFinite(ms) || ms < 0) {
+            return '';
+        }
+        if (ms < 60_000) {
+            const sec = ms / 1000;
+            return sec < 10 ? `${sec.toFixed(1)} 秒` : `${Math.round(sec)} 秒`;
+        }
+        const min = Math.floor(ms / 60_000);
+        const sec = Math.round((ms % 60_000) / 1000);
+        return sec > 0 ? `${min} 分 ${sec} 秒` : `${min} 分`;
+    };
+
     const permissionLabel = () => {
         if (permission === 'read_write') {
             return canWrite ? '读写' : '浏览';
@@ -767,6 +780,13 @@
         } finally {
             setListLoading(false);
         }
+    }
+
+    async function refreshListQuiet() {
+        invalidateEntriesCache();
+        entries = await fetchEntries(currentPath, false);
+        pruneSelection();
+        await renderFiles();
     }
 
     const renderBreadcrumb = () => {
@@ -1602,7 +1622,65 @@
 
     const selectedPaths = () => [...selectedPathSet];
 
+    const UPLOAD_CONCURRENCY = 3;
+
+    const createUploadProgressItem = (file) => {
+        const div = document.createElement('div');
+        div.className = 'progress-item uploading';
+
+        const head = document.createElement('div');
+        head.className = 'progress-item-head';
+
+        const name = document.createElement('span');
+        name.className = 'progress-item-name';
+        name.title = file.name;
+        name.textContent = file.name;
+
+        const duration = document.createElement('span');
+        duration.className = 'progress-item-duration';
+        duration.textContent = '0.0 秒';
+
+        head.append(name, duration);
+
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        const barFill = document.createElement('div');
+        barFill.className = 'bar-fill';
+        bar.appendChild(barFill);
+
+        div.append(head, bar);
+        return div;
+    };
+
     const uploadSingleFile = (file, itemEl) => new Promise((resolve, reject) => {
+        const startTime = performance.now();
+        const durationEl = itemEl.querySelector('.progress-item-duration');
+        let done = false;
+
+        const setDurationText = (elapsed, finished = false) => {
+            if (!durationEl) {
+                return;
+            }
+            const text = formatUploadDuration(elapsed);
+            durationEl.textContent = finished ? `用时 ${text}` : text;
+        };
+
+        const tickDuration = () => {
+            if (!done) {
+                setDurationText(performance.now() - startTime);
+            }
+        };
+
+        tickDuration();
+        const timer = setInterval(tickDuration, 100);
+
+        const finish = (callback) => {
+            done = true;
+            clearInterval(timer);
+            setDurationText(performance.now() - startTime, true);
+            callback();
+        };
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `/api/files/upload?path=${encodeURIComponent(currentPath)}`);
         xhr.withCredentials = true;
@@ -1614,7 +1692,7 @@
         xhr.onload = () => {
             if (xhr.status >= 200 && xhr.status < 300) {
                 itemEl.querySelector('.bar-fill').style.width = '100%';
-                resolve();
+                finish(() => resolve(performance.now() - startTime));
                 return;
             }
             let msg = '上传失败';
@@ -1623,10 +1701,10 @@
                 msg = extractErrorMessage(body, msg);
             } catch { /* ignore */
             }
-            reject(new Error(msg));
+            finish(() => reject(new Error(msg)));
         };
-        xhr.onerror = () => reject(new Error('网络错误'));
-        xhr.onabort = () => reject(new Error('上传已取消'));
+        xhr.onerror = () => finish(() => reject(new Error('网络错误')));
+        xhr.onabort = () => finish(() => reject(new Error('上传已取消')));
         const fd = new FormData();
         fd.append('file', file);
         xhr.send(fd);
@@ -1636,30 +1714,52 @@
         if (!files.length || !(await ensureUploadable())) {
             return;
         }
+
+        const fileArr = [...files];
         $('progressPanel').style.display = 'block';
-        $('uploadCount').textContent = String(files.length);
+        $('uploadCount').textContent = String(fileArr.length);
         const list = $('progressList');
         list.innerHTML = '';
         let hasError = false;
+        let nextIndex = 0;
 
-        for (const file of files) {
-            const div = document.createElement('div');
-            div.className = 'progress-item';
-            div.innerHTML = `${escapeHtml(file.name)}<div class="bar"><div class="bar-fill"></div></div>`;
-            list.appendChild(div);
+        const uploadOne = async (file) => {
+            const itemEl = createUploadProgressItem(file);
+            list.appendChild(itemEl);
 
             try {
-                await uploadSingleFile(file, div);
+                await uploadSingleFile(file, itemEl);
+                itemEl.classList.remove('uploading');
+                itemEl.classList.add('done');
+                try {
+                    await refreshListQuiet();
+                } catch { /* 单项刷新失败时，结束后会再同步一次 */
+                }
             } catch (e) {
                 hasError = true;
-                div.classList.add('error');
-                div.querySelector('.bar').remove();
-                div.append(document.createTextNode(` — ${e.message || '上传失败'}`));
+                itemEl.classList.remove('uploading');
+                itemEl.classList.add('error');
+                itemEl.querySelector('.bar')?.remove();
+                const err = document.createElement('span');
+                err.className = 'progress-item-error';
+                err.textContent = ` — ${e.message || '上传失败'}`;
+                itemEl.querySelector('.progress-item-head')?.appendChild(err);
             }
-        }
+        };
+
+        const workers = Array.from(
+            {length: Math.min(UPLOAD_CONCURRENCY, fileArr.length)},
+            async () => {
+                while (nextIndex < fileArr.length) {
+                    const file = fileArr[nextIndex++];
+                    await uploadOne(file);
+                }
+            }
+        );
+        await Promise.all(workers);
 
         try {
-            await loadList();
+            await refreshListQuiet();
         } catch (e) {
             if (!hasError) {
                 throw e;

@@ -993,8 +993,37 @@ tr.drop-target,
     font-size: 13px;
 }
 
+.progress-item-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.progress-item-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.progress-item-duration {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.progress-item.done .progress-item-duration {
+    color: var(--text-primary);
+}
+
 .progress-item.error {
     color: var(--text-error);
+}
+
+.progress-item-error {
+    flex-shrink: 0;
 }
 
 .bar {
