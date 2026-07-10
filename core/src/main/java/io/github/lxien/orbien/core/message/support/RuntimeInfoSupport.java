@@ -186,6 +186,8 @@ public final class RuntimeInfoSupport {
         lb.setAllowUpload(limits.isAllowUpload());
         lb.setAllowDelete(limits.isAllowDelete());
         lb.setAllowMkdir(limits.isAllowMkdir());
+        lb.setAllowMove(limits.isAllowMove());
+        lb.setAllowRename(limits.isAllowRename());
         builder.setFileLimits(lb.build());
     }
 
@@ -203,6 +205,8 @@ public final class RuntimeInfoSupport {
         builder.setAllowUpload(config.isAllowUpload());
         builder.setAllowDelete(config.isAllowDelete());
         builder.setAllowMkdir(config.isAllowMkdir());
+        builder.setAllowMove(config.isAllowMove());
+        builder.setAllowRename(config.isAllowRename());
         return builder.build();
     }
 

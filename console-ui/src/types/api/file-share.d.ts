@@ -56,6 +56,8 @@ declare namespace Api.FileShare {
         allowUpload?: boolean
         allowDelete?: boolean
         allowMkdir?: boolean
+        allowMove?: boolean
+        allowRename?: boolean
         limitTotal?: number
         transportProtocol?: number
         transport?: Api.Proxy.TransportDTO
@@ -81,6 +83,8 @@ declare namespace Api.FileShare {
         allowUpload?: boolean
         allowDelete?: boolean
         allowMkdir?: boolean
+        allowMove?: boolean
+        allowRename?: boolean
     }
 
     /** 更新参数 */
@@ -100,5 +104,7 @@ declare namespace Api.FileShare {
         allowUpload?: boolean
         allowDelete?: boolean
         allowMkdir?: boolean
+        allowMove?: boolean
+        allowRename?: boolean
     }
 }

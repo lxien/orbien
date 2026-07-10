@@ -31,6 +31,12 @@ public class FileShareLimitsDO {
     @Column(name = "allow_mkdir")
     private Boolean allowMkdir;
 
+    @Column(name = "allow_move")
+    private Boolean allowMove;
+
+    @Column(name = "allow_rename")
+    private Boolean allowRename;
+
     public FileShareLimitsDO(String proxyId) {
         this.proxyId = proxyId;
     }

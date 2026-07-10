@@ -140,6 +140,8 @@
           <ElCheckbox v-model="formData.allowUpload">允许上传</ElCheckbox>
           <ElCheckbox v-model="formData.allowDelete">允许删除</ElCheckbox>
           <ElCheckbox v-model="formData.allowMkdir">允许创建目录</ElCheckbox>
+          <ElCheckbox v-model="formData.allowMove">允许移动</ElCheckbox>
+          <ElCheckbox v-model="formData.allowRename">允许重命名</ElCheckbox>
         </ElSpace>
       </ElFormItem>
     </ElForm>
@@ -186,6 +188,8 @@ interface FormDataState {
   allowUpload: boolean
   allowDelete: boolean
   allowMkdir: boolean
+  allowMove: boolean
+  allowRename: boolean
 }
 
 interface Props {
@@ -240,7 +244,9 @@ const createDefaultFormData = (): FormDataState => ({
   maxUploadSizeMb: DEFAULT_MAX_UPLOAD_MB,
   allowUpload: true,
   allowDelete: true,
-  allowMkdir: true
+  allowMkdir: true,
+  allowMove: true,
+  allowRename: true
 })
 
 const formData = reactive<FormDataState>(createDefaultFormData())
@@ -372,7 +378,9 @@ const applyDetail = (detail: Api.FileShare.FileShareDetailDTO) => {
     maxUploadSizeMb: bytesToMb(detail.maxUploadSize),
     allowUpload: detail.allowUpload ?? true,
     allowDelete: detail.allowDelete ?? true,
-    allowMkdir: detail.allowMkdir ?? true
+    allowMkdir: detail.allowMkdir ?? true,
+    allowMove: detail.allowMove ?? true,
+    allowRename: detail.allowRename ?? true
   })
   authUsers.value = (detail.authUsers || []).map((user) => ({
     id: user.id,
@@ -497,6 +505,8 @@ const handleSubmit = async () => {
       allowUpload: formData.allowUpload,
       allowDelete: formData.allowDelete,
       allowMkdir: formData.allowMkdir,
+      allowMove: formData.allowMove,
+      allowRename: formData.allowRename,
       ...buildDomainPayload()
     }
 

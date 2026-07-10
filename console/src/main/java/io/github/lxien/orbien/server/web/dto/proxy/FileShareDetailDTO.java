@@ -24,6 +24,8 @@ public class FileShareDetailDTO {
     private Boolean allowUpload;
     private Boolean allowDelete;
     private Boolean allowMkdir;
+    private Boolean allowMove;
+    private Boolean allowRename;
     private Integer limitTotal;
     private Integer transportProtocol;
     private TransportDTO transport;

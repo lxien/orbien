@@ -257,6 +257,8 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         limitsDO.setAllowUpload(limits.getAllowUpload());
         limitsDO.setAllowDelete(limits.getAllowDelete());
         limitsDO.setAllowMkdir(limits.getAllowMkdir());
+        limitsDO.setAllowMove(limits.getAllowMove());
+        limitsDO.setAllowRename(limits.getAllowRename());
         fileShareLimitsRepository.save(limitsDO);
     }
 

@@ -56,24 +56,98 @@
     };
 
     const THEME_KEY = 'orbien-file-theme';
+    const THEME_MODES = ['light', 'dark', 'system'];
+    const THEME_LABELS = {
+        light: '白昼模式',
+        dark: '夜间模式',
+        system: '跟随系统'
+    };
+    const THEME_NEXT_HINT = {
+        light: '切换到夜间模式',
+        dark: '切换到跟随系统',
+        system: '切换到白昼模式'
+    };
     const VIEW_KEY = 'orbien-file-view';
     const AUTH_REFRESH_INTERVAL = 30_000;
     const VIEW_MODES = ['list', 'icon', 'column'];
-    const WRITE_CONTROL_IDS = ['btnUpload', 'btnMkdir', 'btnDelete', 'fileInput', 'emptyUploadLink', 'emptyMkdirLink'];
+    const WRITE_CONTROL_IDS = ['btnUpload', 'btnMkdir', 'btnDelete', 'btnRename', 'fileInput', 'emptyUploadLink', 'emptyMkdirLink'];
     const THEME_BUTTON_IDS = ['btnTheme', 'btnThemeLogin'];
 
     let currentPath = '/';
     let entries = [];
     let authRequired = true;
     let canWrite = true;
+    let canMove = true;
+    let canRename = true;
     let permission = 'read_write';
     let currentUsername = '';
     let authRefreshTimer = null;
     let listLoading = false;
     let viewMode = 'list';
+    let dragPaths = [];
+    const selectedPathSet = new Set();
+    let selectionAnchorPath = null;
     const entriesCache = new Map();
 
     const $ = (id) => document.getElementById(id);
+
+    const isMultiSelectModifier = (e) => !!(e.ctrlKey || e.metaKey);
+    const isRangeSelectModifier = (e) => !!e.shiftKey;
+
+    const clearSelection = () => {
+        selectedPathSet.clear();
+        selectionAnchorPath = null;
+    };
+
+    const pruneSelection = () => {
+        const validPaths = new Set(entries.map((entry) => entryPath(entry)));
+        for (const path of [...selectedPathSet]) {
+            if (!validPaths.has(path)) {
+                selectedPathSet.delete(path);
+            }
+        }
+        if (selectionAnchorPath && !validPaths.has(selectionAnchorPath)) {
+            selectionAnchorPath = null;
+        }
+    };
+
+    const orderedCurrentPaths = () => entries.map((entry) => entryPath(entry));
+
+    const applySelectionClick = (e, index, path, orderedPaths = orderedCurrentPaths()) => {
+        const shift = isRangeSelectModifier(e);
+        const multi = isMultiSelectModifier(e);
+
+        if (shift && selectionAnchorPath !== null) {
+            const anchorIndex = orderedPaths.indexOf(selectionAnchorPath);
+            if (anchorIndex === -1) {
+                if (!multi) {
+                    selectedPathSet.clear();
+                }
+                selectedPathSet.add(path);
+            } else {
+                const start = Math.min(anchorIndex, index);
+                const end = Math.max(anchorIndex, index);
+                if (!multi) {
+                    selectedPathSet.clear();
+                }
+                for (let i = start; i <= end; i++) {
+                    selectedPathSet.add(orderedPaths[i]);
+                }
+            }
+        } else if (multi) {
+            if (selectedPathSet.has(path)) {
+                selectedPathSet.delete(path);
+            } else {
+                selectedPathSet.add(path);
+            }
+            selectionAnchorPath = path;
+        } else {
+            selectedPathSet.clear();
+            selectedPathSet.add(path);
+            selectionAnchorPath = path;
+        }
+        syncSelectionState();
+    };
 
     const entryName = (entry) => entry.name || entry.name_ || '';
 
@@ -141,8 +215,179 @@
         return fallback;
     };
 
-    const showError = (err) => {
-        alert(err.message || String(err));
+    let dialogResolver = null;
+    let dialogOptions = null;
+    let dialogKeyHandler = null;
+
+    const closeDialog = (action, value) => {
+        const root = $('appDialog');
+        if (!root || root.classList.contains('hidden')) {
+            return;
+        }
+        root.classList.add('hidden');
+        root.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('dialog-open');
+        if (dialogKeyHandler) {
+            document.removeEventListener('keydown', dialogKeyHandler);
+            dialogKeyHandler = null;
+        }
+        const resolve = dialogResolver;
+        dialogResolver = null;
+        dialogOptions = null;
+        if (resolve) {
+            resolve({action, value});
+        }
+    };
+
+    const openDialog = (options = {}) => new Promise((resolve) => {
+        const root = $('appDialog');
+        const icon = $('dialogIcon');
+        const titleEl = $('dialogTitle');
+        const messageEl = $('dialogMessage');
+        const inputWrap = $('dialogInputWrap');
+        const input = $('dialogInput');
+        const btnCancel = $('dialogCancel');
+        const btnConfirm = $('dialogConfirm');
+        if (!root || !icon || !titleEl || !messageEl || !btnCancel || !btnConfirm || !input || !inputWrap) {
+            resolve({action: 'cancel'});
+            return;
+        }
+
+        if (dialogResolver) {
+            closeDialog('cancel');
+        }
+
+        const {
+            title = '提示',
+            message = '',
+            type = 'info',
+            confirmText = '确定',
+            cancelText = '取消',
+            showCancel = true,
+            danger = false,
+            prompt = false,
+            defaultValue = '',
+            placeholder = '',
+            dismissOnBackdrop = true,
+            selectOnOpen = true
+        } = options;
+
+        dialogResolver = resolve;
+        dialogOptions = {prompt, dismissOnBackdrop, danger, showCancel};
+
+        icon.className = `app-dialog-icon is-${type}`;
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        messageEl.classList.toggle('hidden', !message);
+
+        inputWrap.classList.toggle('hidden', !prompt);
+        input.value = defaultValue;
+        input.placeholder = placeholder;
+
+        btnCancel.textContent = cancelText;
+        btnConfirm.textContent = confirmText;
+        btnCancel.classList.toggle('hidden', !showCancel);
+        btnConfirm.classList.toggle('danger', danger);
+        btnConfirm.classList.toggle('primary', !danger);
+
+        root.classList.remove('hidden');
+        root.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('dialog-open');
+
+        dialogKeyHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeDialog('cancel');
+                return;
+            }
+            if (e.key === 'Enter' && !dialogOptions?.prompt) {
+                if (dialogOptions?.danger && dialogOptions?.showCancel) {
+                    return;
+                }
+                e.preventDefault();
+                closeDialog('confirm');
+                return;
+            }
+            if (e.key === 'Enter' && prompt && document.activeElement === input) {
+                e.preventDefault();
+                closeDialog('confirm', input.value);
+            }
+        };
+        document.addEventListener('keydown', dialogKeyHandler);
+
+        requestAnimationFrame(() => {
+            if (prompt) {
+                input.focus();
+                if (selectOnOpen) {
+                    input.select();
+                }
+                return;
+            }
+            if (danger && showCancel) {
+                btnCancel.focus();
+                return;
+            }
+            (showCancel ? btnCancel : btnConfirm).focus();
+        });
+    });
+
+    const showAlert = (message, options = {}) => openDialog({
+        title: options.title || '提示',
+        message,
+        type: options.type || 'info',
+        confirmText: options.confirmText || '知道了',
+        showCancel: false,
+        dismissOnBackdrop: options.dismissOnBackdrop !== false
+    }).then(() => undefined);
+
+    const showConfirm = (messageOrOptions, legacyOptions = {}) => {
+        const options = typeof messageOrOptions === 'string'
+            ? {...legacyOptions, message: messageOrOptions}
+            : messageOrOptions;
+        return openDialog({
+            title: options.title || '确认',
+            message: options.message || '',
+            type: options.type || (options.danger ? 'danger' : 'warning'),
+            confirmText: options.confirmText || '确定',
+            cancelText: options.cancelText || '取消',
+            danger: !!options.danger,
+            showCancel: true
+        });
+    };
+
+    const showPrompt = (options = {}) => openDialog({
+        title: options.title || '请输入',
+        message: options.message || '',
+        type: 'prompt',
+        confirmText: options.confirmText || '确定',
+        cancelText: options.cancelText || '取消',
+        prompt: true,
+        defaultValue: options.defaultValue || '',
+        placeholder: options.placeholder || '',
+        selectOnOpen: options.selectOnOpen !== false
+    });
+
+    const initDialog = () => {
+        const root = $('appDialog');
+        if (!root) {
+            return;
+        }
+        root.querySelectorAll('[data-dialog-dismiss="true"]').forEach((el) => {
+            el.addEventListener('click', () => {
+                if (dialogOptions?.dismissOnBackdrop !== false) {
+                    closeDialog('cancel');
+                }
+            });
+        });
+        $('dialogCancel')?.addEventListener('click', () => closeDialog('cancel'));
+        $('dialogConfirm')?.addEventListener('click', () => {
+            const input = $('dialogInput');
+            closeDialog('confirm', dialogOptions?.prompt ? input?.value : undefined);
+        });
+    };
+
+    const showError = async (err) => {
+        await showAlert(err.message || String(err), {title: '操作失败', type: 'danger'});
     };
 
     const sortEntries = (list) => [...list].sort((a, b) => {
@@ -181,28 +426,53 @@
 
     const invalidateEntriesCache = () => entriesCache.clear();
 
-    const applyTheme = (theme) => {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem(THEME_KEY, theme);
-        const label = theme === 'dark' ? '白昼' : '黑夜';
-        const title = theme === 'dark' ? '切换到白昼模式' : '切换到黑夜模式';
+    const normalizeThemeMode = (mode) => (THEME_MODES.includes(mode) ? mode : 'light');
+
+    const resolveEffectiveTheme = (mode) => {
+        if (mode === 'system') {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        return mode === 'dark' ? 'dark' : 'light';
+    };
+
+    const applyTheme = (mode) => {
+        const themeMode = normalizeThemeMode(mode);
+        const effective = resolveEffectiveTheme(themeMode);
+        document.documentElement.setAttribute('data-theme', effective);
+        document.documentElement.setAttribute('data-theme-mode', themeMode);
+        localStorage.setItem(THEME_KEY, themeMode);
+        const title = `${THEME_LABELS[themeMode]} · ${THEME_NEXT_HINT[themeMode]}`;
         for (const id of THEME_BUTTON_IDS) {
             const btn = $(id);
-            if (btn) {
-                btn.textContent = label;
-                btn.title = title;
+            if (!btn) {
+                continue;
             }
+            btn.dataset.themeMode = themeMode;
+            btn.title = title;
+            btn.setAttribute('aria-label', title);
         }
     };
 
     const initTheme = () => {
-        const saved = localStorage.getItem(THEME_KEY);
-        applyTheme(saved === 'dark' ? 'dark' : 'light');
+        const saved = normalizeThemeMode(localStorage.getItem(THEME_KEY));
+        applyTheme(saved);
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const onSystemThemeChange = () => {
+            if (normalizeThemeMode(localStorage.getItem(THEME_KEY)) === 'system') {
+                document.documentElement.setAttribute('data-theme', resolveEffectiveTheme('system'));
+            }
+        };
+        if (typeof media.addEventListener === 'function') {
+            media.addEventListener('change', onSystemThemeChange);
+        } else if (typeof media.addListener === 'function') {
+            media.addListener(onSystemThemeChange);
+        }
     };
 
     const toggleTheme = () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        applyTheme(current === 'dark' ? 'light' : 'dark');
+        const current = normalizeThemeMode(localStorage.getItem(THEME_KEY));
+        const index = THEME_MODES.indexOf(current);
+        applyTheme(THEME_MODES[(index + 1) % THEME_MODES.length]);
     };
 
     const updatePermissionBadge = () => {
@@ -219,12 +489,22 @@
         readonlyTip.classList.toggle('hidden', canWrite);
     };
 
+    const applyCapabilities = (data) => {
+        canWrite = data.canWrite === true;
+        canMove = data.canMove !== false && canWrite;
+        canRename = data.canRename !== false && canWrite;
+    };
+
     const updateWriteControls = () => {
         for (const id of WRITE_CONTROL_IDS) {
             const el = $(id);
             if (el) {
                 el.style.display = canWrite ? '' : 'none';
             }
+        }
+        const renameBtn = $('btnRename');
+        if (renameBtn) {
+            renameBtn.style.display = canRename ? '' : 'none';
         }
         const emptyActions = document.querySelector('.empty-actions');
         const emptyDesc = document.querySelector('.empty-desc');
@@ -294,7 +574,7 @@
         const data = await res.json();
         authRequired = !!data.authRequired;
         permission = data.permission || (data.canWrite ? 'read_write' : 'read');
-        canWrite = data.canWrite === true;
+        applyCapabilities(data);
         currentUsername = data.username || '';
 
         if (!authRequired) {
@@ -331,6 +611,7 @@
                 body: JSON.stringify({username, password})
             });
             canWrite = data.canWrite === true;
+            applyCapabilities(data);
             permission = data.permission || (canWrite ? 'read_write' : 'read');
             currentUsername = username;
             showApp(username);
@@ -347,6 +628,8 @@
         } catch { /* ignore */
         }
         canWrite = false;
+        canMove = false;
+        canRename = false;
         permission = 'read';
         showLogin();
     }
@@ -409,6 +692,9 @@
         if (mode === viewMode) {
             return;
         }
+        if (mode !== 'column') {
+            clearSelection();
+        }
         applyViewMode(mode);
         renderFiles().catch(showError);
     };
@@ -417,6 +703,7 @@
         if (listLoading || path === currentPath) {
             return;
         }
+        clearSelection();
         currentPath = path;
         loadList().catch(showError);
     };
@@ -443,6 +730,7 @@
         try {
             invalidateEntriesCache();
             entries = await fetchEntries(currentPath, false);
+            pruneSelection();
             await renderFiles();
         } catch (e) {
             if (e.message?.includes('目录不存在') || e.message?.includes('不是目录')) {
@@ -495,12 +783,11 @@
             }
             btn.textContent = item.label;
             btn.title = item.label;
-            if (!isLast) {
-                btn.dataset.path = item.path;
-            }
+            btn.dataset.path = item.path;
             wrap.appendChild(btn);
             nav.appendChild(wrap);
         });
+        bindBreadcrumbDropTargets();
     };
 
     const updateSummary = () => {
@@ -560,26 +847,25 @@
 
     const entryPath = (entry, basePath = currentPath) => joinPath(basePath, entryName(entry));
 
-    const createSelectCheckbox = (index, filePath, isDirectory = false) => {
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'file-select';
-        checkbox.dataset.idx = String(index);
-        checkbox.dataset.filePath = filePath;
-        checkbox.dataset.isDirectory = isDirectory ? '1' : '0';
-        checkbox.addEventListener('change', syncSelectionState);
-        return checkbox;
+    const findEntryByPath = (path) => {
+        const parent = parentDirOf(path);
+        const name = path.split('/').pop();
+        const list = parent === currentPath ? entries : entriesCache.get(parent);
+        return list?.find((entry) => entryName(entry) === name);
     };
 
     const syncSelectionState = () => {
-        const checkboxes = [...document.querySelectorAll('#fileListWrap .file-select')];
-        const checked = checkboxes.filter((el) => el.checked);
-        $('selectAll').checked = checkboxes.length > 0 && checked.length === checkboxes.length;
-        $('selectAll').indeterminate = checked.length > 0 && checked.length < checkboxes.length;
-
-        for (const item of document.querySelectorAll('.icon-item, .column-item')) {
-            const checkbox = item.querySelector('.file-select');
-            item.classList.toggle('is-selected', !!checkbox?.checked);
+        for (const item of document.querySelectorAll('.icon-item')) {
+            const path = item.dataset.filePath;
+            item.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
+        }
+        for (const row of document.querySelectorAll('#fileList tr')) {
+            const path = row.dataset.filePath;
+            row.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
+        }
+        for (const item of document.querySelectorAll('.column-item')) {
+            const path = item.dataset.filePath;
+            item.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
         }
     };
 
@@ -593,16 +879,216 @@
         }
     };
 
+    const parentDirOf = (path) => {
+        if (!path || path === '/') {
+            return '/';
+        }
+        const parts = path.split('/').filter(Boolean);
+        parts.pop();
+        return parts.length ? `/${parts.join('/')}` : '/';
+    };
+
+    const canDropMove = (sourcePaths, destDir) => {
+        for (const src of sourcePaths) {
+            if (!src || src === destDir) {
+                return false;
+            }
+            if (destDir.startsWith(`${src}/`)) {
+                return false;
+            }
+            if (parentDirOf(src) === destDir) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    const clearDropTargets = () => {
+        for (const el of document.querySelectorAll('.drop-target')) {
+            el.classList.remove('drop-target');
+        }
+    };
+
+    const bindDragSource = (element, filePath) => {
+        if (!canMove || !filePath) {
+            return;
+        }
+        element.draggable = true;
+        element.addEventListener('dragstart', (e) => {
+            const selected = selectedPaths();
+            dragPaths = selected.includes(filePath) ? selected : [filePath];
+            e.dataTransfer.setData('text/plain', filePath);
+            e.dataTransfer.effectAllowed = 'move';
+            element.classList.add('is-dragging');
+        });
+        element.addEventListener('dragend', () => {
+            element.classList.remove('is-dragging');
+            clearDropTargets();
+            dragPaths = [];
+        });
+    };
+
+    const dropBindings = new WeakMap();
+
+    const bindDropTarget = (element, destDir) => {
+        if (!canMove || !destDir) {
+            return;
+        }
+        const prev = dropBindings.get(element);
+        if (prev?.destDir === destDir) {
+            return;
+        }
+        if (prev?.controller) {
+            prev.controller.abort();
+        }
+        const controller = new AbortController();
+        const {signal} = controller;
+        dropBindings.set(element, {destDir, controller});
+
+        element.addEventListener('dragover', (e) => {
+            const paths = dragPaths.length ? dragPaths : [];
+            if (!paths.length) {
+                return;
+            }
+            if (!canDropMove(paths, destDir)) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            e.dataTransfer.dropEffect = 'move';
+            clearDropTargets();
+            element.classList.add('drop-target');
+        }, {signal});
+
+        element.addEventListener('dragleave', (e) => {
+            if (!element.contains(e.relatedTarget)) {
+                element.classList.remove('drop-target');
+            }
+        }, {signal});
+
+        element.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            element.classList.remove('drop-target');
+            const paths = dragPaths.length
+                ? dragPaths
+                : [e.dataTransfer.getData('text/plain')].filter(Boolean);
+            if (!paths.length || !canDropMove(paths, destDir)) {
+                return;
+            }
+            moveItems(paths, destDir).catch(showError);
+        }, {signal});
+    };
+
+    const bindDirectoryDropZones = () => {
+        bindDropTarget($('fileListWrap'), currentPath);
+        const pathNavMain = document.querySelector('.path-nav-main');
+        if (pathNavMain) {
+            bindDropTarget(pathNavMain, currentPath);
+        }
+        const back = $('btnBack');
+        if (back && currentPath !== '/') {
+            bindDropTarget(back, parentPath(currentPath));
+        }
+        for (const panel of document.querySelectorAll('.column-panel')) {
+            bindDropTarget(panel, panel.dataset.path);
+        }
+    };
+
+    const bindBreadcrumbDropTargets = () => {
+        for (const btn of document.querySelectorAll('#breadcrumb .breadcrumb-link[data-path]')) {
+            bindDropTarget(btn, btn.dataset.path);
+        }
+    };
+
+    async function ensureMovable() {
+        await refreshAuthStatus();
+        if (!canMove) {
+            throw new Error('当前不允许移动文件');
+        }
+    }
+
+    async function ensureRenamable() {
+        await refreshAuthStatus();
+        if (!canRename) {
+            throw new Error('当前不允许重命名');
+        }
+    }
+
+    async function moveItems(paths, destDir) {
+        await ensureMovable();
+        const items = [...new Set(paths)].filter((p) => p && canDropMove([p], destDir));
+        if (!items.length) {
+            return;
+        }
+        const data = await api('/api/files/move', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({items, destDir})
+        });
+        invalidateEntriesCache();
+        clearSelection();
+        await loadList();
+        if (data.failCount > 0) {
+            const lines = (data.results || [])
+                .filter((item) => !item.ok)
+                .map((item) => `${item.path}: ${item.message || '移动失败'}`);
+            await showAlert(
+                `成功 ${data.successCount} 项，失败 ${data.failCount} 项：\n${lines.join('\n')}`,
+                {title: '部分移动失败', type: 'warning'}
+            );
+        }
+    }
+
+    async function renameSelected() {
+        await ensureRenamable();
+        const paths = selectedPaths();
+        if (paths.length !== 1) {
+            await showAlert('请选择一个文件或文件夹进行重命名', {title: '无法重命名', type: 'warning'});
+            return;
+        }
+        const oldPath = paths[0];
+        const oldName = oldPath.split('/').pop() || '';
+        const result = await showPrompt({
+            title: '重命名',
+            message: '请输入新名称',
+            defaultValue: oldName,
+            confirmText: '确定',
+            cancelText: '取消'
+        });
+        if (result.action !== 'confirm') {
+            return;
+        }
+        const trimmed = (result.value || '').trim();
+        if (!trimmed || trimmed === oldName) {
+            return;
+        }
+        await api('/api/files/rename', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({path: oldPath, name: trimmed})
+        });
+        if (viewMode === 'column' && selectedPathSet.size === 1) {
+            const onlyPath = [...selectedPathSet][0];
+            if (onlyPath === oldPath) {
+                selectedPathSet.clear();
+                selectedPathSet.add(joinPath(parentDirOf(oldPath), trimmed));
+                selectionAnchorPath = [...selectedPathSet][0];
+            }
+        }
+        invalidateEntriesCache();
+        await loadList();
+    }
+
     const renderListView = () => {
         const tbody = $('fileList');
         const fragment = document.createDocumentFragment();
 
         entries.forEach((entry, index) => {
             const name = entryName(entry);
+            const itemPath = entryPath(entry);
             const tr = document.createElement('tr');
-
-            const tdCheck = document.createElement('td');
-            tdCheck.appendChild(createSelectCheckbox(index, entryPath(entry), entry.directory));
+            tr.dataset.filePath = itemPath;
 
             const tdName = document.createElement('td');
             const nameSpan = document.createElement('span');
@@ -612,8 +1098,12 @@
             nameText.textContent = name;
             nameSpan.appendChild(nameText);
             if (entry.directory) {
-                bindEnterDir(nameSpan, name);
+                bindEnterDir(nameSpan, name, {dblclick: true});
             }
+            nameSpan.addEventListener('click', (e) => {
+                e.stopPropagation();
+                applySelectionClick(e, index, itemPath);
+            });
             tdName.appendChild(nameSpan);
 
             const tdTime = document.createElement('td');
@@ -625,7 +1115,19 @@
             const tdSize = document.createElement('td');
             tdSize.textContent = entry.directory ? '' : formatSize(entry.size);
 
-            tr.append(tdCheck, tdName, tdTime, tdType, tdSize);
+            tr.append(tdName, tdTime, tdType, tdSize);
+            bindDragSource(tr, itemPath);
+            if (entry.directory) {
+                bindDropTarget(tr, itemPath);
+            } else {
+                bindDropTarget(tr, currentPath);
+            }
+            tr.addEventListener('click', (e) => {
+                if (e.target.closest('.name-link')) {
+                    return;
+                }
+                applySelectionClick(e, index, itemPath);
+            });
             fragment.appendChild(tr);
         });
         tbody.replaceChildren(fragment);
@@ -637,13 +1139,11 @@
 
         entries.forEach((entry, index) => {
             const name = entryName(entry);
+            const itemPath = entryPath(entry);
             const item = document.createElement('div');
             item.className = 'icon-item';
             item.title = name;
-
-            const checkbox = createSelectCheckbox(index, entryPath(entry), entry.directory);
-            checkbox.classList.add('icon-item-check');
-            item.appendChild(checkbox);
+            item.dataset.filePath = itemPath;
 
             const thumb = document.createElement('div');
             thumb.className = 'icon-item-thumb';
@@ -655,43 +1155,39 @@
             label.textContent = name;
             item.appendChild(label);
 
-            let clickTimer;
             item.addEventListener('click', (e) => {
-                if (e.target.closest('input[type=checkbox]')) {
-                    return;
-                }
-                clearTimeout(clickTimer);
-                clickTimer = setTimeout(() => {
-                    checkbox.checked = !checkbox.checked;
-                    syncSelectionState();
-                }, 220);
+                applySelectionClick(e, index, itemPath);
             });
 
             if (entry.directory) {
-                const cancelClick = () => clearTimeout(clickTimer);
                 bindEnterDir(thumb, name, {dblclick: true});
                 bindEnterDir(label, name, {dblclick: true});
-                thumb.addEventListener('dblclick', cancelClick);
-                label.addEventListener('dblclick', cancelClick);
+                bindDropTarget(item, itemPath);
+            } else {
+                bindDropTarget(item, currentPath);
             }
+
+            bindDragSource(item, itemPath);
 
             fragment.appendChild(item);
         });
         grid.replaceChildren(fragment);
     };
 
-    const renderColumnItem = (entry, colPath, highlightName) => {
+    const renderColumnItem = (entry, colPath, highlightName, index, panelPaths) => {
         const name = entryName(entry);
         const fullPath = entryPath(entry, colPath);
         const item = document.createElement('div');
         item.className = 'column-item';
-        if (highlightName && name === highlightName) {
+        item.dataset.filePath = fullPath;
+        const isPathHighlight = highlightName && name === highlightName;
+        if (isPathHighlight) {
             item.classList.add('is-selected');
         }
+        if (selectedPathSet.has(fullPath)) {
+            item.classList.add('is-checked');
+        }
 
-        const checkbox = createSelectCheckbox(-1, fullPath, entry.directory);
-        checkbox.classList.add('column-item-check');
-        item.appendChild(checkbox);
         item.appendChild(createFileIcon(name, entry.directory));
 
         const label = document.createElement('span');
@@ -708,21 +1204,28 @@
         }
 
         item.addEventListener('click', (e) => {
-            if (e.target.closest('input[type=checkbox]')) {
+            if (listLoading) {
                 return;
             }
-            const targetPath = joinPath(colPath, name);
-            if (entry.directory) {
-                if (listLoading) {
-                    return;
+            const shift = isRangeSelectModifier(e);
+            const multi = isMultiSelectModifier(e);
+            applySelectionClick(e, index, fullPath, panelPaths);
+
+            if (!shift && !multi && entry.directory) {
+                const targetPath = joinPath(colPath, name);
+                if (targetPath !== currentPath) {
+                    currentPath = targetPath;
+                    loadList().catch(showError);
                 }
-                currentPath = targetPath;
-                loadList().catch(showError);
-                return;
             }
-            checkbox.checked = !checkbox.checked;
-            syncSelectionState();
         });
+
+        bindDragSource(item, fullPath);
+        if (entry.directory) {
+            bindDropTarget(item, fullPath);
+        } else {
+            bindDropTarget(item, colPath);
+        }
 
         return item;
     };
@@ -755,8 +1258,9 @@
             if (!colEntries.length) {
                 panel.appendChild(createColumnEmptyContent());
             } else {
-                colEntries.forEach((entry) => {
-                    panel.appendChild(renderColumnItem(entry, colPath, highlightName));
+                const panelPaths = colEntries.map((entry) => entryPath(entry, colPath));
+                colEntries.forEach((entry, index) => {
+                    panel.appendChild(renderColumnItem(entry, colPath, highlightName, index, panelPaths));
                 });
             }
             fragment.appendChild(panel);
@@ -779,8 +1283,6 @@
     async function renderFiles() {
         renderBreadcrumb();
         updateSummary();
-        $('selectAll').checked = false;
-        $('selectAll').indeterminate = false;
 
         if (viewMode === 'list') {
             renderListView();
@@ -789,6 +1291,7 @@
         } else {
             await renderColumnView();
         }
+        bindDirectoryDropZones();
         syncSelectionState();
     }
 
@@ -806,9 +1309,7 @@
         navigateTo(joinPath(currentPath, name));
     };
 
-    const selectedPaths = () => [...document.querySelectorAll('#fileListWrap .file-select:checked')]
-        .map((checkbox) => checkbox.dataset.filePath)
-        .filter(Boolean);
+    const selectedPaths = () => [...selectedPathSet];
 
     const uploadSingleFile = (file, itemEl) => new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -874,7 +1375,10 @@
         }
         $('fileInput').value = '';
         if (hasError) {
-            alert('部分文件上传失败，请查看上传面板中的错误信息');
+            await showAlert('部分文件上传失败，请查看上传面板中的错误信息', {
+                title: '上传未完成',
+                type: 'warning'
+            });
         }
     }
 
@@ -921,11 +1425,11 @@
     async function downloadSelected() {
         const paths = selectedPaths();
         const errors = [];
-        for (const checkbox of document.querySelectorAll('#fileListWrap .file-select:checked')) {
-            if (checkbox.dataset.isDirectory === '1') {
+        for (const p of paths) {
+            const entry = findEntryByPath(p);
+            if (entry?.directory) {
                 continue;
             }
-            const p = checkbox.dataset.filePath;
             const name = p.split('/').pop();
             try {
                 await downloadFile(p);
@@ -934,14 +1438,27 @@
             }
         }
         if (errors.length) {
-            alert(`部分下载失败：\n${errors.join('\n')}`);
+            await showAlert(errors.join('\n'), {title: '部分下载失败', type: 'warning'});
         }
     }
 
     async function mkdir() {
         await ensureWritable('新建文件夹');
-        const name = prompt('文件夹名称');
-        if (!name) return;
+        const result = await showPrompt({
+            title: '新建文件夹',
+            message: '请输入文件夹名称',
+            placeholder: '文件夹名称',
+            confirmText: '创建',
+            cancelText: '取消',
+            selectOnOpen: false
+        });
+        if (result.action !== 'confirm') {
+            return;
+        }
+        const name = (result.value || '').trim();
+        if (!name) {
+            return;
+        }
         await api('/api/files/mkdir', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -950,38 +1467,70 @@
         await loadList();
     }
 
+    const buildDeleteConfirmOptions = (paths) => {
+        const hasDirectory = paths.some((p) => findEntryByPath(p)?.directory);
+        const count = paths.length;
+        if (hasDirectory) {
+            return {
+                title: count === 1 ? '删除文件夹' : `删除 ${count} 项`,
+                message: count === 1
+                    ? '文件夹内的所有内容将一并删除，且无法恢复。'
+                    : '选中的项目中包含文件夹，将连同内部所有文件一并删除，且无法恢复。',
+                type: 'danger',
+                danger: true,
+                confirmText: '删除',
+                cancelText: '取消'
+            };
+        }
+        return {
+            title: count === 1 ? '删除文件' : `删除 ${count} 个文件`,
+            message: '删除后无法恢复，确定继续吗？',
+            type: 'warning',
+            danger: true,
+            confirmText: '删除',
+            cancelText: '取消'
+        };
+    };
+
     async function deleteSelected() {
         await ensureWritable('删除文件');
         const paths = selectedPaths();
-        if (!paths.length || !confirm('确认删除选中项？')) return;
-
-        const errors = [];
-        for (const p of paths) {
-            try {
-                await api(`/api/files?path=${encodeURIComponent(p)}`, {method: 'DELETE'});
-            } catch (e) {
-                errors.push(`${p.split('/').pop() || p}: ${e.message || '删除失败'}`);
-            }
+        if (!paths.length) {
+            return;
         }
+        const result = await showConfirm(buildDeleteConfirmOptions(paths));
+        if (result.action !== 'confirm') {
+            return;
+        }
+
+        setListLoading(true);
+        const errors = [];
         try {
-            await loadList();
-        } catch (e) {
-            errors.push(e.message || '刷新列表失败');
+            for (const p of paths) {
+                try {
+                    await api(`/api/files?path=${encodeURIComponent(p)}`, {method: 'DELETE'});
+                } catch (e) {
+                    errors.push(`${p.split('/').pop() || p}: ${e.message || '删除失败'}`);
+                }
+            }
+            clearSelection();
+            invalidateEntriesCache();
+            try {
+                await loadList(true);
+            } catch (e) {
+                errors.push(e.message || '刷新列表失败');
+            }
+        } finally {
+            setListLoading(false);
         }
         if (errors.length) {
-            alert(`部分删除失败：\n${errors.join('\n')}`);
+            await showAlert(errors.join('\n'), {title: '部分删除失败', type: 'danger'});
         }
     }
 
-    const toggleAll = (el) => {
-        for (const checkbox of document.querySelectorAll('#fileListWrap .file-select')) {
-            checkbox.checked = el.checked;
-        }
-        syncSelectionState();
-    };
-
     async function bootstrap() {
         initTheme();
+        initDialog();
         initViewMode();
         try {
             const status = await refreshAuthStatus();
@@ -1020,8 +1569,8 @@
     });
     $('btnDownload').addEventListener('click', () => downloadSelected().catch(showError));
     $('btnMkdir').addEventListener('click', () => mkdir().catch(showError));
+    $('btnRename').addEventListener('click', () => renameSelected().catch(showError));
     $('btnDelete').addEventListener('click', () => deleteSelected().catch(showError));
-    $('selectAll').addEventListener('change', (e) => toggleAll(e.target));
     $('breadcrumb').addEventListener('click', navigate);
     $('btnBack').addEventListener('click', goBack);
     $('btnHome').addEventListener('click', goHome);

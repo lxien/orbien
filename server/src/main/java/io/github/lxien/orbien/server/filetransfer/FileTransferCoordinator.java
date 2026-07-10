@@ -121,6 +121,11 @@ public class FileTransferCoordinator {
     }
 
     public Message.FileOpResponse op(String agentId, String proxyId, String op, String path, String name) throws Exception {
+        return op(agentId, proxyId, op, path, name, FileTransferConstants.REQUEST_TIMEOUT_MS);
+    }
+
+    public Message.FileOpResponse op(String agentId, String proxyId, String op, String path, String name,
+                                     long timeoutMs) throws Exception {
         String requestId = newRequestId();
         Message.FileOpRequest req = Message.FileOpRequest.newBuilder()
                 .setRequestId(requestId)
@@ -129,9 +134,9 @@ public class FileTransferCoordinator {
                 .setPath(path)
                 .setName(name == null ? "" : name)
                 .build();
-        CompletableFuture<Message.FileOpResponse> future = register(requestId);
+        CompletableFuture<Message.FileOpResponse> future = register(requestId, timeoutMs);
         send(agentId, TMSP.MSG_FILE_OP_REQ, req, proxyId, future);
-        return future.get(FileTransferConstants.REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+        return future.get(timeoutMs, TimeUnit.MILLISECONDS);
     }
 
     public void onListResp(Message.FileListResponse resp) {

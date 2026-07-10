@@ -276,6 +276,8 @@ public class TomlConfigLoader implements ConfigSource {
                         limitsConfig.setAllowUpload(fileLimits.getBoolean("allow_upload", true));
                         limitsConfig.setAllowDelete(fileLimits.getBoolean("allow_delete", true));
                         limitsConfig.setAllowMkdir(fileLimits.getBoolean("allow_mkdir", true));
+                        limitsConfig.setAllowMove(fileLimits.getBoolean("allow_move", true));
+                        limitsConfig.setAllowRename(fileLimits.getBoolean("allow_rename", true));
                     }
                     if (!StringUtils.hasText(rootPath)) {
                         throw new IllegalArgumentException("file 协议必须配置 root_path");

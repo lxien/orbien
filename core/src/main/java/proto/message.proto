@@ -120,6 +120,8 @@ message FileShareLimits {
   bool allow_upload = 3;
   bool allow_delete = 4;
   bool allow_mkdir = 5;
+  bool allow_move = 6;
+  bool allow_rename = 7;
 }
 
 message FileListRequest {

@@ -7,17 +7,25 @@
     <link rel="stylesheet" href="/css/app.css"/>
     <script>
         (() => {
-            const theme = localStorage.getItem('orbien-file-theme');
-            if (theme === 'dark' || theme === 'light') {
-                document.documentElement.setAttribute('data-theme', theme);
-            }
+            const THEME_KEY = 'orbien-file-theme';
+            const saved = localStorage.getItem(THEME_KEY);
+            const mode = saved === 'dark' || saved === 'system' ? saved : 'light';
+            const effective = mode === 'system'
+                ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+                : mode;
+            document.documentElement.setAttribute('data-theme', effective);
+            document.documentElement.setAttribute('data-theme-mode', mode);
         })();
     </script>
 </head>
 <body>
 <div id="loginView" class="login-wrap">
     <div class="login-toolbar">
-        <button id="btnThemeLogin" class="icon-btn" type="button" title="切换主题">黑夜</button>
+        <button id="btnThemeLogin" class="theme-btn icon-btn" type="button" data-theme-mode="light"
+                title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
+            <span class="theme-btn-icon" aria-hidden="true"></span>
+            <span class="sr-only">切换主题</span>
+        </button>
     </div>
     <div class="login-brand">
         <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
@@ -42,7 +50,11 @@
             <strong id="shareTitle">文件共享</strong>
         </button>
         <div class="user-info">
-            <button id="btnTheme" class="icon-btn" type="button" title="切换主题">黑夜</button>
+            <button id="btnTheme" class="theme-btn icon-btn" type="button" data-theme-mode="light"
+                    title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
+                <span class="theme-btn-icon" aria-hidden="true"></span>
+                <span class="sr-only">切换主题</span>
+            </button>
             <span id="currentUser"></span>
             <span id="permissionBadge" class="permission-badge hidden"></span>
             <button id="btnLogout" class="hidden">退出</button>
@@ -65,6 +77,7 @@
                 <button class="primary" id="btnUpload">上传</button>
                 <button id="btnDownload">下载</button>
                 <button id="btnMkdir">新建文件夹</button>
+                <button id="btnRename">重命名</button>
                 <button id="btnDelete">删除</button>
             </div>
             <div class="view-switcher" role="group" aria-label="切换视图">
@@ -88,7 +101,6 @@
                 <table>
                     <thead>
                     <tr>
-                        <th class="col-check"><input type="checkbox" id="selectAll"/></th>
                         <th>名称</th>
                         <th class="col-time">修改时间</th>
                         <th class="col-type">类型</th>
@@ -121,6 +133,25 @@
     <div class="progress-title">文件上传 · 共 <span id="uploadCount">0</span> 项</div>
     <div id="progressList"></div>
     <button id="btnHideProgress" class="btn-block">收起</button>
+</div>
+
+<div id="appDialog" class="app-dialog hidden" aria-hidden="true">
+    <div class="app-dialog-backdrop" data-dialog-dismiss="true"></div>
+    <div class="app-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"
+         aria-describedby="dialogMessage">
+        <div class="app-dialog-icon" id="dialogIcon" aria-hidden="true"></div>
+        <div class="app-dialog-content">
+            <h3 class="app-dialog-title" id="dialogTitle"></h3>
+            <p class="app-dialog-message" id="dialogMessage"></p>
+            <div class="app-dialog-input-wrap hidden" id="dialogInputWrap">
+                <input type="text" class="app-dialog-input" id="dialogInput" autocomplete="off"/>
+            </div>
+            <div class="app-dialog-actions">
+                <button type="button" class="app-dialog-btn" id="dialogCancel">取消</button>
+                <button type="button" class="app-dialog-btn primary" id="dialogConfirm">确定</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/js/app.js"></script>

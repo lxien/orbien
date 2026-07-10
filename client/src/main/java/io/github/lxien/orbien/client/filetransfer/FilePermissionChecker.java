@@ -48,6 +48,18 @@ public final class FilePermissionChecker {
         }
     }
 
+    public static void assertMovable(Message.FileShareLimits limits) {
+        if (limits != null && !limits.getAllowMove()) {
+            throw new FileAccessException("不允许移动文件");
+        }
+    }
+
+    public static void assertRenamable(Message.FileShareLimits limits) {
+        if (limits != null && !limits.getAllowRename()) {
+            throw new FileAccessException("不允许重命名");
+        }
+    }
+
     public static long maxUploadSize(Message.FileShareLimits limits) {
         if (limits == null || limits.getMaxUploadSize() <= 0) {
             return io.github.lxien.orbien.core.domain.FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;

@@ -115,6 +115,10 @@ public class FileTransferControlHandler {
             resp = fileSystemService.mkdir(ctx.root(), req.getPath(), req.getName(), ctx.limits());
         } else if (FileTransferConstants.OP_DELETE.equals(req.getOp())) {
             resp = fileSystemService.delete(ctx.root(), req.getPath(), ctx.limits());
+        } else if (FileTransferConstants.OP_MOVE.equals(req.getOp())) {
+            resp = fileSystemService.move(ctx.root(), req.getPath(), req.getName(), ctx.limits());
+        } else if (FileTransferConstants.OP_RENAME.equals(req.getOp())) {
+            resp = fileSystemService.rename(ctx.root(), req.getPath(), req.getName(), ctx.limits());
         } else {
             resp = Message.FileOpResponse.newBuilder()
                     .setStatus(status(1, "不支持的操作"))

@@ -33,4 +33,6 @@ public class FileShareCreateParam {
     private Boolean allowUpload = Boolean.TRUE;
     private Boolean allowDelete = Boolean.TRUE;
     private Boolean allowMkdir = Boolean.TRUE;
+    private Boolean allowMove = Boolean.TRUE;
+    private Boolean allowRename = Boolean.TRUE;
 }

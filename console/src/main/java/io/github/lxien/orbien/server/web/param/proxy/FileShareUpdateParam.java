@@ -35,4 +35,6 @@ public class FileShareUpdateParam {
     private Boolean allowUpload;
     private Boolean allowDelete;
     private Boolean allowMkdir;
+    private Boolean allowMove;
+    private Boolean allowRename;
 }

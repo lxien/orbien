@@ -15,6 +15,8 @@ public class FileShareLimitsConfig implements Serializable {
     private boolean allowUpload = true;
     private boolean allowDelete = true;
     private boolean allowMkdir = true;
+    private boolean allowMove = true;
+    private boolean allowRename = true;
 
     public static final long DEFAULT_MAX_UPLOAD_SIZE = 524_288_000L;
 }

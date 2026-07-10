@@ -116,12 +116,24 @@ public class FileShareHttpHandler {
                     writeJson(ctx.channel(), 403, Map.of("message", "只读用户"));
                     return;
                 }
+                if (!resolveCanMkdir(config, session)) {
+                    writeJson(ctx.channel(), 403, Map.of("message", "不允许创建目录"));
+                    return;
+                }
                 JsonObject json = GSON.fromJson(req.bodyText(), JsonObject.class);
                 Message.FileOpResponse resp = fileTransferCoordinator.op(agentId, proxyId,
                         FileTransferConstants.OP_MKDIR,
                         json.get("path").getAsString(),
                         json.get("name").getAsString());
                 writeJson(ctx.channel(), resp.getStatus().getCode() == 0 ? 200 : 400, toOpJson(resp));
+                return;
+            }
+            if ("POST".equals(req.method()) && path.startsWith("/api/files/move")) {
+                handleMove(ctx.channel(), config, session, agentId, proxyId, req.bodyText());
+                return;
+            }
+            if ("POST".equals(req.method()) && path.startsWith("/api/files/rename")) {
+                handleRename(ctx.channel(), config, session, agentId, proxyId, req.bodyText());
                 return;
             }
             if ("DELETE".equals(req.method()) && path.startsWith("/api/files")) {
@@ -131,7 +143,8 @@ public class FileShareHttpHandler {
                 }
                 String filePath = queryParam(requestPath, "path");
                 Message.FileOpResponse resp = fileTransferCoordinator.op(agentId, proxyId,
-                        FileTransferConstants.OP_DELETE, filePath, "");
+                        FileTransferConstants.OP_DELETE, filePath, "",
+                        FileTransferConstants.DELETE_MAX_TIMEOUT_MS);
                 writeJson(ctx.channel(), resp.getStatus().getCode() == 0 ? 200 : 400, toOpJson(resp));
                 return;
             }
@@ -184,7 +197,7 @@ public class FileShareHttpHandler {
             body.put("loggedIn", true);
             body.put("username", "访客");
             body.put("permission", guest.permission());
-            body.put("canWrite", resolveCanWrite(config, guest));
+            putFileCapabilities(body, config, guest);
             writeJson(channel, 200, body);
             return;
         }
@@ -195,7 +208,7 @@ public class FileShareHttpHandler {
                 body.put("loggedIn", true);
                 body.put("username", session.username());
                 body.put("permission", session.permission());
-                body.put("canWrite", resolveCanWrite(config, session));
+                putFileCapabilities(body, config, session);
                 writeJson(channel, 200, body);
                 return;
             } catch (FileAuthService.AuthException e) {
@@ -212,15 +225,128 @@ public class FileShareHttpHandler {
         writeJson(channel, 200, body);
     }
 
+    private void putFileCapabilities(Map<String, Object> body, ProxyConfig config, FileAuthService.FileSession session) {
+        body.put("canWrite", resolveCanWrite(config, session));
+        body.put("canMove", resolveCanMove(config, session));
+        body.put("canRename", resolveCanRename(config, session));
+    }
+
     private boolean resolveCanWrite(ProxyConfig config, FileAuthService.FileSession session) {
         if (session == null || !session.canWrite()) {
             return false;
         }
         if (config.hasFileShareLimits()) {
             FileShareLimitsConfig limits = config.getFileShareLimits();
-            return limits.isAllowUpload() || limits.isAllowDelete() || limits.isAllowMkdir();
+            return limits.isAllowUpload() || limits.isAllowDelete() || limits.isAllowMkdir()
+                    || limits.isAllowMove() || limits.isAllowRename();
         }
         return true;
+    }
+
+    private boolean resolveCanMkdir(ProxyConfig config, FileAuthService.FileSession session) {
+        if (session == null || !session.canWrite()) {
+            return false;
+        }
+        if (config.hasFileShareLimits()) {
+            return config.getFileShareLimits().isAllowMkdir();
+        }
+        return true;
+    }
+
+    private boolean resolveCanMove(ProxyConfig config, FileAuthService.FileSession session) {
+        if (session == null || !session.canWrite()) {
+            return false;
+        }
+        if (config.hasFileShareLimits()) {
+            return config.getFileShareLimits().isAllowMove();
+        }
+        return true;
+    }
+
+    private boolean resolveCanRename(ProxyConfig config, FileAuthService.FileSession session) {
+        if (session == null || !session.canWrite()) {
+            return false;
+        }
+        if (config.hasFileShareLimits()) {
+            return config.getFileShareLimits().isAllowRename();
+        }
+        return true;
+    }
+
+    private void handleMove(Channel channel, ProxyConfig config, FileAuthService.FileSession session,
+                            String agentId, String proxyId, String bodyText) throws Exception {
+        if (!session.canWrite()) {
+            writeJson(channel, 403, Map.of("message", "只读用户"));
+            return;
+        }
+        if (!resolveCanMove(config, session)) {
+            writeJson(channel, 403, Map.of("message", "不允许移动文件"));
+            return;
+        }
+        JsonObject json = GSON.fromJson(bodyText, JsonObject.class);
+        if (json == null || !json.has("destDir") || !json.has("items") || !json.get("items").isJsonArray()) {
+            writeJson(channel, 400, Map.of("message", "请求参数无效"));
+            return;
+        }
+        String destDir = json.get("destDir").getAsString();
+        List<Map<String, Object>> results = new ArrayList<>();
+        int successCount = 0;
+        int failCount = 0;
+        for (var element : json.getAsJsonArray("items")) {
+            String itemPath = element.getAsString();
+            try {
+                Message.FileOpResponse resp = fileTransferCoordinator.op(agentId, proxyId,
+                        FileTransferConstants.OP_MOVE, itemPath, destDir,
+                        FileTransferConstants.MOVE_MAX_TIMEOUT_MS);
+                if (resp.getStatus().getCode() == 0) {
+                    successCount++;
+                    results.add(resultItem(itemPath, true, null));
+                } else {
+                    failCount++;
+                    results.add(resultItem(itemPath, false, resp.getStatus().getMessage()));
+                }
+            } catch (Exception e) {
+                failCount++;
+                results.add(resultItem(itemPath, false, e.getMessage() != null ? e.getMessage() : "移动失败"));
+            }
+        }
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("successCount", successCount);
+        payload.put("failCount", failCount);
+        payload.put("results", results);
+        writeJson(channel, 200, payload);
+    }
+
+    private void handleRename(Channel channel, ProxyConfig config, FileAuthService.FileSession session,
+                              String agentId, String proxyId, String bodyText) throws Exception {
+        if (!session.canWrite()) {
+            writeJson(channel, 403, Map.of("message", "只读用户"));
+            return;
+        }
+        if (!resolveCanRename(config, session)) {
+            writeJson(channel, 403, Map.of("message", "不允许重命名"));
+            return;
+        }
+        JsonObject json = GSON.fromJson(bodyText, JsonObject.class);
+        if (json == null || !json.has("path") || !json.has("name")) {
+            writeJson(channel, 400, Map.of("message", "请求参数无效"));
+            return;
+        }
+        Message.FileOpResponse resp = fileTransferCoordinator.op(agentId, proxyId,
+                FileTransferConstants.OP_RENAME,
+                json.get("path").getAsString(),
+                json.get("name").getAsString());
+        writeJson(channel, resp.getStatus().getCode() == 0 ? 200 : 400, toOpJson(resp));
+    }
+
+    private Map<String, Object> resultItem(String path, boolean ok, String message) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("path", path);
+        item.put("ok", ok);
+        if (!ok && message != null) {
+            item.put("message", message);
+        }
+        return item;
     }
 
     private FileAuthService.FileSession resolveSession(ProxyConfig config, String sessionId) {
@@ -241,7 +367,7 @@ public class FileShareHttpHandler {
             payload.put("ok", true);
             payload.put("username", username);
             payload.put("permission", session.permission());
-            payload.put("canWrite", resolveCanWrite(config, session));
+            putFileCapabilities(payload, config, session);
             String response = GSON.toJson(payload);
             byte[] bodyBytes = response.getBytes(StandardCharsets.UTF_8);
             String http = """

@@ -68,23 +68,148 @@ public class FileSystemService {
         }
         try {
             if (Files.isDirectory(target)) {
-                try (Stream<Path> children = Files.list(target)) {
-                    if (children.findAny().isPresent()) {
-                        throw new FilePermissionChecker.FileAccessException("只能删除空目录");
-                    }
-                }
-                Files.delete(target);
+                deleteDirectoryRecursive(target);
             } else {
                 Files.delete(target);
             }
         } catch (NoSuchFileException e) {
             throw new FilePermissionChecker.FileAccessException("文件不存在");
-        } catch (DirectoryNotEmptyException e) {
-            throw new FilePermissionChecker.FileAccessException("只能删除空目录");
         } catch (AccessDeniedException e) {
             throw new FilePermissionChecker.FileAccessException("没有删除权限");
+        } catch (FilePermissionChecker.FileAccessException e) {
+            throw e;
+        } catch (IOException e) {
+            throw new FilePermissionChecker.FileAccessException("删除失败");
         }
         return Message.FileOpResponse.newBuilder().setStatus(success()).build();
+    }
+
+    public Message.FileOpResponse move(Path rootPath, String sourcePath, String destDirPath,
+                                       Message.FileShareLimits limits) throws IOException {
+        FilePermissionChecker.assertMovable(limits);
+        Path source = FilePermissionChecker.resolveSafe(rootPath, sourcePath);
+        Path destDir = FilePermissionChecker.resolveSafe(rootPath, destDirPath);
+        if (!Files.exists(source)) {
+            throw new FilePermissionChecker.FileAccessException("源文件不存在");
+        }
+        if (!Files.exists(destDir) || !Files.isDirectory(destDir)) {
+            throw new FilePermissionChecker.FileAccessException("目标目录不存在");
+        }
+        Path normalizedSource = source.normalize();
+        Path normalizedDestDir = destDir.normalize();
+        if (normalizedSource.equals(normalizedDestDir)) {
+            throw new FilePermissionChecker.FileAccessException("不能移动到自身");
+        }
+        if (Files.isDirectory(normalizedSource)
+                && normalizedDestDir.startsWith(normalizedSource)) {
+            throw new FilePermissionChecker.FileAccessException("不能将文件夹移动到其子目录中");
+        }
+        Path target = normalizedDestDir.resolve(source.getFileName());
+        if (Files.exists(target)) {
+            throw new FilePermissionChecker.FileAccessException("目标位置已存在同名文件或文件夹");
+        }
+        Path parent = source.getParent();
+        if (parent != null && parent.normalize().equals(normalizedDestDir)) {
+            throw new FilePermissionChecker.FileAccessException("文件已在目标目录中");
+        }
+        try {
+            moveEntry(source, target);
+        } catch (FileAlreadyExistsException e) {
+            throw new FilePermissionChecker.FileAccessException("目标位置已存在同名文件或文件夹");
+        } catch (AccessDeniedException e) {
+            throw new FilePermissionChecker.FileAccessException("没有移动权限");
+        } catch (IOException e) {
+            throw new FilePermissionChecker.FileAccessException("移动失败");
+        }
+        return Message.FileOpResponse.newBuilder().setStatus(success()).build();
+    }
+
+    public Message.FileOpResponse rename(Path rootPath, String sourcePath, String newName,
+                                         Message.FileShareLimits limits) throws IOException {
+        FilePermissionChecker.assertRenamable(limits);
+        if (newName == null || newName.isBlank() || newName.contains("/") || newName.contains("\\")) {
+            throw new FilePermissionChecker.FileAccessException("名称无效");
+        }
+        String trimmed = newName.trim();
+        if (trimmed.isEmpty() || ".".equals(trimmed) || "..".equals(trimmed)) {
+            throw new FilePermissionChecker.FileAccessException("名称无效");
+        }
+        Path source = FilePermissionChecker.resolveSafe(rootPath, sourcePath);
+        if (!Files.exists(source)) {
+            throw new FilePermissionChecker.FileAccessException("文件不存在");
+        }
+        Path parent = source.getParent();
+        if (parent == null) {
+            throw new FilePermissionChecker.FileAccessException("无法重命名根路径");
+        }
+        Path target = parent.resolve(trimmed);
+        if (source.normalize().equals(target.normalize())) {
+            return Message.FileOpResponse.newBuilder().setStatus(success()).build();
+        }
+        if (Files.exists(target)) {
+            throw new FilePermissionChecker.FileAccessException("已存在同名文件或文件夹");
+        }
+        try {
+            moveEntry(source, target);
+        } catch (FileAlreadyExistsException e) {
+            throw new FilePermissionChecker.FileAccessException("已存在同名文件或文件夹");
+        } catch (AccessDeniedException e) {
+            throw new FilePermissionChecker.FileAccessException("没有重命名权限");
+        } catch (IOException e) {
+            throw new FilePermissionChecker.FileAccessException("重命名失败");
+        }
+        return Message.FileOpResponse.newBuilder().setStatus(success()).build();
+    }
+
+    private void moveEntry(Path source, Path target) throws IOException {
+        try {
+            Files.move(source, target, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException ex) {
+            if (Files.isDirectory(source)) {
+                copyDirectory(source, target);
+                deleteDirectoryRecursive(source);
+            } else {
+                Files.move(source, target);
+            }
+        }
+    }
+
+    private void copyDirectory(Path source, Path target) throws IOException {
+        Files.walkFileTree(source, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                Path destDir = target.resolve(source.relativize(dir));
+                Files.createDirectories(destDir);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                Path destFile = target.resolve(source.relativize(file));
+                if (destFile.getParent() != null) {
+                    Files.createDirectories(destFile.getParent());
+                }
+                Files.copy(file, destFile);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
+    private void deleteDirectoryRecursive(Path directory) throws IOException {
+        try (Stream<Path> walk = Files.walk(directory)) {
+            List<Path> paths = walk.sorted(Comparator.reverseOrder()).toList();
+            for (Path path : paths) {
+                try {
+                    Files.delete(path);
+                } catch (NoSuchFileException ignored) {
+                    // 并发删除或重复遍历时忽略
+                } catch (AccessDeniedException e) {
+                    throw new FilePermissionChecker.FileAccessException("没有删除权限");
+                } catch (DirectoryNotEmptyException e) {
+                    throw new FilePermissionChecker.FileAccessException("删除失败");
+                }
+            }
+        }
     }
 
     public void writeChunk(Path rootPath, String requestPath, long offset, byte[] data, boolean last,

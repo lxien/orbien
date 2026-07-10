@@ -81,7 +81,9 @@ function buildFileShareUpdatePayload(
         maxUploadSize: detail.maxUploadSize,
         allowUpload: detail.allowUpload,
         allowDelete: detail.allowDelete,
-        allowMkdir: detail.allowMkdir
+        allowMkdir: detail.allowMkdir,
+        allowMove: detail.allowMove,
+        allowRename: detail.allowRename
     }
 
     if (detail.domainType === DomainType.SUBDOMAIN) {

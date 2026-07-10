@@ -136,7 +136,14 @@ public class ProxyConfigAssembler {
         if (limitsDO == null) {
             return;
         }
-        config.setFileShareLimits(proxyModelConvert.toFileShareLimitsConfig(limitsDO));
+        FileShareLimitsConfig limits = proxyModelConvert.toFileShareLimitsConfig(limitsDO);
+        if (limitsDO.getAllowMove() == null) {
+            limits.setAllowMove(true);
+        }
+        if (limitsDO.getAllowRename() == null) {
+            limits.setAllowRename(true);
+        }
+        config.setFileShareLimits(limits);
     }
 
     public void assembleTransport(ProxyConfig config, ProxyDO proxyDO) {

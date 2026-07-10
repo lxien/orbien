@@ -508,7 +508,8 @@ public class ProxyServiceImpl implements ProxyService {
         proxyRepository.save(proxyDO);
         saveHttpDomains(proxyId, domainType, param.getSubdomainBindings(), param.getCustomDomains(), null);
         saveFileShareLimits(proxyId, param.getRootPath(), param.getMaxUploadSize(),
-                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir());
+                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir(),
+                param.getAllowMove(), param.getAllowRename());
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         saveFileShareAuthConfig(proxyId, param.getAuthEnabled(), param.getAuthUsers(), true);
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
@@ -544,7 +545,8 @@ public class ProxyServiceImpl implements ProxyService {
         }
 
         saveFileShareLimits(proxyId, param.getRootPath(), param.getMaxUploadSize(),
-                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir());
+                param.getAllowUpload(), param.getAllowDelete(), param.getAllowMkdir(),
+                param.getAllowMove(), param.getAllowRename());
 
         if (param.getAuthEnabled() != null || !CollectionUtils.isEmpty(param.getAuthUsers())) {
             Boolean enabled = param.getAuthEnabled();
@@ -1549,6 +1551,8 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setAllowUpload(limitsDO.getAllowUpload());
             dto.setAllowDelete(limitsDO.getAllowDelete());
             dto.setAllowMkdir(limitsDO.getAllowMkdir());
+            dto.setAllowMove(limitsDO.getAllowMove());
+            dto.setAllowRename(limitsDO.getAllowRename());
         });
 
         fileShareAuthRepository.findById(proxyId).ifPresent(authDO -> {
@@ -1580,7 +1584,8 @@ public class ProxyServiceImpl implements ProxyService {
     }
 
     private void saveFileShareLimits(String proxyId, String rootPath, Long maxUploadSize,
-                                     Boolean allowUpload, Boolean allowDelete, Boolean allowMkdir) {
+                                     Boolean allowUpload, Boolean allowDelete, Boolean allowMkdir,
+                                     Boolean allowMove, Boolean allowRename) {
         if (!StringUtils.hasText(rootPath)) {
             throw new BizException("根目录不能为空");
         }
@@ -1591,6 +1596,8 @@ public class ProxyServiceImpl implements ProxyService {
         limitsDO.setAllowUpload(allowUpload == null || Boolean.TRUE.equals(allowUpload));
         limitsDO.setAllowDelete(allowDelete == null || Boolean.TRUE.equals(allowDelete));
         limitsDO.setAllowMkdir(allowMkdir == null || Boolean.TRUE.equals(allowMkdir));
+        limitsDO.setAllowMove(allowMove == null || Boolean.TRUE.equals(allowMove));
+        limitsDO.setAllowRename(allowRename == null || Boolean.TRUE.equals(allowRename));
         fileShareLimitsRepository.save(limitsDO);
     }
 
