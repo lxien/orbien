@@ -70,15 +70,17 @@
     const VIEW_KEY = 'orbien-file-view';
     const AUTH_REFRESH_INTERVAL = 30_000;
     const VIEW_MODES = ['list', 'icon', 'column'];
-    const WRITE_CONTROL_IDS = ['btnUpload', 'btnMkdir', 'btnDelete', 'btnRename', 'fileInput', 'emptyUploadLink', 'emptyMkdirLink'];
     const THEME_BUTTON_IDS = ['btnTheme', 'btnThemeLogin'];
 
     let currentPath = '/';
     let entries = [];
     let authRequired = true;
-    let canWrite = true;
-    let canMove = true;
-    let canRename = true;
+    let canWrite = false;
+    let canUpload = false;
+    let canDelete = false;
+    let canMkdir = false;
+    let canMove = false;
+    let canRename = false;
     let permission = 'read_write';
     let currentUsername = '';
     let authRefreshTimer = null;
@@ -487,34 +489,47 @@
         badge.textContent = permissionLabel(permission);
         badge.className = `permission-badge ${canWrite ? 'write' : 'read'}`;
         readonlyTip.classList.toggle('hidden', canWrite);
+        if (!canWrite && permission === 'read_write') {
+            readonlyTip.textContent = '当前未开启任何文件操作权限，仅可浏览和下载';
+        } else {
+            readonlyTip.textContent = '当前为只读权限，无法上传、新建或删除文件';
+        }
+    };
+
+    const setActionVisible = (id, visible) => {
+        const el = $(id);
+        if (el) {
+            el.style.display = visible ? '' : 'none';
+        }
     };
 
     const applyCapabilities = (data) => {
+        canUpload = data.canUpload === true;
+        canDelete = data.canDelete === true;
+        canMkdir = data.canMkdir === true;
+        canMove = data.canMove === true;
+        canRename = data.canRename === true;
         canWrite = data.canWrite === true;
-        canMove = data.canMove !== false && canWrite;
-        canRename = data.canRename !== false && canWrite;
+        updateActionControls();
     };
 
-    const updateWriteControls = () => {
-        for (const id of WRITE_CONTROL_IDS) {
-            const el = $(id);
-            if (el) {
-                el.style.display = canWrite ? '' : 'none';
-            }
+    const updateActionControls = () => {
+        setActionVisible('btnUpload', canUpload);
+        setActionVisible('btnDownload', true);
+        setActionVisible('btnMkdir', canMkdir);
+        setActionVisible('btnRename', canRename);
+        setActionVisible('btnDelete', canDelete);
+        setActionVisible('fileInput', canUpload);
+        setActionVisible('emptyUploadLink', canUpload);
+        setActionVisible('emptyMkdirLink', canMkdir);
+
+        const emptyDivider = document.querySelector('#emptyState .empty-divider');
+        if (emptyDivider) {
+            emptyDivider.style.display = canUpload && canMkdir ? '' : 'none';
         }
-        const renameBtn = $('btnRename');
-        if (renameBtn) {
-            renameBtn.style.display = canRename ? '' : 'none';
-        }
-        const emptyActions = document.querySelector('.empty-actions');
-        const emptyDesc = document.querySelector('.empty-desc');
+        const emptyActions = document.querySelector('#emptyState .empty-actions');
         if (emptyActions) {
-            emptyActions.style.display = canWrite ? '' : 'none';
-        }
-        if (emptyDesc) {
-            emptyDesc.textContent = canWrite
-                ? '开始添加内容，让文件管理更高效'
-                : '当前目录暂无文件';
+            emptyActions.style.display = canUpload || canMkdir ? '' : 'none';
         }
     };
 
@@ -536,7 +551,7 @@
         $('currentUser').textContent = username ? `${username} ` : '';
         $('btnLogout').classList.toggle('hidden', !authRequired);
         updatePermissionBadge();
-        updateWriteControls();
+        updateActionControls();
     };
 
     async function api(path, options = {}) {
@@ -610,9 +625,8 @@
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({username, password})
             });
-            canWrite = data.canWrite === true;
             applyCapabilities(data);
-            permission = data.permission || (canWrite ? 'read_write' : 'read');
+            permission = data.permission || (data.canWrite ? 'read_write' : 'read');
             currentUsername = username;
             showApp(username);
             await loadList();
@@ -628,16 +642,33 @@
         } catch { /* ignore */
         }
         canWrite = false;
+        canUpload = false;
+        canDelete = false;
+        canMkdir = false;
         canMove = false;
         canRename = false;
         permission = 'read';
         showLogin();
     }
 
-    async function ensureWritable(actionName) {
+    async function ensureUploadable() {
         await refreshAuthStatus();
-        if (!canWrite) {
-            throw new Error(`当前为只读权限，无法${actionName || '执行此操作'}`);
+        if (!canUpload) {
+            throw new Error('当前不允许上传文件');
+        }
+    }
+
+    async function ensureDeletable() {
+        await refreshAuthStatus();
+        if (!canDelete) {
+            throw new Error('当前不允许删除文件');
+        }
+    }
+
+    async function ensureMkdirable() {
+        await refreshAuthStatus();
+        if (!canMkdir) {
+            throw new Error('当前不允许创建目录');
         }
     }
 
@@ -806,30 +837,38 @@
 
         const text = document.createElement('p');
         text.className = 'column-panel-empty-text';
-        text.textContent = canWrite ? '此文件夹为空' : '当前目录暂无文件';
+        text.textContent = (canUpload || canMkdir) ? '此文件夹为空' : '当前目录暂无文件';
         wrap.appendChild(text);
 
-        if (canWrite) {
+        if (canUpload || canMkdir) {
             const actions = document.createElement('div');
             actions.className = 'column-panel-empty-actions';
 
-            const uploadBtn = document.createElement('button');
-            uploadBtn.type = 'button';
-            uploadBtn.className = 'empty-action';
-            uploadBtn.textContent = '上传文件';
-            uploadBtn.addEventListener('click', () => $('fileInput').click());
+            if (canUpload) {
+                const uploadBtn = document.createElement('button');
+                uploadBtn.type = 'button';
+                uploadBtn.className = 'empty-action';
+                uploadBtn.textContent = '上传文件';
+                uploadBtn.addEventListener('click', () => $('fileInput').click());
+                actions.appendChild(uploadBtn);
+            }
 
-            const divider = document.createElement('span');
-            divider.className = 'empty-divider';
-            divider.setAttribute('aria-hidden', 'true');
+            if (canUpload && canMkdir) {
+                const divider = document.createElement('span');
+                divider.className = 'empty-divider';
+                divider.setAttribute('aria-hidden', 'true');
+                actions.appendChild(divider);
+            }
 
-            const mkdirBtn = document.createElement('button');
-            mkdirBtn.type = 'button';
-            mkdirBtn.className = 'empty-action';
-            mkdirBtn.textContent = '新建文件夹';
-            mkdirBtn.addEventListener('click', () => mkdir().catch(showError));
+            if (canMkdir) {
+                const mkdirBtn = document.createElement('button');
+                mkdirBtn.type = 'button';
+                mkdirBtn.className = 'empty-action';
+                mkdirBtn.textContent = '新建文件夹';
+                mkdirBtn.addEventListener('click', () => mkdir().catch(showError));
+                actions.appendChild(mkdirBtn);
+            }
 
-            actions.append(uploadBtn, divider, mkdirBtn);
             wrap.appendChild(actions);
         }
         return wrap;
@@ -1343,7 +1382,7 @@
 
     async function uploadFiles(files) {
         if (!files.length) return;
-        await ensureWritable('上传文件');
+        await ensureUploadable();
         $('progressPanel').style.display = 'block';
         $('uploadCount').textContent = String(files.length);
         const list = $('progressList');
@@ -1443,7 +1482,7 @@
     }
 
     async function mkdir() {
-        await ensureWritable('新建文件夹');
+        await ensureMkdirable();
         const result = await showPrompt({
             title: '新建文件夹',
             message: '请输入文件夹名称',
@@ -1493,7 +1532,7 @@
     };
 
     async function deleteSelected() {
-        await ensureWritable('删除文件');
+        await ensureDeletable();
         const paths = selectedPaths();
         if (!paths.length) {
             return;

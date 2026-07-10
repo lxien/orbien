@@ -141,6 +141,10 @@ public class FileShareHttpHandler {
                     writeJson(ctx.channel(), 403, Map.of("message", "只读用户"));
                     return;
                 }
+                if (!resolveCanDelete(config, session)) {
+                    writeJson(ctx.channel(), 403, Map.of("message", "不允许删除"));
+                    return;
+                }
                 String filePath = queryParam(requestPath, "path");
                 Message.FileOpResponse resp = fileTransferCoordinator.op(agentId, proxyId,
                         FileTransferConstants.OP_DELETE, filePath, "",
@@ -151,6 +155,10 @@ public class FileShareHttpHandler {
             if ("POST".equals(req.method()) && path.startsWith("/api/files/upload")) {
                 if (!session.canWrite()) {
                     writeJson(ctx.channel(), 403, Map.of("message", "只读用户"));
+                    return;
+                }
+                if (!resolveCanUpload(config, session)) {
+                    writeJson(ctx.channel(), 403, Map.of("message", "不允许上传"));
                     return;
                 }
                 handleUpload(ctx.channel(), agentId, proxyId, requestPath, req);
@@ -226,9 +234,32 @@ public class FileShareHttpHandler {
     }
 
     private void putFileCapabilities(Map<String, Object> body, ProxyConfig config, FileAuthService.FileSession session) {
-        body.put("canWrite", resolveCanWrite(config, session));
+        body.put("canUpload", resolveCanUpload(config, session));
+        body.put("canDelete", resolveCanDelete(config, session));
+        body.put("canMkdir", resolveCanMkdir(config, session));
         body.put("canMove", resolveCanMove(config, session));
         body.put("canRename", resolveCanRename(config, session));
+        body.put("canWrite", resolveCanWrite(config, session));
+    }
+
+    private boolean resolveCanUpload(ProxyConfig config, FileAuthService.FileSession session) {
+        if (session == null || !session.canWrite()) {
+            return false;
+        }
+        if (config.hasFileShareLimits()) {
+            return config.getFileShareLimits().isAllowUpload();
+        }
+        return true;
+    }
+
+    private boolean resolveCanDelete(ProxyConfig config, FileAuthService.FileSession session) {
+        if (session == null || !session.canWrite()) {
+            return false;
+        }
+        if (config.hasFileShareLimits()) {
+            return config.getFileShareLimits().isAllowDelete();
+        }
+        return true;
     }
 
     private boolean resolveCanWrite(ProxyConfig config, FileAuthService.FileSession session) {
