@@ -63,15 +63,9 @@
         </div>
     </div>
     <div id="mainPanel" class="main">
-        <div class="path-nav">
-            <button id="btnBack" class="nav-back-btn hidden" type="button" title="返回上一级">
-                <span class="nav-back-icon" aria-hidden="true">←</span>
-                <span>上一级</span>
-            </button>
-            <div class="path-nav-main">
-                <nav id="breadcrumb" class="breadcrumb" aria-label="文件路径"></nav>
-                <div id="summary" class="file-summary"></div>
-            </div>
+        <div class="path-nav path-nav-top">
+            <nav id="breadcrumb" class="path-bar path-bar-top" aria-label="文件路径"></nav>
+            <div id="summary" class="file-summary"></div>
         </div>
         <div class="toolbar">
             <div class="toolbar-actions">
@@ -81,19 +75,70 @@
                 <button id="btnRename">重命名</button>
                 <button id="btnDelete">删除</button>
             </div>
-            <div class="view-switcher" role="group" aria-label="切换视图">
-                <button type="button" class="view-btn active" data-view="list" title="列表视图" aria-label="列表视图"
-                        aria-pressed="true">
-                    <span class="view-btn-icon icon-list" aria-hidden="true"></span>
-                </button>
-                <button type="button" class="view-btn" data-view="icon" title="图标视图" aria-label="图标视图"
-                        aria-pressed="false">
-                    <span class="view-btn-icon icon-grid" aria-hidden="true"></span>
-                </button>
-                <button type="button" class="view-btn" data-view="column" title="分栏视图" aria-label="分栏视图"
-                        aria-pressed="false">
-                    <span class="view-btn-icon icon-column" aria-hidden="true"></span>
-                </button>
+            <div class="toolbar-view-controls">
+                <div class="view-switcher" role="group" aria-label="切换视图">
+                    <button type="button" class="view-btn active" data-view="list" title="列表视图"
+                            aria-label="列表视图"
+                            aria-pressed="true">
+                        <span class="view-btn-icon icon-list" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="view-btn" data-view="icon" title="图标视图" aria-label="图标视图"
+                            aria-pressed="false">
+                        <span class="view-btn-icon icon-grid" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="view-btn" data-view="column" title="分栏视图" aria-label="分栏视图"
+                            aria-pressed="false">
+                        <span class="view-btn-icon icon-column" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div class="sort-menu-wrap">
+                    <button type="button" id="btnSort" class="sort-btn" title="排序方式" aria-label="排序方式"
+                            aria-haspopup="menu" aria-expanded="false">
+                        <span class="sort-btn-icon" aria-hidden="true"></span>
+                        <span class="sort-btn-chevron" aria-hidden="true"></span>
+                    </button>
+                    <div id="sortDropdown" class="sort-dropdown hidden" role="menu" aria-label="排序方式">
+                        <button type="button" class="sort-option" data-sort="" role="menuitemradio" aria-checked="true">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>无</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="name" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>名称</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="kind" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>种类</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="last_opened" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>上次打开日期</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="date_added" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>添加日期</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="modified" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>修改日期</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="created" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>创建日期</span>
+                        </button>
+                        <button type="button" class="sort-option" data-sort="size" role="menuitemradio"
+                                aria-checked="false">
+                            <span class="sort-option-check" aria-hidden="true">✓</span>
+                            <span>大小</span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
         <input type="file" id="fileInput" multiple class="hidden"/>
@@ -128,6 +173,7 @@
             </div>
             <div id="selectionMarquee" class="selection-marquee hidden" aria-hidden="true"></div>
         </div>
+        <nav id="breadcrumbBottom" class="path-bar path-bar-bottom" aria-label="当前路径"></nav>
     </div>
 </div>
 

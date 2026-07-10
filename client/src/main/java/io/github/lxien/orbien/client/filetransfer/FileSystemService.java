@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.client.filetransfer;
 
+import io.github.lxien.orbien.core.filetransfer.FileListSort;
 import io.github.lxien.orbien.core.message.Message;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
 
 public class FileSystemService {
 
-    public Message.FileListResponse list(Path rootPath, String requestPath) throws IOException {
+    public Message.FileListResponse list(Path rootPath, String requestPath, String sort) throws IOException {
         Path dir = FilePermissionChecker.resolveSafe(rootPath, requestPath);
         if (!Files.exists(dir)) {
             throw new FilePermissionChecker.FileAccessException("目录不存在");
@@ -28,13 +29,15 @@ public class FileSystemService {
 
         List<Message.FileEntry> entries = new ArrayList<>();
         try (Stream<Path> stream = Files.list(dir)) {
-            stream.sorted(Comparator.<Path>comparingInt(p -> Files.isDirectory(p) ? 0 : 1)
-                            .thenComparing(p -> p.getFileName().toString().toLowerCase()))
-                    .forEach(path -> entries.add(toEntry(path)));
+            stream.map(this::toEntry).forEach(entries::add);
         } catch (NoSuchFileException | NotDirectoryException e) {
             throw new FilePermissionChecker.FileAccessException("目录不存在");
         } catch (AccessDeniedException e) {
             throw new FilePermissionChecker.FileAccessException("没有读取权限");
+        }
+        Comparator<Message.FileEntry> comparator = FileListSort.comparator(sort);
+        if (comparator != null) {
+            entries.sort(comparator);
         }
         return Message.FileListResponse.newBuilder()
                 .setCurrentPath(current)
@@ -287,7 +290,9 @@ public class FileSystemService {
                     .setName(path.getFileName().toString())
                     .setDirectory(attrs.isDirectory())
                     .setSize(attrs.isDirectory() ? 0 : attrs.size())
-                    .setModifiedTime(attrs.lastModifiedTime().toMillis());
+                    .setModifiedTime(attrs.lastModifiedTime().toMillis())
+                    .setCreatedTime(attrs.creationTime().toMillis())
+                    .setLastAccessTime(attrs.lastAccessTime().toMillis());
             return builder.build();
         } catch (IOException e) {
             return Message.FileEntry.newBuilder()

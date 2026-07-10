@@ -128,6 +128,8 @@ message FileListRequest {
   string request_id = 1;
   string proxy_id = 2;
   string path = 3;
+  // 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+  string sort = 4;
 }
 
 message FileEntry {
@@ -135,6 +137,8 @@ message FileEntry {
   bool directory = 2;
   int64 size = 3;
   int64 modified_time = 4;
+  int64 created_time = 5;
+  int64 last_access_time = 6;
 }
 
 message FileListResponse {

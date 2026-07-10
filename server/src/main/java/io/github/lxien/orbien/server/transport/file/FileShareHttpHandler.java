@@ -103,7 +103,8 @@ public class FileShareHttpHandler {
 
             if ("GET".equals(req.method()) && path.startsWith("/api/files/list")) {
                 String dir = queryParam(requestPath, "path");
-                Message.FileListResponse resp = fileTransferCoordinator.list(agentId, proxyId, dir);
+                String sort = queryParam(requestPath, "sort");
+                Message.FileListResponse resp = fileTransferCoordinator.list(agentId, proxyId, dir, sort);
                 if (resp.getStatus().getCode() != 0) {
                     logger.debug("文件列表失败 agentId={} proxyId={} path={} msg={}",
                             agentId, proxyId, dir, resp.getStatus().getMessage());
@@ -598,6 +599,8 @@ public class FileShareHttpHandler {
             item.put("directory", e.getDirectory());
             item.put("size", e.getSize());
             item.put("modifiedTime", e.getModifiedTime());
+            item.put("createdTime", e.getCreatedTime());
+            item.put("lastAccessTime", e.getLastAccessTime());
             entries.add(item);
         }
         Map<String, Object> map = new LinkedHashMap<>();

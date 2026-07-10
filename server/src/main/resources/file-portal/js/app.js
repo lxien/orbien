@@ -55,6 +55,9 @@
         dmg: 'dmg', pkg: 'dmg', deb: 'dmg', rpm: 'dmg', iso: 'dmg'
     };
 
+    const PATH_ROOT_LABEL = 'Disk';
+    const PATH_DISK_ICON = '/icon/menu/disk.svg';
+    const PATH_FOLDER_ICON = '/icon/folder.svg';
     const THEME_KEY = 'orbien-file-theme';
     const THEME_MODES = ['light', 'dark', 'system'];
     const THEME_LABELS = {
@@ -68,6 +71,10 @@
         system: '切换到白昼模式'
     };
     const VIEW_KEY = 'orbien-file-view';
+    const SORT_KEY = 'orbien-file-sort';
+    const VALID_SORT_VALUES = new Set([
+        '', 'name', 'kind', 'last_opened', 'date_added', 'modified', 'created', 'size'
+    ]);
     const AUTH_REFRESH_INTERVAL = 30_000;
     const VIEW_MODES = ['list', 'icon', 'column'];
     const THEME_BUTTON_IDS = ['btnTheme', 'btnThemeLogin'];
@@ -86,6 +93,7 @@
     let authRefreshTimer = null;
     let listLoading = false;
     let viewMode = 'list';
+    let currentSort = '';
     let dragPaths = [];
     const selectedPathSet = new Set();
     let selectionAnchorPath = null;
@@ -103,6 +111,9 @@
 
     const pruneSelection = () => {
         const validPaths = new Set(entries.map((entry) => entryPath(entry)));
+        if (currentPath && currentPath !== '/') {
+            validPaths.add(currentPath);
+        }
         for (const path of [...selectedPathSet]) {
             if (!validPaths.has(path)) {
                 selectedPathSet.delete(path);
@@ -410,14 +421,9 @@
         await showAlert(err.message || String(err), {title: '操作失败', type: 'danger'});
     };
 
-    const sortEntries = (list) => [...list].sort((a, b) => {
-        const aDir = !!a.directory;
-        const bDir = !!b.directory;
-        if (aDir !== bDir) {
-            return aDir ? -1 : 1;
-        }
-        return entryName(a).localeCompare(entryName(b), 'zh-CN');
-    });
+    const entriesCacheKey = (path, sort) => `${path}\0${sort || ''}`;
+
+    const invalidateEntriesCache = () => entriesCache.clear();
 
     const pathChain = (path) => {
         if (path === '/') {
@@ -443,8 +449,6 @@
         }
         return childPath.slice(prefix.length).split('/').filter(Boolean)[0] || null;
     };
-
-    const invalidateEntriesCache = () => entriesCache.clear();
 
     const normalizeThemeMode = (mode) => (THEME_MODES.includes(mode) ? mode : 'light');
 
@@ -692,8 +696,70 @@
     };
 
     const updatePathNav = () => {
-        const atRoot = currentPath === '/';
-        $('btnBack').classList.toggle('hidden', atRoot);
+        /* 路径导航由面包屑承担，不再显示返回按钮 */
+    };
+
+    const buildPathItems = () => {
+        const parts = currentPath === '/' ? [] : currentPath.split('/').filter(Boolean);
+        const items = [{label: PATH_ROOT_LABEL, path: '/', icon: PATH_DISK_ICON}];
+        let acc = '';
+        for (const part of parts) {
+            acc += `/${part}`;
+            items.push({label: part, path: acc, icon: PATH_FOLDER_ICON});
+        }
+        return items;
+    };
+
+    const createPathSegment = (item, isLast) => {
+        const wrap = document.createElement('span');
+        wrap.className = 'path-segment-wrap';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'path-segment';
+        if (isLast) {
+            btn.classList.add('is-current');
+        }
+        btn.title = item.label;
+        btn.dataset.path = item.path;
+
+        const icon = document.createElement('img');
+        icon.className = 'path-segment-icon';
+        icon.src = item.icon;
+        icon.alt = '';
+        btn.appendChild(icon);
+
+        const label = document.createElement('span');
+        label.className = 'path-segment-label';
+        label.textContent = item.label;
+        btn.appendChild(label);
+
+        wrap.appendChild(btn);
+        return wrap;
+    };
+
+    const renderPathBar = (nav, {chevrons = false} = {}) => {
+        if (!nav) {
+            return;
+        }
+        nav.replaceChildren();
+        const items = buildPathItems();
+        items.forEach((item, index) => {
+            if (chevrons && index > 0) {
+                const sep = document.createElement('span');
+                sep.className = 'path-segment-chevron';
+                sep.textContent = '›';
+                sep.setAttribute('aria-hidden', 'true');
+                nav.appendChild(sep);
+            }
+            nav.appendChild(createPathSegment(item, index === items.length - 1));
+        });
+    };
+
+    const renderBreadcrumb = () => {
+        renderPathBar($('breadcrumb'), {chevrons: true});
+        renderPathBar($('breadcrumbBottom'), {chevrons: true});
+        bindBreadcrumbDropTargets();
     };
 
     const applyViewMode = (mode, persist = true) => {
@@ -724,6 +790,81 @@
         applyViewMode(VIEW_MODES.includes(saved) ? saved : 'list', false);
     };
 
+    const normalizeSort = (sort) => (VALID_SORT_VALUES.has(sort) ? sort : '');
+
+    const applySortSelection = () => {
+        for (const option of document.querySelectorAll('.sort-option')) {
+            const active = option.dataset.sort === currentSort;
+            option.setAttribute('aria-checked', active ? 'true' : 'false');
+        }
+    };
+
+    const closeSortDropdown = () => {
+        const dropdown = $('sortDropdown');
+        const btn = $('btnSort');
+        if (!dropdown || !btn) {
+            return;
+        }
+        dropdown.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
+    };
+
+    const toggleSortDropdown = () => {
+        const dropdown = $('sortDropdown');
+        const btn = $('btnSort');
+        if (!dropdown || !btn) {
+            return;
+        }
+        const open = dropdown.classList.contains('hidden');
+        if (open) {
+            dropdown.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+        } else {
+            closeSortDropdown();
+        }
+    };
+
+    const setSort = (sort) => {
+        const next = normalizeSort(sort);
+        if (next === currentSort) {
+            closeSortDropdown();
+            return;
+        }
+        currentSort = next;
+        localStorage.setItem(SORT_KEY, currentSort);
+        applySortSelection();
+        closeSortDropdown();
+        invalidateEntriesCache();
+        loadList().catch(showError);
+    };
+
+    const initSortMenu = () => {
+        currentSort = normalizeSort(localStorage.getItem(SORT_KEY) || '');
+        applySortSelection();
+
+        $('btnSort')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleSortDropdown();
+        });
+
+        for (const option of document.querySelectorAll('.sort-option')) {
+            option.addEventListener('click', () => setSort(option.dataset.sort || ''));
+        }
+
+        document.addEventListener('click', (e) => {
+            const wrap = document.querySelector('.sort-menu-wrap');
+            if (wrap && !wrap.contains(e.target)) {
+                closeSortDropdown();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSortDropdown();
+            }
+        });
+    };
+
     const setViewMode = (mode) => {
         if (mode === viewMode) {
             return;
@@ -749,12 +890,17 @@
     const goHome = () => navigateTo('/');
 
     async function fetchEntries(path, useCache = true) {
-        if (useCache && entriesCache.has(path)) {
-            return entriesCache.get(path);
+        const key = entriesCacheKey(path, currentSort);
+        if (useCache && entriesCache.has(key)) {
+            return entriesCache.get(key);
         }
-        const data = await api(`/api/files/list?path=${encodeURIComponent(path)}`);
-        const list = sortEntries(data.entries || data.entriesList || []);
-        entriesCache.set(path, list);
+        let url = `/api/files/list?path=${encodeURIComponent(path)}`;
+        if (currentSort) {
+            url += `&sort=${encodeURIComponent(currentSort)}`;
+        }
+        const data = await api(url);
+        const list = data.entries || data.entriesList || [];
+        entriesCache.set(key, list);
         return list;
     }
 
@@ -788,50 +934,6 @@
         pruneSelection();
         await renderFiles();
     }
-
-    const renderBreadcrumb = () => {
-        const nav = $('breadcrumb');
-        nav.replaceChildren();
-        updatePathNav();
-
-        const parts = currentPath === '/' ? [] : currentPath.split('/').filter(Boolean);
-        const items = [{label: '全部文件', path: '/'}];
-        let acc = '';
-        for (const part of parts) {
-            acc += `/${part}`;
-            items.push({label: part, path: acc});
-        }
-
-        items.forEach((item, index) => {
-            if (index > 0) {
-                const sep = document.createElement('span');
-                sep.className = 'breadcrumb-sep';
-                sep.textContent = '/';
-                sep.setAttribute('aria-hidden', 'true');
-                nav.appendChild(sep);
-            }
-
-            const wrap = document.createElement('span');
-            wrap.className = 'breadcrumb-item';
-
-            const isLast = index === items.length - 1;
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'breadcrumb-link';
-            if (index === 0) {
-                btn.classList.add('is-root');
-            }
-            if (isLast) {
-                btn.classList.add('is-current');
-            }
-            btn.textContent = item.label;
-            btn.title = item.label;
-            btn.dataset.path = item.path;
-            wrap.appendChild(btn);
-            nav.appendChild(wrap);
-        });
-        bindBreadcrumbDropTargets();
-    };
 
     const updateSummary = () => {
         const dirs = entries.filter((e) => e.directory).length;
@@ -888,7 +990,7 @@
 
     const scrollColumnBrowser = (browser) => {
         requestAnimationFrame(() => {
-            const selected = browser.querySelector('.column-item.is-selected');
+            const selected = browser.querySelector('.column-item.is-path-active, .column-item.is-path');
             if (selected) {
                 selected.scrollIntoView({block: 'nearest', inline: 'nearest'});
             }
@@ -899,13 +1001,23 @@
     const entryPath = (entry, basePath = currentPath) => joinPath(basePath, entryName(entry));
 
     const findEntryByPath = (path) => {
+        if (!path) {
+            return undefined;
+        }
+        if (path === currentPath) {
+            const name = path === '/' ? '' : path.split('/').filter(Boolean).pop();
+            return {directory: true, name: name || 'Disk'};
+        }
         const parent = parentDirOf(path);
-        const name = path.split('/').pop();
-        const list = parent === currentPath ? entries : entriesCache.get(parent);
+        const name = path.split('/').filter(Boolean).pop();
+        const list = parent === currentPath
+            ? entries
+            : entriesCache.get(entriesCacheKey(parent, currentSort));
         return list?.find((entry) => entryName(entry) === name);
     };
 
     const syncSelectionState = () => {
+        const fileSelectedInCurrent = viewMode === 'column' && hasFileSelectionInCurrentPanel(entries);
         for (const item of document.querySelectorAll('.icon-item')) {
             const path = item.dataset.filePath;
             item.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
@@ -916,7 +1028,11 @@
         }
         for (const item of document.querySelectorAll('.column-item')) {
             const path = item.dataset.filePath;
-            item.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
+            let checked = !!path && selectedPathSet.has(path);
+            if (checked && fileSelectedInCurrent && item.classList.contains('is-path')) {
+                checked = false;
+            }
+            item.classList.toggle('is-checked', checked);
         }
     };
 
@@ -1190,6 +1306,55 @@
         }
     };
 
+    const hasFileSelectionInCurrentPanel = (panelEntries) => {
+        if (!selectedPathSet.size || !panelEntries?.length) {
+            return false;
+        }
+        for (const selectedPath of selectedPathSet) {
+            if (parentDirOf(selectedPath) !== currentPath) {
+                continue;
+            }
+            const baseName = selectedPath.split('/').filter(Boolean).pop();
+            const match = panelEntries.find((e) => entryName(e) === baseName);
+            if (match && !match.directory) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    const resolveColumnPathHighlightMode = (panelIndex, chainLength, fileSelectedInCurrent) => {
+        if (fileSelectedInCurrent) {
+            return 'parent';
+        }
+        return panelIndex === chainLength - 2 ? 'active' : 'parent';
+    };
+
+    const shouldApplyColumnPathHighlight = (colPath, highlightName, itemName) => {
+        if (!highlightName || itemName !== highlightName) {
+            return false;
+        }
+        const folderPath = joinPath(colPath, highlightName);
+        for (const selectedPath of selectedPathSet) {
+            if (parentDirOf(selectedPath) !== colPath) {
+                continue;
+            }
+            if (selectedPath === folderPath) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    };
+
+    const syncColumnPathForSelection = (colPath, entry) => {
+        if (viewMode !== 'column' || entry.directory || colPath === currentPath) {
+            return false;
+        }
+        currentPath = colPath;
+        return true;
+    };
+
     const parentDirOf = (path) => {
         if (!path || path === '/') {
             return '/';
@@ -1293,21 +1458,15 @@
 
     const bindDirectoryDropZones = () => {
         bindDropTarget($('fileListWrap'), currentPath);
-        const pathNavMain = document.querySelector('.path-nav-main');
-        if (pathNavMain) {
-            bindDropTarget(pathNavMain, currentPath);
-        }
-        const back = $('btnBack');
-        if (back && currentPath !== '/') {
-            bindDropTarget(back, parentPath(currentPath));
-        }
+        bindDropTarget($('breadcrumb'), currentPath);
+        bindDropTarget($('breadcrumbBottom'), currentPath);
         for (const panel of document.querySelectorAll('.column-panel')) {
             bindDropTarget(panel, panel.dataset.path);
         }
     };
 
     const bindBreadcrumbDropTargets = () => {
-        for (const btn of document.querySelectorAll('#breadcrumb .breadcrumb-link[data-path]')) {
+        for (const btn of document.querySelectorAll('.path-segment[data-path]')) {
             bindDropTarget(btn, btn.dataset.path);
         }
     };
@@ -1379,13 +1538,16 @@
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({path: oldPath, name: trimmed})
         });
-        if (viewMode === 'column' && selectedPathSet.size === 1) {
-            const onlyPath = [...selectedPathSet][0];
-            if (onlyPath === oldPath) {
-                selectedPathSet.clear();
-                selectedPathSet.add(joinPath(parentDirOf(oldPath), trimmed));
-                selectionAnchorPath = [...selectedPathSet][0];
-            }
+        const newPath = joinPath(parentDirOf(oldPath), trimmed);
+        if (currentPath === oldPath || currentPath.startsWith(`${oldPath}/`)) {
+            currentPath = currentPath === oldPath
+                ? newPath
+                : `${newPath}${currentPath.slice(oldPath.length)}`;
+        }
+        if (selectedPathSet.has(oldPath)) {
+            selectedPathSet.delete(oldPath);
+            selectedPathSet.add(newPath);
+            selectionAnchorPath = newPath;
         }
         invalidateEntriesCache();
         await loadList();
@@ -1485,17 +1647,21 @@
         grid.replaceChildren(fragment);
     };
 
-    const renderColumnItem = (entry, colPath, highlightName, index, panelPaths) => {
+    const renderColumnItem = (entry, colPath, highlightName, index, panelPaths, pathHighlightMode) => {
         const name = entryName(entry);
         const fullPath = entryPath(entry, colPath);
         const item = document.createElement('div');
         item.className = 'column-item';
         item.dataset.filePath = fullPath;
-        const isPathHighlight = highlightName && name === highlightName;
+        const isPathHighlight = highlightName
+            && name === highlightName
+            && shouldApplyColumnPathHighlight(colPath, highlightName, name);
         if (isPathHighlight) {
-            item.classList.add('is-selected');
+            item.classList.add(pathHighlightMode === 'active' ? 'is-path-active' : 'is-path');
         }
-        if (selectedPathSet.has(fullPath)) {
+        const isPrimarySelection = selectedPathSet.has(fullPath);
+        const suppressPathCheck = isPathHighlight && pathHighlightMode === 'parent';
+        if (isPrimarySelection && !suppressPathCheck) {
             item.classList.add('is-checked');
         }
 
@@ -1520,6 +1686,7 @@
             }
             const shift = isRangeSelectModifier(e);
             const multi = isMultiSelectModifier(e);
+            const pathTrimmed = syncColumnPathForSelection(colPath, entry);
             applySelectionClick(e, index, fullPath, panelPaths);
 
             if (!shift && !multi && entry.directory) {
@@ -1527,7 +1694,15 @@
                 if (targetPath !== currentPath) {
                     currentPath = targetPath;
                     loadList().catch(showError);
+                    return;
                 }
+            }
+            if (pathTrimmed) {
+                loadList().catch(showError);
+                return;
+            }
+            if (!entry.directory && colPath === currentPath) {
+                renderColumnView().catch(showError);
             }
         });
 
@@ -1547,6 +1722,8 @@
         const fragment = document.createDocumentFragment();
         let panelCount = 0;
 
+        const fileSelectedInCurrent = hasFileSelectionInCurrentPanel(entries);
+
         for (let i = 0; i < chain.length; i++) {
             const colPath = chain[i];
             const isLastColumn = i === chain.length - 1;
@@ -1561,6 +1738,9 @@
             const highlightName = i + 1 < chain.length
                 ? selectedChildName(colPath, chain[i + 1])
                 : null;
+            const pathHighlightMode = highlightName
+                ? resolveColumnPathHighlightMode(i, chain.length, fileSelectedInCurrent)
+                : 'parent';
 
             const panel = document.createElement('div');
             panel.className = 'column-panel';
@@ -1571,7 +1751,8 @@
             } else {
                 const panelPaths = colEntries.map((entry) => entryPath(entry, colPath));
                 colEntries.forEach((entry, index) => {
-                    panel.appendChild(renderColumnItem(entry, colPath, highlightName, index, panelPaths));
+                    panel.appendChild(renderColumnItem(
+                        entry, colPath, highlightName, index, panelPaths, pathHighlightMode));
                 });
             }
             fragment.appendChild(panel);
@@ -1929,6 +2110,7 @@
         initDialog();
         initMarqueeSelection();
         initViewMode();
+        initSortMenu();
         try {
             const status = await refreshAuthStatus();
             scheduleAuthRefresh();
@@ -1969,7 +2151,7 @@
     $('btnRename').addEventListener('click', () => renameSelected().catch(showError));
     $('btnDelete').addEventListener('click', () => deleteSelected().catch(showError));
     $('breadcrumb').addEventListener('click', navigate);
-    $('btnBack').addEventListener('click', goBack);
+    $('breadcrumbBottom').addEventListener('click', navigate);
     $('btnHome').addEventListener('click', goHome);
     for (const btn of document.querySelectorAll('.view-btn')) {
         btn.addEventListener('click', () => setViewMode(btn.dataset.view));

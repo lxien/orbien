@@ -41,12 +41,13 @@ public class FileTransferCoordinator {
     private final Map<String, ChunkListener> chunkListeners = new ConcurrentHashMap<>();
     private final Map<String, String> transferProxyIds = new ConcurrentHashMap<>();
 
-    public Message.FileListResponse list(String agentId, String proxyId, String path) throws Exception {
+    public Message.FileListResponse list(String agentId, String proxyId, String path, String sort) throws Exception {
         String requestId = newRequestId();
         Message.FileListRequest req = Message.FileListRequest.newBuilder()
                 .setRequestId(requestId)
                 .setProxyId(proxyId)
                 .setPath(path == null ? "/" : path)
+                .setSort(sort == null ? "" : sort)
                 .build();
         CompletableFuture<Message.FileListResponse> future = register(requestId);
         send(agentId, TMSP.MSG_FILE_LIST_REQ, req, proxyId, future);

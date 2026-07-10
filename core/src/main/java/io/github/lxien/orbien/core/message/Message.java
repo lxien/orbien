@@ -12319,6 +12319,26 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      */
     com.google.protobuf.ByteString
         getPathBytes();
+
+    /**
+     * <pre>
+     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+     * </pre>
+     *
+     * <code>string sort = 4;</code>
+     * @return The sort.
+     */
+    java.lang.String getSort();
+    /**
+     * <pre>
+     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+     * </pre>
+     *
+     * <code>string sort = 4;</code>
+     * @return The bytes for sort.
+     */
+    com.google.protobuf.ByteString
+        getSortBytes();
   }
   /**
    * Protobuf type {@code io.github.lxien.orbien.core.message.FileListRequest}
@@ -12345,6 +12365,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       requestId_ = "";
       proxyId_ = "";
       path_ = "";
+      sort_ = "";
     }
 
     public static final com.google.protobuf.Descriptors.Descriptor
@@ -12477,6 +12498,53 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
     }
 
+    public static final int SORT_FIELD_NUMBER = 4;
+    @SuppressWarnings("serial")
+    private volatile java.lang.Object sort_ = "";
+    /**
+     * <pre>
+     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+     * </pre>
+     *
+     * <code>string sort = 4;</code>
+     * @return The sort.
+     */
+    @java.lang.Override
+    public java.lang.String getSort() {
+      java.lang.Object ref = sort_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        sort_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+     * </pre>
+     *
+     * <code>string sort = 4;</code>
+     * @return The bytes for sort.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getSortBytes() {
+      java.lang.Object ref = sort_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        sort_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -12500,6 +12568,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
         com.google.protobuf.GeneratedMessage.writeString(output, 3, path_);
       }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sort_)) {
+        com.google.protobuf.GeneratedMessage.writeString(output, 4, sort_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -12517,6 +12588,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       }
       if (!com.google.protobuf.GeneratedMessage.isStringEmpty(path_)) {
         size += com.google.protobuf.GeneratedMessage.computeStringSize(3, path_);
+      }
+      if (!com.google.protobuf.GeneratedMessage.isStringEmpty(sort_)) {
+        size += com.google.protobuf.GeneratedMessage.computeStringSize(4, sort_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
@@ -12539,6 +12613,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           .equals(other.getProxyId())) return false;
       if (!getPath()
           .equals(other.getPath())) return false;
+      if (!getSort()
+          .equals(other.getSort())) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -12556,6 +12632,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       hash = (53 * hash) + getProxyId().hashCode();
       hash = (37 * hash) + PATH_FIELD_NUMBER;
       hash = (53 * hash) + getPath().hashCode();
+      hash = (37 * hash) + SORT_FIELD_NUMBER;
+      hash = (53 * hash) + getSort().hashCode();
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -12690,6 +12768,7 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         requestId_ = "";
         proxyId_ = "";
         path_ = "";
+        sort_ = "";
         return this;
       }
 
@@ -12732,6 +12811,9 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (((from_bitField0_ & 0x00000004) != 0)) {
           result.path_ = path_;
         }
+        if (((from_bitField0_ & 0x00000008) != 0)) {
+          result.sort_ = sort_;
+        }
       }
 
       @java.lang.Override
@@ -12759,6 +12841,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (!other.getPath().isEmpty()) {
           path_ = other.path_;
           bitField0_ |= 0x00000004;
+          onChanged();
+        }
+        if (!other.getSort().isEmpty()) {
+          sort_ = other.sort_;
+          bitField0_ |= 0x00000008;
           onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
@@ -12802,6 +12889,11 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00000004;
                 break;
               } // case 26
+              case 34: {
+                sort_ = input.readStringRequireUtf8();
+                bitField0_ |= 0x00000008;
+                break;
+              } // case 34
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -13035,6 +13127,98 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         return this;
       }
 
+      private java.lang.Object sort_ = "";
+      /**
+       * <pre>
+       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+       * </pre>
+       *
+       * <code>string sort = 4;</code>
+       * @return The sort.
+       */
+      public java.lang.String getSort() {
+        java.lang.Object ref = sort_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          sort_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+       * </pre>
+       *
+       * <code>string sort = 4;</code>
+       * @return The bytes for sort.
+       */
+      public com.google.protobuf.ByteString
+          getSortBytes() {
+        java.lang.Object ref = sort_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          sort_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+       * </pre>
+       *
+       * <code>string sort = 4;</code>
+       * @param value The sort to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSort(
+          java.lang.String value) {
+        if (value == null) { throw new NullPointerException(); }
+        sort_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+       * </pre>
+       *
+       * <code>string sort = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearSort() {
+        sort_ = getDefaultInstance().getSort();
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
+       * </pre>
+       *
+       * <code>string sort = 4;</code>
+       * @param value The bytes for sort to set.
+       * @return This builder for chaining.
+       */
+      public Builder setSortBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) { throw new NullPointerException(); }
+        checkByteStringIsUtf8(value);
+        sort_ = value;
+        bitField0_ |= 0x00000008;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:io.github.lxien.orbien.core.message.FileListRequest)
     }
 
@@ -13119,6 +13303,18 @@ public final class Message extends com.google.protobuf.GeneratedFile {
      * @return The modifiedTime.
      */
     long getModifiedTime();
+
+    /**
+     * <code>int64 created_time = 5;</code>
+     * @return The createdTime.
+     */
+    long getCreatedTime();
+
+    /**
+     * <code>int64 last_access_time = 6;</code>
+     * @return The lastAccessTime.
+     */
+    long getLastAccessTime();
   }
   /**
    * Protobuf type {@code io.github.lxien.orbien.core.message.FileEntry}
@@ -13230,6 +13426,28 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       return modifiedTime_;
     }
 
+    public static final int CREATED_TIME_FIELD_NUMBER = 5;
+    private long createdTime_ = 0L;
+    /**
+     * <code>int64 created_time = 5;</code>
+     * @return The createdTime.
+     */
+    @java.lang.Override
+    public long getCreatedTime() {
+      return createdTime_;
+    }
+
+    public static final int LAST_ACCESS_TIME_FIELD_NUMBER = 6;
+    private long lastAccessTime_ = 0L;
+    /**
+     * <code>int64 last_access_time = 6;</code>
+     * @return The lastAccessTime.
+     */
+    @java.lang.Override
+    public long getLastAccessTime() {
+      return lastAccessTime_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13256,6 +13474,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       if (modifiedTime_ != 0L) {
         output.writeInt64(4, modifiedTime_);
       }
+      if (createdTime_ != 0L) {
+        output.writeInt64(5, createdTime_);
+      }
+      if (lastAccessTime_ != 0L) {
+        output.writeInt64(6, lastAccessTime_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -13280,6 +13504,14 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(4, modifiedTime_);
       }
+      if (createdTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, createdTime_);
+      }
+      if (lastAccessTime_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(6, lastAccessTime_);
+      }
       size += getUnknownFields().getSerializedSize();
       memoizedSize = size;
       return size;
@@ -13303,6 +13535,10 @@ public final class Message extends com.google.protobuf.GeneratedFile {
           != other.getSize()) return false;
       if (getModifiedTime()
           != other.getModifiedTime()) return false;
+      if (getCreatedTime()
+          != other.getCreatedTime()) return false;
+      if (getLastAccessTime()
+          != other.getLastAccessTime()) return false;
       if (!getUnknownFields().equals(other.getUnknownFields())) return false;
       return true;
     }
@@ -13325,6 +13561,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       hash = (37 * hash) + MODIFIED_TIME_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getModifiedTime());
+      hash = (37 * hash) + CREATED_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getCreatedTime());
+      hash = (37 * hash) + LAST_ACCESS_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getLastAccessTime());
       hash = (29 * hash) + getUnknownFields().hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13460,6 +13702,8 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         directory_ = false;
         size_ = 0L;
         modifiedTime_ = 0L;
+        createdTime_ = 0L;
+        lastAccessTime_ = 0L;
         return this;
       }
 
@@ -13505,6 +13749,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         if (((from_bitField0_ & 0x00000008) != 0)) {
           result.modifiedTime_ = modifiedTime_;
         }
+        if (((from_bitField0_ & 0x00000010) != 0)) {
+          result.createdTime_ = createdTime_;
+        }
+        if (((from_bitField0_ & 0x00000020) != 0)) {
+          result.lastAccessTime_ = lastAccessTime_;
+        }
       }
 
       @java.lang.Override
@@ -13532,6 +13782,12 @@ public final class Message extends com.google.protobuf.GeneratedFile {
         }
         if (other.getModifiedTime() != 0L) {
           setModifiedTime(other.getModifiedTime());
+        }
+        if (other.getCreatedTime() != 0L) {
+          setCreatedTime(other.getCreatedTime());
+        }
+        if (other.getLastAccessTime() != 0L) {
+          setLastAccessTime(other.getLastAccessTime());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         onChanged();
@@ -13579,6 +13835,16 @@ public final class Message extends com.google.protobuf.GeneratedFile {
                 bitField0_ |= 0x00000008;
                 break;
               } // case 32
+              case 40: {
+                createdTime_ = input.readInt64();
+                bitField0_ |= 0x00000010;
+                break;
+              } // case 40
+              case 48: {
+                lastAccessTime_ = input.readInt64();
+                bitField0_ |= 0x00000020;
+                break;
+              } // case 48
               default: {
                 if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                   done = true; // was an endgroup tag
@@ -13760,6 +14026,70 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       public Builder clearModifiedTime() {
         bitField0_ = (bitField0_ & ~0x00000008);
         modifiedTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long createdTime_ ;
+      /**
+       * <code>int64 created_time = 5;</code>
+       * @return The createdTime.
+       */
+      @java.lang.Override
+      public long getCreatedTime() {
+        return createdTime_;
+      }
+      /**
+       * <code>int64 created_time = 5;</code>
+       * @param value The createdTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCreatedTime(long value) {
+
+        createdTime_ = value;
+        bitField0_ |= 0x00000010;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 created_time = 5;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCreatedTime() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        createdTime_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private long lastAccessTime_ ;
+      /**
+       * <code>int64 last_access_time = 6;</code>
+       * @return The lastAccessTime.
+       */
+      @java.lang.Override
+      public long getLastAccessTime() {
+        return lastAccessTime_;
+      }
+      /**
+       * <code>int64 last_access_time = 6;</code>
+       * @param value The lastAccessTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLastAccessTime(long value) {
+
+        lastAccessTime_ = value;
+        bitField0_ |= 0x00000020;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 last_access_time = 6;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLastAccessTime() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        lastAccessTime_ = 0L;
         onChanged();
         return this;
       }
@@ -35206,118 +35536,120 @@ public final class Message extends com.google.protobuf.GeneratedFile {
       "\001 \001(\t\022\027\n\017max_upload_size\030\002 \001(\003\022\024\n\014allow_" +
       "upload\030\003 \001(\010\022\024\n\014allow_delete\030\004 \001(\010\022\023\n\013al" +
       "low_mkdir\030\005 \001(\010\022\022\n\nallow_move\030\006 \001(\010\022\024\n\014a" +
-      "llow_rename\030\007 \001(\010\"E\n\017FileListRequest\022\022\n\n" +
+      "llow_rename\030\007 \001(\010\"S\n\017FileListRequest\022\022\n\n" +
       "request_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022\014\n\004pa" +
-      "th\030\003 \001(\t\"Q\n\tFileEntry\022\014\n\004name\030\001 \001(\t\022\021\n\td" +
-      "irectory\030\002 \001(\010\022\014\n\004size\030\003 \001(\003\022\025\n\rmodified" +
-      "_time\030\004 \001(\003\"\317\001\n\020FileListResponse\022\022\n\nrequ" +
-      "est_id\030\001 \001(\t\022\024\n\014current_path\030\002 \001(\t\022\023\n\013pa" +
-      "rent_path\030\003 \001(\t\022?\n\007entries\030\004 \003(\0132..io.gi" +
-      "thub.lxien.orbien.core.message.FileEntry" +
-      "\022;\n\006status\030\005 \001(\0132+.io.github.lxien.orbie" +
-      "n.core.message.Status\"j\n\020FileTransferIni" +
-      "t\022\022\n\nrequest_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022" +
-      "\014\n\004path\030\003 \001(\t\022\022\n\ntotal_size\030\004 \001(\003\022\016\n\006upl" +
-      "oad\030\005 \001(\010\"K\n\tFileChunk\022\022\n\nrequest_id\030\001 \001" +
-      "(\t\022\016\n\006offset\030\002 \001(\003\022\014\n\004data\030\003 \001(\014\022\014\n\004last" +
-      "\030\004 \001(\010\"c\n\020FileTransferDone\022\022\n\nrequest_id" +
-      "\030\001 \001(\t\022;\n\006status\030\002 \001(\0132+.io.github.lxien" +
-      ".orbien.core.message.Status\"]\n\rFileOpReq" +
-      "uest\022\022\n\nrequest_id\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001" +
-      "(\t\022\n\n\002op\030\003 \001(\t\022\014\n\004path\030\004 \001(\t\022\014\n\004name\030\005 \001" +
-      "(\t\"a\n\016FileOpResponse\022\022\n\nrequest_id\030\001 \001(\t" +
-      "\022;\n\006status\030\002 \001(\0132+.io.github.lxien.orbie" +
-      "n.core.message.Status\"s\n\tBandwidth\022\022\n\005li" +
-      "mit\030\001 \001(\tH\000\210\001\001\022\025\n\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n" +
-      "\tlimit_out\030\003 \001(\tH\002\210\001\001B\010\n\006_limitB\013\n\t_limi" +
-      "t_inB\014\n\n_limit_out\"`\n\006Target\022\014\n\004host\030\001 \001" +
-      "(\t\022\014\n\004port\030\002 \001(\r\022\021\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006w" +
-      "eight\030\004 \001(\005H\001\210\001\001B\007\n\005_nameB\t\n\007_weight\"_\n\006" +
-      "Domain\022\030\n\013auto_domain\030\001 \001(\010H\000\210\001\001\022\026\n\016cust" +
-      "om_domains\030\002 \003(\t\022\023\n\013sub_domains\030\003 \003(\tB\016\n" +
-      "\014_auto_domain\":\n\007TlsCert\022\027\n\017private_key_" +
-      "pem\030\001 \001(\t\022\026\n\016cert_chain_pem\030\002 \001(\t\"\323\001\n\tTr" +
-      "ansport\022\026\n\tmultiplex\030\001 \001(\010H\000\210\001\001\022\024\n\007encry" +
-      "pt\030\002 \001(\010H\001\210\001\001\022\025\n\010compress\030\003 \001(\010H\002\210\001\001\022\025\n\010" +
-      "protocol\030\004 \001(\tH\003\210\001\001\022\037\n\022compress_algorith" +
-      "m\030\005 \001(\tH\004\210\001\001B\014\n\n_multiplexB\n\n\010_encryptB\013" +
-      "\n\t_compressB\013\n\t_protocolB\025\n\023_compress_al" +
-      "gorithm\"\247\001\n\013HealthCheck\022B\n\004type\030\001 \001(\01624." +
-      "io.github.lxien.orbien.core.message.Heal" +
-      "thCheckType\022\020\n\010interval\030\002 \001(\005\022\017\n\007timeout" +
-      "\030\003 \001(\005\022\022\n\nmax_failed\030\004 \001(\005\022\014\n\004path\030\005 \001(\t" +
-      "\022\017\n\007enabled\030\006 \001(\010\"\353\t\n\005Proxy\022\017\n\007proxyId\030\001" +
-      " \001(\t\022\014\n\004name\030\002 \001(\t\022C\n\010protocol\030\003 \001(\01621.i" +
-      "o.github.lxien.orbien.core.message.Proto" +
-      "colType\022\017\n\007enabled\030\004 \001(\010\022<\n\007targets\030\005 \003(" +
-      "\0132+.io.github.lxien.orbien.core.message." +
-      "Target\022\023\n\013force_https\030\006 \001(\010\022\030\n\013remote_po" +
-      "rt\030\007 \001(\rH\000\210\001\001\022@\n\006domain\030\010 \001(\0132+.io.githu" +
-      "b.lxien.orbien.core.message.DomainH\001\210\001\001\022" +
-      "O\n\016access_control\030\t \001(\01322.io.github.lxie" +
-      "n.orbien.core.message.AccessControlH\002\210\001\001" +
-      "\022G\n\nbasic_auth\030\n \001(\0132..io.github.lxien.o" +
-      "rbien.core.message.BasicAuthH\003\210\001\001\022F\n\tban" +
-      "dwidth\030\013 \001(\0132..io.github.lxien.orbien.co" +
-      "re.message.BandwidthH\004\210\001\001\022\\\n\025load_balanc" +
-      "e_strategy\030\014 \001(\01628.io.github.lxien.orbie" +
-      "n.core.message.LoadBalanceStrategyH\005\210\001\001\022" +
-      "F\n\ttransport\030\r \001(\0132..io.github.lxien.orb" +
-      "ien.core.message.TransportH\006\210\001\001\022C\n\010tls_c" +
-      "ert\030\016 \001(\0132,.io.github.lxien.orbien.core." +
-      "message.TlsCertH\007\210\001\001\022K\n\014health_check\030\017 \001" +
-      "(\01320.io.github.lxien.orbien.core.message" +
-      ".HealthCheckH\010\210\001\001\022I\n\013socks5_auth\030\020 \001(\0132/" +
-      ".io.github.lxien.orbien.core.message.Soc" +
-      "ks5AuthH\t\210\001\001\022J\n\tfile_auth\030\021 \001(\01322.io.git" +
-      "hub.lxien.orbien.core.message.FileShareA" +
-      "uthH\n\210\001\001\022N\n\013file_limits\030\022 \001(\01324.io.githu" +
-      "b.lxien.orbien.core.message.FileShareLim" +
-      "itsH\013\210\001\001B\016\n\014_remote_portB\t\n\007_domainB\021\n\017_" +
-      "access_controlB\r\n\013_basic_authB\014\n\n_bandwi" +
-      "dthB\030\n\026_load_balance_strategyB\014\n\n_transp" +
-      "ortB\013\n\t_tls_certB\017\n\r_health_checkB\016\n\014_so" +
-      "cks5_authB\014\n\n_file_authB\016\n\014_file_limits\"" +
-      "\223\003\n\013RuntimeInfo\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004name" +
-      "\030\002 \001(\t\022<\n\007targets\030\003 \003(\0132+.io.github.lxie" +
-      "n.orbien.core.message.Target\022\023\n\013remote_a" +
-      "ddr\030\004 \003(\t\022K\n\014health_check\030\005 \001(\01320.io.git" +
-      "hub.lxien.orbien.core.message.HealthChec" +
-      "kH\000\210\001\001\022F\n\ttransport\030\006 \001(\0132..io.github.lx" +
-      "ien.orbien.core.message.TransportH\001\210\001\001\022N" +
-      "\n\013file_limits\030\007 \001(\01324.io.github.lxien.or" +
-      "bien.core.message.FileShareLimitsH\002\210\001\001B\017" +
-      "\n\r_health_checkB\014\n\n_transportB\016\n\014_file_l" +
-      "imits\"X\n\031BatchCreateProxiesRequest\022;\n\007pr" +
-      "oxies\030\001 \003(\0132*.io.github.lxien.orbien.cor" +
-      "e.message.Proxy\"\232\001\n\032BatchCreateProxiesRe" +
-      "sponse\022?\n\005items\030\001 \003(\01320.io.github.lxien." +
-      "orbien.core.message.RuntimeInfo\022;\n\006statu" +
-      "s\030\002 \001(\0132+.io.github.lxien.orbien.core.me" +
-      "ssage.Status\"\264\001\n\021ProxySyncResponse\022K\n\017pr" +
-      "oxy_sync_type\030\001 \001(\01622.io.github.lxien.or" +
-      "bien.core.message.ProxySyncType\022?\n\005items" +
-      "\030\002 \003(\01320.io.github.lxien.orbien.core.mes" +
-      "sage.RuntimeInfo\022\021\n\tproxy_ids\030\003 \003(\t\"\230\001\n\r" +
-      "ServiceHealth\022\020\n\010proxy_id\030\001 \001(\t\022\014\n\004host\030" +
-      "\002 \001(\t\022\014\n\004port\030\003 \001(\r\022A\n\006status\030\004 \001(\01621.io" +
-      ".github.lxien.orbien.core.message.Health" +
-      "Status\022\026\n\016responseTimeMs\030\005 \001(\004\"d\n\037BatchR" +
-      "eportServiceHealthRequest\022A\n\005items\030\001 \003(\013" +
-      "22.io.github.lxien.orbien.core.message.S" +
-      "erviceHealth\"D\n\005Error\022;\n\006status\030\001 \001(\0132+." +
-      "io.github.lxien.orbien.core.message.Stat" +
-      "us*K\n\014ProtocolType\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n" +
-      "\005HTTPS\020\002\022\007\n\003UDP\020\003\022\n\n\006SOCKS5\020\004\022\010\n\004FILE\020\005*" +
-      "$\n\tAgentType\022\n\n\006BINARY\020\000\022\013\n\007SESSION\020\001*!\n" +
-      "\nAccessMode\022\t\n\005ALLOW\020\000\022\010\n\004DENY\020\001*N\n\023Load" +
-      "BalanceStrategy\022\017\n\013ROUND_ROBIN\020\000\022\n\n\006WEIG" +
-      "HT\020\001\022\n\n\006RANDOM\020\002\022\016\n\nLEAST_CONN\020\003*-\n\014Heal" +
-      "thStatus\022\013\n\007UNKNOWN\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*" +
-      ":\n\rProxySyncType\022\010\n\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006U" +
-      "PDATE\020\002\022\n\n\006DELETE\020\003*H\n\017HealthCheckType\022\031" +
-      "\n\025HEALTH_CHECK_TYPE_TCP\020\000\022\032\n\026HEALTH_CHEC" +
-      "K_TYPE_HTTP\020\001b\006proto3"
+      "th\030\003 \001(\t\022\014\n\004sort\030\004 \001(\t\"\201\001\n\tFileEntry\022\014\n\004" +
+      "name\030\001 \001(\t\022\021\n\tdirectory\030\002 \001(\010\022\014\n\004size\030\003 " +
+      "\001(\003\022\025\n\rmodified_time\030\004 \001(\003\022\024\n\014created_ti" +
+      "me\030\005 \001(\003\022\030\n\020last_access_time\030\006 \001(\003\"\317\001\n\020F" +
+      "ileListResponse\022\022\n\nrequest_id\030\001 \001(\t\022\024\n\014c" +
+      "urrent_path\030\002 \001(\t\022\023\n\013parent_path\030\003 \001(\t\022?" +
+      "\n\007entries\030\004 \003(\0132..io.github.lxien.orbien" +
+      ".core.message.FileEntry\022;\n\006status\030\005 \001(\0132" +
+      "+.io.github.lxien.orbien.core.message.St" +
+      "atus\"j\n\020FileTransferInit\022\022\n\nrequest_id\030\001" +
+      " \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022\014\n\004path\030\003 \001(\t\022\022\n\n" +
+      "total_size\030\004 \001(\003\022\016\n\006upload\030\005 \001(\010\"K\n\tFile" +
+      "Chunk\022\022\n\nrequest_id\030\001 \001(\t\022\016\n\006offset\030\002 \001(" +
+      "\003\022\014\n\004data\030\003 \001(\014\022\014\n\004last\030\004 \001(\010\"c\n\020FileTra" +
+      "nsferDone\022\022\n\nrequest_id\030\001 \001(\t\022;\n\006status\030" +
+      "\002 \001(\0132+.io.github.lxien.orbien.core.mess" +
+      "age.Status\"]\n\rFileOpRequest\022\022\n\nrequest_i" +
+      "d\030\001 \001(\t\022\020\n\010proxy_id\030\002 \001(\t\022\n\n\002op\030\003 \001(\t\022\014\n" +
+      "\004path\030\004 \001(\t\022\014\n\004name\030\005 \001(\t\"a\n\016FileOpRespo" +
+      "nse\022\022\n\nrequest_id\030\001 \001(\t\022;\n\006status\030\002 \001(\0132" +
+      "+.io.github.lxien.orbien.core.message.St" +
+      "atus\"s\n\tBandwidth\022\022\n\005limit\030\001 \001(\tH\000\210\001\001\022\025\n" +
+      "\010limit_in\030\002 \001(\tH\001\210\001\001\022\026\n\tlimit_out\030\003 \001(\tH" +
+      "\002\210\001\001B\010\n\006_limitB\013\n\t_limit_inB\014\n\n_limit_ou" +
+      "t\"`\n\006Target\022\014\n\004host\030\001 \001(\t\022\014\n\004port\030\002 \001(\r\022" +
+      "\021\n\004name\030\003 \001(\tH\000\210\001\001\022\023\n\006weight\030\004 \001(\005H\001\210\001\001B" +
+      "\007\n\005_nameB\t\n\007_weight\"_\n\006Domain\022\030\n\013auto_do" +
+      "main\030\001 \001(\010H\000\210\001\001\022\026\n\016custom_domains\030\002 \003(\t\022" +
+      "\023\n\013sub_domains\030\003 \003(\tB\016\n\014_auto_domain\":\n\007" +
+      "TlsCert\022\027\n\017private_key_pem\030\001 \001(\t\022\026\n\016cert" +
+      "_chain_pem\030\002 \001(\t\"\323\001\n\tTransport\022\026\n\tmultip" +
+      "lex\030\001 \001(\010H\000\210\001\001\022\024\n\007encrypt\030\002 \001(\010H\001\210\001\001\022\025\n\010" +
+      "compress\030\003 \001(\010H\002\210\001\001\022\025\n\010protocol\030\004 \001(\tH\003\210" +
+      "\001\001\022\037\n\022compress_algorithm\030\005 \001(\tH\004\210\001\001B\014\n\n_" +
+      "multiplexB\n\n\010_encryptB\013\n\t_compressB\013\n\t_p" +
+      "rotocolB\025\n\023_compress_algorithm\"\247\001\n\013Healt" +
+      "hCheck\022B\n\004type\030\001 \001(\01624.io.github.lxien.o" +
+      "rbien.core.message.HealthCheckType\022\020\n\010in" +
+      "terval\030\002 \001(\005\022\017\n\007timeout\030\003 \001(\005\022\022\n\nmax_fai" +
+      "led\030\004 \001(\005\022\014\n\004path\030\005 \001(\t\022\017\n\007enabled\030\006 \001(\010" +
+      "\"\353\t\n\005Proxy\022\017\n\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(" +
+      "\t\022C\n\010protocol\030\003 \001(\01621.io.github.lxien.or" +
+      "bien.core.message.ProtocolType\022\017\n\007enable" +
+      "d\030\004 \001(\010\022<\n\007targets\030\005 \003(\0132+.io.github.lxi" +
+      "en.orbien.core.message.Target\022\023\n\013force_h" +
+      "ttps\030\006 \001(\010\022\030\n\013remote_port\030\007 \001(\rH\000\210\001\001\022@\n\006" +
+      "domain\030\010 \001(\0132+.io.github.lxien.orbien.co" +
+      "re.message.DomainH\001\210\001\001\022O\n\016access_control" +
+      "\030\t \001(\01322.io.github.lxien.orbien.core.mes" +
+      "sage.AccessControlH\002\210\001\001\022G\n\nbasic_auth\030\n " +
+      "\001(\0132..io.github.lxien.orbien.core.messag" +
+      "e.BasicAuthH\003\210\001\001\022F\n\tbandwidth\030\013 \001(\0132..io" +
+      ".github.lxien.orbien.core.message.Bandwi" +
+      "dthH\004\210\001\001\022\\\n\025load_balance_strategy\030\014 \001(\0162" +
+      "8.io.github.lxien.orbien.core.message.Lo" +
+      "adBalanceStrategyH\005\210\001\001\022F\n\ttransport\030\r \001(" +
+      "\0132..io.github.lxien.orbien.core.message." +
+      "TransportH\006\210\001\001\022C\n\010tls_cert\030\016 \001(\0132,.io.gi" +
+      "thub.lxien.orbien.core.message.TlsCertH\007" +
+      "\210\001\001\022K\n\014health_check\030\017 \001(\01320.io.github.lx" +
+      "ien.orbien.core.message.HealthCheckH\010\210\001\001" +
+      "\022I\n\013socks5_auth\030\020 \001(\0132/.io.github.lxien." +
+      "orbien.core.message.Socks5AuthH\t\210\001\001\022J\n\tf" +
+      "ile_auth\030\021 \001(\01322.io.github.lxien.orbien." +
+      "core.message.FileShareAuthH\n\210\001\001\022N\n\013file_" +
+      "limits\030\022 \001(\01324.io.github.lxien.orbien.co" +
+      "re.message.FileShareLimitsH\013\210\001\001B\016\n\014_remo" +
+      "te_portB\t\n\007_domainB\021\n\017_access_controlB\r\n" +
+      "\013_basic_authB\014\n\n_bandwidthB\030\n\026_load_bala" +
+      "nce_strategyB\014\n\n_transportB\013\n\t_tls_certB" +
+      "\017\n\r_health_checkB\016\n\014_socks5_authB\014\n\n_fil" +
+      "e_authB\016\n\014_file_limits\"\223\003\n\013RuntimeInfo\022\017" +
+      "\n\007proxyId\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n\007targets" +
+      "\030\003 \003(\0132+.io.github.lxien.orbien.core.mes" +
+      "sage.Target\022\023\n\013remote_addr\030\004 \003(\t\022K\n\014heal" +
+      "th_check\030\005 \001(\01320.io.github.lxien.orbien." +
+      "core.message.HealthCheckH\000\210\001\001\022F\n\ttranspo" +
+      "rt\030\006 \001(\0132..io.github.lxien.orbien.core.m" +
+      "essage.TransportH\001\210\001\001\022N\n\013file_limits\030\007 \001" +
+      "(\01324.io.github.lxien.orbien.core.message" +
+      ".FileShareLimitsH\002\210\001\001B\017\n\r_health_checkB\014" +
+      "\n\n_transportB\016\n\014_file_limits\"X\n\031BatchCre" +
+      "ateProxiesRequest\022;\n\007proxies\030\001 \003(\0132*.io." +
+      "github.lxien.orbien.core.message.Proxy\"\232" +
+      "\001\n\032BatchCreateProxiesResponse\022?\n\005items\030\001" +
+      " \003(\01320.io.github.lxien.orbien.core.messa" +
+      "ge.RuntimeInfo\022;\n\006status\030\002 \001(\0132+.io.gith" +
+      "ub.lxien.orbien.core.message.Status\"\264\001\n\021" +
+      "ProxySyncResponse\022K\n\017proxy_sync_type\030\001 \001" +
+      "(\01622.io.github.lxien.orbien.core.message" +
+      ".ProxySyncType\022?\n\005items\030\002 \003(\01320.io.githu" +
+      "b.lxien.orbien.core.message.RuntimeInfo\022" +
+      "\021\n\tproxy_ids\030\003 \003(\t\"\230\001\n\rServiceHealth\022\020\n\010" +
+      "proxy_id\030\001 \001(\t\022\014\n\004host\030\002 \001(\t\022\014\n\004port\030\003 \001" +
+      "(\r\022A\n\006status\030\004 \001(\01621.io.github.lxien.orb" +
+      "ien.core.message.HealthStatus\022\026\n\016respons" +
+      "eTimeMs\030\005 \001(\004\"d\n\037BatchReportServiceHealt" +
+      "hRequest\022A\n\005items\030\001 \003(\01322.io.github.lxie" +
+      "n.orbien.core.message.ServiceHealth\"D\n\005E" +
+      "rror\022;\n\006status\030\001 \001(\0132+.io.github.lxien.o" +
+      "rbien.core.message.Status*K\n\014ProtocolTyp" +
+      "e\022\007\n\003TCP\020\000\022\010\n\004HTTP\020\001\022\t\n\005HTTPS\020\002\022\007\n\003UDP\020\003" +
+      "\022\n\n\006SOCKS5\020\004\022\010\n\004FILE\020\005*$\n\tAgentType\022\n\n\006B" +
+      "INARY\020\000\022\013\n\007SESSION\020\001*!\n\nAccessMode\022\t\n\005AL" +
+      "LOW\020\000\022\010\n\004DENY\020\001*N\n\023LoadBalanceStrategy\022\017" +
+      "\n\013ROUND_ROBIN\020\000\022\n\n\006WEIGHT\020\001\022\n\n\006RANDOM\020\002\022" +
+      "\016\n\nLEAST_CONN\020\003*-\n\014HealthStatus\022\013\n\007UNKNO" +
+      "WN\020\000\022\006\n\002UP\020\001\022\010\n\004DOWN\020\002*:\n\rProxySyncType\022" +
+      "\010\n\004FULL\020\000\022\007\n\003ADD\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DELETE" +
+      "\020\003*H\n\017HealthCheckType\022\031\n\025HEALTH_CHECK_TY" +
+      "PE_TCP\020\000\022\032\n\026HEALTH_CHECK_TYPE_HTTP\020\001b\006pr" +
+      "oto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -35412,13 +35744,13 @@ public final class Message extends com.google.protobuf.GeneratedFile {
     internal_static_io_github_lxien_orbien_core_message_FileListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_FileListRequest_descriptor,
-        new java.lang.String[] { "RequestId", "ProxyId", "Path", });
+        new java.lang.String[] { "RequestId", "ProxyId", "Path", "Sort", });
     internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor =
       getDescriptor().getMessageType(15);
     internal_static_io_github_lxien_orbien_core_message_FileEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_io_github_lxien_orbien_core_message_FileEntry_descriptor,
-        new java.lang.String[] { "Name", "Directory", "Size", "ModifiedTime", });
+        new java.lang.String[] { "Name", "Directory", "Size", "ModifiedTime", "CreatedTime", "LastAccessTime", });
     internal_static_io_github_lxien_orbien_core_message_FileListResponse_descriptor =
       getDescriptor().getMessageType(16);
     internal_static_io_github_lxien_orbien_core_message_FileListResponse_fieldAccessorTable = new
