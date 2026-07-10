@@ -22,4 +22,7 @@ public class ProxyTransportDetailDTO extends TransportDTO {
     private TransportEncryptConstraints encryptConstraints;
     private TransportTunnelConstraints tunnelConstraints;
     private TransportProtocolConstraints protocolConstraints;
+    private TransportCompressConstraints compressConstraints;
+    private Boolean effectiveCompress;
+    private String effectiveCompressAlgorithm;
 }

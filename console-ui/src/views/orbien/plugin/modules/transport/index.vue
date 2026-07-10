@@ -42,6 +42,31 @@
           <span class="setting-name">隧道加密</span>
           <ElSwitch v-model="form.encrypt" :disabled="!encryptEditable"/>
         </div>
+
+        <div class="setting-item">
+          <div class="setting-row">
+            <span class="setting-name">数据压缩</span>
+            <ElSwitch v-model="form.compress"/>
+          </div>
+          <p class="setting-hint">开启后仅压缩大于 1KB 的s数据包</p>
+        </div>
+
+        <div v-if="form.compress" class="setting-item setting-item--nested">
+          <span class="setting-name">压缩算法</span>
+          <ElSelect v-model="form.compressAlgorithm" class="algorithm-select">
+            <ElOption
+                v-for="item in algorithmOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+            >
+              <div class="algorithm-option">
+                <span class="algorithm-option__name">{{ item.label }}</span>
+                <span class="algorithm-option__desc">{{ item.desc }}</span>
+              </div>
+            </ElOption>
+          </ElSelect>
+        </div>
       </div>
     </section>
 
@@ -78,8 +103,16 @@ const detail = ref<Api.Proxy.ProxyTransportDetailDTO | null>(null)
 const form = reactive({
   dataProtocol: TransportProtocol.TCP,
   encrypt: true,
-  tunnelType: String(TunnelType.MULTIPLEX)
+  tunnelType: String(TunnelType.MULTIPLEX),
+  compress: false,
+  compressAlgorithm: 'snappy'
 })
+
+const algorithmOptions = [
+  {value: 'snappy', label: 'Snappy', desc: '兼容性好，适合通用文本流量'},
+  {value: 'lz4', label: 'LZ4', desc: '压缩速度快，CPU 开销更低'},
+  {value: 'zstd', label: 'Zstd', desc: '压缩率高，适合带宽敏感场景'}
+]
 
 const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
 const protocolConstraints = computed(() => detail.value?.protocolConstraints)
@@ -133,6 +166,12 @@ const encryptEditable = computed(() => {
   return true
 })
 
+const compressSummary = computed(() => {
+  if (!form.compress) return '无压缩'
+  const algo = algorithmOptions.find(item => item.value === form.compressAlgorithm)
+  return `${algo?.label ?? form.compressAlgorithm} 压缩`
+})
+
 const summaryText = computed(() => {
   const protocol = getTransportProtocolLabel(
       detail.value?.effectiveDataProtocol ?? form.dataProtocol
@@ -141,7 +180,7 @@ const summaryText = computed(() => {
       multiplexOnly.value ? TunnelType.MULTIPLEX : Number(form.tunnelType)
   )
   const enc = (requiresTlsProtocol.value ? true : form.encrypt) ? 'TLS 加密' : '明文传输'
-  return `${protocol} · ${tunnel} · ${enc}`
+  return `${protocol} · ${tunnel} · ${enc} · ${compressSummary.value}`
 })
 
 const applyDependentFields = () => {
@@ -164,6 +203,8 @@ const applyDetail = (data: Api.Proxy.ProxyTransportDetailDTO) => {
   detail.value = data
   form.dataProtocol = data.effectiveDataProtocol ?? data.dataProtocol ?? TransportProtocol.TCP
   form.encrypt = data.encrypt
+  form.compress = data.compress ?? false
+  form.compressAlgorithm = data.compressAlgorithm ?? 'snappy'
   const effective = data.effectiveTunnelType ?? data.tunnelType ?? TunnelType.MULTIPLEX
   form.tunnelType = String(effective)
   applyDependentFields()
@@ -185,7 +226,9 @@ const handleSave = async () => {
     await saveProxyTransport(props.proxyId, {
       dataProtocol: form.dataProtocol,
       encrypt: form.encrypt,
-      tunnelType: Number(form.tunnelType)
+      tunnelType: Number(form.tunnelType),
+      compress: form.compress,
+      compressAlgorithm: form.compress ? form.compressAlgorithm : undefined
     })
     ElMessage.success('传输配置已保存')
     await loadData()
@@ -309,6 +352,45 @@ watch(
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.setting-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.setting-item--nested {
+  padding-left: 12px;
+  border-left: 2px solid var(--el-color-primary-light-7);
+}
+
+.setting-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  line-height: 1.5;
+}
+
+.algorithm-select {
+  width: 100%;
+}
+
+.algorithm-option {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+}
+
+.algorithm-option__name {
+  font-weight: 500;
+}
+
+.algorithm-option__desc {
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .setting-name {

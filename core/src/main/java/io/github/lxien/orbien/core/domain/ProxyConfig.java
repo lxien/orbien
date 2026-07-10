@@ -19,6 +19,7 @@ import io.github.lxien.orbien.core.enums.*;
 import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
 import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
 import io.github.lxien.orbien.core.transport.api.TransportEncryptResolver;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import lombok.*;
@@ -174,6 +175,13 @@ public class ProxyConfig implements Serializable {
      */
     public boolean isCompress() {
         return transport != null && Boolean.TRUE.equals(transport.getCompress());
+    }
+
+    public CompressionType resolveCompressAlgorithm() {
+        if (transport == null) {
+            return CompressionType.NONE;
+        }
+        return transport.resolveCompressAlgorithm();
     }
 
     public boolean hasAccessControl() {

@@ -104,6 +104,11 @@ public class ProxyDO {
     @Column(name = "compress")
     private Boolean compress;
     /**
+     * 压缩算法：snappy / lz4 / zstd
+     */
+    @Column(name = "compress_algorithm", length = 16)
+    private String compressAlgorithm;
+    /**
      * 数据隧道传输协议
      */
     @Column(name = "transport_protocol")

@@ -21,6 +21,7 @@ import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.core.enums.ProxyStatus;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
@@ -192,6 +193,9 @@ final class AppConfigBuilder {
                 .multiplex(transport.isMultiplex())
                 .encrypt(transport.isEncrypt())
                 .compress(transport.isCompress());
+        if (transport.getCompressAlgorithm() != null) {
+            transportBuilder.compressAlgorithm(CompressionType.of(transport.getCompressAlgorithm()));
+        }
         if (transport.getProtocol() != null) {
             transportBuilder.protocol(transport.getProtocol());
         }

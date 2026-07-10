@@ -81,6 +81,11 @@ public class ProxyReportConvert {
         if (transport.hasCompress()) {
             proxyDO.setCompress(transport.getCompress());
         }
+        if (transport.hasCompressAlgorithm()) {
+            proxyDO.setCompressAlgorithm(transport.getCompressAlgorithm());
+        } else if (transport.hasCompress() && !transport.getCompress()) {
+            proxyDO.setCompressAlgorithm("none");
+        }
         if (transport.hasProtocol()) {
             TransportProtocol protocol = TransportProtocol.fromName(transport.getProtocol());
             if (protocol == null) {

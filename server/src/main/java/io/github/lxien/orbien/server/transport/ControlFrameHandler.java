@@ -22,6 +22,8 @@ import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.ChannelType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.server.filetransfer.FileTransferCoordinator;
@@ -177,19 +179,24 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     streamContext.setMultiplex(frame.isMuxTunnel());
                     streamContext.setVariable(StreamConstants.TUNNEL_ID, tunnelId);
                     streamContext.setCompress(frame.isCompressed());
+                    streamContext.setCompressAlgorithm(CompressionType.fromFlag(frame.getFlags()));
                     streamContext.setEncrypt(frame.isEncrypted());
                     streamContext.fireEvent(StreamEvent.STREAM_OPEN_SUCCESS);
                 }
                 case TMSP.MSG_STREAM_DATA -> {
                     int streamId = frame.getStreamId();
                     TransportProtocol tunnelProtocol = ctx.channel().attr(AttributeKeys.TRANSPORT_PROTOCOL).get();
+                    TmspPayloadCompressor.ForwardPayload forward =
+                            TmspPayloadCompressor.decodeForForward(ctx.channel(), frame);
+                    ByteBuf decoded = forward.buf();
                     logger.debug("[传输] 收到隧道流数据 streamId={} protocol={} bytes={} channelClass={}",
                             streamId, tunnelProtocol != null ? tunnelProtocol.getName() : "unknown",
-                            frame.getPayload() != null ? frame.getPayload().readableBytes() : 0,
-                            ctx.channel().getClass().getSimpleName());
+                            decoded.readableBytes(), ctx.channel().getClass().getSimpleName());
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext != null && streamContext.getState() == StreamState.OPENED) {
-                        streamContext.forwardToRemote(frame.getPayload());
+                        streamContext.forwardToRemote(decoded, forward.sharedWithInbound());
+                    } else {
+                        forward.releaseIfOwned();
                     }
                 }
                 case TMSP.MSG_STREAM_CLOSE -> {
@@ -258,19 +265,19 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     agentContext.fireEvent(AgentEvent.SERVICE_HEALTH_REPORT);
                 }
                 case TMSP.MSG_FILE_LIST_RESP -> {
-                    Message.FileListResponse resp = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileListResponse.parser());
+                    Message.FileListResponse resp = parseCompressedFileMessage(ctx, frame, Message.FileListResponse.parser());
                     fileTransferCoordinator.onListResp(resp);
                 }
                 case TMSP.MSG_FILE_OP_RESP -> {
-                    Message.FileOpResponse resp = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileOpResponse.parser());
+                    Message.FileOpResponse resp = parseCompressedFileMessage(ctx, frame, Message.FileOpResponse.parser());
                     fileTransferCoordinator.onOpResp(resp);
                 }
                 case TMSP.MSG_FILE_TRANSFER_DONE -> {
-                    Message.FileTransferDone done = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileTransferDone.parser());
+                    Message.FileTransferDone done = parseCompressedFileMessage(ctx, frame, Message.FileTransferDone.parser());
                     fileTransferCoordinator.onTransferDone(done);
                 }
                 case TMSP.MSG_FILE_CHUNK -> {
-                    Message.FileChunk chunk = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileChunk.parser());
+                    Message.FileChunk chunk = parseCompressedFileMessage(ctx, frame, Message.FileChunk.parser());
                     fileTransferCoordinator.onChunk(chunk);
                 }
             }
@@ -345,5 +352,17 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     private ChannelType getChannelType(Channel channel) {
         ChannelType channelType = channel.attr(AttributeKeys.CHANNEL_TYPE).get();
         return channelType != null ? channelType : ChannelType.UNKNOWN;
+    }
+
+    private <T extends com.google.protobuf.Message> T parseCompressedFileMessage(ChannelHandlerContext ctx,
+                                                                                  TMSPFrame frame,
+                                                                                  com.google.protobuf.Parser<T> parser) {
+        TmspPayloadCompressor.ControlPayload payload =
+                TmspPayloadCompressor.decodeControlPayload(ctx.channel(), frame);
+        try {
+            return ProtobufUtil.parseFrom(payload.buf(), parser);
+        } finally {
+            payload.releaseIfOwned();
+        }
     }
 }

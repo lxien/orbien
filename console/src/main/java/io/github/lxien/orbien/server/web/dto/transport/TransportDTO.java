@@ -27,4 +27,6 @@ import java.io.Serializable;
 public class TransportDTO implements Serializable {
     private Boolean encrypt;
     private Integer tunnelType;
+    private Boolean compress;
+    private String compressAlgorithm;
 }

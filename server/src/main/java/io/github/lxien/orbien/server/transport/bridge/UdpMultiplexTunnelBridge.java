@@ -1,15 +1,16 @@
 package io.github.lxien.orbien.server.transport.bridge;
 
-import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.ImmediateEventExecutor;
 import io.netty.util.internal.logging.InternalLogger;
@@ -49,12 +50,19 @@ public class UdpMultiplexTunnelBridge implements TunnelBridge {
             return;
         }
         payload.retain();
-        TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_DATA, payload);
+        TMSPFrame frame = TmspPayloadCompressor.encodeStreamData(
+                tunnel, streamId, payload, streamContext.resolveCompressAlgorithm());
         tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
+            ReferenceCountUtil.release(payload);
             if (!future.isSuccess()) {
                 logger.debug("[UDP] 数据转发到内网失败 streamId={}", streamId, future.cause());
             }
         });
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
+        forwardToLocal(payload);
     }
 
     @Override

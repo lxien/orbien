@@ -18,6 +18,7 @@ package io.github.lxien.orbien.core.transport;
 
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.statemachine.context.ProcessContextImpl;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.netty.buffer.ByteBuf;
 import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     protected int streamId;
     protected TunnelEntry tunnelEntry;
     protected boolean compress;
+    protected CompressionType compressAlgorithm = CompressionType.NONE;
     protected boolean encrypt;
     protected boolean multiplex;
     protected boolean datagram;
@@ -46,21 +48,44 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     private final Queue<ByteBuf> pendingQueue = new ConcurrentLinkedQueue<>();
 
     public void forwardToRemote(ByteBuf payload) {
+        forwardToRemote(payload, true);
+    }
+
+    public void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
         if (tunnelBridge == null) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             return;
         }
-        tunnelBridge.forwardToRemote(payload);
+        tunnelBridge.forwardToRemote(payload, sharedWithInbound);
     }
 
     public void forwardToLocal(ByteBuf payload) {
+        forwardToLocal(payload, true);
+    }
+
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
         if (tunnelBridge == null) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             return;
         }
-        tunnelBridge.forwardToLocal(payload);
+        tunnelBridge.forwardToLocal(payload, sharedWithInbound);
     }
 
     public boolean isDirectConnection() {
         return !multiplex;
+    }
+
+    public CompressionType resolveCompressAlgorithm() {
+        if (!compress) {
+            return CompressionType.NONE;
+        }
+        return compressAlgorithm != null && compressAlgorithm.isCompressed()
+                ? compressAlgorithm
+                : CompressionType.SNAPPY;
     }
 
     public void enqueue(ByteBuf byteBuf) {
@@ -80,7 +105,7 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
         while ((pending = pollPending()) != null) {
             try {
                 if (pending.isReadable()) {
-                    forwardToLocal(pending);
+                    forwardToLocal(pending, true);
                 }
             } finally {
                 ReferenceCountUtil.release(pending);

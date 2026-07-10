@@ -90,6 +90,7 @@ public class TargetResolverAction extends StreamBaseAction {
                 streamManager.incrementStreamCount(config.getProxyId());
             }
             context.setCompress(config.isCompress());
+            context.setCompressAlgorithm(config.resolveCompressAlgorithm());
             boolean globalTlsEnabled = appConfig.getTransportConfig().getTlsConfig().isEnabled();
             context.setEncrypt(config.resolveEffectiveEncrypt(globalTlsEnabled));
             //传输协议

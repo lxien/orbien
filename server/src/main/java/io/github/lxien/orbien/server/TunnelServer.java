@@ -22,8 +22,6 @@ import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.compression.SnappyFrameDecoder;
-import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import io.netty.handler.ssl.OptionalSslHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.util.internal.logging.InternalLogger;
@@ -83,8 +81,6 @@ public class TunnelServer implements Lifecycle {
                                 sc.pipeline().addLast(new OptionalSslHandler(tlsContext));
                             }
                             sc.pipeline()
-                                    .addLast(NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder())
-                                    .addLast(NettyConstants.SNAPPY_DECODER, new SnappyFrameDecoder())
                                     .addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(10 * 1024 * 1024))
                                     .addLast(NettyConstants.DOWNLOAD_RATE_LIMIT_HANDLER, downloadRateLimitHandler)
                                     .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER, new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS))

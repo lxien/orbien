@@ -222,27 +222,29 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * 发送HTTP 协议首次缓存的第一个数据包
+     * 发送 HTTP 协议首次缓存的第一个数据包。
+     * <p>
+     * 使用 {@code getAndSet} 原子取走 attr，避免与 {@link StreamContext#abortLocalForwarding()} 竞态双重释放。
      */
     public void relayHttpFirstPackage(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
-        ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
+        ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
         if (cached == null || !cached.isReadable()) {
-            logger.debug("[HTTP] 无首个数据包可转发 streamId={} cachedNull={}",
-                    context.getStreamId(), cached == null);
-            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
-            if (cached != null) {
-                ReferenceCountUtil.release(cached);
-            }
+            logger.debug("[HTTP] 无首个数据包可转发 streamId={} cachedNull={} refCnt={}",
+                    context.getStreamId(), cached == null, cached != null ? cached.refCnt() : -1);
+            safeRelease(cached);
             return;
         }
-        logger.debug("[HTTP] 转发首个数据包 streamId={} bytes={} protocol={}",
+        logger.debug("[HTTP] 转发首个数据包 streamId={} bytes={} protocol={} refCnt={}",
                 context.getStreamId(), cached.readableBytes(),
-                context.getTransportProtocol() != null ? context.getTransportProtocol().getName() : "unknown");
-        try {
-            tunnelBridge.forwardToLocal(cached);
-        } finally {
-            visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).set(null);
-            ReferenceCountUtil.release(cached);
+                context.getTransportProtocol() != null ? context.getTransportProtocol().getName() : "unknown",
+                cached.refCnt());
+        // HTTP_FIRST_PACKET 在 HttpVisitorHandler 中已 retain，此处为 sole owner
+        tunnelBridge.forwardToLocal(cached, false);
+    }
+
+    private static void safeRelease(ByteBuf buf) {
+        if (buf != null && buf.refCnt() > 0) {
+            ReferenceCountUtil.release(buf);
         }
     }
 
@@ -256,10 +258,13 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 if (pending.isReadable()) {
                     logger.debug("[HTTP] 转发打开期间缓存的数据 streamId={} bytes={}",
                             context.getStreamId(), pending.readableBytes());
-                    tunnelBridge.forwardToLocal(pending);
+                    tunnelBridge.forwardToLocal(pending, false);
+                } else {
+                    safeRelease(pending);
                 }
-            } finally {
-                ReferenceCountUtil.release(pending);
+            } catch (RuntimeException ex) {
+                safeRelease(pending);
+                throw ex;
             }
         }
     }
@@ -272,14 +277,12 @@ public class StreamOpenResponseAction extends StreamBaseAction {
 
     public void relayUdpFirstPacket(StreamContext context, TunnelBridge tunnelBridge) {
         ByteBuf cached = context.getPendingFirstPacket();
-        if (cached != null && cached.refCnt() > 0) {
-            logger.debug("转发 UDP 第一个数据包 streamId={}", context.getStreamId());
-            try {
-                tunnelBridge.forwardToLocal(cached);
-            } finally {
-                context.setPendingFirstPacket(null);
-                ReferenceCountUtil.release(cached);
-            }
+        context.setPendingFirstPacket(null);
+        if (cached == null || cached.refCnt() <= 0 || !cached.isReadable()) {
+            safeRelease(cached);
+            return;
         }
+        logger.debug("转发 UDP 第一个数据包 streamId={}", context.getStreamId());
+        tunnelBridge.forwardToLocal(cached, false);
     }
 }

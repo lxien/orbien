@@ -23,6 +23,8 @@ import io.github.lxien.orbien.core.codec.NewStreamCodec;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.client.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
@@ -136,6 +138,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                 StreamContext streamContext = StreamManager.createStreamContext(frame.getStreamId(), agentContext);
                 streamContext.setVariable(StreamConstants.VISIT_INFO, visitorInfo);
                 streamContext.setCompress(frame.isCompressed());
+                streamContext.setCompressAlgorithm(CompressionType.fromFlag(frame.getFlags()));
                 streamContext.setEncrypt(frame.isEncrypted());
                 streamContext.setMultiplex(frame.isMuxTunnel());
                 streamContext.setDatagram(frame.isDatagram());
@@ -145,16 +148,25 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             }
             case TMSP.MSG_STREAM_DATA: {
                 int streamId = frame.getStreamId();
-                ByteBuf payload = frame.getPayload();
+                TmspPayloadCompressor.ForwardPayload forward =
+                        TmspPayloadCompressor.decodeForForward(ctx.channel(), frame);
+                ByteBuf decoded = forward.buf();
                 StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
-                    if (payload == null || !payload.isReadable()) {
+                    if (!decoded.isReadable()) {
+                        forward.releaseIfOwned();
                         return;
                     }
                     if (streamContext.getState() == StreamState.OPENED) {
-                        streamContext.forwardToLocal(payload);
+                        streamContext.forwardToLocal(decoded, forward.sharedWithInbound());
                     } else if (streamContext.getState() == StreamState.OPENING) {
-                        logger.debug("[传输] 流打开中，缓存远程数据 streamId={} bytes={}", streamId, payload.readableBytes());
-                        streamContext.enqueue(payload.retain());
+                        logger.debug("[传输] 流打开中，缓存远程数据 streamId={} bytes={}", streamId, decoded.readableBytes());
+                        if (forward.sharedWithInbound()) {
+                            streamContext.enqueue(decoded.retain());
+                        } else {
+                            streamContext.enqueue(decoded);
+                        }
+                    } else {
+                        forward.releaseIfOwned();
                     }
                 });
                 break;

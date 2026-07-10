@@ -17,9 +17,9 @@
 package io.github.lxien.orbien.server.web.proxy.repository.assembler;
 
 import io.github.lxien.orbien.core.domain.*;
-import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.DomainType;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.proxy.converter.ProxyModelConvert;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyDetailQueryResult;
@@ -144,7 +144,8 @@ public class ProxyConfigAssembler {
             return;
         }
         if (proxyDO.getMultiplex() == null && proxyDO.getEncrypt() == null
-                && proxyDO.getCompress() == null && proxyDO.getTransportProtocol() == null) {
+                && proxyDO.getCompress() == null && proxyDO.getTransportProtocol() == null
+                && proxyDO.getCompressAlgorithm() == null) {
             return;
         }
         config.setTransport(TransportCustomConfig.builder()
@@ -152,7 +153,15 @@ public class ProxyConfigAssembler {
                 .multiplex(proxyDO.getMultiplex())
                 .encrypt(proxyDO.getEncrypt())
                 .compress(proxyDO.getCompress())
+                .compressAlgorithm(resolveCompressAlgorithm(proxyDO))
                 .build());
+    }
+
+    private CompressionType resolveCompressAlgorithm(ProxyDO proxyDO) {
+        if (!Boolean.TRUE.equals(proxyDO.getCompress())) {
+            return CompressionType.NONE;
+        }
+        return CompressionType.of(proxyDO.getCompressAlgorithm());
     }
 
     public void assembleTargets(ProxyConfig config, List<ProxyTargetDO> targets) {

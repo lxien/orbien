@@ -33,4 +33,9 @@ public class TransportSaveParam {
     @NotNull(message = "tunnelType 不能为空")
     @EnumValue(enumClass = TunnelType.class)
     private Integer tunnelType;
+
+    @NotNull(message = "compress 不能为空")
+    private Boolean compress;
+
+    private String compressAlgorithm;
 }

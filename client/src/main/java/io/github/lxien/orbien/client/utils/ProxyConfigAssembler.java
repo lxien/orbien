@@ -188,6 +188,9 @@ public class ProxyConfigAssembler {
             if (compress != null) {
                 builder.setCompress(compress);
             }
+            if (transport.getCompressAlgorithm() != null && transport.getCompressAlgorithm().isCompressed()) {
+                builder.setCompressAlgorithm(transport.getCompressAlgorithm().toConfigValue());
+            }
             if (mux != null) {
                 builder.setMultiplex(mux);
             }

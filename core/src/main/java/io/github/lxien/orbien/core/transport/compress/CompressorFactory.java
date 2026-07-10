@@ -8,6 +8,8 @@ public class CompressorFactory {
     static {
         COMPRESSORS = new EnumMap<>(CompressionType.class);
         COMPRESSORS.put(CompressionType.SNAPPY, new SnappyCompressor());
+        COMPRESSORS.put(CompressionType.LZ4, new Lz4Compressor());
+        COMPRESSORS.put(CompressionType.ZSTD, new ZstdCompressor());
     }
 
     public static Compressor getCompressor(CompressionType type) {

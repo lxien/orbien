@@ -17,10 +17,10 @@ public interface NettyConstants {
     String HAPROXY_DECODER = "haproxyDecoder";
     String HAPROXY_ADDRESS_HANDLER = "haproxyAddressHandler";
     String DIRECT_TUNNEL_BRIDGE_HANDLER = "directTunnelBridgeBandler";
+    String DIRECT_TUNNEL_COMPRESSION_DECODER = "directTunnelCompressionDecoder";
+    String DIRECT_TUNNEL_COMPRESSION_ENCODER = "directTunnelCompressionEncoder";
     String WEBSOCKET_HANDLER = "webSocketHandler";
     String WEBSOCKET_FRAME_CODEC = "webSocketFrameCodec";
-    String SNAPPY_ENCODER = "snappyEncoder";
-    String SNAPPY_DECODER = "snappyDecoder";
     String DOWNLOAD_RATE_LIMIT_HANDLER = "downloadRateLimitHandler";
 
 }

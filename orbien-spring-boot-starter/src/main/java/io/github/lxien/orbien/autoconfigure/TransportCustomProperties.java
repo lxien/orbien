@@ -15,4 +15,5 @@ public class TransportCustomProperties {
     private boolean encrypt;
     private boolean multiplex = true;
     private boolean compress;
+    private String compressAlgorithm = "snappy";
 }

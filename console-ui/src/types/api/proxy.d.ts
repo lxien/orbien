@@ -225,6 +225,14 @@ declare namespace Api.Proxy {
         dataProtocol: number
         encrypt: boolean
         tunnelType: number
+        compress: boolean
+        compressAlgorithm?: string
+    }
+
+    interface TransportCompressConstraints {
+        compressEditable: boolean
+        algorithmEditable: boolean
+        allowedAlgorithms: string[]
     }
 
     interface TransportEncryptConstraints {
@@ -254,13 +262,18 @@ declare namespace Api.Proxy {
     interface ProxyTransportDetailDTO {
         encrypt: boolean
         tunnelType: number
+        compress: boolean
+        compressAlgorithm?: string
         dataProtocol?: number
         effectiveDataProtocol?: number
         effectiveEncrypt: boolean
+        effectiveCompress: boolean
+        effectiveCompressAlgorithm?: string
         effectiveTunnelType?: number
         encryptConstraints: TransportEncryptConstraints
         tunnelConstraints?: TransportTunnelConstraints
         protocolConstraints?: TransportProtocolConstraints
+        compressConstraints?: TransportCompressConstraints
     }
 
     /** 带宽配置参数 */

@@ -46,7 +46,8 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public Future<Void> openAsync() {
-        return DirectTunnelLifecycle.enablePassthrough(tunnel, bridgeHandler);
+        return DirectTunnelLifecycle.enablePassthrough(tunnel, bridgeHandler,
+                streamContext.resolveCompressAlgorithm());
     }
 
     @Override

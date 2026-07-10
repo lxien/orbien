@@ -149,32 +149,32 @@ public class TMSPFrame implements ReferenceCounted {
      * 获取压缩算法类型
      */
     public byte getCompressType() {
-        return (byte) (flags & TMSP.COMPRESS_MASK);
+        return (byte) (flags & TMSP.COMPRESS_ALGO_MASK);
     }
 
     /**
      * 设置压缩算法类型
      */
     public void setCompressType(byte compressType) {
-        // 先清除原来的压缩类型位
-        flags &= ~TMSP.COMPRESS_MASK;
-        // 设置新的压缩类型
+        flags &= ~TMSP.COMPRESS_ALGO_MASK;
         flags |= compressType;
-
-        // 如果设置了非 NONE，则自动打开压缩标志
-        if (compressType != TMSP.COMPRESS_NONE) {
+        if (compressType != TMSP.COMPRESS_ALGO_NONE) {
             flags |= TMSP.FLAG_COMPRESSED;
         } else {
             flags &= ~TMSP.FLAG_COMPRESSED;
         }
     }
 
+    public boolean isZstd() {
+        return getCompressType() == TMSP.COMPRESS_ALGO_ZSTD;
+    }
+
     public boolean isLz4() {
-        return getCompressType() == TMSP.COMPRESS_LZ4;
+        return getCompressType() == TMSP.COMPRESS_ALGO_LZ4;
     }
 
     public boolean isSnappy() {
-        return getCompressType() == TMSP.COMPRESS_SNAPPY;
+        return getCompressType() == TMSP.COMPRESS_ALGO_SNAPPY;
     }
 
     @Override

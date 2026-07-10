@@ -21,7 +21,10 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-classes-io_uring</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-io_uring</artifactId>
@@ -56,6 +59,10 @@
         <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.lz4</groupId>
+            <artifactId>lz4-java</artifactId>
         </dependency>
         <dependency>
             <groupId>com.lmax</groupId>

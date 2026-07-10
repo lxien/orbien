@@ -5,6 +5,7 @@ import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.Target;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
@@ -39,7 +40,7 @@ public class StreamOpenAction extends StreamBaseAction {
         TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN, payload);
 
         frame.setMultiplexTunnel(config.isMuxTunnel() || config.isUdp());
-        frame.setCompressed(context.isCompress());
+        TmspPayloadCompressor.applyStreamFlags(frame, context.resolveCompressAlgorithm());
         frame.setEncrypted(context.isEncrypt());
         frame.setDatagram(config.isUdp());
 

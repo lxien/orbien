@@ -429,13 +429,18 @@ public class TomlConfigLoader implements ConfigSource {
                                 TransportProtocol.fromName(transportProtocol.trim(), TransportProtocol.TCP));
                     }
                     Boolean multiplex = transport.getBoolean("multiplex");
-                    Boolean compress = transport.getBoolean("compress", true);
+                    Boolean compress = transport.getBoolean("compress", false);
                     Boolean encrypt = transport.getBoolean("encrypt", true);
+                    String compressAlgorithm = transport.getString("compress_algorithm");
                     if (multiplex != null) {
                         transportCustomConfig.setMultiplex(multiplex);
                     }
                     transportCustomConfig.setCompress(compress);
                     transportCustomConfig.setEncrypt(encrypt);
+                    if (StringUtils.hasText(compressAlgorithm)) {
+                        transportCustomConfig.setCompressAlgorithm(
+                                io.github.lxien.orbien.core.transport.compress.CompressionType.of(compressAlgorithm));
+                    }
                 }
                 if (protocolType.isUdp()) {
                     transportCustomConfig.setMultiplex(true);

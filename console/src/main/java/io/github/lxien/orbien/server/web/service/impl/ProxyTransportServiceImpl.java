@@ -16,6 +16,7 @@ import io.github.lxien.orbien.server.web.param.transport.TransportSaveParam;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyRuntimeSyncService;
 import io.github.lxien.orbien.server.web.repository.ProxyRepository;
 import io.github.lxien.orbien.server.web.service.ProxyTransportService;
+import io.github.lxien.orbien.server.web.service.support.TransportCompressConstraintSupport;
 import io.github.lxien.orbien.server.web.service.support.TransportEncryptConstraintSupport;
 import io.github.lxien.orbien.server.web.service.support.TransportProtocolConstraintSupport;
 import io.github.lxien.orbien.server.web.service.support.TransportTunnelConstraintSupport;
@@ -53,10 +54,14 @@ public class ProxyTransportServiceImpl implements ProxyTransportService {
         TransportProtocolConstraintSupport.validateAvailable(appConfig, dataProtocol);
         validateEncrypt(dataProtocol, globalTlsEnabled, param.getEncrypt());
         validateTunnelType(proxyDO.getProtocol(), dataProtocol, param.getTunnelType());
+        TransportCompressConstraintSupport.validate(param.getCompress(), param.getCompressAlgorithm());
 
         proxyDO.setTransportProtocol(dataProtocol);
         proxyDO.setEncrypt(param.getEncrypt());
         proxyDO.setMultiplex(TransportEncryptConstraintSupport.toMultiplex(param.getTunnelType()));
+        proxyDO.setCompress(param.getCompress());
+        proxyDO.setCompressAlgorithm(
+                TransportCompressConstraintSupport.toStorageValue(param.getCompress(), param.getCompressAlgorithm()));
         proxyRepository.save(proxyDO);
 
         transactionHelper.afterCommit(() -> proxyRuntimeSyncService.syncProxy(proxyId));
@@ -79,6 +84,12 @@ public class ProxyTransportServiceImpl implements ProxyTransportService {
                 proxyDO.getProtocol(), effectiveProtocol, storedMultiplex);
         TransportProtocolConstraints protocolConstraints = TransportProtocolConstraintSupport.build(appConfig);
 
+        Boolean storedCompress = proxyDO.getCompress();
+        String storedAlgorithm = proxyDO.getCompressAlgorithm();
+        boolean effectiveCompress = Boolean.TRUE.equals(storedCompress);
+        String effectiveAlgorithm = TransportCompressConstraintSupport.resolveEffectiveAlgorithm(
+                storedCompress, storedAlgorithm);
+
         ProxyTransportDetailDTO dto = new ProxyTransportDetailDTO();
         dto.setDataProtocol(effectiveProtocol.getCode());
         dto.setEffectiveDataProtocol(effectiveProtocol.getCode());
@@ -89,6 +100,12 @@ public class ProxyTransportServiceImpl implements ProxyTransportService {
         dto.setEffectiveTunnelType(effectiveTunnelType);
         dto.setTunnelConstraints(tunnelConstraints);
         dto.setProtocolConstraints(protocolConstraints);
+        dto.setCompress(storedCompress != null ? storedCompress : false);
+        dto.setEffectiveCompress(effectiveCompress);
+        dto.setCompressAlgorithm(TransportCompressConstraintSupport.resolveStoredAlgorithm(
+                storedCompress, storedAlgorithm));
+        dto.setEffectiveCompressAlgorithm(effectiveAlgorithm);
+        dto.setCompressConstraints(TransportCompressConstraintSupport.build());
         return dto;
     }
 

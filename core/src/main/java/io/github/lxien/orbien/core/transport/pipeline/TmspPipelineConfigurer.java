@@ -10,8 +10,6 @@ import io.github.lxien.orbien.core.transport.api.PipelineRole;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.compression.SnappyFrameDecoder;
-import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
@@ -130,8 +128,6 @@ public final class TmspPipelineConfigurer {
     }
 
     private static void addTmspStack(ChannelPipeline pipeline) {
-        pipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
-        pipeline.addLast(NettyConstants.SNAPPY_DECODER, new SnappyFrameDecoder());
         pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
     }
 

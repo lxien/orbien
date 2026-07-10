@@ -76,7 +76,7 @@ public class StreamCloseAction extends StreamBaseAction {
         }
         visitor.attr(AttributeKeys.PENDING_READ).set(null);
         ByteBuf httpFirst = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
-        if (httpFirst != null) {
+        if (httpFirst != null && httpFirst.refCnt() > 0) {
             ReferenceCountUtil.release(httpFirst);
         }
         ByteBuf pending;

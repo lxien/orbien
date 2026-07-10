@@ -12,6 +12,7 @@ import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.client.transport.bridge.TunnelBridgeFactory;
 import io.github.lxien.orbien.client.transport.TransportProtocolResolver;
 import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
@@ -104,7 +105,7 @@ public class StreamOpenAction extends StreamBaseAction {
                             .build();
                     ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
                     TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
-                    frame.setCompressed(streamContext.isCompress());
+                    TmspPayloadCompressor.applyStreamFlags(frame, streamContext.resolveCompressAlgorithm());
                     frame.setEncrypted(streamContext.isEncrypt());
                     frame.setMultiplexTunnel(streamContext.isMultiplex());
                     control.writeAndFlush(frame).addListener(f -> {
@@ -231,7 +232,7 @@ public class StreamOpenAction extends StreamBaseAction {
                     .build();
             ByteBuf payload = ProtobufUtil.toByteBuf(response, control.alloc());
             TMSPFrame frame = new TMSPFrame(streamId, TMSP.MSG_STREAM_OPEN_RESP, payload);
-            frame.setCompressed(streamContext.isCompress());
+            TmspPayloadCompressor.applyStreamFlags(frame, streamContext.resolveCompressAlgorithm());
             frame.setEncrypted(streamContext.isEncrypt());
             frame.setMultiplexTunnel(true);
             frame.setDatagram(true);

@@ -1,13 +1,12 @@
 package io.github.lxien.orbien.core.transport.direct;
 
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.core.codec.TMSPCodec;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
-import io.netty.handler.codec.compression.SnappyFrameDecoder;
-import io.netty.handler.codec.compression.SnappyFrameEncoder;
 import io.netty.util.concurrent.Future;
 
 import java.util.function.Consumer;
@@ -26,18 +25,27 @@ public final class DirectTunnelLifecycle {
 
     /**
      * 切换为原始字节透传模式，并挂载 bridge handler。
+     * 若代理开启压缩，在透传栈上增加分块压缩编解码器。
      */
-    public static Future<Void> enablePassthrough(Channel tunnel, ChannelHandler bridgeHandler) {
+    public static Future<Void> enablePassthrough(Channel tunnel, ChannelHandler bridgeHandler,
+                                                 CompressionType compressAlgorithm) {
+        CompressionType algorithm = compressAlgorithm != null ? compressAlgorithm : CompressionType.NONE;
         return toVoidFuture(runOnLoop(tunnel, () -> {
             ChannelPipeline pipeline = tunnel.pipeline();
             removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_ENCODER);
             removeIfPresent(pipeline, NettyConstants.TMSP_CODEC);
             removeIfPresent(pipeline, NettyConstants.CONTROL_FRAME_HANDLER);
             removeIfPresent(pipeline, NettyConstants.CONTROL_IDLE_CHECK_HANDLER);
             removeIfPresent(pipeline, NettyConstants.IDLE_CHECK_HANDLER);
-            removeIfPresent(pipeline, NettyConstants.SNAPPY_ENCODER);
-            removeIfPresent(pipeline, NettyConstants.SNAPPY_DECODER);
             removeIfPresent(pipeline, NettyConstants.DOWNLOAD_RATE_LIMIT_HANDLER);
+            if (algorithm.isCompressed()) {
+                pipeline.addLast(NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER,
+                        new DirectTunnelCompressionDecoder(algorithm));
+                pipeline.addLast(NettyConstants.DIRECT_TUNNEL_COMPRESSION_ENCODER,
+                        new DirectTunnelCompressionEncoder(algorithm));
+            }
             pipeline.addLast(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER, bridgeHandler);
             tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.TRUE);
         }));
@@ -51,7 +59,7 @@ public final class DirectTunnelLifecycle {
     public static Future<Void> restoreControlStack(Channel tunnel, Consumer<ChannelPipeline> tailConfigurer) {
         return toVoidFuture(runOnLoop(tunnel, () -> {
             tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
-            if (tunnel == null || !tunnel.isOpen()) {
+            if (!tunnel.isOpen()) {
                 return;
             }
             ChannelPipeline pipeline = tunnel.pipeline();
@@ -59,18 +67,12 @@ public final class DirectTunnelLifecycle {
                 return;
             }
             removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_ENCODER);
             if (pipeline.get(NettyConstants.TMSP_CODEC) != null) {
                 return;
             }
-            String anchor = findControlStackAnchor(pipeline);
-            if (anchor != null) {
-                pipeline.addAfter(anchor, NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
-            } else {
-                pipeline.addLast(NettyConstants.SNAPPY_ENCODER, new SnappyFrameEncoder());
-            }
-            pipeline.addAfter(NettyConstants.SNAPPY_ENCODER, NettyConstants.SNAPPY_DECODER, new SnappyFrameDecoder());
-            pipeline.addAfter(NettyConstants.SNAPPY_DECODER, NettyConstants.TMSP_CODEC,
-                    TMSPCodec.create(DEFAULT_MAX_FRAME));
+            pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
             if (tailConfigurer != null) {
                 tailConfigurer.accept(pipeline);
             }

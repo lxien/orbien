@@ -1,11 +1,15 @@
 package io.github.lxien.orbien.server.filetransfer;
 
 import io.github.lxien.orbien.core.domain.FileShareLimitsConfig;
+import io.github.lxien.orbien.core.filetransfer.FileTransferCompressionSupport;
 import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.server.statemachine.agent.AgentManager;
 import io.github.lxien.orbien.server.statemachine.agent.AgentState;
@@ -30,8 +34,12 @@ public class FileTransferCoordinator {
     @Autowired
     private AgentManager agentManager;
 
+    @Autowired
+    private ProxyConfigService proxyConfigService;
+
     private final Map<String, PendingRequest<?>> pending = new ConcurrentHashMap<>();
     private final Map<String, ChunkListener> chunkListeners = new ConcurrentHashMap<>();
+    private final Map<String, String> transferProxyIds = new ConcurrentHashMap<>();
 
     public Message.FileListResponse list(String agentId, String proxyId, String path) throws Exception {
         String requestId = newRequestId();
@@ -41,7 +49,7 @@ public class FileTransferCoordinator {
                 .setPath(path == null ? "/" : path)
                 .build();
         CompletableFuture<Message.FileListResponse> future = register(requestId);
-        send(agentId, TMSP.MSG_FILE_LIST_REQ, req, future);
+        send(agentId, TMSP.MSG_FILE_LIST_REQ, req, proxyId, future);
         return future.get(FileTransferConstants.REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
@@ -56,7 +64,8 @@ public class FileTransferCoordinator {
                 .setTotalSize(totalSize)
                 .setUpload(true)
                 .build();
-        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, init, future);
+        transferProxyIds.put(requestId, proxyId);
+        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, init, proxyId, future);
         return new UploadSession(requestId, future, totalSize);
     }
 
@@ -67,7 +76,8 @@ public class FileTransferCoordinator {
                 .setData(com.google.protobuf.ByteString.copyFrom(data))
                 .setLast(last)
                 .build();
-        sendAndAwait(agentId, TMSP.MSG_FILE_CHUNK, chunk, FileTransferConstants.CHUNK_SEND_TIMEOUT_MS);
+        sendAndAwait(agentId, TMSP.MSG_FILE_CHUNK, chunk,
+                transferProxyIds.get(requestId), FileTransferConstants.CHUNK_SEND_TIMEOUT_MS);
     }
 
     public void awaitUpload(UploadSession session) throws Exception {
@@ -88,13 +98,15 @@ public class FileTransferCoordinator {
                 .setPath(path)
                 .setUpload(false)
                 .build();
+        transferProxyIds.put(requestId, proxyId);
         CompletableFuture<Message.FileTransferDone> future = register(requestId,
                 FileTransferConstants.transferTimeoutMs(FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE));
-        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, init, future);
+        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, init, proxyId, future);
         Message.FileTransferDone done = future.get(
                 FileTransferConstants.transferTimeoutMs(FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE),
                 TimeUnit.MILLISECONDS);
         removeChunkListener(requestId);
+        transferProxyIds.remove(requestId);
         if (done.getStatus().getCode() != 0) {
             throw new IllegalStateException(done.getStatus().getMessage());
         }
@@ -118,7 +130,7 @@ public class FileTransferCoordinator {
                 .setName(name == null ? "" : name)
                 .build();
         CompletableFuture<Message.FileOpResponse> future = register(requestId);
-        send(agentId, TMSP.MSG_FILE_OP_REQ, req, future);
+        send(agentId, TMSP.MSG_FILE_OP_REQ, req, proxyId, future);
         return future.get(FileTransferConstants.REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
@@ -133,6 +145,7 @@ public class FileTransferCoordinator {
     }
 
     public void onTransferDone(Message.FileTransferDone done) {
+        transferProxyIds.remove(done.getRequestId());
         complete(done.getRequestId(), done);
     }
 
@@ -158,7 +171,8 @@ public class FileTransferCoordinator {
     public record UploadSession(String requestId, CompletableFuture<Message.FileTransferDone> future, long totalSize) {
     }
 
-    private void sendAndAwait(String agentId, byte type, com.google.protobuf.MessageLite message, long timeoutMs) throws Exception {
+    private void sendAndAwait(String agentId, byte type, com.google.protobuf.MessageLite message,
+                              String proxyId, long timeoutMs) throws Exception {
         Optional<AgentContext> contextOpt = agentManager.getAgentContext(agentId);
         if (contextOpt.isEmpty()) {
             throw new IllegalStateException("客户端 Agent 不在线: " + agentId);
@@ -173,8 +187,8 @@ public class FileTransferCoordinator {
         }
         CompletableFuture<Void> writeFuture = new CompletableFuture<>();
         control.eventLoop().execute(() -> {
-            ByteBuf buf = ProtobufUtil.toByteBuf(message, control.alloc());
-            control.writeAndFlush(new TMSPFrame(0, type, buf))
+            TMSPFrame frame = buildFrame(control, type, message, proxyId);
+            control.writeAndFlush(frame)
                     .addListener(future -> {
                         if (future.isSuccess()) {
                             logger.debug("已发送文件传输消息 agentId={} msgType={}", agentId, type);
@@ -188,12 +202,12 @@ public class FileTransferCoordinator {
         writeFuture.get(timeoutMs, TimeUnit.MILLISECONDS);
     }
 
-    private void send(String agentId, byte type, com.google.protobuf.MessageLite message) {
-        send(agentId, type, message, null);
+    private void send(String agentId, byte type, com.google.protobuf.MessageLite message, String proxyId) {
+        send(agentId, type, message, proxyId, null);
     }
 
     private void send(String agentId, byte type, com.google.protobuf.MessageLite message,
-                      CompletableFuture<?> pendingFuture) {
+                      String proxyId, CompletableFuture<?> pendingFuture) {
         Optional<AgentContext> contextOpt = agentManager.getAgentContext(agentId);
         if (contextOpt.isEmpty()) {
             failPending(pendingFuture, "客户端 Agent 不在线: " + agentId);
@@ -210,8 +224,8 @@ public class FileTransferCoordinator {
             return;
         }
         control.eventLoop().execute(() -> {
-            ByteBuf buf = ProtobufUtil.toByteBuf(message, control.alloc());
-            control.writeAndFlush(new TMSPFrame(0, type, buf))
+            TMSPFrame frame = buildFrame(control, type, message, proxyId);
+            control.writeAndFlush(frame)
                     .addListener(future -> {
                         if (!future.isSuccess()) {
                             logger.warn("文件传输消息发送失败 agentId={} msgType={}", agentId, type, future.cause());
@@ -221,6 +235,24 @@ public class FileTransferCoordinator {
                         }
                     });
         });
+    }
+
+    private TMSPFrame buildFrame(Channel control, byte type, com.google.protobuf.MessageLite message, String proxyId) {
+        ByteBuf buf = ProtobufUtil.toByteBuf(message, control.alloc());
+        TMSPFrame frame = new TMSPFrame(0, type, buf);
+        TmspPayloadCompressor.encodeControlPayload(control, frame, resolveAlgorithm(proxyId));
+        return frame;
+    }
+
+    private CompressionType resolveAlgorithm(String proxyId) {
+        if (proxyId == null || proxyId.isBlank()) {
+            return CompressionType.NONE;
+        }
+        var ext = proxyConfigService.findById(proxyId);
+        if (ext == null || ext.getProxyConfig() == null) {
+            return CompressionType.NONE;
+        }
+        return FileTransferCompressionSupport.resolveFromProxy(ext.getProxyConfig());
     }
 
     private void failPending(CompletableFuture<?> future, String message) {

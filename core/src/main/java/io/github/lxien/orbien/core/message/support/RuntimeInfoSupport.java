@@ -11,6 +11,7 @@ import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.transport.api.TransportEndpointResolver;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,10 +39,37 @@ public final class RuntimeInfoSupport {
         if (transport.getCompress() != null) {
             builder.setCompress(transport.getCompress());
         }
+        if (transport.getCompressAlgorithm() != null && transport.getCompressAlgorithm().isCompressed()) {
+            builder.setCompressAlgorithm(transport.getCompressAlgorithm().toConfigValue());
+        }
         if (transport.getProtocol() != null) {
             builder.setProtocol(transport.getProtocol().getName());
         }
         return builder.build();
+    }
+
+    public static TransportCustomConfig fromTransportProto(Message.Transport transport) {
+        if (transport == null) {
+            return null;
+        }
+        TransportCustomConfig config = new TransportCustomConfig();
+        if (transport.hasMultiplex()) {
+            config.setMultiplex(transport.getMultiplex());
+        }
+        if (transport.hasEncrypt()) {
+            config.setEncrypt(transport.getEncrypt());
+        }
+        if (transport.hasCompress()) {
+            config.setCompress(transport.getCompress());
+        }
+        if (transport.hasCompressAlgorithm()) {
+            config.setCompressAlgorithm(CompressionType.of(transport.getCompressAlgorithm()));
+        }
+        if (transport.hasProtocol()) {
+            TransportProtocol protocol = TransportProtocol.fromName(transport.getProtocol());
+            config.setProtocol(protocol);
+        }
+        return config;
     }
 
     public static Message.Transport toTransportProto(Message.Proxy proxy) {

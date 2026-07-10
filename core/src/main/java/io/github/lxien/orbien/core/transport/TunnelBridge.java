@@ -29,4 +29,12 @@ public interface TunnelBridge {
     void forwardToLocal(ByteBuf payload);
 
     void forwardToRemote(ByteBuf payload);
+
+    default void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
+        forwardToLocal(payload);
+    }
+
+    default void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
+        forwardToRemote(payload);
+    }
 }

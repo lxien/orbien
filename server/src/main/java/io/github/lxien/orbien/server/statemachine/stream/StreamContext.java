@@ -132,7 +132,7 @@ public class StreamContext extends AbstractStreamContext {
         }
         if (v != null) {
             ByteBuf httpFirst = v.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
-            if (httpFirst != null) {
+            if (httpFirst != null && httpFirst.refCnt() > 0) {
                 ReferenceCountUtil.release(httpFirst);
             }
         }

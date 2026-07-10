@@ -2,10 +2,13 @@ package io.github.lxien.orbien.client.filetransfer;
 
 import io.github.lxien.orbien.client.manager.ProxyManager;
 import io.github.lxien.orbien.client.manager.ProxyManagerHolder;
+import io.github.lxien.orbien.core.filetransfer.FileTransferCompressionSupport;
 import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
+import io.github.lxien.orbien.core.transport.compress.CompressionType;
+import io.github.lxien.orbien.core.transport.compress.TmspPayloadCompressor;
 import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -29,7 +32,7 @@ public class FileTransferControlHandler {
                 case TMSP.MSG_FILE_LIST_REQ -> handleList(control, frame);
                 case TMSP.MSG_FILE_TRANSFER_INIT -> handleTransferInit(control, frame);
                 case TMSP.MSG_FILE_CHUNK -> handleChunk(control, frame);
-                case TMSP.MSG_FILE_TRANSFER_DONE -> handleTransferDone(frame);
+                case TMSP.MSG_FILE_TRANSFER_DONE -> handleTransferDone(control, frame);
                 case TMSP.MSG_FILE_OP_REQ -> handleOp(control, frame);
                 default -> logger.warn("未知文件消息: {}", frame.getMsgType());
             }
@@ -42,40 +45,47 @@ public class FileTransferControlHandler {
         }
     }
 
-    private <T extends com.google.protobuf.Message> T parseFrame(TMSPFrame frame, com.google.protobuf.Parser<T> parser) {
-        return ProtobufUtil.parseFrom(frame.getPayload(), parser);
+    private <T extends com.google.protobuf.Message> T parseFrame(Channel control, TMSPFrame frame,
+                                                                 com.google.protobuf.Parser<T> parser) {
+        TmspPayloadCompressor.ControlPayload payload =
+                TmspPayloadCompressor.decodeControlPayload(control, frame);
+        try {
+            return ProtobufUtil.parseFrom(payload.buf(), parser);
+        } finally {
+            payload.releaseIfOwned();
+        }
     }
 
     private void handleList(Channel control, TMSPFrame frame) throws Exception {
-        Message.FileListRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileListRequest.parser());
+        Message.FileListRequest req = parseFrame(control, frame, Message.FileListRequest.parser());
         logger.debug("收到文件列表请求 proxyId={} path={}", req.getProxyId(), req.getPath());
         PathContext ctx = resolve(req.getProxyId());
         Message.FileListResponse resp = fileSystemService.list(ctx.root(), req.getPath());
-        send(control, TMSP.MSG_FILE_LIST_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build());
+        send(control, TMSP.MSG_FILE_LIST_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build(), req.getProxyId());
     }
 
     private void handleTransferInit(Channel control, TMSPFrame frame) throws Exception {
-        Message.FileTransferInit req = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileTransferInit.parser());
+        Message.FileTransferInit req = parseFrame(control, frame, Message.FileTransferInit.parser());
         PathContext ctx = resolve(req.getProxyId());
         if (req.getUpload()) {
             FilePermissionChecker.assertWritable(ctx.limits());
             long max = FilePermissionChecker.maxUploadSize(ctx.limits());
             if (req.getTotalSize() > max) {
-                failDone(control, req.getRequestId(), "文件超过大小限制");
+                failDone(control, req.getRequestId(), req.getProxyId(), "文件超过大小限制");
                 return;
             }
             sessionManager.startUpload(req.getRequestId(), req.getProxyId(), req.getPath());
         } else {
             InputStream in = fileSystemService.openDownload(ctx.root(), req.getPath());
-            sendChunks(control, req.getRequestId(), in);
+            sendChunks(control, req.getRequestId(), req.getProxyId(), in);
         }
     }
 
     private void handleChunk(Channel control, TMSPFrame frame) throws Exception {
-        Message.FileChunk chunk = parseFrame(frame, Message.FileChunk.parser());
+        Message.FileChunk chunk = parseFrame(control, frame, Message.FileChunk.parser());
         FileTransferSessionManager.UploadSession session = sessionManager.upload(chunk.getRequestId());
         if (session == null) {
-            failDone(control, chunk.getRequestId(), "上传会话不存在");
+            failDone(control, chunk.getRequestId(), null, "上传会话不存在");
             return;
         }
         PathContext ctx = resolve(session.getProxyId());
@@ -88,17 +98,17 @@ public class FileTransferControlHandler {
         }
         if (chunk.getLast()) {
             sessionManager.finishUpload(chunk.getRequestId());
-            sendDone(control, chunk.getRequestId());
+            sendDone(control, chunk.getRequestId(), session.getProxyId());
         }
     }
 
-    private void handleTransferDone(TMSPFrame frame) {
-        Message.FileTransferDone done = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileTransferDone.parser());
+    private void handleTransferDone(Channel control, TMSPFrame frame) {
+        Message.FileTransferDone done = parseFrame(control, frame, Message.FileTransferDone.parser());
         sessionManager.finishUpload(done.getRequestId());
     }
 
     private void handleOp(Channel control, TMSPFrame frame) throws Exception {
-        Message.FileOpRequest req = ProtobufUtil.parseFrom(frame.getPayload(), Message.FileOpRequest.parser());
+        Message.FileOpRequest req = parseFrame(control, frame, Message.FileOpRequest.parser());
         PathContext ctx = resolve(req.getProxyId());
         Message.FileOpResponse resp;
         if (FileTransferConstants.OP_MKDIR.equals(req.getOp())) {
@@ -110,10 +120,10 @@ public class FileTransferControlHandler {
                     .setStatus(status(1, "不支持的操作"))
                     .build();
         }
-        send(control, TMSP.MSG_FILE_OP_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build());
+        send(control, TMSP.MSG_FILE_OP_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build(), req.getProxyId());
     }
 
-    private void sendChunks(Channel control, String requestId, InputStream in) throws Exception {
+    private void sendChunks(Channel control, String requestId, String proxyId, InputStream in) throws Exception {
         byte[] buffer = new byte[FileTransferConstants.CHUNK_SIZE];
         long offset = 0;
         try (PushbackInputStream pin = new PushbackInputStream(in, 1)) {
@@ -134,11 +144,11 @@ public class FileTransferControlHandler {
                         .setData(com.google.protobuf.ByteString.copyFrom(buffer, 0, read))
                         .setLast(last)
                         .build();
-                send(control, TMSP.MSG_FILE_CHUNK, chunk);
+                send(control, TMSP.MSG_FILE_CHUNK, chunk, proxyId);
                 offset += read;
             }
         }
-        sendDone(control, requestId);
+        sendDone(control, requestId, proxyId);
     }
 
     private PathContext resolve(String proxyId) {
@@ -153,21 +163,22 @@ public class FileTransferControlHandler {
         byte type = frame.getMsgType();
         try {
             if (type == TMSP.MSG_FILE_LIST_REQ) {
-                Message.FileListRequest req = parseFrame(frame, Message.FileListRequest.parser());
+                Message.FileListRequest req = parseFrame(control, frame, Message.FileListRequest.parser());
                 Message.FileListResponse resp = Message.FileListResponse.newBuilder()
                         .setRequestId(req.getRequestId())
                         .setStatus(status(1, message))
                         .build();
-                send(control, TMSP.MSG_FILE_LIST_RESP, resp);
+                send(control, TMSP.MSG_FILE_LIST_RESP, resp, req.getProxyId());
             } else if (type == TMSP.MSG_FILE_TRANSFER_INIT) {
-                Message.FileTransferInit req = parseFrame(frame, Message.FileTransferInit.parser());
+                Message.FileTransferInit req = parseFrame(control, frame, Message.FileTransferInit.parser());
                 if (req.getUpload()) {
                     sessionManager.finishUpload(req.getRequestId());
                 }
-                failDone(control, req.getRequestId(), message);
+                failDone(control, req.getRequestId(), req.getProxyId(), message);
             } else if (type == TMSP.MSG_FILE_CHUNK) {
-                Message.FileChunk chunk = parseFrame(frame, Message.FileChunk.parser());
+                Message.FileChunk chunk = parseFrame(control, frame, Message.FileChunk.parser());
                 FileTransferSessionManager.UploadSession session = sessionManager.upload(chunk.getRequestId());
+                String proxyId = session != null ? session.getProxyId() : null;
                 if (session != null) {
                     try {
                         PathContext ctx = resolve(session.getProxyId());
@@ -178,14 +189,14 @@ public class FileTransferControlHandler {
                 } else {
                     sessionManager.finishUpload(chunk.getRequestId());
                 }
-                failDone(control, chunk.getRequestId(), message);
+                failDone(control, chunk.getRequestId(), proxyId, message);
             } else if (type == TMSP.MSG_FILE_OP_REQ) {
-                Message.FileOpRequest req = parseFrame(frame, Message.FileOpRequest.parser());
+                Message.FileOpRequest req = parseFrame(control, frame, Message.FileOpRequest.parser());
                 Message.FileOpResponse resp = Message.FileOpResponse.newBuilder()
                         .setRequestId(req.getRequestId())
                         .setStatus(status(1, message))
                         .build();
-                send(control, TMSP.MSG_FILE_OP_RESP, resp);
+                send(control, TMSP.MSG_FILE_OP_RESP, resp, req.getProxyId());
             } else {
                 logger.warn("无法回复文件错误响应 msgType={} message={}", type, message);
             }
@@ -199,25 +210,32 @@ public class FileTransferControlHandler {
         fileSystemService.cleanupPartialUpload(root, session.getPath());
     }
 
-    private void send(Channel control, byte type, com.google.protobuf.MessageLite message) {
+    private void send(Channel control, byte type, com.google.protobuf.MessageLite message, String proxyId) {
         control.eventLoop().execute(() -> {
             ByteBuf buf = ProtobufUtil.toByteBuf(message, control.alloc());
-            control.writeAndFlush(new TMSPFrame(0, type, buf));
+            TMSPFrame frame = new TMSPFrame(0, type, buf);
+            TmspPayloadCompressor.encodeControlPayload(control, frame, resolveAlgorithm(proxyId));
+            control.writeAndFlush(frame);
         });
     }
 
-    private void sendDone(Channel control, String requestId) {
+    private CompressionType resolveAlgorithm(String proxyId) {
+        Message.RuntimeInfo info = proxyId != null ? proxyManager.get(proxyId) : null;
+        return FileTransferCompressionSupport.resolveFromRuntime(info);
+    }
+
+    private void sendDone(Channel control, String requestId, String proxyId) {
         send(control, TMSP.MSG_FILE_TRANSFER_DONE, Message.FileTransferDone.newBuilder()
                 .setRequestId(requestId)
                 .setStatus(status(0, "ok"))
-                .build());
+                .build(), proxyId);
     }
 
-    private void failDone(Channel control, String requestId, String message) {
+    private void failDone(Channel control, String requestId, String proxyId, String message) {
         send(control, TMSP.MSG_FILE_TRANSFER_DONE, Message.FileTransferDone.newBuilder()
                 .setRequestId(requestId)
                 .setStatus(status(1, message))
-                .build());
+                .build(), proxyId);
     }
 
     private Message.Status status(int code, String message) {

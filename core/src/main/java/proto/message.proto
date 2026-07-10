@@ -204,6 +204,7 @@ message Transport {
   optional bool encrypt = 2;
   optional bool compress = 3;
   optional string protocol = 4;
+  optional string compress_algorithm = 5;
 }
 message HealthCheck{
   HealthCheckType type = 1;

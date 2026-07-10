@@ -46,6 +46,11 @@ public class MetricsTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        forwardToLocal(payload, true);
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
         int bytes = payload.readableBytes();
         if (bytes > 0) {
             logger.debug("流量统计: proxyId-{} 向本地转发 {} 字节数据", proxyId, bytes);
@@ -54,11 +59,16 @@ public class MetricsTunnelBridge implements TunnelBridge {
                 collector.incReadMessages(1);
             });
         }
-        delegate.forwardToLocal(payload);
+        delegate.forwardToLocal(payload, sharedWithInbound);
     }
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
+        forwardToRemote(payload, true);
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
         int bytes = payload.readableBytes();
         if (bytes > 0) {
             logger.debug("流量统计: proxyId-{} 向远程转发 {} 字节数据", proxyId, bytes);
@@ -67,6 +77,6 @@ public class MetricsTunnelBridge implements TunnelBridge {
                 metrics.incWriteMessages(1);
             });
         }
-        delegate.forwardToRemote(payload);
+        delegate.forwardToRemote(payload, sharedWithInbound);
     }
 }
