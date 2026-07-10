@@ -37,10 +37,10 @@
 
 <div id="appView" class="hidden">
     <div class="header">
-        <div class="header-brand">
+        <button id="btnHome" class="header-brand" type="button" title="返回首页">
             <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
             <strong id="shareTitle">文件共享</strong>
-        </div>
+        </button>
         <div class="user-info">
             <button id="btnTheme" class="icon-btn" type="button" title="切换主题">黑夜</button>
             <span id="currentUser"></span>
@@ -48,33 +48,71 @@
             <button id="btnLogout" class="hidden">退出</button>
         </div>
     </div>
-    <div class="main">
+    <div id="mainPanel" class="main">
         <div id="readonlyTip" class="readonly-tip hidden">当前为只读权限，无法上传、新建或删除文件</div>
-        <div class="breadcrumb" id="breadcrumb"></div>
-        <div id="summary" class="summary"></div>
+        <div class="path-nav">
+            <button id="btnBack" class="nav-back-btn hidden" type="button" title="返回上一级">
+                <span class="nav-back-icon" aria-hidden="true">←</span>
+                <span>上一级</span>
+            </button>
+            <div class="path-nav-main">
+                <nav id="breadcrumb" class="breadcrumb" aria-label="文件路径"></nav>
+                <div id="summary" class="file-summary"></div>
+            </div>
+        </div>
         <div class="toolbar">
-            <button class="primary" id="btnUpload">上传</button>
-            <button id="btnDownload">下载</button>
-            <button id="btnMkdir">新建文件夹</button>
-            <button id="btnDelete">删除</button>
+            <div class="toolbar-actions">
+                <button class="primary" id="btnUpload">上传</button>
+                <button id="btnDownload">下载</button>
+                <button id="btnMkdir">新建文件夹</button>
+                <button id="btnDelete">删除</button>
+            </div>
+            <div class="view-switcher" role="group" aria-label="切换视图">
+                <button type="button" class="view-btn active" data-view="list" title="列表视图" aria-label="列表视图"
+                        aria-pressed="true">
+                    <span class="view-btn-icon icon-list" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="view-btn" data-view="icon" title="图标视图" aria-label="图标视图"
+                        aria-pressed="false">
+                    <span class="view-btn-icon icon-grid" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="view-btn" data-view="column" title="分栏视图" aria-label="分栏视图"
+                        aria-pressed="false">
+                    <span class="view-btn-icon icon-column" aria-hidden="true"></span>
+                </button>
+            </div>
         </div>
         <input type="file" id="fileInput" multiple class="hidden"/>
-        <table>
-            <thead>
-            <tr>
-                <th><input type="checkbox" id="selectAll"/></th>
-                <th>名称</th>
-                <th>修改时间</th>
-                <th>类型</th>
-                <th>大小</th>
-            </tr>
-            </thead>
-            <tbody id="fileList"></tbody>
-        </table>
-        <div id="emptyState" class="empty hidden">
-            <p>点击 <a href="#" id="emptyUploadLink">上传</a> 添加本地文件 或点击 <a href="#"
-                                                                                     id="emptyMkdirLink">新建文件夹</a>
-            </p>
+        <div id="fileListWrap" class="file-browser" data-view-mode="list">
+            <div id="viewList" class="view-panel view-list">
+                <table>
+                    <thead>
+                    <tr>
+                        <th class="col-check"><input type="checkbox" id="selectAll"/></th>
+                        <th>名称</th>
+                        <th class="col-time">修改时间</th>
+                        <th class="col-type">类型</th>
+                        <th class="col-size">大小</th>
+                    </tr>
+                    </thead>
+                    <tbody id="fileList"></tbody>
+                </table>
+            </div>
+            <div id="viewIcon" class="view-panel view-icon hidden">
+                <div id="iconGrid" class="icon-grid"></div>
+            </div>
+            <div id="viewColumn" class="view-panel view-column hidden">
+                <div id="columnBrowser" class="column-browser"></div>
+            </div>
+            <div id="emptyState" class="empty hidden">
+                <div class="empty-inner">
+                    <div class="empty-actions">
+                        <button type="button" class="empty-action" id="emptyUploadLink">上传文件</button>
+                        <span class="empty-divider" aria-hidden="true"></span>
+                        <button type="button" class="empty-action" id="emptyMkdirLink">新建文件夹</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

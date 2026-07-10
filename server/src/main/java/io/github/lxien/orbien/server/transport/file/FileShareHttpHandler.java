@@ -359,11 +359,11 @@ public class FileShareHttpHandler {
             return "file-portal" + path;
         }
         if (path.startsWith("/icon/")) {
-            String iconName = URLDecoder.decode(path.substring("/icon/".length()), StandardCharsets.UTF_8);
-            if (iconName.isBlank() || iconName.contains("..") || iconName.contains("/") || iconName.contains("\\")) {
+            String iconPath = URLDecoder.decode(path.substring("/icon/".length()), StandardCharsets.UTF_8);
+            if (iconPath.isBlank() || iconPath.contains("..") || iconPath.contains("\\")) {
                 return null;
             }
-            return "static/icon/" + iconName;
+            return "static/icon/" + iconPath;
         }
         if (path.startsWith("/img/")) {
             String imgName = URLDecoder.decode(path.substring("/img/".length()), StandardCharsets.UTF_8);

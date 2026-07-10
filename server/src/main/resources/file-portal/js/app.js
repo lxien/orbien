@@ -56,7 +56,9 @@
     };
 
     const THEME_KEY = 'orbien-file-theme';
+    const VIEW_KEY = 'orbien-file-view';
     const AUTH_REFRESH_INTERVAL = 30_000;
+    const VIEW_MODES = ['list', 'icon', 'column'];
     const WRITE_CONTROL_IDS = ['btnUpload', 'btnMkdir', 'btnDelete', 'fileInput', 'emptyUploadLink', 'emptyMkdirLink'];
     const THEME_BUTTON_IDS = ['btnTheme', 'btnThemeLogin'];
 
@@ -67,6 +69,9 @@
     let permission = 'read_write';
     let currentUsername = '';
     let authRefreshTimer = null;
+    let listLoading = false;
+    let viewMode = 'list';
+    const entriesCache = new Map();
 
     const $ = (id) => document.getElementById(id);
 
@@ -92,9 +97,9 @@
         return ext ? (EXT_ICON_TYPES[ext] || 'file') : 'file';
     };
 
-    const createFileIcon = (name, isDirectory) => {
+    const createFileIcon = (name, isDirectory, large = false) => {
         const img = document.createElement('img');
-        img.className = 'file-icon';
+        img.className = large ? 'file-icon file-icon-lg' : 'file-icon';
         img.alt = '';
         img.src = iconUrl(resolveIconType(name, isDirectory));
         img.onerror = () => {
@@ -140,6 +145,42 @@
         alert(err.message || String(err));
     };
 
+    const sortEntries = (list) => [...list].sort((a, b) => {
+        const aDir = !!a.directory;
+        const bDir = !!b.directory;
+        if (aDir !== bDir) {
+            return aDir ? -1 : 1;
+        }
+        return entryName(a).localeCompare(entryName(b), 'zh-CN');
+    });
+
+    const pathChain = (path) => {
+        if (path === '/') {
+            return ['/'];
+        }
+        const parts = path.split('/').filter(Boolean);
+        const chain = ['/'];
+        let acc = '';
+        for (const part of parts) {
+            acc += `/${part}`;
+            chain.push(acc);
+        }
+        return chain;
+    };
+
+    const selectedChildName = (parentPath, childPath) => {
+        if (parentPath === '/') {
+            return childPath.split('/').filter(Boolean)[0] || null;
+        }
+        const prefix = `${parentPath}/`;
+        if (!childPath.startsWith(prefix)) {
+            return null;
+        }
+        return childPath.slice(prefix.length).split('/').filter(Boolean)[0] || null;
+    };
+
+    const invalidateEntriesCache = () => entriesCache.clear();
+
     const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem(THEME_KEY, theme);
@@ -184,6 +225,16 @@
             if (el) {
                 el.style.display = canWrite ? '' : 'none';
             }
+        }
+        const emptyActions = document.querySelector('.empty-actions');
+        const emptyDesc = document.querySelector('.empty-desc');
+        if (emptyActions) {
+            emptyActions.style.display = canWrite ? '' : 'none';
+        }
+        if (emptyDesc) {
+            emptyDesc.textContent = canWrite
+                ? '开始添加内容，让文件管理更高效'
+                : '当前目录暂无文件';
         }
     };
 
@@ -307,53 +358,251 @@
         }
     }
 
-    async function loadList() {
+    const parentPath = (path) => {
+        if (path === '/') {
+            return '/';
+        }
+        const parts = path.split('/').filter(Boolean);
+        parts.pop();
+        return parts.length ? `/${parts.join('/')}` : '/';
+    };
+
+    const setListLoading = (loading) => {
+        listLoading = loading;
+        $('fileListWrap').classList.toggle('is-loading', loading);
+    };
+
+    const updatePathNav = () => {
+        const atRoot = currentPath === '/';
+        $('btnBack').classList.toggle('hidden', atRoot);
+    };
+
+    const applyViewMode = (mode, persist = true) => {
+        if (!VIEW_MODES.includes(mode)) {
+            mode = 'list';
+        }
+        viewMode = mode;
+        if (persist) {
+            localStorage.setItem(VIEW_KEY, mode);
+        }
+
+        $('fileListWrap').dataset.viewMode = mode;
+        $('mainPanel').classList.toggle('is-column-view', mode === 'column');
+
+        $('viewList').classList.toggle('hidden', mode !== 'list');
+        $('viewIcon').classList.toggle('hidden', mode !== 'icon');
+        $('viewColumn').classList.toggle('hidden', mode !== 'column');
+
+        for (const btn of document.querySelectorAll('.view-btn')) {
+            const active = btn.dataset.view === mode;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        }
+    };
+
+    const initViewMode = () => {
+        const saved = localStorage.getItem(VIEW_KEY);
+        applyViewMode(VIEW_MODES.includes(saved) ? saved : 'list', false);
+    };
+
+    const setViewMode = (mode) => {
+        if (mode === viewMode) {
+            return;
+        }
+        applyViewMode(mode);
+        renderFiles().catch(showError);
+    };
+
+    const navigateTo = (path) => {
+        if (listLoading || path === currentPath) {
+            return;
+        }
+        currentPath = path;
+        loadList().catch(showError);
+    };
+
+    const goBack = () => navigateTo(parentPath(currentPath));
+
+    const goHome = () => navigateTo('/');
+
+    async function fetchEntries(path, useCache = true) {
+        if (useCache && entriesCache.has(path)) {
+            return entriesCache.get(path);
+        }
+        const data = await api(`/api/files/list?path=${encodeURIComponent(path)}`);
+        const list = sortEntries(data.entries || data.entriesList || []);
+        entriesCache.set(path, list);
+        return list;
+    }
+
+    async function loadList(skipGuard = false) {
+        if (!skipGuard && listLoading) {
+            return;
+        }
+        setListLoading(true);
         try {
-            const data = await api(`/api/files/list?path=${encodeURIComponent(currentPath)}`);
-            entries = data.entries || data.entriesList || [];
-            renderList();
+            invalidateEntriesCache();
+            entries = await fetchEntries(currentPath, false);
+            await renderFiles();
         } catch (e) {
             if (e.message?.includes('目录不存在') || e.message?.includes('不是目录')) {
                 if (currentPath !== '/') {
-                    const parts = currentPath.split('/').filter(Boolean);
-                    parts.pop();
-                    currentPath = parts.length ? `/${parts.join('/')}` : '/';
-                    return loadList();
+                    currentPath = parentPath(currentPath);
+                    await loadList(true);
+                    return;
                 }
             }
             throw e;
+        } finally {
+            setListLoading(false);
         }
     }
 
     const renderBreadcrumb = () => {
+        const nav = $('breadcrumb');
+        nav.replaceChildren();
+        updatePathNav();
+
         const parts = currentPath === '/' ? [] : currentPath.split('/').filter(Boolean);
-        let html = '<span data-path="/">全部文件</span>';
+        const items = [{label: '全部文件', path: '/'}];
         let acc = '';
         for (const part of parts) {
             acc += `/${part}`;
-            html += ` / <span data-path="${acc}">${escapeHtml(part)}</span>`;
+            items.push({label: part, path: acc});
         }
-        $('breadcrumb').innerHTML = html;
+
+        items.forEach((item, index) => {
+            if (index > 0) {
+                const sep = document.createElement('span');
+                sep.className = 'breadcrumb-sep';
+                sep.textContent = '/';
+                sep.setAttribute('aria-hidden', 'true');
+                nav.appendChild(sep);
+            }
+
+            const wrap = document.createElement('span');
+            wrap.className = 'breadcrumb-item';
+
+            const isLast = index === items.length - 1;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'breadcrumb-link';
+            if (index === 0) {
+                btn.classList.add('is-root');
+            }
+            if (isLast) {
+                btn.classList.add('is-current');
+            }
+            btn.textContent = item.label;
+            btn.title = item.label;
+            if (!isLast) {
+                btn.dataset.path = item.path;
+            }
+            wrap.appendChild(btn);
+            nav.appendChild(wrap);
+        });
     };
 
-    const renderList = () => {
-        const tbody = $('fileList');
-        tbody.innerHTML = '';
+    const updateSummary = () => {
         const dirs = entries.filter((e) => e.directory).length;
         const files = entries.length - dirs;
-        $('summary').textContent = `全部文件 (${dirs}个目录, ${files}个文件)`;
-        $('emptyState').classList.toggle('hidden', entries.length > 0);
-        renderBreadcrumb();
+        $('summary').textContent = entries.length
+            ? `${dirs} 个文件夹，${files} 个文件`
+            : '此文件夹为空';
+        const showGlobalEmpty = entries.length === 0 && viewMode !== 'column';
+        $('emptyState').classList.toggle('hidden', !showGlobalEmpty);
+    };
+
+    const createColumnEmptyContent = () => {
+        const wrap = document.createElement('div');
+        wrap.className = 'column-panel-empty';
+
+        const text = document.createElement('p');
+        text.className = 'column-panel-empty-text';
+        text.textContent = canWrite ? '此文件夹为空' : '当前目录暂无文件';
+        wrap.appendChild(text);
+
+        if (canWrite) {
+            const actions = document.createElement('div');
+            actions.className = 'column-panel-empty-actions';
+
+            const uploadBtn = document.createElement('button');
+            uploadBtn.type = 'button';
+            uploadBtn.className = 'empty-action';
+            uploadBtn.textContent = '上传文件';
+            uploadBtn.addEventListener('click', () => $('fileInput').click());
+
+            const divider = document.createElement('span');
+            divider.className = 'empty-divider';
+            divider.setAttribute('aria-hidden', 'true');
+
+            const mkdirBtn = document.createElement('button');
+            mkdirBtn.type = 'button';
+            mkdirBtn.className = 'empty-action';
+            mkdirBtn.textContent = '新建文件夹';
+            mkdirBtn.addEventListener('click', () => mkdir().catch(showError));
+
+            actions.append(uploadBtn, divider, mkdirBtn);
+            wrap.appendChild(actions);
+        }
+        return wrap;
+    };
+
+    const scrollColumnBrowser = (browser) => {
+        requestAnimationFrame(() => {
+            const selected = browser.querySelector('.column-item.is-selected');
+            if (selected) {
+                selected.scrollIntoView({block: 'nearest', inline: 'nearest'});
+            }
+            browser.scrollLeft = Math.max(0, browser.scrollWidth - browser.clientWidth);
+        });
+    };
+
+    const entryPath = (entry, basePath = currentPath) => joinPath(basePath, entryName(entry));
+
+    const createSelectCheckbox = (index, filePath, isDirectory = false) => {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'file-select';
+        checkbox.dataset.idx = String(index);
+        checkbox.dataset.filePath = filePath;
+        checkbox.dataset.isDirectory = isDirectory ? '1' : '0';
+        checkbox.addEventListener('change', syncSelectionState);
+        return checkbox;
+    };
+
+    const syncSelectionState = () => {
+        const checkboxes = [...document.querySelectorAll('#fileListWrap .file-select')];
+        const checked = checkboxes.filter((el) => el.checked);
+        $('selectAll').checked = checkboxes.length > 0 && checked.length === checkboxes.length;
+        $('selectAll').indeterminate = checked.length > 0 && checked.length < checkboxes.length;
+
+        for (const item of document.querySelectorAll('.icon-item, .column-item')) {
+            const checkbox = item.querySelector('.file-select');
+            item.classList.toggle('is-selected', !!checkbox?.checked);
+        }
+    };
+
+    const bindEnterDir = (element, name, options = {}) => {
+        const {dblclick = false} = options;
+        const open = () => enterDir(name);
+        if (dblclick) {
+            element.addEventListener('dblclick', open);
+        } else {
+            element.addEventListener('click', open);
+        }
+    };
+
+    const renderListView = () => {
+        const tbody = $('fileList');
+        const fragment = document.createDocumentFragment();
 
         entries.forEach((entry, index) => {
             const name = entryName(entry);
             const tr = document.createElement('tr');
 
             const tdCheck = document.createElement('td');
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.dataset.idx = String(index);
-            tdCheck.appendChild(checkbox);
+            tdCheck.appendChild(createSelectCheckbox(index, entryPath(entry), entry.directory));
 
             const tdName = document.createElement('td');
             const nameSpan = document.createElement('span');
@@ -363,7 +612,7 @@
             nameText.textContent = name;
             nameSpan.appendChild(nameText);
             if (entry.directory) {
-                nameSpan.addEventListener('click', () => enterDir(name));
+                bindEnterDir(nameSpan, name);
             }
             tdName.appendChild(nameSpan);
 
@@ -377,27 +626,189 @@
             tdSize.textContent = entry.directory ? '' : formatSize(entry.size);
 
             tr.append(tdCheck, tdName, tdTime, tdType, tdSize);
-            tbody.appendChild(tr);
+            fragment.appendChild(tr);
         });
+        tbody.replaceChildren(fragment);
     };
 
+    const renderIconView = () => {
+        const grid = $('iconGrid');
+        const fragment = document.createDocumentFragment();
+
+        entries.forEach((entry, index) => {
+            const name = entryName(entry);
+            const item = document.createElement('div');
+            item.className = 'icon-item';
+            item.title = name;
+
+            const checkbox = createSelectCheckbox(index, entryPath(entry), entry.directory);
+            checkbox.classList.add('icon-item-check');
+            item.appendChild(checkbox);
+
+            const thumb = document.createElement('div');
+            thumb.className = 'icon-item-thumb';
+            thumb.appendChild(createFileIcon(name, entry.directory, true));
+            item.appendChild(thumb);
+
+            const label = document.createElement('div');
+            label.className = 'icon-item-name';
+            label.textContent = name;
+            item.appendChild(label);
+
+            let clickTimer;
+            item.addEventListener('click', (e) => {
+                if (e.target.closest('input[type=checkbox]')) {
+                    return;
+                }
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    checkbox.checked = !checkbox.checked;
+                    syncSelectionState();
+                }, 220);
+            });
+
+            if (entry.directory) {
+                const cancelClick = () => clearTimeout(clickTimer);
+                bindEnterDir(thumb, name, {dblclick: true});
+                bindEnterDir(label, name, {dblclick: true});
+                thumb.addEventListener('dblclick', cancelClick);
+                label.addEventListener('dblclick', cancelClick);
+            }
+
+            fragment.appendChild(item);
+        });
+        grid.replaceChildren(fragment);
+    };
+
+    const renderColumnItem = (entry, colPath, highlightName) => {
+        const name = entryName(entry);
+        const fullPath = entryPath(entry, colPath);
+        const item = document.createElement('div');
+        item.className = 'column-item';
+        if (highlightName && name === highlightName) {
+            item.classList.add('is-selected');
+        }
+
+        const checkbox = createSelectCheckbox(-1, fullPath, entry.directory);
+        checkbox.classList.add('column-item-check');
+        item.appendChild(checkbox);
+        item.appendChild(createFileIcon(name, entry.directory));
+
+        const label = document.createElement('span');
+        label.className = 'column-item-name';
+        label.textContent = name;
+        item.appendChild(label);
+
+        if (entry.directory) {
+            const chevron = document.createElement('span');
+            chevron.className = 'column-item-chevron';
+            chevron.setAttribute('aria-hidden', 'true');
+            chevron.textContent = '›';
+            item.appendChild(chevron);
+        }
+
+        item.addEventListener('click', (e) => {
+            if (e.target.closest('input[type=checkbox]')) {
+                return;
+            }
+            const targetPath = joinPath(colPath, name);
+            if (entry.directory) {
+                if (listLoading) {
+                    return;
+                }
+                currentPath = targetPath;
+                loadList().catch(showError);
+                return;
+            }
+            checkbox.checked = !checkbox.checked;
+            syncSelectionState();
+        });
+
+        return item;
+    };
+
+    const renderColumnView = async () => {
+        const browser = $('columnBrowser');
+        const chain = pathChain(currentPath);
+        const fragment = document.createDocumentFragment();
+        let panelCount = 0;
+
+        for (let i = 0; i < chain.length; i++) {
+            const colPath = chain[i];
+            const isLastColumn = i === chain.length - 1;
+            const colEntries = colPath === currentPath
+                ? entries
+                : await fetchEntries(colPath);
+
+            if (!colEntries.length && !isLastColumn) {
+                continue;
+            }
+
+            const highlightName = i + 1 < chain.length
+                ? selectedChildName(colPath, chain[i + 1])
+                : null;
+
+            const panel = document.createElement('div');
+            panel.className = 'column-panel';
+            panel.dataset.path = colPath;
+
+            if (!colEntries.length) {
+                panel.appendChild(createColumnEmptyContent());
+            } else {
+                colEntries.forEach((entry) => {
+                    panel.appendChild(renderColumnItem(entry, colPath, highlightName));
+                });
+            }
+            fragment.appendChild(panel);
+            panelCount += 1;
+        }
+
+        browser.replaceChildren(fragment);
+
+        if (panelCount === 0) {
+            const panel = document.createElement('div');
+            panel.className = 'column-panel';
+            panel.dataset.path = currentPath;
+            panel.appendChild(createColumnEmptyContent());
+            browser.appendChild(panel);
+        }
+
+        scrollColumnBrowser(browser);
+    };
+
+    async function renderFiles() {
+        renderBreadcrumb();
+        updateSummary();
+        $('selectAll').checked = false;
+        $('selectAll').indeterminate = false;
+
+        if (viewMode === 'list') {
+            renderListView();
+        } else if (viewMode === 'icon') {
+            renderIconView();
+        } else {
+            await renderColumnView();
+        }
+        syncSelectionState();
+    }
+
     const navigate = (e) => {
-        if (e.target.dataset.path) {
-            currentPath = e.target.dataset.path;
-            loadList().catch(showError);
+        const link = e.target.closest('[data-path]');
+        if (link?.dataset.path) {
+            navigateTo(link.dataset.path);
         }
     };
 
     const enterDir = (name) => {
-        currentPath = joinPath(currentPath, name);
-        loadList().catch(showError);
+        if (listLoading) {
+            return;
+        }
+        navigateTo(joinPath(currentPath, name));
     };
 
-    const selectedPaths = () => [...document.querySelectorAll('#fileList input[type=checkbox]:checked')]
-        .map((checkbox) => {
-            const entry = entries[Number(checkbox.dataset.idx)];
-            return joinPath(currentPath, entryName(entry));
-        });
+    const selectedPaths = () => [...document.querySelectorAll('#fileListWrap .file-select:checked')]
+        .map((checkbox) => checkbox.dataset.filePath)
+        .filter(Boolean);
 
     const uploadSingleFile = (file, itemEl) => new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
@@ -510,12 +921,12 @@
     async function downloadSelected() {
         const paths = selectedPaths();
         const errors = [];
-        for (const p of paths) {
-            const name = p.split('/').pop();
-            const entry = entries.find((e) => entryName(e) === name);
-            if (!entry || entry.directory) {
+        for (const checkbox of document.querySelectorAll('#fileListWrap .file-select:checked')) {
+            if (checkbox.dataset.isDirectory === '1') {
                 continue;
             }
+            const p = checkbox.dataset.filePath;
+            const name = p.split('/').pop();
             try {
                 await downloadFile(p);
             } catch (e) {
@@ -563,13 +974,15 @@
     }
 
     const toggleAll = (el) => {
-        for (const checkbox of document.querySelectorAll('#fileList input[type=checkbox]')) {
+        for (const checkbox of document.querySelectorAll('#fileListWrap .file-select')) {
             checkbox.checked = el.checked;
         }
+        syncSelectionState();
     };
 
     async function bootstrap() {
         initTheme();
+        initViewMode();
         try {
             const status = await refreshAuthStatus();
             scheduleAuthRefresh();
@@ -600,14 +1013,8 @@
     });
     $('btnLogout').addEventListener('click', logout);
     $('btnUpload').addEventListener('click', () => $('fileInput').click());
-    $('emptyUploadLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        $('fileInput').click();
-    });
-    $('emptyMkdirLink').addEventListener('click', (e) => {
-        e.preventDefault();
-        mkdir().catch(showError);
-    });
+    $('emptyUploadLink').addEventListener('click', () => $('fileInput').click());
+    $('emptyMkdirLink').addEventListener('click', () => mkdir().catch(showError));
     $('fileInput').addEventListener('change', (e) => {
         uploadFiles(e.target.files).catch(showError);
     });
@@ -616,6 +1023,11 @@
     $('btnDelete').addEventListener('click', () => deleteSelected().catch(showError));
     $('selectAll').addEventListener('change', (e) => toggleAll(e.target));
     $('breadcrumb').addEventListener('click', navigate);
+    $('btnBack').addEventListener('click', goBack);
+    $('btnHome').addEventListener('click', goHome);
+    for (const btn of document.querySelectorAll('.view-btn')) {
+        btn.addEventListener('click', () => setViewMode(btn.dataset.view));
+    }
     $('btnHideProgress').addEventListener('click', () => {
         $('progressPanel').style.display = 'none';
     });
