@@ -73,37 +73,43 @@ jobs:
       matrix:
         include:
           # Linux 平台
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             platform: linux
             arch: amd64
             artifact_suffix: linux_amd64
+            client_native_profile: client-native-linux-amd64
             display_name: "Linux AMD64"
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             platform: linux
             arch: arm64
             artifact_suffix: linux_arm64
+            client_native_profile: client-native-linux-arm64
             display_name: "Linux ARM64"
           # Windows 平台
           - os: windows-latest
             platform: windows
             arch: amd64
             artifact_suffix: windows_amd64
+            client_native_profile: client-native-windows-amd64
             display_name: "Windows AMD64"
-          - os: windows-latest
+          - os: windows-11-arm
             platform: windows
             arch: arm64
             artifact_suffix: windows_arm64
+            client_native_profile: client-native-windows-arm64
             display_name: "Windows ARM64"
           # macOS 平台
-          - os: macos-latest
+          - os: macos-13
             platform: darwin
             arch: amd64
             artifact_suffix: darwin_amd64
+            client_native_profile: client-native-darwin-amd64
             display_name: "macOS AMD64"
           - os: macos-latest
             platform: darwin
             arch: arm64
             artifact_suffix: darwin_arm64
+            client_native_profile: client-native-darwin-arm64
             display_name: "macOS ARM64"
 
     runs-on: ${{ matrix.os }}
@@ -158,7 +164,7 @@ jobs:
         run: cd main && mvn clean package -pl orbiens -DskipTests --no-transfer-progress
 
       - name: 构建客户端原生镜像
-        run: cd main && mvn package native:compile -pl orbienc -Pnative -DskipTests --no-transfer-progress
+        run: mvn package -pl main/orbienc,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       # Linux/macOS 打包
       - name: 打包 Unix 发布文件
@@ -167,10 +173,10 @@ jobs:
         run: |
           VERSION="${{ github.ref_name }}"
           ORBIENS_RELEASE_NAME="orbiens_${VERSION}_${{ matrix.artifact_suffix }}"
-          orbienc_RELEASE_NAME="orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
+          ORBIENC_RELEASE_NAME="orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
 
           mkdir -p "$ORBIENS_RELEASE_NAME/config"
-          mkdir -p "$orbienc_RELEASE_NAME"
+          mkdir -p "$ORBIENC_RELEASE_NAME"
 
           # 打包服务端
           cp main/orbiens/target/orbiens-[0-9]*.jar "$ORBIENS_RELEASE_NAME/orbiens.jar"

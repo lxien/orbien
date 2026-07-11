@@ -29,11 +29,6 @@
     <profiles>
         <profile>
             <id>native</id>
-            <activation>
-                <property>
-                    <name>env.GRAALVM_HOME</name>
-                </property>
-            </activation>
             <properties>
                 <shade.skip>true</shade.skip>
             </properties>
@@ -43,10 +38,22 @@
                         <groupId>org.graalvm.buildtools</groupId>
                         <artifactId>native-maven-plugin</artifactId>
                         <version>${native-maven-plugin.version}</version>
+                        <extensions>true</extensions>
+                        <executions>
+                            <execution>
+                                <id>build-native</id>
+                                <goals>
+                                    <goal>compile-no-fork</goal>
+                                </goals>
+                                <phase>package</phase>
+                            </execution>
+                        </executions>
                         <configuration>
                             <mainClass>io.github.lxien.orbien.client.TunnelClientStartup</mainClass>
                             <imageName>orbienc</imageName>
                             <buildArgs>
+                                <buildArg>-Os</buildArg>
+                                <buildArg>--no-fallback</buildArg>
                                 <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                                 <buildArg>--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED</buildArg>
                                 <buildArg>--add-opens=java.base/java.nio=ALL-UNNAMED</buildArg>
