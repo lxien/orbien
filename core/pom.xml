@@ -83,10 +83,6 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.alibaba.cola</groupId>
-            <artifactId>cola-component-statemachine</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <resources>

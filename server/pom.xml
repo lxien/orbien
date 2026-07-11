@@ -43,6 +43,10 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.alibaba.cola</groupId>
+            <artifactId>cola-component-statemachine</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.bucket4j</groupId>
             <artifactId>bucket4j_jdk17-core</artifactId>
         </dependency>
