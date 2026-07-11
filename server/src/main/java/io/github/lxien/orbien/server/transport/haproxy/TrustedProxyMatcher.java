@@ -1,7 +1,7 @@
 package io.github.lxien.orbien.server.transport.haproxy;
 
 import io.github.lxien.orbien.core.enums.AccessControl;
-import io.github.lxien.orbien.core.ip.cidr.CIDRMatcher;
+import io.github.lxien.orbien.server.ip.cidr.CIDRMatcher;
 
 import java.util.Set;
 

@@ -4,7 +4,7 @@ import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.event.ProxyAddEvent;
 import io.github.lxien.orbien.server.manager.ProxyManager;

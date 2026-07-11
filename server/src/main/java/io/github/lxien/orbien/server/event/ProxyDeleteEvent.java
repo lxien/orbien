@@ -18,7 +18,7 @@
 
 package io.github.lxien.orbien.server.event;
 
-import io.github.lxien.orbien.core.notify.Event;
+import io.github.lxien.orbien.server.notify.Event;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

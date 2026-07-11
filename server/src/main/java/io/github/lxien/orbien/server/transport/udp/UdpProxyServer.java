@@ -3,7 +3,7 @@ package io.github.lxien.orbien.server.transport.udp;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.configuration.SpringContextHolder;
 import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.netty.bootstrap.Bootstrap;

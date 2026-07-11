@@ -16,18 +16,33 @@
  *
  */
 
-package io.github.lxien.orbien.server.event;
+package io.github.lxien.orbien.server.ip.cidr;
 
-import io.github.lxien.orbien.core.enums.AgentType;
-import io.github.lxien.orbien.server.notify.Event;
-import io.github.lxien.orbien.server.metrics.HourlyTraffic;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+/**
+ * CIDR IP区间
+ */
+public class CIDRRange {
 
-@Getter
-@AllArgsConstructor
-public class HourlyTrafficEvent extends Event {
-    private String proxyId;
-    private AgentType agentType;
-    private HourlyTraffic hourlyTraffic;
+    private final long startIp;
+    private final long endIp;
+
+    public CIDRRange(long startIp, long endIp) {
+        this.startIp = startIp;
+        this.endIp = endIp;
+    }
+
+    public long getStartIp() {
+        return startIp;
+    }
+
+    public long getEndIp() {
+        return endIp;
+    }
+
+    /**
+     * 检查IP是否在区间内
+     */
+    public boolean contains(long ip) {
+        return ip >= startIp && ip <= endIp;
+    }
 }

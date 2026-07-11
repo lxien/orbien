@@ -3,7 +3,7 @@ package io.github.lxien.orbien.server.configuration;
 
 import io.github.lxien.orbien.server.uid.UidGenerator;
 import io.github.lxien.orbien.server.uid.impl.CachedUidGenerator;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.netty.util.HashedWheelTimer;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

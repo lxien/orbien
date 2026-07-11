@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.server.event;
 
-import io.github.lxien.orbien.core.notify.Event;
+import io.github.lxien.orbien.server.notify.Event;
 import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
 import lombok.Getter;
 

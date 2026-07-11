@@ -16,8 +16,7 @@
 package io.github.lxien.orbien.server.security;
 
 import io.github.lxien.orbien.core.domain.AccessControlConfig;
-import io.github.lxien.orbien.core.domain.ProxyConfig;
-import io.github.lxien.orbien.core.ip.cidr.CIDRMatcher;
+import io.github.lxien.orbien.server.ip.cidr.CIDRMatcher;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import org.springframework.stereotype.Component;
 

@@ -16,8 +16,8 @@
 
 package io.github.lxien.orbien.server.web.listener;
 
-import io.github.lxien.orbien.core.notify.EventBus;
-import io.github.lxien.orbien.core.notify.EventListener;
+import io.github.lxien.orbien.server.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.config.domain.AuthConfig;
 import io.github.lxien.orbien.server.config.domain.TokenConfig;

@@ -16,18 +16,17 @@
  *
  */
 
-package io.github.lxien.orbien.server.event;
+package io.github.lxien.orbien.server.notify;
 
-import io.github.lxien.orbien.core.enums.AgentType;
-import io.github.lxien.orbien.server.notify.Event;
-import io.github.lxien.orbien.server.metrics.HourlyTraffic;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
-@Getter
-@AllArgsConstructor
-public class HourlyTrafficEvent extends Event {
-    private String proxyId;
-    private AgentType agentType;
-    private HourlyTraffic hourlyTraffic;
+/**
+ * 事件监听器接口
+ */
+@FunctionalInterface
+public interface EventListener<T> {
+    /**
+     * 事件回调
+     *
+     * @param event 事件对象
+     */
+    void onEvent(T event);
 }

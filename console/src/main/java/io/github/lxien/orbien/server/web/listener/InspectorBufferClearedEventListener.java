@@ -1,7 +1,7 @@
 package io.github.lxien.orbien.server.web.listener;
 
-import io.github.lxien.orbien.core.notify.EventBus;
-import io.github.lxien.orbien.core.notify.EventListener;
+import io.github.lxien.orbien.server.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.HttpRequestBufferClearedEvent;
 import io.github.lxien.orbien.server.web.service.inspector.InspectorSseHub;
 import jakarta.annotation.PostConstruct;

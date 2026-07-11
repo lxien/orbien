@@ -16,7 +16,7 @@
 
 package io.github.lxien.orbien.server.metrics;
 
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.event.HourlyTrafficEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

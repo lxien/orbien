@@ -1,7 +1,7 @@
 package io.github.lxien.orbien.server.inspector;
 
 import io.github.lxien.orbien.core.domain.ProxyConfig;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.event.HttpRequestBufferClearedEvent;
 import io.github.lxien.orbien.server.event.HttpRequestCapturedEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;

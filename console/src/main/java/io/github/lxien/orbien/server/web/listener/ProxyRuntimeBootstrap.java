@@ -16,8 +16,8 @@
 
 package io.github.lxien.orbien.server.web.listener;
 
-import io.github.lxien.orbien.core.notify.EventBus;
-import io.github.lxien.orbien.core.notify.EventListener;
+import io.github.lxien.orbien.server.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.TunnelServerBindEvent;
 import io.github.lxien.orbien.server.service.ProxyRuntimeRegistry;
 import jakarta.annotation.PostConstruct;

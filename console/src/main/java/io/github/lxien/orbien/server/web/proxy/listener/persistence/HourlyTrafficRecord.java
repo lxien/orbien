@@ -18,8 +18,8 @@
 
 package io.github.lxien.orbien.server.web.proxy.listener.persistence;
 
-import io.github.lxien.orbien.core.notify.EventBus;
-import io.github.lxien.orbien.core.notify.EventListener;
+import io.github.lxien.orbien.server.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.HourlyTrafficEvent;
 import io.github.lxien.orbien.server.metrics.HourlyTraffic;
 import io.github.lxien.orbien.server.web.entity.MetricsDO;

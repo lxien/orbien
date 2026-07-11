@@ -20,7 +20,7 @@ package io.github.lxien.orbien.server.statemachine.agent.action.config;
 
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.service.DomainConfigService;
 import io.github.lxien.orbien.server.uid.UidGenerator;

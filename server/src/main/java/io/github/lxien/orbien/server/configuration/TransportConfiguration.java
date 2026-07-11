@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.server.configuration;
 
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.transport.TransportListenerManager;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;

@@ -16,18 +16,31 @@
  *
  */
 
-package io.github.lxien.orbien.server.event;
+package io.github.lxien.orbien.server.notify;
 
-import io.github.lxien.orbien.core.enums.AgentType;
-import io.github.lxien.orbien.server.notify.Event;
-import io.github.lxien.orbien.server.metrics.HourlyTraffic;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.io.Serializable;
 
-@Getter
-@AllArgsConstructor
-public class HourlyTrafficEvent extends Event {
-    private String proxyId;
-    private AgentType agentType;
-    private HourlyTraffic hourlyTraffic;
+/**
+ * 事件
+ */
+public abstract class Event implements Serializable {
+
+    private long sequence = -1;
+    private boolean endOfBatch = false;
+    public long getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(long sequence) {
+        this.sequence = sequence;
+    }
+
+    public boolean isEndOfBatch() {
+        return endOfBatch;
+    }
+
+    public void setEndOfBatch(boolean endOfBatch) {
+        this.endOfBatch = endOfBatch;
+    }
+
 }

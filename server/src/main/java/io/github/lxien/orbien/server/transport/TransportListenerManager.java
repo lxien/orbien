@@ -5,7 +5,7 @@ import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.core.domain.transport.QuicProtocolConfig;
 import io.github.lxien.orbien.core.domain.transport.TcpProtocolConfig;
 import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
-import io.github.lxien.orbien.core.notify.EventBus;
+import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
