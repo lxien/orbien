@@ -16,7 +16,7 @@ public class NetworkErrorAction extends AgentBaseAction {
         if (context.isShuttingDown()) {
             return;
         }
-        logger.error("网络错误");
-        context.fireEvent(AgentEvent.RETRY);
+        logger.error("网络错误，准备重连");
+        context.fireEvent(AgentEvent.CONNECT_FAILURE);
     }
 }

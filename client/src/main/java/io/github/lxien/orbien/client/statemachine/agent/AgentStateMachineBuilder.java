@@ -132,6 +132,12 @@ public class AgentStateMachineBuilder {
                     .to(AgentState.DISCONNECTED)
                     .on(AgentEvent.DISCONNECT)
                     .perform(disconnectedAction);
+            // 连接断开后重连
+            builder.externalTransition()
+                    .from(AgentState.DISCONNECTED)
+                    .to(AgentState.CONNECTING)
+                    .on(AgentEvent.CONNECT_FAILURE)
+                    .perform(connRetryAction);
             // 连接断开，尝试重连
             builder.externalTransitions()
                     .fromAmong(AgentState.DISCONNECTED)

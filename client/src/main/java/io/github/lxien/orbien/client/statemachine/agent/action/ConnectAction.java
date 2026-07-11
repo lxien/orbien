@@ -50,7 +50,6 @@ public class ConnectAction extends AgentBaseAction {
                     appConfig.getTransportConfig().getProtocol().getName(),
                     appConfig.getServerAddr(), appConfig.getServerPort());
             Channel control = session.nettyChannel();
-            ctx.getRetryCount().set(0);
             ctx.setControl(control);
             HealthCheckHolder.init(control);
             ctx.fireEvent(AgentEvent.CONNECT_SUCCESS);

@@ -26,9 +26,7 @@ public class DisconnectedAction extends AgentBaseAction {
         if (context.isShuttingDown()) {
             return;
         }
-         //前置处理
         ChannelUtils.closeOnFlush(context.getControl());
-        //重新连接
-        context.fireEvent(AgentEvent.RETRY);
+        context.fireEvent(AgentEvent.CONNECT_FAILURE);
     }
 }

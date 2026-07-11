@@ -23,6 +23,7 @@ public class AuthSuccessAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
+        context.getRetryCount().set(0);
         handleLocalProxyPush(context);
         context.fireEvent(AgentEvent.CREATE_CONN_POOL);
     }

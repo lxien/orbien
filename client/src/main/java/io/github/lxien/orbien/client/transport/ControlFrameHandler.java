@@ -29,9 +29,12 @@ import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.client.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.ssl.NotSslRecordException;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
+import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -231,11 +234,17 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         Channel channel = ctx.channel();
         //控制隧道
         if (channel == agentContext.getControl()) {
+            if (isTlsException(cause)) {
+                logger.error("TLS 握手失败，请检查 transport.tls 配置是否与服务端一致"
+                        + "（服务端启用 mTLS 时客户端需配置 cert_file、key_file 和 ca_file）", cause);
+                agentContext.markShuttingDown();
+                agentContext.fireEvent(AgentEvent.LOCAL_GOAWAY);
+                return;
+            }
             if (isNetworkException(cause)) {
-                if (agentContext.getControl() == ctx.channel()) {
-                    logger.error("控制隧道网络错误", cause);
-                    agentContext.fireEvent(AgentEvent.NETWORK_ERROR);
-                }
+                logger.error("控制隧道网络错误", cause);
+                agentContext.fireEvent(AgentEvent.NETWORK_ERROR);
+                return;
             }
         } else {
             logger.error("数据连接异常，关闭数据连接", cause);
@@ -278,7 +287,33 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         streamContext.getControl().writeAndFlush(frame);
     }
 
+    private boolean isTlsException(Throwable cause) {
+        while (cause != null) {
+            if (cause instanceof SSLException || cause instanceof NotSslRecordException) {
+                return true;
+            }
+            if (cause instanceof DecoderException && cause.getCause() != null) {
+                return isTlsException(cause.getCause());
+            }
+            String msg = cause.getMessage();
+            if (msg != null) {
+                String lower = msg.toLowerCase();
+                if (lower.contains("not an ssl/tls record")
+                        || lower.contains("handshake_failure")
+                        || lower.contains("certificate_required")
+                        || lower.contains("bad_certificate")) {
+                    return true;
+                }
+            }
+            cause = cause.getCause();
+        }
+        return false;
+    }
+
     private boolean isNetworkException(Throwable cause) {
+        if (isTlsException(cause)) {
+            return false;
+        }
         if (cause instanceof IOException) {
             return true;
         }
