@@ -152,12 +152,15 @@ jobs:
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
 
       - name: 安装根目录模块到本地仓库
+        shell: bash
         run: mvn install -pl '!main' -am -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       - name: 构建服务端 JAR 包
+        shell: bash
         run: cd main && mvn clean package -pl orbiens -DskipTests --no-transfer-progress
 
       - name: 构建客户端原生镜像
+        shell: bash
         run: mvn clean package -pl main/orbienc,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       # Linux/macOS 打包
