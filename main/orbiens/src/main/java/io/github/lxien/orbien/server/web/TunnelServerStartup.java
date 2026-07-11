@@ -20,7 +20,6 @@ import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.config.DashboardSpringBootSupport;
 import io.github.lxien.orbien.server.config.domain.DashboardConfig;
 import io.github.lxien.orbien.server.config.ConfigParser;
-import io.github.lxien.orbien.core.transport.NettyJvmSupport;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
@@ -36,7 +35,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @ComponentScan("io.github.lxien.orbien")
 public class TunnelServerStartup {
     public static void main(String[] args) {
-        NettyJvmSupport.ensureNativeAccess();
         AppConfig config = ConfigParser.parse(args);
         DashboardConfig dashboard = config.getDashboard();
         SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class)

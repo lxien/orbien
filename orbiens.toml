@@ -11,7 +11,7 @@ root_domains = ["domain1.com", "domain2.com"]
 enabled = true
 cert_file = "cert/transport/server.crt"
 key_file = "cert/transport/server.key"
-ca_file = "cert/transport/ca.crt"
+#ca_file = "cert/transport/ca.crt"
 
 [transport.websocket]
 enabled = true

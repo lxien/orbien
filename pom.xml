@@ -115,6 +115,7 @@
         <module>server</module>
         <module>console</module>
         <module>client</module>
+        <module>cli</module>
         <module>main</module>
     </modules>
 
@@ -300,6 +301,11 @@
             <dependency>
                 <groupId>io.github.lxien</groupId>
                 <artifactId>orbien-client</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.lxien</groupId>
+                <artifactId>orbien-cli</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

@@ -104,9 +104,9 @@ public final class TunnelClient implements Lifecycle {
     }
 
     /**
-     * JVM shutdown hook 调用：只做资源清理，不再触发进程退出。
+     * 外部 shutdown hook 调用，只做资源清理，不触发进程退出。
      */
-    void stopFromShutdownHook() {
+    public void shutdownGracefully() {
         stopInternal(true);
     }
 

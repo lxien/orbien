@@ -11,6 +11,8 @@
     <name>orbiens</name>
     <properties>
         <java.version>25</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <orbien.version>0.20.0</orbien.version>
         <native-maven-plugin.version>0.11.4</native-maven-plugin.version>
         <spring-boot-maven-plugin.version>4.0.5</spring-boot-maven-plugin.version>
