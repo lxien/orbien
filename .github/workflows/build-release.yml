@@ -92,12 +92,6 @@ jobs:
             artifact_suffix: windows_amd64
             client_native_profile: client-native-windows-amd64
             display_name: "Windows AMD64"
-          - os: windows-11-arm
-            platform: windows
-            arch: arm64
-            artifact_suffix: windows_arm64
-            client_native_profile: client-native-windows-arm64
-            display_name: "Windows ARM64"
           # macOS 平台
           - os: macos-13
             platform: darwin
@@ -127,7 +121,7 @@ jobs:
           path: ./console-ui/dist
 
       - name: 复制前端资源到 Spring Boot (Unix)
-        if: matrix.os != 'windows-latest'
+        if: matrix.platform != 'windows'
         run: |
           mkdir -p main/orbiens/src/main/resources/static
           cp -r console-ui/dist/* main/orbiens/src/main/resources/static/
@@ -135,7 +129,7 @@ jobs:
           ls -la main/orbiens/src/main/resources/static/
 
       - name: 复制前端资源到 Spring Boot (Windows)
-        if: matrix.os == 'windows-latest'
+        if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path main\orbiens\src\main\resources\static
@@ -164,11 +158,11 @@ jobs:
         run: cd main && mvn clean package -pl orbiens -DskipTests --no-transfer-progress
 
       - name: 构建客户端原生镜像
-        run: mvn package -pl main/orbienc,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
+        run: mvn clean package -pl main/orbienc,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       # Linux/macOS 打包
       - name: 打包 Unix 发布文件
-        if: matrix.os != 'windows-latest'
+        if: matrix.platform != 'windows'
         shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
@@ -195,7 +189,7 @@ jobs:
 
       # Windows 打包
       - name: 打包 Windows 发布文件
-        if: matrix.os == 'windows-latest'
+        if: matrix.platform == 'windows'
         shell: pwsh
         run: |
           $VERSION = "${{ github.ref_name }}"
