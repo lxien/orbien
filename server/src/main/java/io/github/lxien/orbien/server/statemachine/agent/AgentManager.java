@@ -54,6 +54,26 @@ public class AgentManager {
         agentToContextMap.put(agentId, context);
     }
 
+    /**
+     * 断线重连时，将已有会话绑定到新的控制连接。
+     */
+    public void rebindControlChannel(AgentContext context, Channel newChannel) {
+        writeLock.lock();
+        try {
+            Integer oldConnectionId = context.getConnectionId();
+            if (oldConnectionId != null) {
+                connectionToContextMap.remove(oldConnectionId);
+            }
+            int connectionId = connectionIdGenerator.nextConnId();
+            newChannel.attr(AttributeKeys.CONNECTION_ID).set(connectionId);
+            context.setConnectionId(connectionId);
+            context.setControl(newChannel);
+            connectionToContextMap.put(connectionId, context);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
     public int getOnlineCount() {
         return connectionToContextMap.size();
     }

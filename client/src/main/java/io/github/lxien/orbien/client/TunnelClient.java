@@ -61,7 +61,7 @@ public final class TunnelClient implements Lifecycle {
     private void initializeStateMachine() {
         agentContext = new AgentContext(config, AgentStateMachineBuilder.getStateMachine());
         agentContext.setTunnelClient(this);
-        agentContext.setAgentIdentity(new AgentIdentity());
+        agentContext.setAgentIdentity(new AgentIdentity(config.getAgentType()));
 
         serverWorkBootstrap = NettyEventLoopFactory.eventLoopGroup();
         Bootstrap serverBootstrap = new Bootstrap()

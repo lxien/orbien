@@ -42,6 +42,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import java.util.Set;
@@ -96,21 +97,28 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             authInfo.getAgentId());
                     String agentId = authInfo.getAgentId();
                     Optional<AgentContext> contextOpt = agentManager.getAgentContext(ctx.channel());
+                    if (contextOpt.isEmpty() && StringUtils.hasText(agentId)) {
+                        contextOpt = agentManager.getAgentContext(agentId);
+                    }
                     if (contextOpt.isPresent()) {
                         AgentContext context = contextOpt.get();
                         //如果连接是断开状态，说明是断线重连，更新连接并重试连接
                         if (context.getState() == AgentState.DISCONNECTED) {
                             logger.debug("断线重连：{}", context.getAgentId());
                             Channel oldChannel = context.getControl();
-                            ChannelUtils.closeOnFlush(oldChannel);
-                            // 再设置新连接
-                            context.setControl(ctx.channel());
+                            if (oldChannel != null && oldChannel != ctx.channel()) {
+                                ChannelUtils.closeOnFlush(oldChannel);
+                            }
+                            agentManager.rebindControlChannel(context, ctx.channel());
                             context.setVariable(AgentConstants.AGENT_AUTH_INFO, authInfo);
                             context.fireEvent(AgentEvent.RETRY_CONNECT);
                         } else {
                             //重复登录，断开旧连接，设置新连接
-                            ChannelUtils.closeOnFlush(context.getControl());
-                            context.setControl(ctx.channel());
+                            Channel oldControl = context.getControl();
+                            if (oldControl != null && oldControl != ctx.channel()) {
+                                ChannelUtils.closeOnFlush(oldControl);
+                            }
+                            agentManager.rebindControlChannel(context, ctx.channel());
                             logger.debug("客户端 {} 重新登录", agentId);
                         }
                     } else {

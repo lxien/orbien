@@ -11,9 +11,9 @@ import lombok.Getter;
 public enum AgentType {
 
     /**
-     * 内嵌客户端 Agent（集成在 Spring Boot 等框架中，短生命周期、一次性使用）
+     * 会话型客户端（Starter、CLI）
      */
-    EMBEDDED(0, "Embedded Agent", true),
+    SESSION(0, "Session Agent", true),
 
     /**
      * 标准客户端（独立运行的可执行程序，长期运行，支持配置持久化）
@@ -34,8 +34,8 @@ public enum AgentType {
         return null;
     }
 
-    public boolean isEmbedded() {
-        return this == EMBEDDED;
+    public boolean isSession() {
+        return this == SESSION;
     }
 
     public boolean isStandalone() {

@@ -43,7 +43,7 @@ export enum LoadBalanceType {
 }
 
 export enum AgentType {
-    EMBEDDED = 0,
+    SESSION = 0,
     STANDALONE = 1
 }
 
@@ -133,7 +133,7 @@ export function getDomainTypeLabel(domainType: number) {
 }
 
 export function getAgentTypeLabel(agentType?: number) {
-    return agentType === AgentType.STANDALONE ? 'Standalone' : 'Embedded'
+    return agentType === AgentType.STANDALONE ? 'Standalone' : 'Session'
 }
 
 export function getPortPoolTypeLabel(type: number) {

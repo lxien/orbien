@@ -90,22 +90,29 @@ public class AuthAction extends AgentBaseAction {
             return;
         }
 
-        //如果没有 agentId 则生成
         String agentId = authInfo.getAgentId();
         AgentInfo oldAgentInfo = null;
+        AgentType clientAgentType = getAgentType(authInfo);
+        boolean sessionClient = clientAgentType != null && clientAgentType.isSession();
+
         if (!StringUtils.hasText(agentId)) {
             agentId = uuidGenerator.getUIDAsString();
         } else {
-            //如果携带了 agentId 需要检查是否存在
             Optional<AgentInfo> agentInfoOpt = agentConfigService.findById(agentId);
             if (agentInfoOpt.isEmpty()) {
-                logger.warn("设备ID {} 不存在", agentId);
-                Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
-                        .setStatus(Message.Status.newBuilder().setCode(100).setMessage("AgentId " + agentId + " 不存在"))
-                        .build();
-                sendAuthError(control, authResponse);
-                context.fireEvent(AgentEvent.AUTH_FAILURE);
-                return;
+                if (sessionClient) {
+                    // 进程未退出但记录已清理（或首次连接），分配新 agentId
+                    agentId = uuidGenerator.getUIDAsString();
+                    logger.debug("会话型客户端分配新 agentId: {}", agentId);
+                } else {
+                    logger.warn("设备ID {} 不存在", agentId);
+                    Message.AuthResponse authResponse = Message.AuthResponse.newBuilder()
+                            .setStatus(Message.Status.newBuilder().setCode(100).setMessage("AgentId " + agentId + " 不存在"))
+                            .build();
+                    sendAuthError(control, authResponse);
+                    context.fireEvent(AgentEvent.AUTH_FAILURE);
+                    return;
+                }
             } else {
                 oldAgentInfo = agentInfoOpt.get();
             }
@@ -162,7 +169,7 @@ public class AuthAction extends AgentBaseAction {
                 return AgentType.STANDALONE;
             }
             case SESSION -> {
-                return AgentType.EMBEDDED;
+                return AgentType.SESSION;
             }
         }
         return null;

@@ -29,11 +29,6 @@ import org.springframework.util.StringUtils;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * 将 Spring Boot 配置属性组装为客户端 {@link AppConfig}。
- * <p>
- * 本地 proxy 配置仅用于启动时向服务端上报
- */
 final class AppConfigBuilder {
 
     private AppConfigBuilder() {
@@ -46,7 +41,7 @@ final class AppConfigBuilder {
         return DefaultAppConfig.builder()
                 .serverAddr(properties.getServerAddr())
                 .serverPort(properties.getServerPort())
-                .agentType(AgentType.EMBEDDED)
+                .agentType(AgentType.SESSION)
                 .authConfig(buildAuthConfig(properties))
                 .transportConfig(buildTransportConfig(properties, resourceLoader))
                 .connectionConfig(buildConnectionConfig(properties))

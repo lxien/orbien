@@ -98,7 +98,7 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform(agentDisconnectHealthCleanupAction);
 
-        // 心跳超时
+        // 心跳超时：保留重连窗口
         builder.externalTransition()
                 .from(AgentState.CONNECTED)
                 .to(AgentState.DISCONNECTED)

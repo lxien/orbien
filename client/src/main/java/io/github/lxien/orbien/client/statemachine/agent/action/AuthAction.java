@@ -69,7 +69,7 @@ public class AuthAction extends AgentBaseAction {
         switch (agentType) {
             case STANDALONE:
                 return Message.AgentType.BINARY;
-            case EMBEDDED:
+            case SESSION:
                 return Message.AgentType.SESSION;
             default:
                 return Message.AgentType.UNRECOGNIZED;
