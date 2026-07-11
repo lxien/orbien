@@ -10,6 +10,11 @@ env:
   JAVA_VERSION: '25'
   NODE_VERSION: '24'
 
+# 默认最小权限；需要写权限的 job 单独覆盖
+permissions:
+  contents: read
+  actions: read
+
 jobs:
   # =============================================
   # 阶段1：构建 Vue 前端
@@ -17,6 +22,9 @@ jobs:
   build-frontend:
     name: 构建前端资源
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -108,7 +116,8 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: write
+      contents: read
+      actions: write
 
     steps:
       - name: 检出代码
@@ -238,7 +247,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
+      actions: read
 
     steps:
       - name: 检出代码
@@ -284,6 +293,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
 
     steps:
       - name: 下载所有构件

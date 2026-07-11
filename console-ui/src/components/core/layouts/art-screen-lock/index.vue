@@ -110,15 +110,12 @@
   import { Lock, Unlock } from '@element-plus/icons-vue'
   import type { FormInstance, FormRules } from 'element-plus'
   import { useI18n } from 'vue-i18n'
-  import CryptoJS from 'crypto-js'
   import { useUserStore } from '@/store/modules/user'
   import { mittBus } from '@/utils/sys'
+  import { hashLockPassword, verifyLockPassword } from '@/utils/security/lock-password'
 
   // 国际化
   const { t } = useI18n()
-
-  // 环境变量
-  const ENCRYPT_KEY = import.meta.env.VITE_LOCK_ENCRYPT_KEY
 
   // Store
   const userStore = useUserStore()
@@ -321,19 +318,6 @@
     }
   }
 
-  // 工具函数
-  const verifyPassword = (inputPassword: string, storedPassword: string): boolean => {
-    try {
-      const decryptedPassword = CryptoJS.AES.decrypt(storedPassword, ENCRYPT_KEY).toString(
-        CryptoJS.enc.Utf8
-      )
-      return inputPassword === decryptedPassword
-    } catch (error) {
-      console.error('密码解密失败:', error)
-      return false
-    }
-  }
-
   // 事件处理函数
   const handleKeydown = (event: KeyboardEvent) => {
     if (event.altKey && event.key.toLowerCase() === '¬') {
@@ -351,11 +335,11 @@
   const handleLock = async () => {
     if (!formRef.value) return
 
-    await formRef.value.validate((valid, fields) => {
+    await formRef.value.validate(async (valid, fields) => {
       if (valid) {
-        const encryptedPassword = CryptoJS.AES.encrypt(formData.password, ENCRYPT_KEY).toString()
+        const hashedPassword = await hashLockPassword(formData.password)
         userStore.setLockStatus(true)
-        userStore.setLockPassword(encryptedPassword)
+        userStore.setLockPassword(hashedPassword)
         visible.value = false
         formData.password = ''
       } else {
@@ -367,9 +351,9 @@
   const handleUnlock = async () => {
     if (!unlockFormRef.value) return
 
-    await unlockFormRef.value.validate((valid, fields) => {
+    await unlockFormRef.value.validate(async (valid, fields) => {
       if (valid) {
-        const isValid = verifyPassword(unlockForm.password, lockPassword.value)
+        const isValid = await verifyLockPassword(unlockForm.password, lockPassword.value)
 
         if (isValid) {
           try {
