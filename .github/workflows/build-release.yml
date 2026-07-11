@@ -101,7 +101,7 @@ jobs:
             client_native_profile: client-native-windows-amd64
             display_name: "Windows AMD64"
           # macOS 平台
-          - os: macos-13
+          - os: macos-latest
             platform: darwin
             arch: amd64
             artifact_suffix: darwin_amd64
