@@ -8,6 +8,8 @@ import io.github.lxien.orbien.client.logging.LogbackConfigurator;
 import io.github.lxien.orbien.core.transport.NettyJvmSupport;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,8 +31,14 @@ public class TunnelClientStartup {
         } catch (IllegalArgumentException e) {
             logger.error("参数错误: {}", e.getMessage());
             System.exit(1);
-        } catch (Exception e) {
-            logger.error("启动失败", e);
+        } catch (Throwable e) {
+            System.err.println("启动失败: " + e);
+            e.printStackTrace(System.err);
+            try {
+                logger.error("启动失败", e);
+            } catch (Throwable ignored) {
+                // logback 可能尚未配置完成
+            }
             System.exit(1);
         }
     }
@@ -90,6 +98,9 @@ public class TunnelClientStartup {
                 .addLogger("io.netty.handler.ssl", Level.WARN)
                 .build()
                 .configure();
+        if (LoggerFactory.getILoggerFactory() instanceof ch.qos.logback.classic.LoggerContext) {
+            InternalLoggerFactory.setDefaultFactory(Slf4JLoggerFactory.INSTANCE);
+        }
     }
 
     private static void registerShutdownHook() {

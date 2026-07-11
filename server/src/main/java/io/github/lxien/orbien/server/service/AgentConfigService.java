@@ -23,9 +23,9 @@ import io.github.lxien.orbien.server.service.repository.AgentQueryRepository;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -63,7 +63,7 @@ public class AgentConfigService {
     }
 
     public void evictByIds(Collection<String> agentIds) {
-        if (CollectionUtils.isNotEmpty(agentIds)) {
+        if (!CollectionUtils.isEmpty(agentIds)) {
             l1Cache.invalidateAll(agentIds);
         }
     }

@@ -17,9 +17,9 @@
  */
 package io.github.lxien.orbien.server.uid.utils;
 
+import io.github.lxien.orbien.core.utils.StringUtils;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * DockerUtils
@@ -81,12 +81,12 @@ public abstract class DockerUtils {
         DOCKER_PORT = System.getenv(ENV_KEY_PORT);
 
         // not found from 'JPAAS_HTTP_PORT', then try to find from 'JPAAS_HOST_PORT_8080'
-        if (StringUtils.isBlank(DOCKER_PORT)) {
+        if (!StringUtils.hasText(DOCKER_PORT)) {
             DOCKER_PORT = System.getenv(ENV_KEY_PORT_ORIGINAL);
         }
 
-        boolean hasEnvHost = StringUtils.isNotBlank(DOCKER_HOST);
-        boolean hasEnvPort = StringUtils.isNotBlank(DOCKER_PORT);
+        boolean hasEnvHost = StringUtils.hasText(DOCKER_HOST);
+        boolean hasEnvPort = StringUtils.hasText(DOCKER_PORT);
 
         // docker can find both host & port from environment
         if (hasEnvHost && hasEnvPort) {

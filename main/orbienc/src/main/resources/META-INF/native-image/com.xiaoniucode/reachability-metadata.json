@@ -10,6 +10,13 @@
       ]
     },
     {
+      "type": "byte[]",
+      "jniAccessible": true
+    },
+    {
+      "type": "byte[][]"
+    },
+    {
       "type": "ch.qos.logback.classic.BasicConfigurator",
       "methods": [
         {
@@ -108,17 +115,6 @@
         {
           "name": "getEmptyRegistry",
           "parameterTypes": []
-        }
-      ]
-    },
-    {
-      "type": "com.lmax.disruptor.AbstractSequencer"
-    },
-    {
-      "type": "com.lmax.disruptor.Value",
-      "fields": [
-        {
-          "name": "value"
         }
       ]
     },
@@ -251,10 +247,10 @@
       ]
     },
     {
-      "type": "io.github.lxien.orbien.client.TunnelClient$1"
+      "type": "io.github.lxien.orbien.client.health.HealthChecker$1"
     },
     {
-      "type": "io.github.lxien.orbien.client.TunnelClient$2"
+      "type": "io.github.lxien.orbien.client.health.TcpHealthHandler"
     },
     {
       "type": "io.github.lxien.orbien.client.transport.ControlFrameHandler"
@@ -266,27 +262,34 @@
       "type": "io.github.lxien.orbien.client.transport.HeartbeatHandler"
     },
     {
-      "type": "io.github.lxien.orbien.client.transport.RealServerHandler"
-    },
-    {
-      "type": "io.github.lxien.orbien.client.transport.TunnelConnectionFactory$1"
-    },
-    {
-      "type": "io.github.lxien.orbien.client.transport.bridge.DirectTunnelBridge$1"
-    },
-    {
       "type": "io.github.lxien.orbien.core.transport.IdleCheckHandler"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.quic.QuicTransportConnector$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.quic.QuicTransportConnector$3"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.tcp.TcpTransportConnector$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.websocket.WebSocketBinaryFrameCodec"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.websocket.WebSocketTransportConnector$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.core.transport.websocket.WebSocketTransportConnector$WebSocketHandshakeAwaiter"
     },
     {
       "type": "io.netty.buffer.AbstractByteBufAllocator"
     },
     {
-      "type": "io.netty.buffer.AbstractReferenceCountedByteBuf",
-      "fields": [
-        {
-          "name": "refCnt"
-        }
-      ]
+      "type": "io.netty.buffer.AdaptivePoolingAllocator$Magazine"
+    },
+    {
+      "type": "io.netty.buffer.AdaptivePoolingAllocator$SizeClassedChunk"
     },
     {
       "type": "io.netty.channel.AbstractChannelHandlerContext"
@@ -326,18 +329,24 @@
       ]
     },
     {
-      "type": "io.netty.channel.epoll.NativeDatagramPacketArray$NativeDatagramPacket"
-    },
-    {
       "type": "io.netty.channel.kqueue.BsdSocket",
       "jniAccessible": true
+    },
+    {
+      "type": "io.netty.channel.kqueue.KQueueDatagramChannel",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
     },
     {
       "type": "io.netty.channel.kqueue.KQueueEventArray",
       "jniAccessible": true
     },
     {
-      "type": "io.netty.channel.kqueue.KQueueEventLoop"
+      "type": "io.netty.channel.kqueue.KQueueIoHandler"
     },
     {
       "type": "io.netty.channel.kqueue.KQueueSocketChannel",
@@ -421,21 +430,242 @@
       "jniAccessible": true
     },
     {
-      "type": "io.netty.handler.codec.compression.SnappyFrameDecoder"
+      "type": "io.netty.handler.codec.http.HttpClientCodec"
     },
     {
-      "type": "io.netty.handler.codec.compression.SnappyFrameEncoder"
+      "type": "io.netty.handler.codec.http.HttpObjectAggregator"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.Utf8FrameValidator"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.WebSocket13FrameDecoder"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.WebSocket13FrameEncoder"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.WebSocketClientHandshaker"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandler"
+    },
+    {
+      "type": "io.netty.handler.codec.http.websocketx.WebSocketClientProtocolHandshakeHandler"
     },
     {
       "type": "io.netty.handler.ssl.SslHandler"
     },
     {
-      "type": "io.netty.util.AbstractReferenceCounted",
+      "type": "io.netty.incubator.codec.quic.BoringSSL",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLCertificateCallback"
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLCertificateCallbackTask",
+      "jniAccessible": true,
       "fields": [
         {
-          "name": "refCnt"
+          "name": "chain"
+        },
+        {
+          "name": "key"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "byte[]",
+            "byte[][]",
+            "java.lang.String[]",
+            "io.netty.incubator.codec.quic.BoringSSLCertificateCallback"
+          ]
         }
       ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLCertificateVerifyCallback"
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLCertificateVerifyCallbackTask",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "byte[][]",
+            "java.lang.String",
+            "io.netty.incubator.codec.quic.BoringSSLCertificateVerifyCallback"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLHandshakeCompleteCallback",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "handshakeComplete",
+          "parameterTypes": [
+            "long",
+            "byte[]",
+            "java.lang.String",
+            "java.lang.String",
+            "byte[]",
+            "byte[][]",
+            "long",
+            "long",
+            "byte[]",
+            "boolean"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLKeylogCallback",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "logKey",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLNativeStaticallyReferencedJniMethods",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLPrivateKeyMethodDecryptTask",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "byte[]",
+            "io.netty.incubator.codec.quic.BoringSSLPrivateKeyMethod"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLPrivateKeyMethodSignTask",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "long",
+            "int",
+            "byte[]",
+            "io.netty.incubator.codec.quic.BoringSSLPrivateKeyMethod"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLPrivateKeyMethodTask",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "resultBytes"
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLSessionCallback",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "newSession",
+          "parameterTypes": [
+            "long",
+            "long",
+            "long",
+            "byte[]",
+            "boolean",
+            "byte[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLSessionTicketCallback",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "findSessionTicket",
+          "parameterTypes": [
+            "byte[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLTask",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "complete"
+        },
+        {
+          "name": "returnValue"
+        }
+      ],
+      "methods": [
+        {
+          "name": "destroy",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.BoringSSLTlsextServernameCallback",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "selectCtx",
+          "parameterTypes": [
+            "long",
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.Quiche",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.QuicheLogger",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "log",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.QuicheNativeStaticallyReferencedJniMethods",
+      "jniAccessible": true
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.QuicheQuicChannel"
+    },
+    {
+      "type": "io.netty.incubator.codec.quic.QuicheQuicClientCodec"
     },
     {
       "type": "io.netty.util.DefaultAttributeMap"
@@ -453,10 +683,35 @@
       "type": "io.netty.util.ResourceLeakDetector$DefaultResourceLeak"
     },
     {
+      "type": "io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap"
+    },
+    {
+      "type": "io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap$Index"
+    },
+    {
+      "type": "io.netty.util.concurrent.ConcurrentSkipListIntObjMultimap$Node"
+    },
+    {
       "type": "io.netty.util.concurrent.DefaultPromise"
     },
     {
+      "type": "io.netty.util.concurrent.MpscIntQueue$MpscAtomicIntegerArrayQueue"
+    },
+    {
       "type": "io.netty.util.concurrent.SingleThreadEventExecutor"
+    },
+    {
+      "type": "io.netty.util.internal.CleanerJava25$CleanableDirectBufferImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.lang.AutoCloseable",
+            "java.nio.ByteBuffer",
+            "long"
+          ]
+        }
+      ]
     },
     {
       "type": "io.netty.util.internal.NativeLibraryUtil",
@@ -471,52 +726,28 @@
       ]
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueColdProducerFields",
-      "fields": [
-        {
-          "name": "producerLimit"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.BaseMpscLinkedAtomicArrayQueueColdProducerFields"
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueConsumerFields",
-      "fields": [
-        {
-          "name": "consumerIndex"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.BaseMpscLinkedAtomicArrayQueueConsumerFields"
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.BaseMpscLinkedArrayQueueProducerFields",
-      "fields": [
-        {
-          "name": "producerIndex"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.BaseMpscLinkedAtomicArrayQueueProducerFields"
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueConsumerIndexField",
-      "fields": [
-        {
-          "name": "consumerIndex"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.MpmcAtomicArrayQueueConsumerIndexField"
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerIndexField",
-      "fields": [
-        {
-          "name": "producerIndex"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.MpmcAtomicArrayQueueProducerIndexField"
     },
     {
-      "type": "io.netty.util.internal.shaded.org.jctools.queues.unpadded.MpscUnpaddedArrayQueueProducerLimitField",
-      "fields": [
-        {
-          "name": "producerLimit"
-        }
-      ]
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.unpadded.MpscAtomicUnpaddedArrayQueueConsumerIndexField"
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.unpadded.MpscAtomicUnpaddedArrayQueueProducerIndexField"
+    },
+    {
+      "type": "io.netty.util.internal.shaded.org.jctools.queues.atomic.unpadded.MpscAtomicUnpaddedArrayQueueProducerLimitField"
     },
     {
       "type": "java.io.FileDescriptor",
@@ -532,9 +763,6 @@
       "jniAccessible": true
     },
     {
-      "type": "java.lang.BaseVirtualThread"
-    },
-    {
       "type": "java.lang.Boolean",
       "jniAccessible": true,
       "methods": [
@@ -542,6 +770,12 @@
           "name": "getBoolean",
           "parameterTypes": [
             "java.lang.String"
+          ]
+        },
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "boolean"
           ]
         }
       ]
@@ -556,13 +790,45 @@
       ]
     },
     {
+      "type": "java.lang.Integer",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.Long",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "valueOf",
+          "parameterTypes": [
+            "long"
+          ]
+        }
+      ]
+    },
+    {
       "type": "java.lang.Module",
       "methods": [
         {
           "name": "getDescriptor",
           "parameterTypes": []
+        },
+        {
+          "name": "isNativeAccessEnabled",
+          "parameterTypes": []
         }
       ]
+    },
+    {
+      "type": "java.lang.Object",
+      "jniAccessible": true
     },
     {
       "type": "java.lang.OutOfMemoryError",
@@ -599,6 +865,136 @@
       ]
     },
     {
+      "type": "java.lang.foreign.Arena",
+      "methods": [
+        {
+          "name": "allocate",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "ofShared",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.MemorySegment",
+      "methods": [
+        {
+          "name": "address",
+          "parameterTypes": []
+        },
+        {
+          "name": "asByteBuffer",
+          "parameterTypes": []
+        },
+        {
+          "name": "ofBuffer",
+          "parameterTypes": [
+            "java.nio.Buffer"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.invoke.MethodHandles",
+      "methods": [
+        {
+          "name": "byteArrayViewVarHandle",
+          "parameterTypes": [
+            "java.lang.Class",
+            "java.nio.ByteOrder"
+          ]
+        },
+        {
+          "name": "byteBufferViewVarHandle",
+          "parameterTypes": [
+            "java.lang.Class",
+            "java.nio.ByteOrder"
+          ]
+        },
+        {
+          "name": "privateLookupIn",
+          "parameterTypes": [
+            "java.lang.Class",
+            "java.lang.invoke.MethodHandles$Lookup"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.invoke.MethodHandles$Lookup",
+      "methods": [
+        {
+          "name": "findVarHandle",
+          "parameterTypes": [
+            "java.lang.Class",
+            "java.lang.String",
+            "java.lang.Class"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.invoke.VarHandle",
+      "methods": [
+        {
+          "name": "acquireFence",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.management.ManagementFactory",
+      "methods": [
+        {
+          "name": "getRuntimeMXBean",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.management.RuntimeMXBean",
+      "methods": [
+        {
+          "name": "getInputArguments",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.net.Inet4Address",
+      "jniAccessible": true
+    },
+    {
+      "type": "java.net.Inet6Address",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getByAddress",
+          "parameterTypes": [
+            "java.lang.String",
+            "byte[]",
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.net.InetAddress",
+      "jniAccessible": true,
+      "methods": [
+        {
+          "name": "getByAddress",
+          "parameterTypes": [
+            "byte[]"
+          ]
+        }
+      ]
+    },
+    {
       "type": "java.net.InetSocketAddress",
       "jniAccessible": true,
       "methods": [
@@ -608,15 +1004,19 @@
             "java.lang.String",
             "int"
           ]
+        },
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "java.net.InetAddress",
+            "int"
+          ]
         }
       ]
     },
     {
       "type": "java.net.PortUnreachableException",
       "jniAccessible": true
-    },
-    {
-      "type": "java.nio.Bits"
     },
     {
       "type": "java.nio.Buffer",
@@ -644,7 +1044,40 @@
       ]
     },
     {
-      "type": "java.nio.ByteBuffer"
+      "type": "java.nio.ByteBuffer",
+      "methods": [
+        {
+          "name": "alignedSlice",
+          "parameterTypes": [
+            "int"
+          ]
+        },
+        {
+          "name": "put",
+          "parameterTypes": [
+            "int",
+            "java.nio.ByteBuffer",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "put",
+          "parameterTypes": [
+            "int",
+            "byte[]",
+            "int",
+            "int"
+          ]
+        },
+        {
+          "name": "slice",
+          "parameterTypes": [
+            "int",
+            "int"
+          ]
+        }
+      ]
     },
     {
       "type": "java.nio.DirectByteBuffer"
@@ -675,13 +1108,7 @@
       "type": "java.security.interfaces.RSAPublicKey"
     },
     {
-      "type": "jdk.internal.misc.Unsafe",
-      "methods": [
-        {
-          "name": "getUnsafe",
-          "parameterTypes": []
-        }
-      ]
+      "type": "javax.net.ssl.X509ExtendedTrustManager"
     },
     {
       "type": "libcore.io.Memory"
@@ -693,27 +1120,46 @@
       "type": "org.bouncycastle.jce.provider.BouncyCastleProvider"
     },
     {
-      "type": "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"
-    },
-    {
       "type": "org.bouncycastle.openssl.PEMParser"
     },
     {
       "type": "org.robolectric.Robolectric"
     },
     {
+      "type": "sun.management.VMManagementImpl",
+      "jniAccessible": true,
+      "fields": [
+        {
+          "name": "compTimeMonitoringSupport"
+        },
+        {
+          "name": "currentThreadCpuTimeSupport"
+        },
+        {
+          "name": "objectMonitorUsageSupport"
+        },
+        {
+          "name": "otherThreadCpuTimeSupport"
+        },
+        {
+          "name": "remoteDiagnosticCommandsSupport"
+        },
+        {
+          "name": "synchronizerUsageSupport"
+        },
+        {
+          "name": "threadAllocatedMemorySupport"
+        },
+        {
+          "name": "threadContentionMonitoringSupport"
+        }
+      ]
+    },
+    {
       "type": "sun.misc.Unsafe",
       "fields": [
         {
           "name": "theUnsafe"
-        }
-      ],
-      "methods": [
-        {
-          "name": "invokeCleaner",
-          "parameterTypes": [
-            "java.nio.ByteBuffer"
-          ]
         }
       ]
     },
@@ -755,6 +1201,24 @@
     },
     {
       "type": "sun.security.provider.DSA$SHA256withDSA",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$DualFormatJKS",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "sun.security.provider.JavaKeyStore$JKS",
       "methods": [
         {
           "name": "<init>",
@@ -1064,6 +1528,12 @@
   ],
   "resources": [
     {
+      "glob": "META-INF/native/libnetty_quiche_osx_aarch_64.dylib"
+    },
+    {
+      "glob": "META-INF/native/libnetty_quiche_osx_aarch_64.jnilib"
+    },
+    {
       "glob": "META-INF/native/libnetty_transport_native_kqueue_aarch_64.dylib"
     },
     {
@@ -1077,9 +1547,6 @@
     },
     {
       "glob": "META-INF/services/java.net.spi.URLStreamHandlerProvider"
-    },
-    {
-      "glob": "META-INF/services/java.nio.channels.spi.SelectorProvider"
     },
     {
       "glob": "META-INF/services/java.time.zone.ZoneRulesProvider"
@@ -1106,6 +1573,18 @@
     {
       "module": "java.base",
       "glob": "jdk/internal/icu/impl/data/icudt76b/nfkc.nrm"
+    },
+    {
+      "module": "java.base",
+      "glob": "jdk/internal/icu/impl/data/icudt76b/uprops.icu"
+    },
+    {
+      "module": "java.base",
+      "glob": "sun/net/idn/uidna.spp"
+    },
+    {
+      "module": "jdk.jfr",
+      "glob": "jdk/jfr/internal/types/metadata.bin"
     }
   ]
 }

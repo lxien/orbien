@@ -19,8 +19,6 @@ package io.github.lxien.orbien.server.uid.utils;
 
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.StringUtils;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.concurrent.ConcurrentHashMap;
@@ -83,7 +81,7 @@ public class NamingThreadFactory implements ThreadFactory {
         // If there is no specified name for thread, it will auto detect using the invoker classname instead.
         // Notice that auto detect may cause some performance overhead
         String prefix = this.name;
-        if (StringUtils.isBlank(prefix)) {
+        if (prefix == null || prefix.isBlank()) {
             prefix = getInvoker(2);
         }
         thread.setName(prefix + "-" + getSequence(prefix));
@@ -112,9 +110,14 @@ public class NamingThreadFactory implements ThreadFactory {
         Exception e = new Exception();
         StackTraceElement[] stes = e.getStackTrace();
         if (stes.length > depth) {
-            return ClassUtils.getShortClassName(stes[depth].getClassName());
+            return shortClassName(stes[depth].getClassName());
         }
         return getClass().getSimpleName();
+    }
+
+    private static String shortClassName(String className) {
+        int index = className.lastIndexOf('.');
+        return index >= 0 ? className.substring(index + 1) : className;
     }
 
     /**

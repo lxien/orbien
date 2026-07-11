@@ -17,9 +17,11 @@
  */
 package io.github.lxien.orbien.server.uid.utils;
 
-import org.apache.commons.lang.time.DateFormatUtils;
-
-import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -28,7 +30,9 @@ import java.util.Date;
  *
  * @author yutianbao
  */
-public abstract class DateUtils extends org.apache.commons.lang.time.DateUtils {
+public abstract class DateUtils {
+    private static final ZoneId DEFAULT_ZONE = ZoneId.systemDefault();
+
     /**
      * Patterns
      */
@@ -36,13 +40,17 @@ public abstract class DateUtils extends org.apache.commons.lang.time.DateUtils {
     public static final String DATETIME_PATTERN = "yyyy-MM-dd HH:mm:ss";
     public static final String DATETIME_MS_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
 
+    private static final DateTimeFormatter DAY_FORMATTER = DateTimeFormatter.ofPattern(DAY_PATTERN);
+    private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern(DATETIME_PATTERN);
+    private static final DateTimeFormatter DATETIME_MS_FORMATTER = DateTimeFormatter.ofPattern(DATETIME_MS_PATTERN);
+
     public static final Date DEFAULT_DATE = DateUtils.parseByDayPattern("1970-01-01");
+
+    private DateUtils() {
+    }
 
     /**
      * Parse date by 'yyyy-MM-dd' pattern
-     *
-     * @param str
-     * @return
      */
     public static Date parseByDayPattern(String str) {
         return parseDate(str, DAY_PATTERN);
@@ -50,70 +58,79 @@ public abstract class DateUtils extends org.apache.commons.lang.time.DateUtils {
 
     /**
      * Parse date by 'yyyy-MM-dd HH:mm:ss' pattern
-     *
-     * @param str
-     * @return
      */
     public static Date parseByDateTimePattern(String str) {
         return parseDate(str, DATETIME_PATTERN);
     }
 
     /**
-     * Parse date without Checked exception
-     *
-     * @param str
-     * @param pattern
-     * @return
-     * @throws RuntimeException when ParseException occurred
+     * Parse date without checked exception
      */
     public static Date parseDate(String str, String pattern) {
         try {
-            return parseDate(str, new String[]{pattern});
-        } catch (ParseException e) {
+            if (DAY_PATTERN.equals(pattern)) {
+                LocalDate localDate = LocalDate.parse(str, DAY_FORMATTER);
+                return Date.from(localDate.atStartOfDay(DEFAULT_ZONE).toInstant());
+            }
+            if (DATETIME_PATTERN.equals(pattern)) {
+                LocalDateTime dateTime = LocalDateTime.parse(str, DATETIME_FORMATTER);
+                return Date.from(dateTime.atZone(DEFAULT_ZONE).toInstant());
+            }
+            if (DATETIME_MS_PATTERN.equals(pattern)) {
+                LocalDateTime dateTime = LocalDateTime.parse(str, DATETIME_MS_FORMATTER);
+                return Date.from(dateTime.atZone(DEFAULT_ZONE).toInstant());
+            }
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            if (pattern.contains("H") || pattern.contains("m") || pattern.contains("s")) {
+                LocalDateTime dateTime = LocalDateTime.parse(str, formatter);
+                return Date.from(dateTime.atZone(DEFAULT_ZONE).toInstant());
+            }
+            LocalDate localDate = LocalDate.parse(str, formatter);
+            return Date.from(localDate.atStartOfDay(DEFAULT_ZONE).toInstant());
+        } catch (DateTimeParseException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
      * Format date into string
-     *
-     * @param date
-     * @param pattern
-     * @return
      */
     public static String formatDate(Date date, String pattern) {
-        return DateFormatUtils.format(date, pattern);
+        if (date == null) {
+            return null;
+        }
+        if (DAY_PATTERN.equals(pattern)) {
+            return DAY_FORMATTER.format(date.toInstant().atZone(DEFAULT_ZONE).toLocalDate());
+        }
+        if (DATETIME_PATTERN.equals(pattern)) {
+            return DATETIME_FORMATTER.format(date.toInstant().atZone(DEFAULT_ZONE).toLocalDateTime());
+        }
+        if (DATETIME_MS_PATTERN.equals(pattern)) {
+            return DATETIME_MS_FORMATTER.format(date.toInstant().atZone(DEFAULT_ZONE).toLocalDateTime());
+        }
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        if (pattern.contains("H") || pattern.contains("m") || pattern.contains("s")) {
+            return formatter.format(date.toInstant().atZone(DEFAULT_ZONE).toLocalDateTime());
+        }
+        return formatter.format(date.toInstant().atZone(DEFAULT_ZONE).toLocalDate());
     }
 
     /**
      * Format date by 'yyyy-MM-dd' pattern
-     *
-     * @param date
-     * @return
      */
     public static String formatByDayPattern(Date date) {
-        if (date != null) {
-            return DateFormatUtils.format(date, DAY_PATTERN);
-        } else {
-            return null;
-        }
+        return formatDate(date, DAY_PATTERN);
     }
 
     /**
      * Format date by 'yyyy-MM-dd HH:mm:ss' pattern
-     *
-     * @param date
-     * @return
      */
     public static String formatByDateTimePattern(Date date) {
-        return DateFormatUtils.format(date, DATETIME_PATTERN);
+        return formatDate(date, DATETIME_PATTERN);
     }
 
     /**
-     * Get current day using format date by 'yyyy-MM-dd HH:mm:ss' pattern
-     *
-     * @return
-     * @author yebo
+     * Get current day using format date by 'yyyy-MM-dd' pattern
      */
     public static String getCurrentDayByDayPattern() {
         Calendar cal = Calendar.getInstance();

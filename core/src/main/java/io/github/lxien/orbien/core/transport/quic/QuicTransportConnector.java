@@ -9,7 +9,7 @@ import io.github.lxien.orbien.core.transport.pipeline.TmspPipelineConfigurer;
 import io.github.lxien.orbien.core.transport.session.NettyTransportSession;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
-import io.netty.incubator.codec.quic.*;
+import io.netty.handler.codec.quic.*;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.internal.logging.InternalLogger;

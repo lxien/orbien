@@ -9,7 +9,6 @@
     <properties>
         <caffeine.version>3.2.3</caffeine.version>
         <jjwt.version>0.12.5</jjwt.version>
-        <jackson.version>3.0.4</jackson.version>
     </properties>
     <artifactId>orbien-console</artifactId>
     <packaging>jar</packaging>
@@ -119,11 +118,6 @@
             <scope>runtime</scope>
         </dependency>
 
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>

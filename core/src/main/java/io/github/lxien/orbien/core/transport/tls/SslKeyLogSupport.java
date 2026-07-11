@@ -1,7 +1,7 @@
 package io.github.lxien.orbien.core.transport.tls;
 
-import io.netty.incubator.codec.quic.BoringSSLKeylog;
-import io.netty.incubator.codec.quic.QuicSslContextBuilder;
+import io.netty.handler.codec.quic.BoringSSLKeylog;
+import io.netty.handler.codec.quic.QuicSslContextBuilder;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 

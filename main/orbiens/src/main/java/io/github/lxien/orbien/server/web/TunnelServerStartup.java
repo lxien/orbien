@@ -39,7 +39,8 @@ public class TunnelServerStartup {
         NettyJvmSupport.ensureNativeAccess();
         AppConfig config = ConfigParser.parse(args);
         DashboardConfig dashboard = config.getDashboard();
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class);
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class)
+                .main(TunnelServerStartup.class);
         if (Boolean.TRUE.equals(dashboard.getEnabled())) {
             DashboardSpringBootSupport.apply(builder, dashboard);
         } else {

@@ -19,6 +19,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.quic.QuicStreamChannel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,7 +133,7 @@ public class CreateConnectionAction extends AgentBaseAction {
     }
 
     private static Object describeQuicStreamId(Channel tunnel) {
-        if (tunnel instanceof io.netty.incubator.codec.quic.QuicStreamChannel streamChannel) {
+        if (tunnel instanceof QuicStreamChannel streamChannel) {
             return streamChannel.streamId();
         }
         return "n/a";

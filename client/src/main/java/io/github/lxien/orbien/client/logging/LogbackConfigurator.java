@@ -21,6 +21,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.FileAppender;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.rolling.RollingFileAppender;
 import ch.qos.logback.core.rolling.TimeBasedRollingPolicy;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
@@ -195,8 +197,10 @@ public class LogbackConfigurator {
     }
 
     public void configure() {
-        LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+        LoggerContext context = resolveLoggerContext();
         context.reset();
+
+        new File(config.getPath()).mkdirs();
 
         // 配置编码器
         PatternLayoutEncoder encoder = new PatternLayoutEncoder();
@@ -211,24 +215,8 @@ public class LogbackConfigurator {
         consoleAppender.setEncoder(encoder);
         consoleAppender.start();
 
-        // 配置文件输出
-        RollingFileAppender<ILoggingEvent> fileAppender = new RollingFileAppender<>();
-        fileAppender.setContext(context);
-        fileAppender.setName("File");
-        fileAppender.setFile(config.getLogFilePath());
-
-        // 配置按天滚动的策略
-        TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
-        rollingPolicy.setContext(context);
-        rollingPolicy.setParent(fileAppender);
-        rollingPolicy.setFileNamePattern(config.getArchiveFilePatternPath());
-        rollingPolicy.setMaxHistory(config.getMaxHistory());
-        rollingPolicy.setTotalSizeCap(FileSize.valueOf(config.getTotalSizeCap()));
-        rollingPolicy.start();
-
-        fileAppender.setRollingPolicy(rollingPolicy);
-        fileAppender.setEncoder(encoder);
-        fileAppender.start();
+        // 配置文件输出（GraalVM 原生镜像下滚动策略解析可能失败，退化为单文件）
+        ch.qos.logback.core.Appender<ILoggingEvent> fileAppender = createFileAppender(context, encoder);
 
         // 配置根 Logger
         Logger rootLogger = context.getLogger(Logger.ROOT_LOGGER_NAME);
@@ -242,5 +230,49 @@ public class LogbackConfigurator {
             Logger logger = context.getLogger(loggerName);
             logger.setLevel(level);
         }
+    }
+
+    private ch.qos.logback.core.Appender<ILoggingEvent> createFileAppender(
+            LoggerContext context, PatternLayoutEncoder encoder) {
+        RollingFileAppender<ILoggingEvent> rollingAppender = new RollingFileAppender<>();
+        rollingAppender.setContext(context);
+        rollingAppender.setName("File");
+        rollingAppender.setFile(config.getLogFilePath());
+        rollingAppender.setEncoder(encoder);
+
+        TimeBasedRollingPolicy<ILoggingEvent> rollingPolicy = new TimeBasedRollingPolicy<>();
+        rollingPolicy.setContext(context);
+        rollingPolicy.setParent(rollingAppender);
+        rollingPolicy.setFileNamePattern(config.getArchiveFilePatternPath());
+        rollingPolicy.setMaxHistory(config.getMaxHistory());
+        rollingPolicy.setTotalSizeCap(FileSize.valueOf(config.getTotalSizeCap()));
+        try {
+            rollingPolicy.start();
+            rollingAppender.setRollingPolicy(rollingPolicy);
+            rollingAppender.start();
+            return rollingAppender;
+        } catch (RuntimeException rollingError) {
+            rollingPolicy.stop();
+            rollingAppender.stop();
+            FileAppender<ILoggingEvent> plainAppender = new FileAppender<>();
+            plainAppender.setContext(context);
+            plainAppender.setName("File");
+            plainAppender.setFile(config.getLogFilePath());
+            plainAppender.setAppend(true);
+            plainAppender.setEncoder(encoder);
+            plainAppender.start();
+            return plainAppender;
+        }
+    }
+    private static LoggerContext resolveLoggerContext() {
+        LoggerFactory.getLogger(LogbackConfigurator.class);
+        ILoggerFactory factory = LoggerFactory.getILoggerFactory();
+        if (factory instanceof LoggerContext loggerContext) {
+            return loggerContext;
+        }
+        LoggerContext context = new LoggerContext();
+        context.setName("orbienc");
+        context.start();
+        return context;
     }
 }

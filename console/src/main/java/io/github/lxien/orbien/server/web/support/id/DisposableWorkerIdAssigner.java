@@ -19,10 +19,11 @@ import io.github.lxien.orbien.server.uid.utils.DockerUtils;
 import io.github.lxien.orbien.server.uid.utils.NetUtils;
 import io.github.lxien.orbien.server.uid.worker.WorkerIdAssigner;
 import io.github.lxien.orbien.server.uid.worker.WorkerNodeType;
-import org.apache.commons.lang.math.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 
 /**
@@ -73,7 +74,7 @@ public class DisposableWorkerIdAssigner implements WorkerIdAssigner {
         } else {
             workerNodeEntity.setType(WorkerNodeType.ACTUAL.value());
             workerNodeEntity.setHostName(NetUtils.getLocalAddress());
-            workerNodeEntity.setPort(System.currentTimeMillis() + "-" + RandomUtils.nextInt(100000));
+            workerNodeEntity.setPort(System.currentTimeMillis() + "-" + ThreadLocalRandom.current().nextInt(100000));
         }
 
         return workerNodeEntity;

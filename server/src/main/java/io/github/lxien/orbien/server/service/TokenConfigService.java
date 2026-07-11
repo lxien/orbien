@@ -22,9 +22,9 @@ import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.server.service.repository.TokenQueryRepository;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +61,7 @@ public class TokenConfigService {
     }
 
     public void evictByTokens(Collection<String> tokens) {
-        if (CollectionUtils.isNotEmpty(tokens)) {
+        if (!CollectionUtils.isEmpty(tokens)) {
             tokenCache.invalidateAll(tokens);
             logger.debug("清理Token缓存：{}", tokens);
         }
