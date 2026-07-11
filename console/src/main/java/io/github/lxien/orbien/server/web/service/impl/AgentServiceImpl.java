@@ -15,6 +15,7 @@
  */
 package io.github.lxien.orbien.server.web.service.impl;
 
+import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.server.service.AgentConfigService;
 import io.github.lxien.orbien.server.statemachine.agent.AgentInfo;
 import io.github.lxien.orbien.server.statemachine.agent.AgentManager;
@@ -36,8 +37,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AgentServiceImpl implements AgentService {
@@ -62,28 +67,14 @@ public class AgentServiceImpl implements AgentService {
         }
 
         List<AgentDO> agents = agentPage.getContent();
-        List<AgentDTO> agentDTOList = agentConvert.toDTOList(agents);
-        agentDTOList.forEach(dto -> {
-            String agentId = dto.getId();
-            dto.setIsOnline(agentManager.isOnline(agentId));
-            agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
-                AgentInfo agentInfo = agentContext.getAgentInfo();
-                dto.setLastActiveTime(agentInfo.getLastActiveTime());
-            });
-        });
+        List<AgentDTO> agentDTOList = enrichAgents(agentConvert.toDTOList(agents));
         return PageResult.wrap(agentPage, agentDTOList);
     }
 
     @Override
     public AgentDTO findById(String agentId) {
         AgentDO agent = agentRepository.findById(agentId).orElseThrow(() -> new BizException("客户端不存在"));
-        AgentDTO dto = agentConvert.toDTO(agent);
-        dto.setIsOnline(agentManager.isOnline(dto.getId()));
-        agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
-            AgentInfo agentInfo = agentContext.getAgentInfo();
-            dto.setLastActiveTime(agentInfo.getLastActiveTime());
-        });
-        return dto;
+        return enrichAgent(agentConvert.toDTO(agent));
     }
 
     @Override
@@ -114,7 +105,41 @@ public class AgentServiceImpl implements AgentService {
 
     @Override
     public List<AgentDTO> findAll() {
-        List<AgentDO> all = agentRepository.findAll();
-        return agentConvert.toDTOList(all);
+        return enrichAgents(agentConvert.toDTOList(agentRepository.findAll()));
+    }
+
+    @Override
+    public List<AgentDTO> findForProxySelection(String includeAgentId) {
+        List<AgentDTO> standaloneAgents = enrichAgents(
+                agentConvert.toDTOList(agentRepository.findByAgentType(AgentType.STANDALONE)));
+
+        Map<String, AgentDTO> result = new LinkedHashMap<>();
+        standaloneAgents.forEach(dto -> result.put(dto.getId(), dto));
+
+        if (StringUtils.hasText(includeAgentId)) {
+            String agentId = includeAgentId.trim();
+            if (!result.containsKey(agentId)) {
+                agentRepository.findById(agentId)
+                        .map(agentConvert::toDTO)
+                        .map(this::enrichAgent)
+                        .ifPresent(dto -> result.put(dto.getId(), dto));
+            }
+        }
+        return new ArrayList<>(result.values());
+    }
+
+    private List<AgentDTO> enrichAgents(List<AgentDTO> agents) {
+        agents.forEach(this::enrichAgent);
+        return agents;
+    }
+
+    private AgentDTO enrichAgent(AgentDTO dto) {
+        String agentId = dto.getId();
+        dto.setIsOnline(agentManager.isOnline(agentId));
+        agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
+            AgentInfo agentInfo = agentContext.getAgentInfo();
+            dto.setLastActiveTime(agentInfo.getLastActiveTime());
+        });
+        return dto;
     }
 }

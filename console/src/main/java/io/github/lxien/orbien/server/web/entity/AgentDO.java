@@ -36,7 +36,7 @@ public class AgentDO {
     @Column(name = "id", nullable = false)
     private String id;
     /**
-     * 系统用户名
+     * 客户端名称
      */
     @Column(name = "name", nullable = false)
     private String name;
@@ -46,7 +46,7 @@ public class AgentDO {
     @Column(name = "token", nullable = false)
     private String token;
     /**
-     * 代理类型
+     * 客户端类型
      */
     @Column(name = "agentType", nullable = false)
     @Convert(converter = AgentTypeConverter.class)

@@ -52,6 +52,9 @@ final class AppConfigBuilder {
     private static AuthConfig buildAuthConfig(OrbienClientProperties properties) {
         AuthConfig authConfig = new AuthConfig();
         authConfig.setToken(properties.getAuth().getToken());
+        if (StringUtils.hasText(properties.getAuth().getName())) {
+            authConfig.setName(properties.getAuth().getName().trim());
+        }
         return authConfig;
     }
 

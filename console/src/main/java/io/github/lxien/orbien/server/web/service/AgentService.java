@@ -37,4 +37,9 @@ public interface AgentService {
     void deleteBatch(AgentBatchDeleteParam param);
 
     List<AgentDTO> findAll();
+
+    /**
+     * 标准客户端列表（代理绑定）
+     */
+    List<AgentDTO> findForProxySelection(String includeAgentId);
 }

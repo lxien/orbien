@@ -13,6 +13,16 @@ export function fetchGetAgentListByPage(params: Api.Common.CommonSearchParams) {
 }
 
 /**
+ * 获取标准客户端列表（代理绑定）
+ */
+export function fetchGetAgentsForProxySelection(includeId?: string) {
+  return request.get<Api.Agent.AgentDTO[]>({
+    url: '/api/agents/list-for-proxy',
+    params: includeId ? { includeId } : undefined
+  })
+}
+
+/**
  * 获取所有客户端列表
  * @returns 客户端列表
  */

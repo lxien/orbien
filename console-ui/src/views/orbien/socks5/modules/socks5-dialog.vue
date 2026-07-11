@@ -19,7 +19,12 @@
             :disabled="dialogType === 'edit'"
             style="width: 250px"
         >
-          <ElOption v-for="agent in agents" :key="agent.id" :label="agent.name" :value="agent.id"/>
+          <ElOption
+              v-for="agent in agents"
+              :key="agent.id"
+              :label="formatAgentOptionLabel(agent)"
+              :value="agent.id"
+          />
         </ElSelect>
       </ElFormItem>
 
@@ -132,10 +137,11 @@ import {ref, reactive, watch, computed} from 'vue'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
 import {DialogType} from '@/types'
-import {fetchGetAgentListAll} from '@/api/agent'
+import {fetchGetAgentsForProxySelection} from '@/api/agent'
 import {fetchCreateSocks5Proxy, fetchUpdateSocks5Proxy, fetchGetSocks5ProxyById} from '@/api/proxy'
 import {fetchSuggestAvailablePorts} from '@/api/port-pool'
 import {PortPoolType} from '@/enums/orbien/business'
+import {formatAgentOptionLabel} from '@/views/orbien/agent/shared/format-agent-option'
 
 defineOptions({name: 'Socks5Dialog'})
 
@@ -322,7 +328,8 @@ const openDialog = async () => {
   formRef.value?.clearValidate()
 
   try {
-    agents.value = await fetchGetAgentListAll() || []
+    const includeId = props.type === 'edit' ? props.proxyData?.agentId : undefined
+    agents.value = await fetchGetAgentsForProxySelection(includeId) || []
   } catch (error) {
     console.error('获取客户端列表失败:', error)
     ElMessage.error('获取客户端列表失败')

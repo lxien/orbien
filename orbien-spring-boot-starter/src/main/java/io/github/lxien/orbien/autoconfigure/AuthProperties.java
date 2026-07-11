@@ -22,5 +22,5 @@ import java.io.Serializable;
 @Data
 public class AuthProperties  implements Serializable {
     private String token;
-
+    private String name;
 }

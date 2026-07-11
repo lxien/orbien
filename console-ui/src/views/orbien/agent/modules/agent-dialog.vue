@@ -2,6 +2,7 @@
   <ElDialog v-model="dialogVisible" title="客户端详情" width="60%" align-center>
     <div v-if="localClientData" class="mt-5">
       <ElDescriptions :column="2" border>
+        <ElDescriptionsItem label="客户端 ID">{{ localClientData.id }}</ElDescriptionsItem>
         <ElDescriptionsItem label="客户端名称">{{ localClientData.name }}</ElDescriptionsItem>
         <ElDescriptionsItem label="访问令牌">{{ localClientData.token }}</ElDescriptionsItem>
         <ElDescriptionsItem label="状态">
@@ -9,9 +10,11 @@
             {{ getStatusText(localClientData.isOnline) }}
           </ElTag>
         </ElDescriptionsItem>
-        <ElDescriptionsItem label="类型">{{
-          getAgentTypeLabel(localClientData.agentType)
-        }}</ElDescriptionsItem>
+        <ElDescriptionsItem label="类型">
+          <ElTag :type="getAgentTypeTag(localClientData.agentType).type">
+            {{ getAgentTypeTag(localClientData.agentType).text }}
+          </ElTag>
+        </ElDescriptionsItem>
         <ElDescriptionsItem label="操作系统">{{ localClientData.os }}</ElDescriptionsItem>
         <ElDescriptionsItem label="架构">{{ localClientData.arch }}</ElDescriptionsItem>
         <ElDescriptionsItem label="版本">{{ localClientData.version }}</ElDescriptionsItem>
@@ -41,7 +44,7 @@
   import { ref, computed, watch, nextTick } from 'vue'
   import { ElTag, ElDescriptions, ElSkeleton, ElButton, ElMessage } from 'element-plus'
   import { fetchGetAgentById } from '@/api/agent'
-  import { getAgentTypeLabel } from '@/enums/orbien/business'
+  import { getAgentTypeTag } from '@/enums/orbien/business'
 
   interface Props {
     visible: boolean

@@ -146,6 +146,10 @@ public class TomlConfigLoader implements ConfigSource {
             String token = authTable.getString("token", "");
             AuthConfig authConfig = new AuthConfig();
             authConfig.setToken(token.trim());
+            String name = authTable.getString("name");
+            if (StringUtils.hasText(name)) {
+                authConfig.setName(name.trim());
+            }
             builder.authConfig(authConfig);
         }
 

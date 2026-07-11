@@ -38,7 +38,7 @@ public class AuthAction extends AgentBaseAction {
                     .setAgentType(agentType)
                     .setOs(OSUtils.getOS())
                     .setArch(OSUtils.getOSArch())
-                    .setName(OSUtils.getHostName());
+                    .setName(resolveAgentName(authConfig));
 
             AgentIdentity agentIdentity = ctx.getAgentIdentity();
             String agentId = agentIdentity.getIdentity();
@@ -60,6 +60,13 @@ public class AuthAction extends AgentBaseAction {
             logger.error("认证失败", e);
             ctx.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
+    }
+
+    private String resolveAgentName(AuthConfig authConfig) {
+        if (authConfig != null && StringUtils.hasText(authConfig.getName())) {
+            return authConfig.getName().trim();
+        }
+        return OSUtils.getHostName();
     }
 
     private Message.AgentType toProto(AgentType agentType) {

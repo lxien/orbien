@@ -1,5 +1,6 @@
 package io.github.lxien.orbien.server.web.repository;
 
+import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.server.web.entity.AgentDO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,6 @@ import java.util.List;
 public interface AgentRepository extends JpaRepository<AgentDO, String> {
 
     List<AgentDO> findByLastActiveTimeBefore(LocalDateTime cutoff);
+
+    List<AgentDO> findByAgentType(AgentType agentType);
 }

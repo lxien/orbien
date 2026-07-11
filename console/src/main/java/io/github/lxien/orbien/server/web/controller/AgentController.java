@@ -46,6 +46,12 @@ public class AgentController {
         return Ajax.success(clients);
     }
 
+    @GetMapping("list-for-proxy")
+    public Ajax listForProxy(@RequestParam(required = false) String includeId) {
+        List<AgentDTO> clients = agentService.findForProxySelection(includeId);
+        return Ajax.success(clients);
+    }
+
     @GetMapping("/{id}")
     public Ajax getById(@PathVariable String id) {
         AgentDTO client = agentService.findById(id);

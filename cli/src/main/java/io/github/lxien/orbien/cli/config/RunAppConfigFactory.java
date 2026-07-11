@@ -50,16 +50,19 @@ public final class RunAppConfigFactory {
     }
 
     private static void mergeAuth(DefaultAppConfig.Builder builder, AuthConfig fileAuth) {
+        AuthConfig authConfig = new AuthConfig();
+        if (fileAuth != null && StringUtils.hasText(fileAuth.getName())) {
+            authConfig.setName(fileAuth.getName().trim());
+        }
+
         String fileToken = fileAuth != null ? fileAuth.getToken() : null;
         if (StringUtils.hasText(fileToken)) {
-            AuthConfig authConfig = new AuthConfig();
             authConfig.setToken(fileToken.trim());
             builder.authConfig(authConfig);
             return;
         }
 
         Credentials credentials = CredentialsStore.loadOrThrow();
-        AuthConfig authConfig = new AuthConfig();
         authConfig.setToken(credentials.getToken());
         builder.authConfig(authConfig);
     }

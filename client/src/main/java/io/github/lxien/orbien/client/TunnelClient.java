@@ -104,7 +104,7 @@ public final class TunnelClient implements Lifecycle {
     }
 
     /**
-     * 外部 shutdown hook 调用，只做资源清理，不触发进程退出。
+     * Shutdown hook 入口，仅释放资源。
      */
     public void shutdownGracefully() {
         stopInternal(true);

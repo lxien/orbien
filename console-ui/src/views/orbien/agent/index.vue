@@ -37,6 +37,7 @@
   import { fetchGetAgentListByPage, fetchKickoutAgent, fetchDeleteBatchAgents } from '@/api/agent'
   import AgentDialog from './modules/agent-dialog.vue'
   import { ElTag, ElMessageBox, ElMessage } from 'element-plus'
+  import { getAgentTypeTag } from '@/enums/orbien/business'
 
   defineOptions({ name: 'ClientManagement' })
 
@@ -85,6 +86,14 @@
         {
           prop: 'name',
           label: '名称'
+        },
+        {
+          prop: 'agentType',
+          label: '类型',
+          formatter: (row: ClientItem) => {
+            const typeConfig = getAgentTypeTag(row.agentType)
+            return h(ElTag, { type: typeConfig.type, size: 'small' }, () => typeConfig.text)
+          }
         },
         {
           prop: 'os',

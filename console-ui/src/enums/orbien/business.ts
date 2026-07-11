@@ -131,9 +131,14 @@ export function getDomainTypeLabel(domainType: number) {
             return {type: 'info' as const, text: '未知'}
     }
 }
-
-export function getAgentTypeLabel(agentType?: number) {
-    return agentType === AgentType.STANDALONE ? 'Standalone' : 'Session'
+export function getAgentTypeTag(agentType?: number) {
+    if (agentType === AgentType.STANDALONE) {
+        return { type: 'primary' as const, text: '标准' }
+    }
+    if (agentType === AgentType.SESSION) {
+        return { type: 'warning' as const, text: '会话' }
+    }
+    return { type: 'info' as const, text: '未知' }
 }
 
 export function getPortPoolTypeLabel(type: number) {
