@@ -23,6 +23,7 @@ import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.dto.tls.TlsCertAutoRenewResultDTO;
 import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
 import io.github.lxien.orbien.server.web.dto.tls.TlsCertDownloadDTO;
+import io.github.lxien.orbien.server.web.enums.CertSource;
 import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveAndDeployParam;
 import io.github.lxien.orbien.server.web.param.tls.TlsCertSaveParam;
 import io.github.lxien.orbien.server.web.dto.binding.CertBindResultDTO;
@@ -35,6 +36,8 @@ public interface TlsCertificateService {
     TlsCertDTO saveCert(TlsCertSaveParam param);
 
     TlsCertDTO saveAcmeCert(String keyPem, String fullChainPem);
+
+    TlsCertDTO saveOrGetCert(String keyPem, String fullChainPem, CertSource source);
 
     PageResult<TlsCertDTO> findByPage(PageQuery pageQuery);
 

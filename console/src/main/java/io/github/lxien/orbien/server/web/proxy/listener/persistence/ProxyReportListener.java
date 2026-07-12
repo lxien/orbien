@@ -27,7 +27,11 @@ import io.github.lxien.orbien.server.event.ProxyAddEvent;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.proxy.converter.ProxyReportConvert;
 import io.github.lxien.orbien.server.web.repository.*;
+import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
+import io.github.lxien.orbien.server.web.service.TlsCertificateService;
+import io.github.lxien.orbien.server.web.dto.tls.TlsCertDTO;
+import io.github.lxien.orbien.server.web.enums.CertSource;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -85,6 +91,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private CertBindingSyncService certBindingSyncService;
+    @Autowired
+    private CertBindingService certBindingService;
+    @Autowired
+    private TlsCertificateService tlsCertificateService;
 
     @PostConstruct
     public void init() {
@@ -138,6 +148,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
             persistFileShareAuth(proxyId, proxy);
             persistFileShareLimits(proxyId, proxy);
             persistDomains(proxyId, event.getDomains());
+        }
+
+        if (protocol.requiresVisitorTls() && proxy.hasTlsCert()) {
+            persistReportedTlsCert(proxyId, proxy);
         }
 
         logger.debug("代理配置信息已保存到数据库: agentId={}, proxyId={}, name={}, protocol={}",
@@ -269,19 +283,60 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     }
 
     private void persistDomains(String proxyId, List<DomainInfo> domains) {
-        certBindingSyncService.removeBindingsByProxyId(proxyId);
-        proxyDomainRepository.deleteByProxyId(proxyId);
+        List<ProxyDomainDO> existing = proxyDomainRepository.findByProxyId(proxyId);
+        Set<String> incoming = CollectionUtils.isEmpty(domains)
+                ? Set.of()
+                : domains.stream().map(DomainInfo::getFullDomain).collect(Collectors.toSet());
+        Set<String> current = existing.stream()
+                .map(ProxyDomainDO::getFullDomain)
+                .collect(Collectors.toSet());
+
+        List<Long> removedIds = existing.stream()
+                .filter(row -> !incoming.contains(row.getFullDomain()))
+                .map(ProxyDomainDO::getId)
+                .toList();
+        if (!removedIds.isEmpty()) {
+            certBindingSyncService.removeBindingsByProxyDomainIds(removedIds);
+            proxyDomainRepository.deleteAllById(removedIds);
+        }
+
         if (CollectionUtils.isEmpty(domains)) {
             return;
         }
 
-        Set<ProxyDomainDO> proxyDomainDOS = domains.stream()
-                .map(domainInfo -> new ProxyDomainDO(
-                        proxyId,
-                        domainInfo.getDomain(),
-                        domainInfo.getRootDomain(),
-                        domainInfo.getDomainType()))
-                .collect(Collectors.toSet());
-        proxyDomainRepository.saveAll(proxyDomainDOS);
+        Set<String> toAdd = new HashSet<>(incoming);
+        toAdd.removeAll(current);
+        if (toAdd.isEmpty()) {
+            return;
+        }
+
+        List<ProxyDomainDO> rows = new ArrayList<>();
+        for (DomainInfo domainInfo : domains) {
+            if (!toAdd.contains(domainInfo.getFullDomain())) {
+                continue;
+            }
+            rows.add(new ProxyDomainDO(
+                    proxyId,
+                    domainInfo.getDomain(),
+                    domainInfo.getRootDomain(),
+                    domainInfo.getDomainType()));
+        }
+        if (!rows.isEmpty()) {
+            proxyDomainRepository.saveAll(rows);
+        }
+    }
+
+    private void persistReportedTlsCert(String proxyId, Message.Proxy proxy) {
+        Message.TlsCert tlsCert = proxy.getTlsCert();
+        if (!StringUtils.hasText(tlsCert.getPrivateKeyPem()) || !StringUtils.hasText(tlsCert.getCertChainPem())) {
+            return;
+        }
+        try {
+            TlsCertDTO cert = tlsCertificateService.saveOrGetCert(
+                    tlsCert.getPrivateKeyPem(), tlsCert.getCertChainPem(), CertSource.AGENT);
+            certBindingService.bindMatchingDomainsForProxy(cert.getId(), proxyId, true);
+        } catch (Exception e) {
+            logger.warn("客户端上报 TLS 证书处理失败: proxyId={}, name={}", proxyId, proxy.getName(), e);
+        }
     }
 }

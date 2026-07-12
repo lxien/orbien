@@ -354,29 +354,8 @@ public class TomlConfigLoader implements ConfigSource {
                         proxyConfig.setBasicAuth(basicAuthConfig);
                     }
                 }
-                //HTTPS TLS 证书
-                if (protocolType.isHttps()) {
-                    Toml tls = proxyTable.getTable("tls");
-                    if (tls == null) {
-                        tls = proxyTable.getTable("ssl");
-                    }
-                    if (tls != null) {
-                        String keyFile = tls.getString("key_file");
-                        String certFile = tls.getString("cert_file");
-                        if (!StringUtils.hasText(keyFile)) {
-                            throw new IllegalArgumentException("请配置私钥路径：" + keyFile);
-                        }
-                        if (!StringUtils.hasText(certFile)) {
-                            throw new IllegalArgumentException("请配置证书路径：" + certFile);
-                        }
-                        if (!new File(keyFile).exists()) {
-                            throw new IllegalArgumentException("私钥不存在，请检查私钥路径");
-                        }
-                        if (!new File(certFile).exists()) {
-                            throw new IllegalArgumentException("证书不存在，请检查证书路径");
-                        }
-                        proxyConfig.setTlsCertConfig(new ProxyTlsCertConfig(keyFile, certFile));
-                    }
+                if (protocolType.isHttps() || protocolType.isFile()) {
+                    applyTlsCertConfig(proxyTable, proxyConfig);
                 }
                 Toml healthCheck = proxyTable.getTable("health_check");
                 if (healthCheck != null) {
@@ -586,5 +565,30 @@ public class TomlConfigLoader implements ConfigSource {
         } catch (NumberFormatException e) {
             return FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
         }
+    }
+
+    private static void applyTlsCertConfig(Toml proxyTable, ProxyConfig proxyConfig) {
+        Toml tls = proxyTable.getTable("tls");
+        if (tls == null) {
+            tls = proxyTable.getTable("ssl");
+        }
+        if (tls == null) {
+            return;
+        }
+        String keyFile = tls.getString("key_file");
+        String certFile = tls.getString("cert_file");
+        if (!StringUtils.hasText(keyFile)) {
+            throw new IllegalArgumentException("请配置 tls.key_file");
+        }
+        if (!StringUtils.hasText(certFile)) {
+            throw new IllegalArgumentException("请配置 tls.cert_file");
+        }
+        if (!new File(keyFile).exists()) {
+            throw new IllegalArgumentException("私钥不存在: " + keyFile);
+        }
+        if (!new File(certFile).exists()) {
+            throw new IllegalArgumentException("证书不存在: " + certFile);
+        }
+        proxyConfig.setTlsCertConfig(new ProxyTlsCertConfig(keyFile, certFile));
     }
 }

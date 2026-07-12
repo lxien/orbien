@@ -23,7 +23,8 @@ import lombok.Getter;
 @Getter
 public enum CertSource {
     MANUAL(1, "手动上传"),
-    ACME(2, "自动申请");
+    ACME(2, "自动申请"),
+    AGENT(3, "客户端上报");
 
     private final Integer code;
     private final String description;

@@ -143,6 +143,12 @@ public class TlsCertServiceImpl implements TlsCertificateService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TlsCertDTO saveAcmeCert(String keyPem, String fullChainPem) {
+        return saveOrGetCert(keyPem, fullChainPem, CertSource.ACME);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public TlsCertDTO saveOrGetCert(String keyPem, String fullChainPem, CertSource source) {
         TlsCertParser.TlsCertInfo sslInfo = TlsCertParser.parsePem(fullChainPem);
         if (sslInfo.hasError()) {
             throw new BizException("证书不可用");
@@ -156,9 +162,9 @@ public class TlsCertServiceImpl implements TlsCertificateService {
         TlsCertSaveParam param = new TlsCertSaveParam(keyPem, fullChainPem);
         TlsCertDTO created = saveCert(param);
         TlsCertDO sslCertDO = tlsCertRepository.findById(created.getId()).orElseThrow();
-        sslCertDO.setSource(CertSource.ACME);
+        sslCertDO.setSource(source != null ? source : CertSource.MANUAL);
         tlsCertRepository.save(sslCertDO);
-        created.setSource(CertSource.ACME.getCode());
+        created.setSource(sslCertDO.getSource().getCode());
         return created;
     }
 

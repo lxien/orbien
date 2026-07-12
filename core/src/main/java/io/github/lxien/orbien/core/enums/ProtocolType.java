@@ -154,6 +154,10 @@ public enum ProtocolType {
         return this == FILE;
     }
 
+    public boolean requiresVisitorTls() {
+        return this == HTTPS || this == FILE;
+    }
+
     public int getCode() {
         return code;
     }

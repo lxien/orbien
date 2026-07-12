@@ -255,6 +255,10 @@ public class ProxyConfig implements Serializable {
         return ProtocolType.isFile(protocol);
     }
 
+    public boolean requiresVisitorTls() {
+        return isHttps() || isFile();
+    }
+
     public boolean hasRemotePort() {
         return remotePort != null;
     }

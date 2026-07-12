@@ -227,7 +227,9 @@ allow_mkdir = true
 [proxies.transport]
 multiplex = true
 encrypt = true
-
+#[proxies.tls]
+#cert_file = "cert/transport/client.crt"
+#key_file = "cert/transport/client.key"
 ########################################################################################################################
 
 [log]

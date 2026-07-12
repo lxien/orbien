@@ -157,23 +157,10 @@ public class ProxyConfigAssembler {
                     }
                     proxyBuilder.setBasicAuth(basicAuthBuilder);
                 }
-                //HTTPS TLS 证书
-                if (config.isHttps()) {
-                    ProxyTlsCertConfig tlsCertConfig = config.getTlsCertConfig();
-                    if (tlsCertConfig != null) {
-                        try {
-                            String keyPem = Files.readString(new File(tlsCertConfig.getKeyFile()).toPath(), StandardCharsets.UTF_8);
-                            String certChainPem = Files.readString(new File(tlsCertConfig.getCertFile()).toPath(), StandardCharsets.UTF_8);
-                            Message.TlsCert.Builder tlsCertBuilder = Message.TlsCert.newBuilder()
-                                    .setPrivateKeyPem(keyPem)
-                                    .setCertChainPem(certChainPem);
-                            proxyBuilder.setTlsCert(tlsCertBuilder);
-                        } catch (Exception e) {
-                            logger.error(e);
-                        }
-                    }
-                }
                 break;
+        }
+        if (config.requiresVisitorTls()) {
+            applyTlsCert(proxyBuilder, config);
         }
         //传输
         if (config.hasTransport()) {
@@ -237,6 +224,22 @@ public class ProxyConfigAssembler {
             proxyBuilder.setHealthCheck(healthCheck);
         }
         return proxyBuilder.build();
+    }
+
+    private static void applyTlsCert(Message.Proxy.Builder proxyBuilder, ProxyConfig config) {
+        ProxyTlsCertConfig tlsCertConfig = config.getTlsCertConfig();
+        if (tlsCertConfig == null) {
+            return;
+        }
+        try {
+            String keyPem = Files.readString(new File(tlsCertConfig.getKeyFile()).toPath(), StandardCharsets.UTF_8);
+            String certChainPem = Files.readString(new File(tlsCertConfig.getCertFile()).toPath(), StandardCharsets.UTF_8);
+            proxyBuilder.setTlsCert(Message.TlsCert.newBuilder()
+                    .setPrivateKeyPem(keyPem)
+                    .setCertChainPem(certChainPem));
+        } catch (Exception e) {
+            logger.error("读取 TLS 证书失败: {}", config.getName(), e);
+        }
     }
 
     private static Message.LoadBalanceStrategy toProtoType(LoadBalanceType strategy) {
