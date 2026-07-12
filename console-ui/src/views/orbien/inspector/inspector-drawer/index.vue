@@ -70,7 +70,7 @@
                   <pre class="inspector-code">{{ detail.rawRequest || '' }}</pre>
                 </ElTabPane>
                 <ElTabPane label="Body" name="body">
-                  <pre class="inspector-code">{{ detail.requestBodyPreview || '' }}</pre>
+                  <pre class="inspector-code">{{ formatPrettyBody(detail.requestBodyPreview) }}</pre>
                   <div v-if="detail.requestBodyTruncated" class="inspector-truncated">Body 已截断</div>
                 </ElTabPane>
               </ElTabs>

@@ -192,14 +192,12 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * HTTP 响应抓包完成，仅写入 Inspector 缓冲，不关闭流/TCP
-     * 关闭由连接自然断开或转发失败触发，避免响应未传完就断开
+     * HTTP 单条交换抓包完成，写入 Inspector 缓冲；不关闭流/TCP，同一连接可继续抓取下一条请求。
      */
     private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
         if (record != null) {
             inspectorBuffer.append(record);
         }
-        context.setHttpStreamCapture(null);
     }
 
     /**

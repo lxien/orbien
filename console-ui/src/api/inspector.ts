@@ -36,7 +36,6 @@ export function fetchUpdateInspectorConfig(data: Api.Inspector.ConfigUpdateParam
     })
 }
 
-/** 拼接 SSE 地址，避免 VITE_API_URL=/ 时产生 //api 错误协议相对 URL */
 export function buildInspectorStreamUrl(proxyId: string, token?: string) {
     const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
     const params = new URLSearchParams({proxyId})

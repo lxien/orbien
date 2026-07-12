@@ -12,14 +12,14 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * 单条 HTTP 流的抓包状态。
+ * 单条 HTTP 流的抓包状态，同一 TCP 连接上可连续捕获多条 HTTP 交换
  */
 public class HttpStreamCapture {
     private static final int MAX_HEADER_SIZE = 65536;
 
     private final StreamContext context;
     private final InspectorProperties properties;
-    private final Instant startedAt = Instant.now();
+    private Instant exchangeStartedAt = Instant.now();
     private final StringBuilder requestBody = new StringBuilder();
     private final StringBuilder responseBody = new StringBuilder();
 
@@ -31,7 +31,8 @@ public class HttpStreamCapture {
     private long responseBodySize;
     private boolean requestBodyTruncated;
     private boolean responseBodyTruncated;
-    private boolean finalized;
+    private boolean streamFinalized;
+    private boolean requestStarted;
     private boolean responseStarted;
     private final byte[] chunkedTailBuf = new byte[5];
     private int chunkedTailLen;
@@ -43,8 +44,11 @@ public class HttpStreamCapture {
         this.properties = properties;
     }
 
+    /**
+     * 在隧道桥接就绪前预解析首包请求头，不采集 body
+     */
     public void captureRequestFirstPacket(ByteBuf buf) {
-        if (buf == null || !buf.isReadable() || parsedRequest != null) {
+        if (streamFinalized || buf == null || !buf.isReadable() || parsedRequest != null) {
             return;
         }
         HttpMessageParser.ParsedRequest request = HttpMessageParser.parseRequest(buf, MAX_HEADER_SIZE);
@@ -53,24 +57,54 @@ public class HttpStreamCapture {
         }
         parsedRequest = request;
         rawRequestHeaders = request.rawHeaders();
-        int headerEnd = HttpMessageParser.findHeaderEnd(buf);
+    }
+
+    public void appendRequestBody(ByteBuf payload) {
+        if (streamFinalized || payload == null || !payload.isReadable()) {
+            return;
+        }
+        if (requestStarted) {
+            HttpMessageParser.ParsedRequest nextRequest = HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
+            if (nextRequest != null) {
+                emitCurrentExchange();
+                beginRequest(payload, nextRequest);
+                return;
+            }
+        }
+        if (!requestStarted) {
+            if (parsedRequest != null) {
+                requestStarted = true;
+                appendBodyAfterHeaders(payload);
+                return;
+            }
+            HttpMessageParser.ParsedRequest request = HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
+            if (request != null) {
+                beginRequest(payload, request);
+                return;
+            }
+        }
+        appendRequestChunk(payload, payload.readerIndex(), payload.readableBytes());
+    }
+
+    private void beginRequest(ByteBuf payload, HttpMessageParser.ParsedRequest request) {
+        parsedRequest = request;
+        rawRequestHeaders = request.rawHeaders();
+        requestStarted = true;
+        appendBodyAfterHeaders(payload);
+    }
+
+    private void appendBodyAfterHeaders(ByteBuf payload) {
+        int headerEnd = HttpMessageParser.findHeaderEnd(payload);
         if (headerEnd > 0) {
-            int bodyStart = buf.readerIndex() + headerEnd;
-            int bodyLen = buf.readableBytes() - headerEnd;
+            int bodyStart = payload.readerIndex() + headerEnd;
+            int bodyLen = payload.readableBytes() - headerEnd;
             if (bodyLen > 0) {
-                appendRequestBody(buf, bodyStart, bodyLen);
+                appendRequestChunk(payload, bodyStart, bodyLen);
             }
         }
     }
 
-    public void appendRequestBody(ByteBuf payload) {
-        if (finalized || payload == null || !payload.isReadable()) {
-            return;
-        }
-        appendRequestBody(payload, payload.readerIndex(), payload.readableBytes());
-    }
-
-    private void appendRequestBody(ByteBuf buf, int index, int length) {
+    private void appendRequestChunk(ByteBuf buf, int index, int length) {
         requestBodySize += length;
         if (requestBodyTruncated) {
             return;
@@ -90,7 +124,7 @@ public class HttpStreamCapture {
     }
 
     public void appendResponseBody(ByteBuf payload) {
-        if (finalized || payload == null || !payload.isReadable()) {
+        if (streamFinalized || payload == null || !payload.isReadable()) {
             return;
         }
         if (!responseStarted) {
@@ -116,13 +150,39 @@ public class HttpStreamCapture {
     }
 
     private void tryCompleteResponse() {
-        if (finalized || !responseStarted || parsedResponse == null || !isHttpResponseComplete()) {
+        if (streamFinalized || !responseStarted || parsedResponse == null || !isHttpResponseComplete()) {
             return;
         }
-        HttpCaptureRecord record = finalizeCapture();
+        emitCurrentExchange();
+    }
+
+    private void emitCurrentExchange() {
+        if (parsedRequest == null) {
+            resetForNextExchange();
+            return;
+        }
+        HttpCaptureRecord record = buildRecord();
         if (record != null && completionHandler != null) {
             completionHandler.accept(record);
         }
+        resetForNextExchange();
+    }
+
+    private void resetForNextExchange() {
+        parsedRequest = null;
+        parsedResponse = null;
+        rawRequestHeaders = null;
+        rawResponseHeaders = null;
+        requestBody.setLength(0);
+        responseBody.setLength(0);
+        requestBodySize = 0;
+        responseBodySize = 0;
+        requestBodyTruncated = false;
+        responseBodyTruncated = false;
+        requestStarted = false;
+        responseStarted = false;
+        chunkedTailLen = 0;
+        exchangeStartedAt = Instant.now();
     }
 
     private boolean isHttpResponseComplete() {
@@ -210,11 +270,18 @@ public class HttpStreamCapture {
     }
 
     public HttpCaptureRecord finalizeCapture() {
-        if (finalized) {
+        if (streamFinalized) {
             return null;
         }
-        finalized = true;
-        long durationMs = Math.max(0, Instant.now().toEpochMilli() - startedAt.toEpochMilli());
+        streamFinalized = true;
+        if (parsedRequest == null && !responseStarted) {
+            return null;
+        }
+        return buildRecord();
+    }
+
+    private HttpCaptureRecord buildRecord() {
+        long durationMs = Math.max(0, Instant.now().toEpochMilli() - exchangeStartedAt.toEpochMilli());
         String method = parsedRequest != null ? parsedRequest.method() : "";
         String path = parsedRequest != null ? parsedRequest.path() : "";
         String host = parsedRequest != null ? nullToEmpty(parsedRequest.host()) : nullToEmpty(context.getVisitorDomain());
@@ -237,7 +304,7 @@ public class HttpStreamCapture {
                 .id("req_" + UUID.randomUUID().toString().replace("-", "").substring(0, 12))
                 .proxyId(context.getProxyId())
                 .streamId(context.getStreamId())
-                .startedAt(startedAt)
+                .startedAt(exchangeStartedAt)
                 .durationMs(durationMs)
                 .clientIp(nullToEmpty(context.getSourceAddress()))
                 .host(host)
