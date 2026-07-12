@@ -53,6 +53,11 @@ public class StreamContext extends AbstractStreamContext {
 
     private HttpStreamCapture httpStreamCapture;
 
+    /**
+     * 打开失败时向访客返回的网关错误状态码
+     */
+    private int gatewayErrorStatus = 502;
+
     public boolean isAwaitingClientPassthroughAck() {
         return awaitingClientPassthroughAck.get();
     }

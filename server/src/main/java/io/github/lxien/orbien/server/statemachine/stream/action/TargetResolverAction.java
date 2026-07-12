@@ -57,6 +57,7 @@ public class TargetResolverAction extends StreamBaseAction {
         ProxyConfigExt ext = resolveProxyConfig(context);
         if (ext == null || ext.getProxyConfig().getStatus().isClosed()) {
             logger.debug("代理不可用，关闭流：streamId={}", context.getStreamId());
+            markHttpServiceUnavailableIfNeeded(context);
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
@@ -64,6 +65,7 @@ public class TargetResolverAction extends StreamBaseAction {
         String agentId = config.getAgentId();
         if (!agentManager.isOnline(agentId)) {
             logger.debug("代理 {} 客户端不在线，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
+            markHttpServiceUnavailableIfNeeded(context);
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
@@ -84,6 +86,7 @@ public class TargetResolverAction extends StreamBaseAction {
                 selectedTarget = selectTarget(config);
                 if (selectedTarget == null) {
                     logger.warn("无可用 proxyId={} 后端目标，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
+                    markHttpServiceUnavailableIfNeeded(context);
                     context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                     return;
                 }
@@ -116,7 +119,14 @@ public class TargetResolverAction extends StreamBaseAction {
             context.fireEvent(StreamEvent.TARGET_VALIDATED);
         } else {
             logger.debug("代理 {} 客户端不可用，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
+            markHttpServiceUnavailableIfNeeded(context);
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+        }
+    }
+
+    private static void markHttpServiceUnavailableIfNeeded(StreamContext context) {
+        if (context.getProtocol().isHttpOrHttps()) {
+            context.setGatewayErrorStatus(503);
         }
     }
 

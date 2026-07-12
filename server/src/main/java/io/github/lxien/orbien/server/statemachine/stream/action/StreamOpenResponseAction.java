@@ -192,8 +192,8 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * HTTP 响应抓包完成：写入缓冲，并在非协议升级场景下关闭当前流。
-     * Keep-Alive 连接保留访客 TCP，下一请求会创建新流并重新抓包。
+     * HTTP 响应抓包完成，写入缓冲，并在非协议升级场景下关闭当前流
+     * 关闭流后同步关闭访客 TCP 连接
      */
     private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
         if (record != null) {
@@ -214,7 +214,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
         visitor.eventLoop().execute(() -> {
             StreamState state = context.getState();
             if (state == StreamState.OPENED || state == StreamState.PAUSED) {
-                logger.debug("[Inspector] HTTP 响应完成，关闭流以支持 Keep-Alive 下一请求 streamId={}",
+                logger.debug("[Inspector] HTTP 响应完成，关闭流 streamId={}",
                         context.getStreamId());
                 context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }

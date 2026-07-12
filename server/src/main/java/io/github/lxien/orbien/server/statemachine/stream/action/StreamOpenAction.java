@@ -53,6 +53,7 @@ public class StreamOpenAction extends StreamBaseAction {
                 control.eventLoop().schedule(() -> {
                     if (context.getState() == StreamState.OPENING) {
                         logger.warn("打开流超时，关闭流 stream={}", streamId);
+                        context.setGatewayErrorStatus(504);
                         context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
                     }
                 }, 10, TimeUnit.SECONDS); // 如果10秒状态未改变，超时处理

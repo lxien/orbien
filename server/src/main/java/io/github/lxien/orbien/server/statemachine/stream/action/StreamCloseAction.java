@@ -20,7 +20,7 @@ import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
-import io.github.lxien.orbien.server.transport.http.HttpKeepAliveHelper;
+import io.github.lxien.orbien.server.utils.NettyHttpUtils;
 import io.github.lxien.orbien.server.transport.socks5.Socks5ReplyHelper;
 import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
@@ -37,6 +37,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -85,7 +86,7 @@ public class StreamCloseAction extends StreamBaseAction {
         }
         if (!context.isDatagram()) {
             if (context.getProtocol().isHttpOrHttps()) {
-                HttpKeepAliveHelper.prepareForNextRequest(visitor);
+                closeHttpVisitor(context, from, visitor);
             } else if (context.getProtocol().isSocks5()
                     && context.hasVariable(StreamConstants.SOCKS5_AWAIT_REPLY)) {
                 context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
@@ -150,6 +151,29 @@ public class StreamCloseAction extends StreamBaseAction {
         }
 
         logger.debug("关闭流: streamId={}", context.getStreamId());
+    }
+
+    private void closeHttpVisitor(StreamContext context, StreamState from, Channel visitor) {
+        if (visitor == null || !visitor.isActive()) {
+            return;
+        }
+        if (from == StreamState.OPENING || from == StreamState.FAILED) {
+            int status = context.getGatewayErrorStatus();
+            String message = gatewayMessage(status);
+            NettyHttpUtils.sendHttpBinaryResponse(visitor, status, message,
+                            "text/plain; charset=UTF-8", message.getBytes(StandardCharsets.UTF_8))
+                    .addListener(f -> ChannelUtils.closeOnFlush(visitor));
+            return;
+        }
+        ChannelUtils.closeOnFlush(visitor);
+    }
+
+    private static String gatewayMessage(int status) {
+        return switch (status) {
+            case 503 -> "Service Unavailable";
+            case 504 -> "Gateway Timeout";
+            default -> "Bad Gateway";
+        };
     }
 
     private void finalizeHttpCapture(StreamContext context) {

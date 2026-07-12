@@ -71,6 +71,18 @@ public class NettyHttpUtils {
         return writeAndFlush(channel, buildResponse(channel, response));
     }
 
+    public static ChannelFuture sendHttp502(Channel channel) {
+        return sendHttpResponse(channel, 502, "Bad Gateway", "text/plain; charset=UTF-8", "Bad Gateway");
+    }
+
+    public static ChannelFuture sendHttp503(Channel channel) {
+        return sendHttpResponse(channel, 503, "Service Unavailable", "text/plain; charset=UTF-8", "Service Unavailable");
+    }
+
+    public static ChannelFuture sendHttp504(Channel channel) {
+        return sendHttpResponse(channel, 504, "Gateway Timeout", "text/plain; charset=UTF-8", "Gateway Timeout");
+    }
+
     public static ChannelFuture sendHttp500(Channel channel) {
         String response = """
                 HTTP/1.1 500 Internal Server Error\r
