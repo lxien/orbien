@@ -10,6 +10,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 @Getter
 @Setter
 public class StreamContext extends AbstractStreamContext {
@@ -22,6 +25,9 @@ public class StreamContext extends AbstractStreamContext {
     @Getter(AccessLevel.NONE)
     @Setter(AccessLevel.NONE)
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
+
+    private final AtomicInteger pendingTunnelWrites = new AtomicInteger(0);
+    private final AtomicBoolean backendDisconnected = new AtomicBoolean(false);
 
     public StreamContext(Integer streamId, StateMachine<StreamState, StreamEvent, StreamContext> stateMachine, AgentContext agentContext) {
         this.streamId = streamId;
@@ -36,5 +42,41 @@ public class StreamContext extends AbstractStreamContext {
     public void fireEvent(StreamEvent event) {
         stateMachine.fireEvent(state, event, this);
     }
-}
 
+    public void beforeTunnelWrite() {
+        pendingTunnelWrites.incrementAndGet();
+    }
+
+    public void afterTunnelWrite() {
+        if (pendingTunnelWrites.decrementAndGet() < 0) {
+            pendingTunnelWrites.set(0);
+        }
+        tryCloseAfterBackendDisconnected();
+    }
+
+    public void markBackendDisconnected() {
+        if (backendDisconnected.compareAndSet(false, true)) {
+            tryCloseAfterBackendDisconnected();
+        }
+    }
+
+    private void tryCloseAfterBackendDisconnected() {
+        if (!backendDisconnected.get() || pendingTunnelWrites.get() > 0) {
+            return;
+        }
+        if (state == StreamState.CLOSED || state == StreamState.FAILED) {
+            return;
+        }
+        Channel control = getControl();
+        Runnable closeTask = () -> {
+            if (state != StreamState.CLOSED && state != StreamState.FAILED) {
+                fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            }
+        };
+        if (control != null && control.eventLoop() != null) {
+            control.eventLoop().execute(closeTask);
+        } else {
+            closeTask.run();
+        }
+    }
+}

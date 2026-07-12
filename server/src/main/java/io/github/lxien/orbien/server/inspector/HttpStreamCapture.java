@@ -33,6 +33,8 @@ public class HttpStreamCapture {
     private boolean responseBodyTruncated;
     private boolean finalized;
     private boolean responseStarted;
+    private final byte[] chunkedTailBuf = new byte[5];
+    private int chunkedTailLen;
     @Setter
     private Consumer<HttpCaptureRecord> completionHandler;
 
@@ -128,9 +130,6 @@ public class HttpStreamCapture {
         if (status == 101 || status == 204 || status == 304) {
             return true;
         }
-        if (status >= 100 && status < 200) {
-            return true;
-        }
         if (parsedRequest != null && "HEAD".equalsIgnoreCase(parsedRequest.method())) {
             return true;
         }
@@ -154,7 +153,12 @@ public class HttpStreamCapture {
     }
 
     private boolean isChunkedBodyComplete() {
-        return responseBody.length() >= 5 && responseBody.toString().endsWith("0\r\n\r\n");
+        return chunkedTailLen >= 5
+                && chunkedTailBuf[0] == '0'
+                && chunkedTailBuf[1] == '\r'
+                && chunkedTailBuf[2] == '\n'
+                && chunkedTailBuf[3] == '\r'
+                && chunkedTailBuf[4] == '\n';
     }
 
     private static String headerValue(Map<String, String> headers, String name) {
@@ -175,6 +179,7 @@ public class HttpStreamCapture {
 
     private void appendResponseChunk(ByteBuf buf, int index, int length) {
         responseBodySize += length;
+        updateChunkedTail(buf, index, length);
         if (responseBodyTruncated) {
             return;
         }
@@ -189,6 +194,18 @@ public class HttpStreamCapture {
         responseBody.append(new String(bytes, StandardCharsets.UTF_8));
         if (toCopy < length) {
             responseBodyTruncated = true;
+        }
+    }
+
+    private void updateChunkedTail(ByteBuf buf, int index, int length) {
+        for (int i = index; i < index + length; i++) {
+            byte b = buf.getByte(i);
+            if (chunkedTailLen < chunkedTailBuf.length) {
+                chunkedTailBuf[chunkedTailLen++] = b;
+            } else {
+                System.arraycopy(chunkedTailBuf, 1, chunkedTailBuf, 0, chunkedTailBuf.length - 1);
+                chunkedTailBuf[chunkedTailBuf.length - 1] = b;
+            }
         }
     }
 

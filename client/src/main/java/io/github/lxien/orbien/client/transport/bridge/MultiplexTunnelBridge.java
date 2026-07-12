@@ -97,6 +97,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             payload.retain();
         }
         Runnable writeTask = () -> {
+            streamContext.beforeTunnelWrite();
             TMSPFrame frame = TmspPayloadCompressor.encodeStreamData(
                     tunnel, streamId, payload, streamContext.resolveCompressAlgorithm());
             logger.debug("[传输] local->tunnel streamId={} protocol={} bytes={} channelClass={}",
@@ -104,6 +105,7 @@ public class MultiplexTunnelBridge implements TunnelBridge {
                     payload.readableBytes(), tunnel.getClass().getSimpleName());
             tunnel.writeAndFlush(frame).addListener((ChannelFutureListener) future -> {
                 ReferenceCountUtil.release(payload);
+                streamContext.afterTunnelWrite();
                 if (!future.isSuccess()) {
                     logger.warn("[传输] 数据转发到远程隧道失败 streamId={} protocol={}",
                             streamId, protocol != null ? protocol.getName() : "unknown", future.cause());

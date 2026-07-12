@@ -46,6 +46,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 控制隧道消息处理器
@@ -201,7 +202,9 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                             streamId, tunnelProtocol != null ? tunnelProtocol.getName() : "unknown",
                             decoded.readableBytes(), ctx.channel().getClass().getSimpleName());
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
-                    if (streamContext != null && streamContext.getState() == StreamState.OPENED) {
+                    StreamState state = streamContext != null ? streamContext.getState() : null;
+                    if (streamContext != null
+                            && (state == StreamState.OPENED || state == StreamState.PAUSED)) {
                         streamContext.forwardToRemote(decoded, forward.sharedWithInbound());
                     } else {
                         forward.releaseIfOwned();
@@ -212,7 +215,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                     int streamId = frame.getStreamId();
                     StreamContext streamContext = streamManager.getStreamContext(streamId);
                     if (streamContext != null) {
-                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
+                        Channel tunnel = resolveDrainChannel(streamContext);
+                        (tunnel != null ? tunnel.eventLoop() : ctx.channel().eventLoop()).schedule(() -> {
+                            StreamContext pending = streamManager.getStreamContext(streamId);
+                            if (pending != null) {
+                                pending.fireEvent(StreamEvent.STREAM_REMOTE_CLOSE);
+                            }
+                        }, 200, TimeUnit.MILLISECONDS);
                     }
                 }
                 //暂停流
@@ -361,6 +370,13 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     private ChannelType getChannelType(Channel channel) {
         ChannelType channelType = channel.attr(AttributeKeys.CHANNEL_TYPE).get();
         return channelType != null ? channelType : ChannelType.UNKNOWN;
+    }
+
+    private Channel resolveDrainChannel(StreamContext streamContext) {
+        if (streamContext.getTunnelEntry() != null) {
+            return streamContext.getTunnelEntry().getChannel();
+        }
+        return null;
     }
 
     private <T extends com.google.protobuf.Message> T parseCompressedFileMessage(ChannelHandlerContext ctx,

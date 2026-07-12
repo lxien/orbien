@@ -192,37 +192,18 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * HTTP 响应抓包完成，写入缓冲，并在非协议升级场景下关闭当前流
-     * 关闭流后同步关闭访客 TCP 连接
+     * HTTP 响应抓包完成，仅写入 Inspector 缓冲，不关闭流/TCP
+     * 关闭由连接自然断开或转发失败触发，避免响应未传完就断开
      */
     private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
         if (record != null) {
             inspectorBuffer.append(record);
         }
         context.setHttpStreamCapture(null);
-        if (record == null || record.getStatus() == 101) {
-            return;
-        }
-        scheduleHttpStreamClose(context);
-    }
-
-    private void scheduleHttpStreamClose(StreamContext context) {
-        Channel visitor = context.getVisitor();
-        if (visitor == null || !visitor.isActive()) {
-            return;
-        }
-        visitor.eventLoop().execute(() -> {
-            StreamState state = context.getState();
-            if (state == StreamState.OPENED || state == StreamState.PAUSED) {
-                logger.debug("[Inspector] HTTP 响应完成，关闭流 streamId={}",
-                        context.getStreamId());
-                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
-            }
-        });
     }
 
     /**
-     * 发送 HTTP 协议首次缓存的第一个数据包。
+     * 发送 HTTP 协议首次缓存的第一个数据包
      * <p>
      * 使用 {@code getAndSet} 原子取走 attr，避免与 {@link StreamContext#abortLocalForwarding()} 竞态双重释放。
      */

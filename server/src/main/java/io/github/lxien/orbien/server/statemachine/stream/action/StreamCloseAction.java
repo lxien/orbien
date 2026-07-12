@@ -86,7 +86,7 @@ public class StreamCloseAction extends StreamBaseAction {
         }
         if (!context.isDatagram()) {
             if (context.getProtocol().isHttpOrHttps()) {
-                closeHttpVisitor(context, from, visitor);
+                closeHttpVisitor(context, from, event, visitor);
             } else if (context.getProtocol().isSocks5()
                     && context.hasVariable(StreamConstants.SOCKS5_AWAIT_REPLY)) {
                 context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
@@ -153,7 +153,7 @@ public class StreamCloseAction extends StreamBaseAction {
         logger.debug("关闭流: streamId={}", context.getStreamId());
     }
 
-    private void closeHttpVisitor(StreamContext context, StreamState from, Channel visitor) {
+    private void closeHttpVisitor(StreamContext context, StreamState from, StreamEvent event, Channel visitor) {
         if (visitor == null || !visitor.isActive()) {
             return;
         }

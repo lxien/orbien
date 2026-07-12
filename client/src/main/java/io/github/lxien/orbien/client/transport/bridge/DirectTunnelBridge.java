@@ -86,14 +86,18 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     private void writeOnLoop(Channel channel, ByteBuf payload, java.util.function.Consumer<Boolean> listener) {
         int bytes = payload.readableBytes();
-        Runnable writeTask = () -> channel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
-            if (f.isSuccess()) {
-                logger.debug("流 {} 数据转发成功 bytes={}", streamContext.getStreamId(), bytes);
-            } else {
-                logger.warn("流 {} 数据转发失败", streamContext.getStreamId(), f.cause());
-            }
-            listener.accept(f.isSuccess());
-        });
+        Runnable writeTask = () -> {
+            streamContext.beforeTunnelWrite();
+            channel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+                streamContext.afterTunnelWrite();
+                if (f.isSuccess()) {
+                    logger.debug("流 {} 数据转发成功 bytes={}", streamContext.getStreamId(), bytes);
+                } else {
+                    logger.warn("流 {} 数据转发失败", streamContext.getStreamId(), f.cause());
+                }
+                listener.accept(f.isSuccess());
+            });
+        };
         DirectTunnelLifecycle.runOnTunnelLoop(channel, writeTask);
     }
 }
