@@ -75,7 +75,35 @@ public class AgentManager {
     }
 
     public int getOnlineCount() {
-        return connectionToContextMap.size();
+        int count = 0;
+        for (AgentContext context : agentToContextMap.values()) {
+            if (context.getState() == AgentState.CONNECTED) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * 断连后解除控制连接索引，保留 agentId 索引以支持标准客户端重连。
+     */
+    public void detachControlChannel(AgentContext context) {
+        writeLock.lock();
+        try {
+            Integer connectionId = context.getConnectionId();
+            if (connectionId != null) {
+                connectionToContextMap.remove(connectionId);
+            }
+            context.setControl(null);
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    public void removeOrphanConnection(Integer connectionId) {
+        if (connectionId != null) {
+            connectionToContextMap.remove(connectionId);
+        }
     }
 
     public void removeAgentContext(String agentId) {
@@ -106,8 +134,9 @@ public class AgentManager {
             logger.debug("强制下线跳过，客户端不在线: {}", agentId);
             return;
         }
-        if (agentContext.getState() != AgentState.CONNECTED) {
-            logger.debug("强制下线跳过，客户端状态非 CONNECTED: {} state={}", agentId, agentContext.getState());
+        AgentState state = agentContext.getState();
+        if (state != AgentState.CONNECTED && state != AgentState.DISCONNECTED) {
+            logger.debug("强制下线跳过，客户端状态不可强退: {} state={}", agentId, state);
             return;
         }
         Channel control = agentContext.getControl();

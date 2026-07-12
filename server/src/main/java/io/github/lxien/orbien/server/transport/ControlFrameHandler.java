@@ -326,7 +326,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
         if (channelType == ChannelType.CONTROL) {
             logger.error("控制连接异常: ", cause);
             agentManager.getAgentContext(ctx.channel()).ifPresent(agentContext -> {
-                //...
+                logger.debug("控制连接异常，触发断连: {}", agentContext.getAgentId());
+                agentContext.fireEvent(AgentEvent.DISCONNECT);
             });
         } else if (channelType == ChannelType.TUNNEL) {
             handleTunnelFailure(channel, cause);

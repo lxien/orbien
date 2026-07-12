@@ -7,7 +7,6 @@ import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.server.statemachine.agent.AgentEvent;
 import io.github.lxien.orbien.server.statemachine.agent.AgentState;
 import io.github.lxien.orbien.server.statemachine.agent.action.*;
-import io.github.lxien.orbien.server.statemachine.agent.action.*;
 import io.github.lxien.orbien.server.statemachine.agent.action.config.ProxyReportAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -28,15 +27,9 @@ public class AgentStateMachineConfig {
     @Autowired
     private GoawayAction goawayAction;
     @Autowired
-    private AuthFailureAction authFailureAction;
-    @Autowired
-    private HeartbeatTimeoutAction heartbeatTimeoutAction;
-    @Autowired
-    private RetryTimeoutAction retryTimeoutAction;
-    @Autowired
     private ServiceHealthReportAction serviceHealthReportAction;
     @Autowired
-    private AgentDisconnectHealthCleanupAction agentDisconnectHealthCleanupAction;
+    private DisconnectAction disconnectAction;
 
     @Bean("agentStateMachine")
     public StateMachine<AgentState, AgentEvent, AgentContext> createStateMachine() {
@@ -66,10 +59,10 @@ public class AgentStateMachineConfig {
         // 认证失败
         builder.externalTransition()
                 .from(AgentState.AUTHENTICATING)
-                .to(AgentState.FAILED)
+                .to(AgentState.CLOSED)
                 .on(AgentEvent.AUTH_FAILURE)
                 .when(ctx -> true)
-                .perform(authFailureAction);
+                .perform(goawayAction);
 
         // 处理代理创建请求
         builder.internalTransition()
@@ -96,15 +89,15 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.DISCONNECT)
                 .when(ctx -> true)
-                .perform(agentDisconnectHealthCleanupAction);
+                .perform(disconnectAction);
 
-        // 心跳超时：保留重连窗口
+        // 心跳超时：标准客户端保留重连窗口，会话型立即 Goaway
         builder.externalTransition()
                 .from(AgentState.CONNECTED)
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.HEARTBEAT_TIMEOUT)
                 .when(ctx -> true)
-                .perform(agentDisconnectHealthCleanupAction);
+                .perform(disconnectAction);
 
         // 认证中断开
         builder.externalTransition()
@@ -112,7 +105,7 @@ public class AgentStateMachineConfig {
                 .to(AgentState.DISCONNECTED)
                 .on(AgentEvent.DISCONNECT)
                 .when(ctx -> true)
-                .perform((from, to, event, context) -> context.setState(to));
+                .perform(disconnectAction);
 
         // 本地停止客户端
         builder.externalTransitions()
@@ -139,10 +132,10 @@ public class AgentStateMachineConfig {
         // 重连窗口超时
         builder.externalTransition()
                 .from(AgentState.DISCONNECTED)
-                .to(AgentState.FAILED)
+                .to(AgentState.CLOSED)
                 .on(AgentEvent.RETRY_TIMEOUT)
                 .when(ctx -> true)
-                .perform(retryTimeoutAction);
+                .perform(goawayAction);
         // 重连
         builder.externalTransition()
                 .from(AgentState.DISCONNECTED)

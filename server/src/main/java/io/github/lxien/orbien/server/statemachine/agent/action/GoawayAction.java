@@ -39,12 +39,26 @@ public class GoawayAction extends AgentBaseAction {
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         logger.debug("开始清理客户端资源，事件：{}", event);
         AgentInfo agentInfo = context.getAgentInfo();
-        if (agentInfo == null) {
+        String agentId = agentInfo != null ? agentInfo.getAgentId() : null;
+        Channel control = context.getControl();
+
+        if (!StringUtils.hasText(agentId)) {
             logger.warn("客户端断开，未找到客户端信息，连接ID：{}", context.getConnectionId());
+            agentManager.detachControlChannel(context);
+            agentManager.removeOrphanConnection(context.getConnectionId());
+            if (control != null) {
+                ChannelUtils.closeOnFlush(control);
+            }
             return;
         }
-        String agentId = agentInfo.getAgentId();
-        Channel control = context.getControl();
+
+        if (agentManager.getAgentContext(agentId).isEmpty()) {
+            logger.debug("{} 客户端资源已清理，跳过重复 Goaway", agentId);
+            if (control != null && control.isActive()) {
+                ChannelUtils.closeOnFlush(control);
+            }
+            return;
+        }
 
         if (event == AgentEvent.LOCAL_GOAWAY && control != null && control.isActive()) {
             logger.info("{} 强制下线，向客户端发送 GOAWAY", agentId);
@@ -54,18 +68,17 @@ public class GoawayAction extends AgentBaseAction {
                                 if (!future.isSuccess()) {
                                     logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
                                 }
-                                cleanupResources(context, agentId, control);
+                                cleanupResources(context, agentInfo, agentId, control);
                             })
             );
             return;
         }
-        cleanupResources(context, agentId, control);
+        cleanupResources(context, agentInfo, agentId, control);
     }
 
-    private void cleanupResources(AgentContext context, String agentId, Channel control) {
+    private void cleanupResources(AgentContext context, AgentInfo agentInfo, String agentId, Channel control) {
         logger.debug("{} 客户端断开，开始清理资源", agentId);
         try {
-            AgentInfo agentInfo = context.getAgentInfo();
             streamManager.fireCloseByAgent(agentId);
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);

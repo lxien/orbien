@@ -32,21 +32,28 @@ public class AgentContextCleanupTask {
     private AgentManager agentManager;
 
     /**
-     * 任务3分钟执行一次
-     * 如果连接断开两分钟没有重连成功，则直接执行Goaway状态机事件清理所有资源
+     * 每分钟扫描一次；标准客户端断连超过 2 分钟未重连则清理全部资源。
      */
-    @Scheduled(fixedDelay = 180_000)
+    @Scheduled(fixedDelay = 60_000)
     public void cleanupInactiveContexts() {
         LocalDateTime now = LocalDateTime.now();
         int total = 0;
         int cleaned = 0;
         for (AgentContext context : agentManager.getAllAgentContext()) {
             total++;
-            if (context.getState() == AgentState.DISCONNECTED && ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 2) {
+            if (context.getState() != AgentState.DISCONNECTED) {
+                continue;
+            }
+            if (ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 2) {
                 cleaned++;
+                logger.debug("客户端 {} 重连窗口超时，触发 Goaway", context.getAgentId());
                 context.fireEvent(AgentEvent.LOCAL_GOAWAY);
             }
         }
-        logger.debug("AgentContext cleanup executed: total={}, cleaned={}", total, cleaned);
+        if (cleaned > 0) {
+            logger.info("AgentContext cleanup: total={}, cleaned={}", total, cleaned);
+        } else {
+            logger.debug("AgentContext cleanup: total={}, cleaned={}", total, cleaned);
+        }
     }
 }
