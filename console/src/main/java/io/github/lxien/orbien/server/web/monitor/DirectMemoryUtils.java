@@ -1,9 +1,10 @@
 package io.github.lxien.orbien.server.web.monitor;
 
+import io.netty.util.internal.PlatformDependent;
+
 import java.lang.management.BufferPoolMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.List;
 
 public final class DirectMemoryUtils {
 
@@ -12,69 +13,68 @@ public final class DirectMemoryUtils {
     private DirectMemoryUtils() {
     }
 
-    /**
-     * 已使用 DirectMemory
-     */
     public static long usedDirectMemory() {
+        try {
+            return Math.max(0L, PlatformDependent.usedDirectMemory());
+        } catch (Throwable ignored) {
+            // fallback below
+        }
         BufferPoolMXBean pool = getDirectPool();
-        return pool == null ? -1 : pool.getMemoryUsed();
+        return pool == null ? 0L : Math.max(0L, pool.getMemoryUsed());
     }
 
-    /**
-     * DirectBuffer 数量
-     */
-    public static long directBufferCount() {
-        BufferPoolMXBean pool = getDirectPool();
-        return pool == null ? -1 : pool.getCount();
-    }
-
-    /**
-     * 获取最大 DirectMemory
-     */
     public static long maxDirectMemory() {
+        try {
+            long max = PlatformDependent.maxDirectMemory();
+            if (max > 0) {
+                return max;
+            }
+        } catch (Throwable ignored) {
+            // fallback below
+        }
         RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        List<String> args = runtimeMXBean.getInputArguments();
-        for (String arg : args) {
+        for (String arg : runtimeMXBean.getInputArguments()) {
             if (arg.startsWith("-XX:MaxDirectMemorySize=")) {
                 String value = arg.substring("-XX:MaxDirectMemorySize=".length());
                 return parseMemory(value);
             }
         }
-        /*
-         * HotSpot 默认：
-         * MaxDirectMemorySize ≈ MaxHeapSize
-         */
         return Runtime.getRuntime().maxMemory();
     }
 
-    /**
-     * 获取 direct pool
-     */
     private static BufferPoolMXBean getDirectPool() {
-        List<BufferPoolMXBean> pools = ManagementFactory.getPlatformMXBeans(BufferPoolMXBean.class);
-        for (BufferPoolMXBean pool : pools) {
+        for (BufferPoolMXBean pool : ManagementFactory.getPlatformMXBeans(BufferPoolMXBean.class)) {
             if (DIRECT.equalsIgnoreCase(pool.getName())) {
                 return pool;
             }
         }
-
         return null;
     }
 
     private static long parseMemory(String value) {
         value = value.trim().toLowerCase();
         long multiplier = 1;
-        if (value.endsWith("k")) {
+        if (value.endsWith("gb")) {
+            multiplier = 1024L * 1024L * 1024L;
+            value = value.substring(0, value.length() - 2);
+        } else if (value.endsWith("mb")) {
+            multiplier = 1024L * 1024L;
+            value = value.substring(0, value.length() - 2);
+        } else if (value.endsWith("kb")) {
             multiplier = 1024L;
+            value = value.substring(0, value.length() - 2);
+        } else if (value.endsWith("g")) {
+            multiplier = 1024L * 1024L * 1024L;
             value = value.substring(0, value.length() - 1);
         } else if (value.endsWith("m")) {
             multiplier = 1024L * 1024L;
             value = value.substring(0, value.length() - 1);
-        } else if (value.endsWith("g")) {
-            multiplier = 1024L * 1024L * 1024L;
+        } else if (value.endsWith("k")) {
+            multiplier = 1024L;
+            value = value.substring(0, value.length() - 1);
+        } else if (value.endsWith("b")) {
             value = value.substring(0, value.length() - 1);
         }
-        return Long.parseLong(value) * multiplier;
+        return Long.parseLong(value.trim()) * multiplier;
     }
-
 }

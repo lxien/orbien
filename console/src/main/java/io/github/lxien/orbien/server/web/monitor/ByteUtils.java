@@ -23,7 +23,12 @@ public class ByteUtils {
      * 将字节数格式化为带单位的字符串（KB/MB/GB/TB）
      */
     public static String formatBytes(long bytes) {
-        if (bytes <= 0) return "0MB";
+        if (bytes < 0) {
+            return "0B";
+        }
+        if (bytes == 0) {
+            return "0B";
+        }
         double value = bytes;
         String unit = "B";
         if (value >= 1024L * 1024 * 1024 * 1024L) {
