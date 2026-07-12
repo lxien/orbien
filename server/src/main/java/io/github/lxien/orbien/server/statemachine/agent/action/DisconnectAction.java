@@ -3,6 +3,7 @@ package io.github.lxien.orbien.server.statemachine.agent.action;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
+import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.statemachine.agent.*;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
@@ -35,18 +36,22 @@ public class DisconnectAction extends AgentBaseAction {
     private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private StreamManager streamManager;
+    @Autowired
+    private ProxyManager proxyManager;
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
         String agentId = context.getAgentId();
+        int proxyCount = 0;
         if (StringUtils.hasText(agentId)) {
             List<ProxyConfigExt> proxies = proxyConfigService.findByAgentId(agentId);
+            proxyCount = proxies.size();
             for (ProxyConfigExt proxy : proxies) {
                 if (proxy.getProxyConfig() != null) {
                     healthManager.removeProxy(proxy.getProxyConfig().getProxyId());
                 }
             }
-            logger.debug("客户端 {} 断连，已清除 {} 个代理健康状态", agentId, proxies.size());
+            logger.debug("客户端 {} 断连，已清除 {} 个代理健康状态", agentId, proxyCount);
 
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
@@ -59,6 +64,10 @@ public class DisconnectAction extends AgentBaseAction {
         if (shouldGoawayImmediately(from, context)) {
             logger.debug("客户端 {} 断连后立即 Goaway, from={}", agentId, from);
             context.fireEvent(AgentEvent.LOCAL_GOAWAY);
+        } else if (StringUtils.hasText(agentId)) {
+            // STANDALONE 保留重连窗口，但暂停公网入口，避免路由到无控制通道的会话
+            proxyManager.onAgentOffline(agentId);
+            logger.debug("客户端 {} 断连，已暂停 {} 个代理的公网入口", agentId, proxyCount);
         }
     }
 

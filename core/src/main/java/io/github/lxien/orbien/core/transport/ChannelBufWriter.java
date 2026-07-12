@@ -31,6 +31,9 @@ public final class ChannelBufWriter {
             buf.retain();
         }
         channel.writeAndFlush(buf).addListener((ChannelFutureListener) future -> {
+            if (!sharedWithInbound) {
+                return;
+            }
             if (!future.isSuccess()) {
                 ReferenceCountUtil.release(buf);
             }

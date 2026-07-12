@@ -26,6 +26,7 @@ import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -60,7 +61,13 @@ public class TargetResolverAction extends StreamBaseAction {
             return;
         }
         ProxyConfig config = ext.getProxyConfig();
-        Optional<AgentContext> gentContextOpt = agentManager.getAgentContext(config.getAgentId());
+        String agentId = config.getAgentId();
+        if (!agentManager.isOnline(agentId)) {
+            logger.debug("代理 {} 客户端不在线，关闭流: streamId={}", config.getProxyId(), context.getStreamId());
+            context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            return;
+        }
+        Optional<AgentContext> gentContextOpt = agentManager.getAgentContext(agentId);
         if (gentContextOpt.isPresent()) {
             context.setProxyConfig(config);
             context.setAgentContext(gentContextOpt.get());
@@ -148,6 +155,9 @@ public class TargetResolverAction extends StreamBaseAction {
         if (context.getProtocol().isHttpOrHttps()) {
             String domain = context.getVisitorDomain();
             String proxyId = domainRegistry.getProxyIdByDomain(domain);
+            if (!StringUtils.hasText(proxyId)) {
+                return null;
+            }
             return proxyConfigService.findById(proxyId);
         } else if (context.getProtocol().isTcp()) {
             int remotePort = context.getListenerPort();

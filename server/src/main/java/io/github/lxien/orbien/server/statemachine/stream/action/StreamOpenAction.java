@@ -29,7 +29,7 @@ public class StreamOpenAction extends StreamBaseAction {
         AgentContext agentContext = context.getAgentContext();
         Channel control = agentContext.getControl();
         ProxyConfig config = context.getProxyConfig();
-        if (!control.isActive()) {
+        if (control == null || !control.isActive()) {
             logger.warn("客户端 {} 控制通道未激活，关闭流 streamId={}", agentContext.getAgentInfo().getAgentId(), streamId);
             context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;

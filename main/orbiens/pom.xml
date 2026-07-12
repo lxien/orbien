@@ -33,6 +33,7 @@
                 <configuration>
                     <buildArgs>
                         <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
+                        <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                         <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>
                     <mainClass>io.github.lxien.orbien.server.web.TunnelServerStartup</mainClass>
@@ -69,6 +70,7 @@
                 </executions>
                 <configuration>
                     <mainClass>io.github.lxien.orbien.server.web.TunnelServerStartup</mainClass>
+                    <jvmArguments>--enable-native-access=ALL-UNNAMED</jvmArguments>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
