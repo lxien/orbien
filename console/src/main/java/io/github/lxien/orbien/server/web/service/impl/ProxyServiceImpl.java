@@ -540,6 +540,7 @@ public class ProxyServiceImpl implements ProxyService {
         if (requestDomainType.isAuto() && existsDomainType.isAuto()) {
             // 自动域名类型未变化，保留已有域名
         } else {
+            certBindingSyncService.removeBindingsByProxyId(proxyId);
             proxyDomainRepository.deleteByProxyId(proxyId);
             saveHttpDomains(proxyId, requestDomainType, param.getSubdomainBindings(), param.getCustomDomains(), proxyId);
         }
@@ -597,6 +598,7 @@ public class ProxyServiceImpl implements ProxyService {
                 .collect(Collectors.groupingBy(FileShareUserDO::getProxyId, Collectors.counting()));
         Map<String, FileShareLimitsDO> limitsMap = fileShareLimitsRepository.findByProxyIdIn(proxyIds).stream()
                 .collect(Collectors.toMap(FileShareLimitsDO::getProxyId, l -> l));
+        Map<String, TlsCertSummaryDTO> tlsCertSummaryMap = certBindingService.summarizeTlsCertByProxyIds(proxyIds);
 
         List<FileShareListDTO> res = new ArrayList<>();
         for (ProxyListQueryResult r : content) {
@@ -607,6 +609,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setDomains(domains);
             dto.setAccessUrls(buildFileShareAccessUrls(domains, httpsProxyPort));
             dto.setHttpsProxyPort(httpsProxyPort);
+            proxyConvert.enrichTlsCertSummary(dto, tlsCertSummaryMap.get(proxyDO.getId()));
             FileShareLimitsDO limitsDO = limitsMap.get(proxyDO.getId());
             if (limitsDO != null) {
                 dto.setRootPath(limitsDO.getRootPath());
@@ -1328,6 +1331,7 @@ public class ProxyServiceImpl implements ProxyService {
             socks5UserRepository.deleteByProxyIdIn(ids);
         }
         if (protocolType.isFile()) {
+            certBindingSyncService.removeBindingsByProxyIds(ids);
             proxyDomainRepository.deleteByProxyIdIn(ids);
             fileShareAuthRepository.deleteByProxyIdIn(ids);
             fileShareUserRepository.deleteByProxyIdIn(ids);

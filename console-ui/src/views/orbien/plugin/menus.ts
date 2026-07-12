@@ -67,6 +67,7 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     ],
     [ProtocolType.FILE]: [
         commonMenus.access,
+        commonMenus.tls,
         commonMenus.trans,
         commonMenus.limit
     ]

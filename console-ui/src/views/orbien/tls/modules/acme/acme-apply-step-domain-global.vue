@@ -10,12 +10,12 @@
     </section>
 
     <section class="section-block">
-      <div class="section-title">HTTPS 隧道</div>
+      <div class="section-title">HTTPS / 文件共享</div>
       <ElSelect
           :model-value="selectedProxyId"
           filterable
           clearable
-          placeholder="选择要申请证书的 HTTPS 代理"
+          placeholder="选择要申请证书的代理"
           style="width: 100%"
           :loading="proxyLoading"
           @update:model-value="handleProxyChange"

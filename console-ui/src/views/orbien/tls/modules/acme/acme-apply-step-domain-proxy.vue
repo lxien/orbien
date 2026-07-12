@@ -12,7 +12,7 @@
     <section class="section-block">
       <div class="section-title">当前代理</div>
       <div class="proxy-context art-card-sm">
-        <span class="proxy-context__name">{{ proxyName || '当前 HTTPS 代理' }}</span>
+        <span class="proxy-context__name">{{ proxyName || '当前代理' }}</span>
         <ElTag size="small" type="info">{{ domainOptions.length }} 个域名</ElTag>
       </div>
     </section>

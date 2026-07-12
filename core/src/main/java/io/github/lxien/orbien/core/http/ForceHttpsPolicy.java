@@ -4,6 +4,7 @@ import io.github.lxien.orbien.core.domain.ProxyConfig;
 
 /**
  * HTTPS 强制跳转策略：HTTPS 代理默认开启 HTTP→HTTPS 重定向，可通过 {@code force_https=false} 关闭。
+ * 文件共享固定走 HTTPS，明文访问一律重定向。
  */
 public final class ForceHttpsPolicy {
 
@@ -15,22 +16,28 @@ public final class ForceHttpsPolicy {
     }
 
     /**
-     * HTTPS 代理是否应把明文 HTTP 请求重定向到 HTTPS。
-     * {@code force_https} 未配置时默认 {@code true}。
+     * 是否应把明文 HTTP 请求重定向到 HTTPS。
+     * 文件共享固定开启；HTTPS 代理在 {@code force_https} 未配置时默认 {@code true}。
      */
     public static boolean isRedirectEnabled(ProxyConfig config) {
-        if (config == null || !config.isHttps()) {
+        if (config == null) {
+            return false;
+        }
+        if (config.isFile()) {
+            return true;
+        }
+        if (!config.isHttps()) {
             return false;
         }
         Boolean forceHttps = config.getForceHttps();
-        return forceHttps == null || Boolean.TRUE.equals(forceHttps);
+        return forceHttps == null || forceHttps;
     }
 
     /**
-     * 解析配置值；非 HTTPS 协议固定为 {@code false}。
+     * 解析配置值；非 HTTPS/FILE 协议固定为 false
      */
     public static boolean resolveFlag(ProxyConfig config) {
-        if (config == null || !config.isHttps()) {
+        if (config == null || (!config.isHttps() && !config.isFile())) {
             return false;
         }
         return isRedirectEnabled(config);

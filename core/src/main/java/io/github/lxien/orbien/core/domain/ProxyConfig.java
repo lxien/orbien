@@ -223,7 +223,7 @@ public class ProxyConfig implements Serializable {
     }
 
     /**
-     * HTTPS 代理是否开启 HTTP→HTTPS 强制跳转（未配置时默认 true）。
+     * HTTPS / 文件共享是否开启 HTTP→HTTPS 强制跳转（文件共享固定 true；HTTPS 未配置时默认 true）。
      */
     public boolean isForceHttpsEnabled() {
         return ForceHttpsPolicy.isRedirectEnabled(this);

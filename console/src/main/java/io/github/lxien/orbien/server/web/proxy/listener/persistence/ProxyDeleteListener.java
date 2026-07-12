@@ -115,6 +115,7 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
             basicUserRepository.deleteByProxyIdIn(ids);
         }
         if (proxyDO.getProtocol().isFile()) {
+            certBindingSyncService.removeBindingsByProxyId(proxyId);
             proxyDomainRepository.deleteByProxyId(proxyId);
             fileShareAuthRepository.deleteByProxyIdIn(ids);
             fileShareUserRepository.deleteByProxyIdIn(ids);

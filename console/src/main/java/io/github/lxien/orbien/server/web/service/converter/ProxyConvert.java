@@ -42,6 +42,7 @@ public interface ProxyConvert {
     Socks5ProxyListDTO toSocks5ListDTO(ProxyDO proxy);
 
     @Mapping(target = "transportProtocol", ignore = true)
+    @Mapping(target = "tlsCertSummary", ignore = true)
     FileShareListDTO toFileShareListDTO(ProxyDO proxy);
 
     @Mapping(target = "transportProtocol", ignore = true)
@@ -88,6 +89,12 @@ public interface ProxyConvert {
     }
 
     default void enrichTlsCertSummary(HttpsProxyListDTO dto, TlsCertSummaryDTO summary) {
+        if (dto != null) {
+            dto.setTlsCertSummary(summary);
+        }
+    }
+
+    default void enrichTlsCertSummary(FileShareListDTO dto, TlsCertSummaryDTO summary) {
         if (dto != null) {
             dto.setTlsCertSummary(summary);
         }

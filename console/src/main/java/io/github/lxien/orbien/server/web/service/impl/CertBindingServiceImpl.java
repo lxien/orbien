@@ -105,11 +105,12 @@ public class CertBindingServiceImpl implements CertBindingService {
                 .orElseThrow(() -> new BizException("证书不存在"));
         List<String> sanDomains = DomainCertMatcher.parseSanDomains(cert.getSanDomains());
 
-        List<ProxyDO> httpsProxies = proxyRepository.findByProtocol(ProtocolType.HTTPS);
-        if (CollectionUtils.isEmpty(httpsProxies)) {
+        List<ProxyDO> tlsProxies = proxyRepository.findByProtocolIn(
+                List.of(ProtocolType.HTTPS, ProtocolType.FILE));
+        if (CollectionUtils.isEmpty(tlsProxies)) {
             return Collections.emptyList();
         }
-        List<String> proxyIds = httpsProxies.stream().map(ProxyDO::getId).toList();
+        List<String> proxyIds = tlsProxies.stream().map(ProxyDO::getId).toList();
         List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyIdIn(proxyIds);
         if (CollectionUtils.isEmpty(domains)) {
             return Collections.emptyList();

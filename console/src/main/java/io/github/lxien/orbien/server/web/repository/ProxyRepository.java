@@ -15,6 +15,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -112,6 +113,8 @@ public interface ProxyRepository extends JpaRepository<ProxyDO, String>, JpaSpec
     List<ProxyDO> findByStatus(ProxyStatus status);
 
     List<ProxyDO> findByProtocol(ProtocolType protocol);
+
+    List<ProxyDO> findByProtocolIn(Collection<ProtocolType> protocols);
 
     @Query("""
             SELECT new io.github.lxien.orbien.server.web.dto.proxy.ProxyListQueryResult(a, p)

@@ -37,6 +37,7 @@
           :protocol="ProtocolType.FILE"
           :proxy-id="currentPluginProxyId"
           :proxy-name="currentPluginProxyName"
+          :initial-menu="pluginInitialMenu"
       />
 
       <MetricsDialog
@@ -67,6 +68,7 @@ import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../metrics/metrics-dialog/index.vue'
 import InspectorDrawer from '../inspector/inspector-drawer/index.vue'
 import {renderTransportProtocolTag} from '../proxy/shared/render-transport-protocol-tag'
+import {renderTlsCertSummaryTag} from '../https/render-tls-cert-summary'
 import {useProxyStatusToggle} from '../proxy/shared/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -85,6 +87,7 @@ const agentNameMap = ref<Record<string, string>>({})
 const pluginDialogVisible = ref(false)
 const currentPluginProxyId = ref('')
 const currentPluginProxyName = ref('')
+const pluginInitialMenu = ref('')
 
 const metricsDialogVisible = ref(false)
 const currentMetricsProxyId = ref('')
@@ -162,6 +165,12 @@ const {
         }
       },
       {
+        prop: 'tlsCertSummary',
+        label: 'TLS 证书',
+        formatter: (row: FileShareItem) =>
+            renderTlsCertSummaryTag(row.tlsCertSummary, () => handleOpenTlsConfig(row))
+      },
+      {
         prop: 'transportProtocol',
         label: '传输协议',
         formatter: (row: FileShareItem) => renderTransportProtocolTag(row.transportProtocol)
@@ -233,6 +242,14 @@ const showDialog = (type: DialogType, row?: FileShareItem): void => {
 }
 
 const handleSettings = (proxy: FileShareItem) => {
+  pluginInitialMenu.value = ''
+  currentPluginProxyId.value = proxy.id
+  currentPluginProxyName.value = proxy.name
+  pluginDialogVisible.value = true
+}
+
+const handleOpenTlsConfig = (proxy: FileShareItem) => {
+  pluginInitialMenu.value = 'tls'
   currentPluginProxyId.value = proxy.id
   currentPluginProxyName.value = proxy.name
   pluginDialogVisible.value = true

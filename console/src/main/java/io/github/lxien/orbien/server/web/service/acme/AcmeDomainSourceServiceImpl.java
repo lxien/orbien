@@ -40,7 +40,8 @@ public class AcmeDomainSourceServiceImpl implements AcmeDomainSourceService {
 
     @Override
     public List<AcmeHttpsProxyOptionDTO> listHttpsProxyOptions() {
-        List<ProxyDO> proxies = proxyRepository.findByProtocol(ProtocolType.HTTPS);
+        List<ProxyDO> proxies = proxyRepository.findByProtocolIn(
+                List.of(ProtocolType.HTTPS, ProtocolType.FILE));
         if (CollectionUtils.isEmpty(proxies)) {
             return List.of();
         }
@@ -62,8 +63,8 @@ public class AcmeDomainSourceServiceImpl implements AcmeDomainSourceService {
     @Override
     public List<AcmeHttpsProxyDomainOptionDTO> listDomainsByProxyId(String proxyId) {
         ProxyDO proxy = proxyRepository.findById(proxyId)
-                .filter(item -> item.getProtocol().isHttps())
-                .orElseThrow(() -> new BizException("HTTPS 代理不存在"));
+                .filter(item -> item.getProtocol().isHttps() || item.getProtocol().isFile())
+                .orElseThrow(() -> new BizException("代理不存在或不支持 TLS 证书"));
 
         List<ProxyDomainDO> domains = proxyDomainRepository.findByProxyId(proxy.getId());
         if (CollectionUtils.isEmpty(domains)) {

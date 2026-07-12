@@ -15,4 +15,5 @@ public class FileShareListDTO extends ProxyListDTO implements Serializable {
     private Boolean authEnabled;
     private Integer authUserCount;
     private Integer httpsProxyPort;
+    private TlsCertSummaryDTO tlsCertSummary;
 }

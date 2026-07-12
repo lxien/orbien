@@ -23,6 +23,7 @@ declare namespace Api.FileShare {
         authEnabled: boolean
         authUserCount: number
         httpsProxyPort?: number
+        tlsCertSummary?: Api.Proxy.TlsCertSummary
     }
 
     /** 认证用户 */

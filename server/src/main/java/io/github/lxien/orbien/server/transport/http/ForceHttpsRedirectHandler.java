@@ -23,9 +23,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
- * HTTP 端口（明文）访问 HTTPS 代理域名时的强制跳转处理。
+ * HTTP 端口访问 HTTPS / 文件共享域名时的强制跳转处理
  * <p>
- * 仅对 {@code protocol=https && force_https=true（默认）} 生效；不建立到内网的隧道。
+ * HTTPS：{@code force_https=true（默认）} 时跳转；文件共享固定跳转。均不在明文端口建立隧道
  */
 @Component
 @ChannelHandler.Sharable
@@ -66,7 +66,7 @@ public class ForceHttpsRedirectHandler extends ChannelInboundHandlerAdapter {
         }
 
         ProxyConfig config = ext.getProxyConfig();
-        if (!config.isHttps()) {
+        if (!config.isHttps() && !config.isFile()) {
             ctx.fireChannelRead(msg);
             return;
         }
