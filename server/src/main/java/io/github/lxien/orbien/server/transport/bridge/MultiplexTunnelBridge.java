@@ -127,20 +127,25 @@ public class MultiplexTunnelBridge implements TunnelBridge {
 
     private void writePayloadToVisitor(ByteBuf payload, int streamId, boolean sharedWithInbound) {
         if (payload == null || !payload.isReadable()) {
-            ReferenceCountUtil.release(payload);
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             return;
         }
+        int bytes = payload.readableBytes();
         if (sharedWithInbound) {
             payload.retain();
         }
         visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
-            if (!future.isSuccess()) {
+            if (sharedWithInbound && !future.isSuccess()) {
                 ReferenceCountUtil.release(payload);
+            }
+            if (!future.isSuccess()) {
                 StreamForwardHelper.abortAndClose(streamContext, logger,
                         "[传输] 数据转发到访问者失败 streamId=" + streamId, future.cause());
             } else {
                 logger.debug("[传输] 数据转发到访问者成功 streamId={} bytes={}",
-                        streamId, payload.readableBytes());
+                        streamId, bytes);
             }
         });
     }

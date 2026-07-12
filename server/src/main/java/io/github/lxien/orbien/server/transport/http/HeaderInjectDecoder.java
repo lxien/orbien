@@ -13,14 +13,23 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.List;
 
+/**
+ * 首包 HTTP 请求头注入 X-Forwarded-For。
+ */
 public class HeaderInjectDecoder extends ByteToMessageDecoder {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HeaderInjectDecoder.class);
 
     private static final int MAX_HEADER_SIZE = 65536;
 
+    private boolean finished;
+
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (in.readableBytes() == 0) {
+        if (!in.isReadable()) {
+            return;
+        }
+        if (finished) {
+            out.add(in.readRetainedSlice(in.readableBytes()));
             return;
         }
         in.markReaderIndex();
@@ -33,6 +42,7 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
             logger.debug("[HTTP] HTTP请求头{}字节超过限制{}字节，关闭流", headerEndIndex, MAX_HEADER_SIZE);
             in.skipBytes(in.readableBytes());
             ChannelUtils.closeOnFlush(ctx.channel());
+            finished = true;
             return;
         }
         in.markReaderIndex();
@@ -41,9 +51,8 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         String headerContent = new String(headerBytes, CharsetUtil.UTF_8);
 
         if (!isHttpRequest(headerContent)) {
-            in.resetReaderIndex();
-            out.add(in.retain());
-            ctx.pipeline().remove(this);
+            out.add(in.readRetainedSlice(in.readableBytes()));
+            finished = true;
             return;
         }
 
@@ -51,24 +60,19 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         String visitorIp = getVisitorIp(visitor);
         if (visitorIp == null || visitorIp.isEmpty()) {
             logger.warn("[HTTP] 客户端IP为空，跳过X-Forwarded-For注入");
-            in.resetReaderIndex();
-            out.add(in.retain());
-            ctx.pipeline().remove(this);
+            out.add(in.readRetainedSlice(in.readableBytes()));
+            finished = true;
             return;
         }
 
-        // 消费header字节
         in.skipBytes(headerEndIndex);
 
-        // 注入X-Forwarded-For头
         String injectedHeader = injectXForwardedFor(headerContent, visitorIp);
         byte[] injectedHeaderBytes = injectedHeader.getBytes(CharsetUtil.UTF_8);
 
-        // 构建新的复合缓冲区
         ByteBuf headerBuf = ctx.alloc().buffer(injectedHeaderBytes.length);
         headerBuf.writeBytes(injectedHeaderBytes);
 
-        // 读取剩余body数据（不消费，保留给下一个handler）
         ByteBuf bodyBuf = in.readRetainedSlice(in.readableBytes());
 
         CompositeByteBuf compositeBuf = ctx.alloc().compositeBuffer(2);
@@ -76,16 +80,13 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
         out.add(compositeBuf);
 
         logger.debug("[HTTP] X-Forwarded-For注入完成，客户端IP={}", visitorIp);
-        // 首包处理完成后移除，后续 upload body 分片直接透传
-        ctx.pipeline().remove(this);
+        finished = true;
     }
+
     protected String getVisitorIp(Channel visitor) {
         return VisitorAddressResolver.resolveIp(visitor);
     }
-    /**
-     * 查找HTTP header的结束位置（\r\n\r\n）
-     * 返回header结束位置（包含\r\n\r\n），未找到返回-1
-     */
+
     private int findHeaderEnd(ByteBuf buf) {
         int readableBytes = buf.readableBytes();
         for (int i = 0; i < readableBytes - 3; i++) {
@@ -93,15 +94,12 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
                     && buf.getByte(buf.readerIndex() + i + 1) == '\n'
                     && buf.getByte(buf.readerIndex() + i + 2) == '\r'
                     && buf.getByte(buf.readerIndex() + i + 3) == '\n') {
-                return i + 4; // 包含\r\n\r\n
+                return i + 4;
             }
         }
         return -1;
     }
 
-    /**
-     * 判断是否为HTTP请求
-     */
     private boolean isHttpRequest(String content) {
         return content.startsWith("GET ") || content.startsWith("POST ")
                 || content.startsWith("PUT ") || content.startsWith("DELETE ")
@@ -110,9 +108,6 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
                 || content.startsWith("TRACE ");
     }
 
-    /**
-     * 注入或更新X-Forwarded-For头
-     */
     private String injectXForwardedFor(String header, String clientIp) {
         StringBuilder result = new StringBuilder();
         String[] lines = header.split("\r\n");
@@ -139,6 +134,13 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
 
         result.append("\r\n");
         return result.toString();
+    }
+
+    @Override
+    protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (in.isReadable()) {
+            out.add(in.readRetainedSlice(in.readableBytes()));
+        }
     }
 
     @Override

@@ -24,6 +24,7 @@ import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.utils.NettyHttpUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,13 +90,31 @@ public class UploadRateLimitHandler extends SimpleChannelInboundHandler<ByteBuf>
 
         logger.debug("访问速度太快，触发限流：streamId={} bytes={} 等待 {} ms", streamContext.getStreamId(), bytes, waitNanos / 1_000_000);
         visitor.config().setOption(ChannelOption.AUTO_READ, false);
-        visitor.attr(AttributeKeys.PENDING_READ).set(payload.retain());
+        ByteBuf retained = payload.retain();
+        visitor.attr(AttributeKeys.PENDING_READ).set(retained);
         visitor.eventLoop().schedule(() -> {
-            ctx.fireChannelRead(visitor.attr(AttributeKeys.PENDING_READ).get());
+            ByteBuf pending = visitor.attr(AttributeKeys.PENDING_READ).getAndSet(null);
+            if (pending == null) {
+                return;
+            }
+            if (!visitor.isActive() || !pending.isReadable()) {
+                ReferenceCountUtil.release(pending);
+                return;
+            }
+            ctx.fireChannelRead(pending);
             visitor.config().setOption(ChannelOption.AUTO_READ, true);
             visitor.read();
             logger.debug("限流恢复，继续读取：streamId={}", streamContext.getStreamId());
         }, waitMillis, TimeUnit.MILLISECONDS);
         logger.debug("发送限流时从访问流收到的数据包到内网");
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        ByteBuf pending = ctx.channel().attr(AttributeKeys.PENDING_READ).getAndSet(null);
+        if (pending != null && pending.refCnt() > 0) {
+            ReferenceCountUtil.release(pending);
+        }
+        super.channelInactive(ctx);
     }
 }

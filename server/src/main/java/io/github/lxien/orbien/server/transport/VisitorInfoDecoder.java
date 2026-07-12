@@ -28,20 +28,23 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.List;
 
+/**
+ * 首包嗅探 HTTP Host / BasicAuth。不得在 decode 内 remove handler，见 {@link io.github.lxien.orbien.server.transport.http.HeaderInjectDecoder}。
+ */
 public class VisitorInfoDecoder extends ByteToMessageDecoder {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(VisitorInfoDecoder.class);
-    private boolean sniffing = true;
-
-    public VisitorInfoDecoder() {
-    }
+    private boolean finished;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        Channel visitor = ctx.channel();
-        if (!sniffing) {
-            out.add(in.retain());
+        if (!in.isReadable()) {
             return;
         }
+        if (finished) {
+            out.add(in.readRetainedSlice(in.readableBytes()));
+            return;
+        }
+        Channel visitor = ctx.channel();
         if (in.readableBytes() < 8) {
             return;
         }
@@ -71,16 +74,21 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
             logger.error(e.getMessage(), e);
         } finally {
             in.resetReaderIndex();
-            sniffing = false;
         }
         if (isHttp) {
             visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.HTTP);
             visitor.attr(AttributeKeys.VISIT_DOMAIN).set(domain);
             visitor.attr(AttributeKeys.BASIC_AUTH_HEADER).set(basicAuth);
         }
-        // handler 移除前必须把 cumulation 交给下游，否则 ByteBuf 泄漏
-        out.add(in.retain());
-        ctx.pipeline().remove(this);
+        out.add(in.readRetainedSlice(in.readableBytes()));
+        finished = true;
+    }
+
+    @Override
+    protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+        if (in.isReadable()) {
+            out.add(in.readRetainedSlice(in.readableBytes()));
+        }
     }
 
     private String parseAuthHeader(String content) {
@@ -121,5 +129,4 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
         }
         return null;
     }
-
 }

@@ -127,6 +127,7 @@ public class StreamContext extends AbstractStreamContext {
         if (!localForwardingAborted.compareAndSet(false, true)) {
             return;
         }
+        drainMessagesQueue();
         Channel v = visitor;
         if (v != null && v.isActive()) {
             v.config().setOption(ChannelOption.AUTO_READ, false);
@@ -148,5 +149,12 @@ public class StreamContext extends AbstractStreamContext {
             return false;
         }
         return state == StreamState.OPENED || state == StreamState.OPENING || state == StreamState.PAUSED;
+    }
+
+    public void drainMessagesQueue() {
+        TMSPFrame frame;
+        while ((frame = messagesQueue.poll()) != null) {
+            ReferenceCountUtil.release(frame);
+        }
     }
 }

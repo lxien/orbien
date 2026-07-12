@@ -18,17 +18,27 @@ public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        forwardToLocal(payload, true);
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
         if (capture != null) {
             capture.appendRequestBody(payload);
         }
-        delegate.forwardToLocal(payload);
+        delegate.forwardToLocal(payload, sharedWithInbound);
     }
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
+        forwardToRemote(payload, true);
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
         if (capture != null) {
             capture.appendResponseBody(payload);
         }
-        delegate.forwardToRemote(payload);
+        delegate.forwardToRemote(payload, sharedWithInbound);
     }
 }

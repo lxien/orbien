@@ -33,11 +33,21 @@ public abstract class AbstractTunnelBridgeDecorator implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
-        delegate.forwardToLocal(payload);
+        forwardToLocal(payload, true);
     }
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
-        delegate.forwardToRemote(payload);
+        forwardToRemote(payload, true);
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
+        delegate.forwardToLocal(payload, sharedWithInbound);
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
+        delegate.forwardToRemote(payload, sharedWithInbound);
     }
 }

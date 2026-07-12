@@ -57,10 +57,11 @@ public class ProxyProtocolDetectHandler extends ByteToMessageDecoder {
 
         // 检测到 PROXY 头，动态挂载解码链
         pipeline.addAfter(ctx.name(), NettyConstants.HAPROXY_DECODER, new HAProxyMessageDecoder());
+        ByteBuf remainder = in.readRetainedSlice(in.readableBytes());
         pipeline.addAfter(NettyConstants.HAPROXY_DECODER, NettyConstants.HAPROXY_ADDRESS_HANDLER,
                 new HAProxyVisitorAddressHandler(config));
-        pipeline.remove(this);
-        ctx.fireChannelRead(in.retain());
+        out.add(remainder);
+        ctx.pipeline().remove(this);
     }
 
     private void forwardAsDirect(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {

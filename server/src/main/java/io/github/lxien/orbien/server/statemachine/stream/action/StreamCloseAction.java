@@ -71,11 +71,11 @@ public class StreamCloseAction extends StreamBaseAction {
         leastConnHooks.onStreamClosed(context);
         metricsCollector.onChannelInactive(context.getProxyId());
 
-        ByteBuf byteBuf = visitor.attr(AttributeKeys.PENDING_READ).get();
+        ByteBuf byteBuf = visitor.attr(AttributeKeys.PENDING_READ).getAndSet(null);
         if (byteBuf != null && byteBuf.refCnt() > 0) {
             byteBuf.release();
         }
-        visitor.attr(AttributeKeys.PENDING_READ).set(null);
+        context.drainMessagesQueue();
         ByteBuf httpFirst = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
         if (httpFirst != null && httpFirst.refCnt() > 0) {
             ReferenceCountUtil.release(httpFirst);
