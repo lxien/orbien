@@ -17,6 +17,7 @@
 package io.github.lxien.orbien.server.manager;
 
 import io.github.lxien.orbien.server.exceptions.OrbienException;
+import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.port.PortAcceptor;
 import io.github.lxien.orbien.server.port.UdpPortAcceptor;
@@ -53,6 +54,8 @@ public class ProxyManager {
     private final Map<String/*proxyId*/, String/*agentId*/> proxyAgentMap = new ConcurrentHashMap<>();
     @Autowired
     private MetricsCollector metricsCollector;
+    @Autowired
+    private HealthManager healthManager;
     @Autowired
     private IpAccessChecker ipAccessChecker;
     @Autowired
@@ -200,8 +203,8 @@ public class ProxyManager {
         domainRegistry.unregister(proxyId);
         //删除IP访问控制
         ipAccessChecker.invalidate(proxyId);
-        //删除代理流量最近内存统计记录
         metricsCollector.removeByProxyId(proxyId);
+        healthManager.removeProxy(proxyId);
     }
 
     public void deactivates(List<String> proxyIds) {

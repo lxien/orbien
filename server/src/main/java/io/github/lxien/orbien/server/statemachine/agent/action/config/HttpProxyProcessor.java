@@ -41,8 +41,9 @@ public class HttpProxyProcessor extends AbstractHttpProxyProcessor {
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public HttpProxyProcessor(AppConfig appConfig, ProxyManager proxyManager, DomainGenerator domainGenerator, UidGenerator uidGenerator,
                               EventBus eventBus, ProxyConfigService proxyConfigService,
-                              DomainConfigService domainConfigService) {
-        super(appConfig, proxyManager, domainGenerator, uidGenerator, eventBus, proxyConfigService, domainConfigService);
+                              DomainConfigService domainConfigService, ProxyOverwriteSupport proxyOverwriteSupport) {
+        super(appConfig, proxyManager, domainGenerator, uidGenerator, eventBus, proxyConfigService, domainConfigService,
+                proxyOverwriteSupport);
     }
 
     @Override

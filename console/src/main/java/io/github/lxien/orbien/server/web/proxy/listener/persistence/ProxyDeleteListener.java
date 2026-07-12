@@ -19,11 +19,9 @@ package io.github.lxien.orbien.server.web.proxy.listener.persistence;
 import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
-import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.*;
 import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
-import io.github.lxien.orbien.server.web.service.MetricsService;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,11 +62,15 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private HealthCheckRepository healthCheckRepository;
     @Autowired
-    private MetricsService metricsService;
+    private FileShareAuthRepository fileShareAuthRepository;
+    @Autowired
+    private FileShareUserRepository fileShareUserRepository;
+    @Autowired
+    private FileShareLimitsRepository fileShareLimitsRepository;
+    @Autowired
+    private MetricsRepository metricsRepository;
     @Autowired
     private CertBindingSyncService certBindingSyncService;
-    @Autowired
-    private HealthManager healthManager;
     @Autowired
     private TransactionTemplate transactionTemplate;
 
@@ -112,13 +114,18 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
         }
+        if (proxyDO.getProtocol().isFile()) {
+            proxyDomainRepository.deleteByProxyId(proxyId);
+            fileShareAuthRepository.deleteByProxyIdIn(ids);
+            fileShareUserRepository.deleteByProxyIdIn(ids);
+            fileShareLimitsRepository.deleteByProxyIdIn(ids);
+        }
         if (proxyDO.getProtocol().isSocks5()) {
             socks5AuthRepository.deleteByProxyIdIn(ids);
             socks5UserRepository.deleteByProxyIdIn(ids);
         }
 
-        metricsService.deleteByProxyId(proxyId);
-        healthManager.removeProxy(proxyId);
+        metricsRepository.deleteByProxyId(proxyId);
         proxyRepository.deleteById(proxyId);
         logger.debug("代理配置已从数据库删除: agentId={}, proxyId={}, name={}",
                 proxyDO.getAgentId(), proxyId, proxyDO.getName());

@@ -31,9 +31,6 @@ public class AgentContextCleanupTask {
     @Autowired
     private AgentManager agentManager;
 
-    /**
-     * 每分钟扫描一次；标准客户端断连超过 2 分钟未重连则清理全部资源。
-     */
     @Scheduled(fixedDelay = 60_000)
     public void cleanupInactiveContexts() {
         LocalDateTime now = LocalDateTime.now();
@@ -46,14 +43,14 @@ public class AgentContextCleanupTask {
             }
             if (ChronoUnit.MINUTES.between(context.getLastActiveTime(), now) >= 2) {
                 cleaned++;
-                logger.debug("客户端 {} 重连窗口超时，触发 Goaway", context.getAgentId());
+                logger.debug("客户端 {} 重连超时，触发 Goaway", context.getAgentId());
                 context.fireEvent(AgentEvent.LOCAL_GOAWAY);
             }
         }
         if (cleaned > 0) {
-            logger.info("AgentContext cleanup: total={}, cleaned={}", total, cleaned);
+            logger.info("客户端上下文清理: total={}, cleaned={}", total, cleaned);
         } else {
-            logger.debug("AgentContext cleanup: total={}, cleaned={}", total, cleaned);
+            logger.debug("客户端上下文清理: total={}, cleaned={}", total, cleaned);
         }
     }
 }

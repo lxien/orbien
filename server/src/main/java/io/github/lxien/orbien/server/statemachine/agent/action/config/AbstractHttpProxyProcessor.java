@@ -21,7 +21,6 @@ package io.github.lxien.orbien.server.statemachine.agent.action.config;
 import com.google.protobuf.ProtocolStringList;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.DomainInfo;
-import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.enums.DomainType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
@@ -30,7 +29,6 @@ import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.event.ProxyAddEvent;
-import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
 import io.github.lxien.orbien.server.exceptions.OrbienException;
 import io.github.lxien.orbien.server.manager.ProxyManager;
 import io.github.lxien.orbien.server.service.DomainConfigService;
@@ -57,6 +55,7 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
     protected final EventBus eventBus;
     protected final ProxyConfigService proxyConfigService;
     protected final DomainConfigService domainConfigService;
+    protected final ProxyOverwriteSupport proxyOverwriteSupport;
 
     public AbstractHttpProxyProcessor(
             AppConfig appConfig,
@@ -65,7 +64,8 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
             UidGenerator uidGenerator,
             EventBus eventBus,
             ProxyConfigService proxyConfigService,
-            DomainConfigService domainConfigService) {
+            DomainConfigService domainConfigService,
+            ProxyOverwriteSupport proxyOverwriteSupport) {
         this.appConfig = appConfig;
         this.proxyManager = proxyManager;
         this.domainGenerator = domainGenerator;
@@ -73,6 +73,7 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         this.eventBus = eventBus;
         this.proxyConfigService = proxyConfigService;
         this.domainConfigService = domainConfigService;
+        this.proxyOverwriteSupport = proxyOverwriteSupport;
     }
 
     @Override
@@ -80,17 +81,23 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         DomainType domainType = getDomainType(proxy.getDomain());
         List<DomainInfo> domains;
         String agentId = context.getAgentId();
-        ProxyConfigExt ext = proxyConfigService.findByAgentAndName(agentId, proxy.getName());
+        ProxyConfigExt existing = proxyConfigService.findByAgentAndName(agentId, proxy.getName());
 
-        if (ext != null) {
-            logger.debug("代理 {} 已存在，先删除旧的代理配置", proxy.getName());
-            ProxyConfig config = ext.getProxyConfig();
-            String proxyId = config.getProxyId();
-            proxyManager.deactivate(proxyId);
-            eventBus.publishSync(new ProxyDeleteEvent(agentId, proxyId));
+        List<DomainInfo> reuseAutoDomains = null;
+        String proxyId;
+        if (existing != null) {
+            if (domainType != null && domainType.isAuto()) {
+                reuseAutoDomains = copyAutoDomains(existing);
+            }
+            proxyId = proxyOverwriteSupport.release(agentId, existing);
+        } else {
+            proxyId = uidGenerator.getUIDAsString();
         }
+
         Message.Domain domain = proxy.getDomain();
-        if (domainType.isCustomDomain()) {
+        if (reuseAutoDomains != null) {
+            domains = reuseAutoDomains;
+        } else if (domainType.isCustomDomain()) {
             domains = domainGenerator.generateCustomDomains(domain.getCustomDomainsList());
         } else if (domainType.isAuto()) {
             String rootDomain = randomBaseDomain();
@@ -112,14 +119,13 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
             domains = domainGenerator.generateSubdomains(rootDomain, subDomainsList);
         }
 
-        String proxyId = uidGenerator.getUIDAsString();
         List<String> list = domains.stream().map(DomainInfo::getFullDomain).toList();
         HashSet<String> domainSet = new HashSet<>(list);
 
         doRegister(agentId, proxyId, domainSet);
 
         ProxyAddEvent proxyAddEvent = new ProxyAddEvent(agentId, proxyId, proxy, domains);
-        eventBus.publishAsync(proxyAddEvent);
+        eventBus.publishSync(proxyAddEvent);
 
         Message.RuntimeInfo.Builder builder = Message.RuntimeInfo.newBuilder();
         builder.setProxyId(proxyId);
@@ -172,6 +178,17 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
         List<String> allRootDomains = domainConfigService.findAllRootDomains();
         int index = ThreadLocalRandom.current().nextInt(allRootDomains.size());
         return allRootDomains.get(index);
+    }
+
+    private List<DomainInfo> copyAutoDomains(ProxyConfigExt existing) {
+        if (CollectionUtils.isEmpty(existing.getDomains())) {
+            return null;
+        }
+        DomainInfo first = existing.getDomains().iterator().next();
+        if (first.getDomainType() != DomainType.AUTO) {
+            return null;
+        }
+        return new ArrayList<>(existing.getDomains());
     }
 
     public DomainType getDomainType(Message.Domain domain) {

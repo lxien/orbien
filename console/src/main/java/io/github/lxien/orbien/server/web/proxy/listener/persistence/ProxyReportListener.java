@@ -195,6 +195,7 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
 
     private void persistBasicAuth(String proxyId, Message.Proxy proxy) {
         basicUserRepository.deleteByProxyIdIn(List.of(proxyId));
+        basicUserRepository.flush();
 
         if (proxy.hasBasicAuth()) {
             Message.BasicAuth basicAuth = proxy.getBasicAuth();
@@ -212,6 +213,8 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
 
     private void persistSocks5Auth(String proxyId, Message.Proxy proxy) {
         socks5UserRepository.deleteByProxyIdIn(List.of(proxyId));
+        socks5UserRepository.flush();
+
         if (proxy.hasSocks5Auth()) {
             Message.Socks5Auth socks5Auth = proxy.getSocks5Auth();
             socks5AuthRepository.save(new Socks5AuthDO(proxyId, socks5Auth.getEnabled()));
@@ -226,7 +229,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     }
 
     private void persistFileShareAuth(String proxyId, Message.Proxy proxy) {
+        fileShareAuthRepository.deleteByProxyIdIn(List.of(proxyId));
         fileShareUserRepository.deleteByProxyIdIn(List.of(proxyId));
+        fileShareUserRepository.flush();
+
         if (proxy.hasFileAuth()) {
             Message.FileShareAuth fileAuth = proxy.getFileAuth();
             fileShareAuthRepository.save(new FileShareAuthDO(proxyId, fileAuth.getEnabled()));
@@ -242,10 +248,12 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
 
     private void persistFileShareLimits(String proxyId, Message.Proxy proxy) {
         if (!proxy.hasFileLimits()) {
+            fileShareLimitsRepository.deleteByProxyIdIn(List.of(proxyId));
             return;
         }
         Message.FileShareLimits limits = proxy.getFileLimits();
-        FileShareLimitsDO limitsDO = new FileShareLimitsDO(proxyId);
+        FileShareLimitsDO limitsDO = fileShareLimitsRepository.findById(proxyId)
+                .orElse(new FileShareLimitsDO(proxyId));
         if (StringUtils.hasText(limits.getRootPath())) {
             limitsDO.setRootPath(limits.getRootPath());
         }

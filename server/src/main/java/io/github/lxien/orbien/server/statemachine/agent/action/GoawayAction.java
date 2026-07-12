@@ -37,13 +37,12 @@ public class GoawayAction extends AgentBaseAction {
 
     @Override
     protected void doExecute(AgentState from, AgentState to, AgentEvent event, AgentContext context) {
-        logger.debug("开始清理客户端资源，事件：{}", event);
         AgentInfo agentInfo = context.getAgentInfo();
         String agentId = agentInfo != null ? agentInfo.getAgentId() : null;
         Channel control = context.getControl();
 
         if (!StringUtils.hasText(agentId)) {
-            logger.warn("客户端断开，未找到客户端信息，连接ID：{}", context.getConnectionId());
+            logger.warn("Goaway 时未找到客户端信息, connectionId={}", context.getConnectionId());
             agentManager.detachControlChannel(context);
             agentManager.removeOrphanConnection(context.getConnectionId());
             if (control != null) {
@@ -53,7 +52,7 @@ public class GoawayAction extends AgentBaseAction {
         }
 
         if (agentManager.getAgentContext(agentId).isEmpty()) {
-            logger.debug("{} 客户端资源已清理，跳过重复 Goaway", agentId);
+            logger.debug("客户端 {} 资源已清理，跳过重复 Goaway", agentId);
             if (control != null && control.isActive()) {
                 ChannelUtils.closeOnFlush(control);
             }
@@ -61,12 +60,12 @@ public class GoawayAction extends AgentBaseAction {
         }
 
         if (event == AgentEvent.LOCAL_GOAWAY && control != null && control.isActive()) {
-            logger.info("{} 强制下线，向客户端发送 GOAWAY", agentId);
+            logger.info("客户端 {} 强制下线，发送 GOAWAY", agentId);
             control.eventLoop().execute(() ->
                     control.writeAndFlush(new TMSPFrame(0, TMSP.MSG_GOAWAY))
                             .addListener((ChannelFutureListener) future -> {
                                 if (!future.isSuccess()) {
-                                    logger.debug("{} GOAWAY 发送失败（可能连接已断）", agentId);
+                                    logger.debug("客户端 {} GOAWAY 发送失败", agentId);
                                 }
                                 cleanupResources(context, agentInfo, agentId, control);
                             })
@@ -77,7 +76,7 @@ public class GoawayAction extends AgentBaseAction {
     }
 
     private void cleanupResources(AgentContext context, AgentInfo agentInfo, String agentId, Channel control) {
-        logger.debug("{} 客户端断开，开始清理资源", agentId);
+        logger.debug("客户端 {} 断开，开始清理资源", agentId);
         try {
             streamManager.fireCloseByAgent(agentId);
             directConnectionPool.offline(agentId);
@@ -88,9 +87,9 @@ public class GoawayAction extends AgentBaseAction {
                 ChannelUtils.closeOnFlush(control);
             }
             publishOfflineEvent(agentInfo);
-            logger.info("{} 客户端资源清理完成", agentId);
+            logger.info("客户端 {} 资源清理完成", agentId);
         } catch (Exception e) {
-            logger.error("{} 资源清理过程中发生异常", agentId, e);
+            logger.error("客户端 {} 资源清理失败", agentId, e);
         }
     }
 

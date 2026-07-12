@@ -23,7 +23,7 @@ import io.github.lxien.orbien.server.event.ProxyDeleteEvent;
 import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.service.AgentConfigService;
-import io.github.lxien.orbien.server.service.ProxyConfigService;
+import io.github.lxien.orbien.server.service.ProxyCacheEvictionService;
 import io.github.lxien.orbien.server.web.entity.ProxyDO;
 import io.github.lxien.orbien.server.web.repository.AgentRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyRepository;
@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/**
+ * 会话型客户端离线后，清理 agent 及关联代理的数据库记录。
+ */
 @Component
 public class AgentOfflineListener implements EventListener<AgentOfflineEvent> {
     private final Logger logger = LoggerFactory.getLogger(AgentOfflineListener.class);
@@ -53,7 +56,7 @@ public class AgentOfflineListener implements EventListener<AgentOfflineEvent> {
     @Autowired
     private AgentConfigService agentConfigService;
     @Autowired
-    private ProxyConfigService proxyConfigService;
+    private ProxyCacheEvictionService proxyCacheEvictionService;
     @Autowired
     private TransactionTemplate transactionTemplate;
 
@@ -61,9 +64,6 @@ public class AgentOfflineListener implements EventListener<AgentOfflineEvent> {
     public void init() {
         eventBus.register(this);
     }
-    /**
-     * 对会话型客户端清理数据库中的 agent 与其代理记录。
-     */
     @Override
     public void onEvent(AgentOfflineEvent event) {
         if (event == null || !StringUtils.hasText(event.getAgentId())) {
@@ -83,7 +83,7 @@ public class AgentOfflineListener implements EventListener<AgentOfflineEvent> {
                 deleteSessionAgent(agentId);
             } catch (Exception e) {
                 status.setRollbackOnly();
-                logger.error("会话型客户端持久化记录清理失败: agentId={}", agentId, e);
+                logger.error("会话型客户端数据库记录清理失败: agentId={}", agentId, e);
             }
         });
     }
@@ -94,14 +94,14 @@ public class AgentOfflineListener implements EventListener<AgentOfflineEvent> {
         if (!CollectionUtils.isEmpty(proxies)) {
             for (ProxyDO proxy : proxies) {
                 proxyIds.add(proxy.getId());
+                proxyCacheEvictionService.evictByProxyId(proxy.getId());
                 eventBus.publishSync(new ProxyDeleteEvent(agentId, proxy.getId()));
             }
-            proxyConfigService.evictByProxyIds(proxyIds);
         }
         if (agentRepository.existsById(agentId)) {
             agentRepository.deleteById(agentId);
         }
         agentConfigService.evictById(agentId);
-        logger.debug("会话型客户端持久化记录已清理: agentId={}, proxyCount={}", agentId, proxyIds.size());
+        logger.debug("会话型客户端数据库记录已清理: agentId={}, proxyCount={}", agentId, proxyIds.size());
     }
 }

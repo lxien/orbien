@@ -51,6 +51,8 @@ public class TcpProxyProcessor implements ProxyProcessor {
     private EventBus eventBus;
     @Autowired
     private ListenPortResolver listenPortResolver;
+    @Autowired
+    private ProxyOverwriteSupport proxyOverwriteSupport;
     @Resource
     private AppConfig appConfig;
 
@@ -59,16 +61,15 @@ public class TcpProxyProcessor implements ProxyProcessor {
         String agentId = context.getAgentId();
         int remotePort = proxy.getRemotePort();
         String name = proxy.getName();
-        ProxyConfigExt ext = proxyConfigService.findByAgentAndName(agentId, name);
+        ProxyConfigExt existing = proxyConfigService.findByAgentAndName(agentId, name);
         String proxyId;
-        if (ext != null) {
-            proxyId = ext.getProxyConfig().getProxyId();
-            proxyManager.deactivate(proxyId);
+        if (existing != null) {
+            proxyId = proxyOverwriteSupport.release(agentId, existing);
         } else {
             proxyId = uidGenerator.getUIDAsString();
         }
-        Integer listenPort = listenPortResolver.resolve(remotePort, ext, PortPoolType.TCP);
-        if (remotePort < 1 && (ext == null || ext.getProxyConfig().getListenPort() == null)) {
+        Integer listenPort = listenPortResolver.resolve(remotePort, existing, PortPoolType.TCP);
+        if (remotePort < 1 && (existing == null || existing.getProxyConfig().getListenPort() == null)) {
             logger.debug("TCP代理 {} 自动分配端口: {}", proxy.getName(), listenPort);
         }
 

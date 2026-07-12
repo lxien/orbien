@@ -17,8 +17,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 /**
- * 控制连接断开时的统一处理：健康状态清理、连接索引解除、运行时资源下线
- * 会话型客户端及认证中断连立即进入 Goaway 终态；标准客户端保留重连窗口
+ * 控制连接断开事件处理。
  */
 @Component
 public class DisconnectAction extends AgentBaseAction {
@@ -47,7 +46,7 @@ public class DisconnectAction extends AgentBaseAction {
                     healthManager.removeProxy(proxy.getProxyConfig().getProxyId());
                 }
             }
-            logger.debug("客户端 {} 断连，已清除 {} 个代理的运行时健康状态", agentId, proxies.size());
+            logger.debug("客户端 {} 断连，已清除 {} 个代理健康状态", agentId, proxies.size());
 
             directConnectionPool.offline(agentId);
             multiplexConnectionPool.offline(agentId);
@@ -58,8 +57,7 @@ public class DisconnectAction extends AgentBaseAction {
         context.updateActiveTime();
 
         if (shouldGoawayImmediately(from, context)) {
-            logger.debug("客户端 {} 断连后立即清理（from={}, type={}）",
-                    agentId, from, context.getAgentInfo() != null ? context.getAgentInfo().getAgentType() : null);
+            logger.debug("客户端 {} 断连后立即 Goaway, from={}", agentId, from);
             context.fireEvent(AgentEvent.LOCAL_GOAWAY);
         }
     }

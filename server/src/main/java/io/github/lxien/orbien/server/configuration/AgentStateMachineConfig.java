@@ -50,7 +50,7 @@ public class AgentStateMachineConfig {
                 .on(AgentEvent.AUTH_SUCCESS)
                 .when(ctx -> true)
                 .perform(proxyConfigSyncAction);
-        //初始化客户端运行时信息
+        // 初始化客户端运行时信息
         builder.internalTransition()
                 .within(AgentState.CONNECTED)
                 .on(AgentEvent.AGENT_INIT)
@@ -91,7 +91,7 @@ public class AgentStateMachineConfig {
                 .when(ctx -> true)
                 .perform(disconnectAction);
 
-        // 心跳超时：标准客户端保留重连窗口，会话型立即 Goaway
+        // 心跳超时
         builder.externalTransition()
                 .from(AgentState.CONNECTED)
                 .to(AgentState.DISCONNECTED)
