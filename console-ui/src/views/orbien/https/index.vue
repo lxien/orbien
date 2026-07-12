@@ -329,9 +329,3 @@ const handleSingleDelete = async (proxy: HttpsProxyItem) => {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-:deep(.el-dialog__body) {
-  padding: 0 !important;
-}
-</style>

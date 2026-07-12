@@ -5,6 +5,7 @@
       width="580px"
       align-center
       destroy-on-close
+      append-to-body
   >
     <ElForm
         ref="formRef"

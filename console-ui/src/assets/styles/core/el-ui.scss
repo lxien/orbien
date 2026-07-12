@@ -100,10 +100,11 @@ html.dark .el-card {
 
 // 修改 el-checkbox-button 高度
 .el-checkbox-button--default .el-checkbox-button__inner,
-// 修改 el-radio-button 高度
+  // 修改 el-radio-button 高度
 .el-radio-button--default .el-radio-button__inner {
   padding: 10px 15px !important;
 }
+
 // -------------------------------- 修改 el-size=default 组件默认高度 end --------------------------------
 
 .el-pagination.is-background .btn-next,
@@ -130,15 +131,15 @@ html.dark .el-card {
 }
 
 .el-dialog__body {
-  padding: 25px 0 !important;
-  position: relative; // 为了兼容 el-pagination 样式，需要设置 relative，不然会影响 el-pagination 的样式，比如 el-pagination__jump--small 会被影响，导致 el-pagination__jump--small 按钮无法点击，详见 URL_ADDRESS.com/element-plus/element-plus/issues/5684#issuecomment-1176299275;
+  padding: 8px 0 !important;
+  position: relative;
 }
 
 .el-dialog.el-dialog-border {
   .el-dialog__body {
     // 上边框
     &::before,
-    // 下边框
+      // 下边框
     &::after {
       content: '';
       position: absolute;
@@ -162,10 +163,9 @@ html.dark .el-card {
 .el-message {
   background-color: var(--default-box-color) !important;
   border: 0 !important;
-  box-shadow:
-    0 6px 16px 0 rgba(0, 0, 0, 0.08),
-    0 3px 6px -4px rgba(0, 0, 0, 0.12),
-    0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08),
+  0 3px 6px -4px rgba(0, 0, 0, 0.12),
+  0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
 
   p {
     font-size: 13px;

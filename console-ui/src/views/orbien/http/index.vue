@@ -311,5 +311,3 @@ const handleSingleDelete = async (proxy: HttpProxyItem) => {
   }
 }
 </script>
-
-<style lang="scss" scoped></style>

@@ -267,5 +267,3 @@ const handleMetricsClose = () => {
   currentMetricsProxyId.value = ''
 }
 </script>
-
-<style lang="scss" scoped></style>

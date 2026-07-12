@@ -168,13 +168,39 @@ const currentPageComponent = computed(() => {
 <style lang="scss" scoped>
 .dialog-layout {
   display: flex;
-  align-items: stretch;
   height: 100%;
 }
 
 .plugin-dialog-sidebar {
-  align-self: stretch;
-  min-height: 100%;
+  flex-shrink: 0;
+  width: 180px;
+  border-right: 1px solid var(--art-card-border);
+  display: flex;
+  flex-direction: column;
+
+  .menu-left {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  :deep(.el-scrollbar) {
+    flex: 1;
+  }
+
+  :deep(.el-scrollbar__wrap) {
+    overflow-x: hidden;
+  }
+
+  :deep(.el-scrollbar__bar.is-horizontal) {
+    display: none;
+  }
+
+  :deep(.el-menu:not(.el-menu--collapse)) {
+    width: 180px;
+    border-right: none;
+  }
 }
 
 .dialog-content {
@@ -188,12 +214,12 @@ const currentPageComponent = computed(() => {
 <style lang="scss">
 .plugin-dialog.el-dialog {
   --el-dialog-padding-primary: 16px;
-  --el-dialog-margin-top: 15px;
   height: calc(100vh - 30px);
-  margin-bottom: 30px;
+  margin: 15px auto 30px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding:  0;
 }
 
 .plugin-dialog.el-dialog .el-dialog__header {
@@ -209,45 +235,5 @@ const currentPageComponent = computed(() => {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding: 0 !important;
-}
-
-.plugin-dialog-sidebar.layout-sidebar {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  height: 100% !important;
-  min-height: 100%;
-  width: 180px;
-  border-right: 1px solid var(--art-card-border) !important;
-
-  .menu-left {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    height: 100% !important;
-    min-height: 100%;
-    width: 180px;
-  }
-
-  .el-scrollbar {
-    flex: 1;
-    height: 100% !important;
-  }
-
-  .el-scrollbar__wrap {
-    height: 100% !important;
-  }
-
-  .el-menu:not(.el-menu--collapse) {
-    width: 180px;
-    height: 100%;
-    min-height: 100%;
-    border-right: none !important;
-  }
-}
-
-.dark .plugin-dialog-sidebar.layout-sidebar {
-  border-right-color: rgb(255 255 255 / 13%) !important;
 }
 </style>
