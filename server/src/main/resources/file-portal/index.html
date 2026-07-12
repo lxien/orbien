@@ -7,6 +7,12 @@
     <link rel="icon" href="/favicon.ico" sizes="any"/>
     <link rel="shortcut icon" href="/favicon.ico"/>
     <link rel="stylesheet" href="/css/app.css"/>
+    <style>
+        body.is-bootstrapping #loginView,
+        body.is-bootstrapping #appView {
+            display: none !important;
+        }
+    </style>
     <script>
         (() => {
             const THEME_KEY = 'orbien-file-theme';
@@ -20,161 +26,168 @@
         })();
     </script>
 </head>
-<body>
-<div id="loginView" class="login-wrap">
-    <div class="login-toolbar">
-        <button id="btnThemeLogin" class="theme-btn icon-btn" type="button" data-theme-mode="light"
-                title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
-            <span class="theme-btn-icon" aria-hidden="true"></span>
-            <span class="sr-only">切换主题</span>
-        </button>
+<body class="is-bootstrapping">
+<div id="loginView" class="hidden">
+    <div class="login-screen">
+        <div class="login-wrap">
+            <div class="login-toolbar">
+                <button id="btnThemeLogin" class="theme-btn icon-btn" type="button" data-theme-mode="light"
+                        title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
+                    <span class="theme-btn-icon" aria-hidden="true"></span>
+                    <span class="sr-only">切换主题</span>
+                </button>
+            </div>
+            <div class="login-brand">
+                <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
+                <h2>文件共享登录</h2>
+            </div>
+            <div class="field">
+                <label for="username">用户名</label>
+                <input id="username" type="text" autocomplete="username"/>
+            </div>
+            <div class="field">
+                <label for="password">密码</label>
+                <input id="password" type="password" autocomplete="current-password"/>
+            </div>
+            <button id="btnLogin" class="primary btn-block">登录</button>
+            <p id="loginError" class="login-error"></p>
+        </div>
     </div>
-    <div class="login-brand">
-        <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
-        <h2>文件共享登录</h2>
-    </div>
-    <div class="field">
-        <label for="username">用户名</label>
-        <input id="username" type="text" autocomplete="username"/>
-    </div>
-    <div class="field">
-        <label for="password">密码</label>
-        <input id="password" type="password" autocomplete="current-password"/>
-    </div>
-    <button id="btnLogin" class="primary btn-block">登录</button>
-    <p id="loginError" class="login-error"></p>
 </div>
 
 <div id="appView" class="hidden">
-    <div class="header">
-        <button id="btnHome" class="header-brand" type="button" title="返回首页">
-            <img src="/img/logo.png" alt="Orbien" class="site-logo"/>
-            <strong id="shareTitle">文件共享</strong>
-        </button>
-        <div class="user-info">
-            <button id="btnTheme" class="theme-btn icon-btn" type="button" data-theme-mode="light"
-                    title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
-                <span class="theme-btn-icon" aria-hidden="true"></span>
-                <span class="sr-only">切换主题</span>
-            </button>
-            <span id="currentUser"></span>
-            <span id="permissionBadge" class="permission-badge hidden"></span>
-            <button id="btnLogout" class="hidden">退出</button>
-        </div>
-    </div>
-    <div id="mainPanel" class="main">
-        <div class="path-nav path-nav-top">
-            <nav id="breadcrumb" class="path-bar path-bar-top" aria-label="文件路径"></nav>
-            <div id="summary" class="file-summary"></div>
-        </div>
-        <div class="toolbar">
-            <div class="toolbar-actions">
-                <button class="primary" id="btnUpload">上传</button>
-                <button id="btnDownload">下载</button>
-                <button id="btnMkdir">新建文件夹</button>
-                <button id="btnRename">重命名</button>
-                <button id="btnDelete">删除</button>
-                <button id="btnDetails" type="button" disabled>详情</button>
+    <div class="app-shell">
+        <aside class="app-sidebar" aria-label="侧边栏">
+            <div class="sidebar-brand">
+                <button id="btnHome" class="sidebar-logo-btn" type="button" title="返回首页">
+                    <img src="/img/logo.png" alt="Orbien" class="site-logo sidebar-logo"/>
+                </button>
             </div>
-            <div class="toolbar-view-controls">
-                <div class="view-switcher" role="group" aria-label="切换视图">
-                    <button type="button" class="view-btn active" data-view="list" title="列表视图"
-                            aria-label="列表视图"
-                            aria-pressed="true">
-                        <span class="view-btn-icon icon-list" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="view-btn" data-view="icon" title="图标视图" aria-label="图标视图"
-                            aria-pressed="false">
-                        <span class="view-btn-icon icon-grid" aria-hidden="true"></span>
-                    </button>
-                    <button type="button" class="view-btn" data-view="column" title="分栏视图" aria-label="分栏视图"
-                            aria-pressed="false">
-                        <span class="view-btn-icon icon-column" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div class="sort-menu-wrap">
-                    <button type="button" id="btnSort" class="sort-btn" title="排序方式" aria-label="排序方式"
+            <div class="sidebar-body" aria-label="导航区域">
+                <!-- 预留：未来可放置收藏夹、位置等导航 -->
+            </div>
+            <div class="sidebar-footer">
+                <button id="btnTheme" class="theme-btn sidebar-theme-btn" type="button" data-theme-mode="light"
+                        title="白昼模式 · 切换到夜间模式" aria-label="白昼模式 · 切换到夜间模式">
+                    <span class="theme-btn-icon" aria-hidden="true"></span>
+                    <span class="sidebar-theme-label">外观</span>
+                </button>
+                <div class="sidebar-user-wrap">
+                    <button id="btnUserMenu" class="sidebar-user-btn" type="button"
                             aria-haspopup="menu" aria-expanded="false">
-                        <span class="sort-btn-icon" aria-hidden="true"></span>
-                        <span class="sort-btn-chevron" aria-hidden="true"></span>
+                        <span id="currentUser" class="sidebar-user-name"></span>
+                        <span id="permissionBadge" class="permission-badge hidden"></span>
                     </button>
-                    <div id="sortDropdown" class="sort-dropdown hidden" role="menu" aria-label="排序方式">
-                        <button type="button" class="sort-option" data-sort="" role="menuitemradio" aria-checked="true">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>无</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="name" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>名称</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="kind" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>种类</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="last_opened" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>上次打开日期</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="date_added" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>添加日期</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="modified" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>修改日期</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="created" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>创建日期</span>
-                        </button>
-                        <button type="button" class="sort-option" data-sort="size" role="menuitemradio"
-                                aria-checked="false">
-                            <span class="sort-option-check" aria-hidden="true">✓</span>
-                            <span>大小</span>
-                        </button>
+                    <div id="userMenuDropdown" class="sidebar-user-dropdown hidden" role="menu"
+                         aria-label="用户菜单">
+                        <button type="button" id="btnLogout" class="sidebar-user-menu-item" role="menuitem">退出登录</button>
                     </div>
                 </div>
             </div>
-        </div>
-        <input type="file" id="fileInput" multiple class="hidden"/>
-        <div id="fileListWrap" class="file-browser" data-view-mode="list">
-            <div id="viewList" class="view-panel view-list">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>名称</th>
-                        <th class="col-time">修改时间</th>
-                        <th class="col-type">类型</th>
-                        <th class="col-size">大小</th>
-                    </tr>
-                    </thead>
-                    <tbody id="fileList"></tbody>
-                </table>
-            </div>
-            <div id="viewIcon" class="view-panel view-icon hidden">
-                <div id="iconGrid" class="icon-grid"></div>
-            </div>
-            <div id="viewColumn" class="view-panel view-column hidden">
-                <div id="columnBrowser" class="column-browser"></div>
-            </div>
-            <div id="emptyState" class="empty hidden">
-                <div class="empty-inner">
-                    <div class="empty-actions">
-                        <button type="button" class="empty-action" id="emptyUploadLink">上传文件</button>
-                        <span class="empty-divider" aria-hidden="true"></span>
-                        <button type="button" class="empty-action" id="emptyMkdirLink">新建文件夹</button>
+        </aside>
+        <div class="app-content">
+            <div id="mainPanel" class="main">
+                <div class="toolbar">
+                    <div class="toolbar-view-controls">
+                        <div class="view-switcher" role="group" aria-label="切换视图">
+                            <button type="button" class="view-btn active" data-view="list" title="列表视图"
+                                    aria-label="列表视图"
+                                    aria-pressed="true">
+                                <span class="view-btn-icon icon-list" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="view-btn" data-view="icon" title="图标视图" aria-label="图标视图"
+                                    aria-pressed="false">
+                                <span class="view-btn-icon icon-grid" aria-hidden="true"></span>
+                            </button>
+                            <button type="button" class="view-btn" data-view="column" title="分栏视图" aria-label="分栏视图"
+                                    aria-pressed="false">
+                                <span class="view-btn-icon icon-column" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                        <div class="sort-menu-wrap">
+                            <button type="button" id="btnSort" class="sort-btn" title="排序方式" aria-label="排序方式"
+                                    aria-haspopup="menu" aria-expanded="false">
+                                <span class="sort-btn-icon" aria-hidden="true"></span>
+                                <span class="sort-btn-chevron" aria-hidden="true"></span>
+                            </button>
+                            <div id="sortDropdown" class="sort-dropdown hidden" role="menu" aria-label="排序方式">
+                                <button type="button" class="sort-option" data-sort="" role="menuitemradio" aria-checked="true">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>无</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="name" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>名称</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="kind" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>种类</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="last_opened" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>上次打开日期</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="date_added" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>添加日期</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="modified" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>修改日期</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="created" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>创建日期</span>
+                                </button>
+                                <button type="button" class="sort-option" data-sort="size" role="menuitemradio"
+                                        aria-checked="false">
+                                    <span class="sort-option-check" aria-hidden="true">✓</span>
+                                    <span>大小</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <input type="file" id="fileInput" multiple class="hidden"/>
+                <div id="fileListWrap" class="file-browser" data-view-mode="list">
+                    <div id="viewList" class="view-panel view-list">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>名称</th>
+                                <th class="col-time">修改时间</th>
+                                <th class="col-type">类型</th>
+                                <th class="col-size">大小</th>
+                            </tr>
+                            </thead>
+                            <tbody id="fileList"></tbody>
+                        </table>
+                    </div>
+                    <div id="viewIcon" class="view-panel view-icon hidden">
+                        <div id="iconGrid" class="icon-grid"></div>
+                    </div>
+                    <div id="viewColumn" class="view-panel view-column hidden">
+                        <div id="columnBrowser" class="column-browser"></div>
+                    </div>
+                    <div id="emptyState" class="empty hidden">
+                        <div class="empty-inner">
+                            <p class="empty-hint">此文件夹为空，右键可上传或新建文件夹</p>
+                        </div>
+                    </div>
+                    <div id="selectionMarquee" class="selection-marquee hidden" aria-hidden="true"></div>
+                </div>
+                <div class="path-footer">
+                    <nav id="breadcrumbBottom" class="path-bar path-bar-bottom" aria-label="当前路径"></nav>
+                    <div id="summary" class="file-summary"></div>
+                </div>
             </div>
-            <div id="selectionMarquee" class="selection-marquee hidden" aria-hidden="true"></div>
         </div>
-        <nav id="breadcrumbBottom" class="path-bar path-bar-bottom" aria-label="当前路径"></nav>
     </div>
 </div>
 
@@ -191,6 +204,8 @@
         <div id="inspectorDialogContent" class="inspector-dialog-content"></div>
     </div>
 </div>
+
+<div id="contextMenu" class="context-menu hidden" role="menu" aria-label="文件操作"></div>
 
 <div id="appDialog" class="app-dialog hidden" aria-hidden="true">
     <div class="app-dialog-backdrop" data-dialog-dismiss="true"></div>

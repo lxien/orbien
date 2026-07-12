@@ -281,7 +281,6 @@
         }
         root.classList.remove('hidden');
         root.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('inspector-open');
         await show(content, path, entry, {mode: 'dialog'});
     };
 
@@ -292,8 +291,8 @@
             root.classList.add('hidden');
             root.setAttribute('aria-hidden', 'true');
         }
-        document.body.classList.remove('inspector-open');
         hide(content);
+        window.dispatchEvent(new CustomEvent('inspector-dialog-close'));
     };
 
     const initDialog = () => {

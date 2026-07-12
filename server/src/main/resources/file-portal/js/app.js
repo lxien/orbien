@@ -99,8 +99,15 @@
     let selectionAnchorPath = null;
     const entriesCache = new Map();
     let inspectorDialogOpen = false;
+    let pendingUploadPath = currentPath;
+    let contextDir = currentPath;
 
     const $ = (id) => document.getElementById(id);
+
+    const isInspectorDialogOpen = () => {
+        const root = $('inspectorDialog');
+        return !!(root && !root.classList.contains('hidden'));
+    };
 
     const isMultiSelectModifier = (e) => !!(e.ctrlKey || e.metaKey);
     const isRangeSelectModifier = (e) => !!e.shiftKey;
@@ -123,14 +130,15 @@
         return {path, entry};
     };
 
-    const updateDetailsButton = () => {
-        const btn = $('btnDetails');
-        if (!btn) {
+    const updateInspectorAfterSelection = () => {
+        if (viewMode === 'column') {
+            closeInspectorDialog();
             return;
         }
-        const showBtn = viewMode !== 'column';
-        btn.style.display = showBtn ? '' : 'none';
-        btn.disabled = !getInspectorTarget();
+        // 列表/图标：选中变化时关闭弹窗，不自动打开
+        if (inspectorDialogOpen || isInspectorDialogOpen()) {
+            closeInspectorDialog();
+        }
     };
 
     const openInspectorDialog = () => {
@@ -144,19 +152,23 @@
 
     const closeInspectorDialog = () => {
         inspectorDialogOpen = false;
-        window.FileInspector?.closeDialog();
+        if (isInspectorDialogOpen()) {
+            window.FileInspector?.closeDialog();
+        }
+    };
+
+    const onInspectorDialogClosed = () => {
+        inspectorDialogOpen = false;
     };
 
     const refreshColumnInspector = async () => {
         const browser = $('columnBrowser');
-        const mainPanel = $('mainPanel');
         if (!browser) {
             return;
         }
         browser.querySelector('.column-panel-inspector')?.remove();
         const target = getInspectorTarget();
         browser.classList.toggle('has-inspector', !!target);
-        mainPanel?.classList.toggle('has-column-inspector', !!target);
         if (!target) {
             return;
         }
@@ -166,22 +178,6 @@
         browser.appendChild(inspectorCol);
         await window.FileInspector?.show(inspectorCol, target.path, target.entry, {mode: 'column', silent: true});
         scrollColumnBrowser(browser);
-    };
-
-    const updateInspectorAfterSelection = () => {
-        updateDetailsButton();
-        if (viewMode === 'column') {
-            closeInspectorDialog();
-            return;
-        }
-        if (inspectorDialogOpen) {
-            const target = getInspectorTarget();
-            if (target) {
-                window.FileInspector?.openDialog(target.path, target.entry);
-            } else {
-                closeInspectorDialog();
-            }
-        }
     };
 
     const pruneSelection = () => {
@@ -576,6 +572,9 @@
 
     const updatePermissionBadge = () => {
         const badge = $('permissionBadge');
+        if (!badge) {
+            return;
+        }
         if (!authRequired) {
             badge.classList.add('hidden');
             return;
@@ -583,6 +582,42 @@
         badge.classList.remove('hidden');
         badge.textContent = permissionLabel();
         badge.className = `permission-badge ${canWrite ? 'write' : 'read'}`;
+    };
+
+    const closeUserMenu = () => {
+        $('userMenuDropdown')?.classList.add('hidden');
+        const btn = $('btnUserMenu');
+        if (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+        }
+    };
+
+    const toggleUserMenu = () => {
+        if (!authRequired) {
+            return;
+        }
+        const dropdown = $('userMenuDropdown');
+        const btn = $('btnUserMenu');
+        if (!dropdown || !btn) {
+            return;
+        }
+        const open = dropdown.classList.contains('hidden');
+        if (open) {
+            dropdown.classList.remove('hidden');
+            btn.setAttribute('aria-expanded', 'true');
+        } else {
+            closeUserMenu();
+        }
+    };
+
+    const updateUserMenuState = () => {
+        const btn = $('btnUserMenu');
+        if (!btn) {
+            return;
+        }
+        btn.classList.toggle('is-static', !authRequired);
+        btn.setAttribute('aria-expanded', 'false');
+        closeUserMenu();
     };
 
     const setActionVisible = (id, visible) => {
@@ -604,26 +639,18 @@
     };
 
     const updateActionControls = () => {
-        setActionVisible('btnUpload', canUpload);
-        setActionVisible('btnDownload', true);
-        setActionVisible('btnMkdir', canMkdir);
-        setActionVisible('btnRename', canRename);
-        setActionVisible('btnDelete', canDelete);
         setActionVisible('fileInput', canUpload);
-        setActionVisible('emptyUploadLink', canUpload);
-        setActionVisible('emptyMkdirLink', canMkdir);
-
-        const emptyDivider = document.querySelector('#emptyState .empty-divider');
-        if (emptyDivider) {
-            emptyDivider.style.display = canUpload && canMkdir ? '' : 'none';
-        }
-        const emptyActions = document.querySelector('#emptyState .empty-actions');
-        if (emptyActions) {
-            emptyActions.style.display = canUpload || canMkdir ? '' : 'none';
+        const hint = document.querySelector('#emptyState .empty-hint');
+        if (hint) {
+            hint.textContent = canUpload || canMkdir
+                ? '此文件夹为空，右键可上传或新建文件夹'
+                : '此文件夹为空';
         }
     };
 
     const showLogin = (message) => {
+        document.body.classList.remove('is-bootstrapping');
+        closeUserMenu();
         $('loginView').classList.remove('hidden');
         $('appView').classList.add('hidden');
         const errEl = $('loginError');
@@ -636,10 +663,12 @@
     };
 
     const showApp = (username) => {
+        document.body.classList.remove('is-bootstrapping');
         $('loginView').classList.add('hidden');
         $('appView').classList.remove('hidden');
-        $('currentUser').textContent = username ? `${username} ` : '';
-        $('btnLogout').classList.toggle('hidden', !authRequired);
+        const displayName = username || (authRequired ? '' : '访客');
+        $('currentUser').textContent = displayName;
+        updateUserMenuState();
         updatePermissionBadge();
         updateActionControls();
     };
@@ -832,7 +861,6 @@
     };
 
     const renderBreadcrumb = () => {
-        renderPathBar($('breadcrumb'), {chevrons: true});
         renderPathBar($('breadcrumbBottom'), {chevrons: true});
         bindBreadcrumbDropTargets();
     };
@@ -947,13 +975,11 @@
         if (mode !== 'column') {
             clearSelection();
             $('columnBrowser')?.classList.remove('has-inspector');
-            $('mainPanel')?.classList.remove('has-column-inspector');
             $('columnBrowser')?.querySelector('.column-panel-inspector')?.remove();
         } else {
             closeInspectorDialog();
         }
         applyViewMode(mode);
-        updateDetailsButton();
         renderFiles().catch(showError);
     };
 
@@ -1033,40 +1059,10 @@
 
         const text = document.createElement('p');
         text.className = 'column-panel-empty-text';
-        text.textContent = '此文件夹为空';
+        text.textContent = canUpload || canMkdir
+            ? '此文件夹为空，右键可上传或新建文件夹'
+            : '此文件夹为空';
         wrap.appendChild(text);
-
-        if (canUpload || canMkdir) {
-            const actions = document.createElement('div');
-            actions.className = 'column-panel-empty-actions';
-
-            if (canUpload) {
-                const uploadBtn = document.createElement('button');
-                uploadBtn.type = 'button';
-                uploadBtn.className = 'empty-action';
-                uploadBtn.textContent = '上传文件';
-                uploadBtn.addEventListener('click', () => $('fileInput').click());
-                actions.appendChild(uploadBtn);
-            }
-
-            if (canUpload && canMkdir) {
-                const divider = document.createElement('span');
-                divider.className = 'empty-divider';
-                divider.setAttribute('aria-hidden', 'true');
-                actions.appendChild(divider);
-            }
-
-            if (canMkdir) {
-                const mkdirBtn = document.createElement('button');
-                mkdirBtn.type = 'button';
-                mkdirBtn.className = 'empty-action';
-                mkdirBtn.textContent = '新建文件夹';
-                mkdirBtn.addEventListener('click', () => mkdir().catch(showError));
-                actions.appendChild(mkdirBtn);
-            }
-
-            wrap.appendChild(actions);
-        }
         return wrap;
     };
 
@@ -1382,6 +1378,204 @@
         });
     };
 
+    const FILE_ITEM_SELECTOR = '#fileList tr[data-file-path], .icon-item[data-file-path], .column-item[data-file-path]';
+
+    const resolveContextDir = (clientX, clientY) => {
+        if (viewMode === 'column') {
+            const panel = resolveMarqueePanel(clientX, clientY);
+            if (panel?.dataset.path) {
+                return panel.dataset.path;
+            }
+        }
+        return currentPath;
+    };
+
+    const isContextMenuBlockedTarget = (target) => {
+        if (!target?.closest) {
+            return true;
+        }
+        if (target.closest('button, input, a, label, thead, .path-footer, .toolbar')) {
+            return true;
+        }
+        if (target.closest('.column-panel-inspector')) {
+            return true;
+        }
+        return false;
+    };
+
+    const closeContextMenu = () => {
+        $('contextMenu')?.classList.add('hidden');
+    };
+
+    const buildContextMenuItem = (label, action, options = {}) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'context-menu-item';
+        btn.setAttribute('role', 'menuitem');
+        btn.textContent = label;
+        if (options.danger) {
+            btn.classList.add('is-danger');
+        }
+        if (options.disabled) {
+            btn.disabled = true;
+        }
+        btn.addEventListener('click', () => {
+            closeContextMenu();
+            if (!options.disabled) {
+                Promise.resolve(action()).catch(showError);
+            }
+        });
+        return btn;
+    };
+
+    const buildContextMenuSeparator = () => {
+        const sep = document.createElement('div');
+        sep.className = 'context-menu-separator';
+        sep.setAttribute('role', 'separator');
+        return sep;
+    };
+
+    const countDownloadableFiles = (paths) => paths.filter((p) => !findEntryByPath(p)?.directory).length;
+
+    const showContextMenu = (clientX, clientY, menuType) => {
+        const menu = $('contextMenu');
+        if (!menu) {
+            return;
+        }
+        menu.innerHTML = '';
+        const paths = selectedPaths();
+        const count = paths.length;
+        const append = (node) => menu.appendChild(node);
+        let hasActions = false;
+
+        if (menuType === 'blank') {
+            if (canUpload) {
+                append(buildContextMenuItem('上传文件', () => {
+                    pendingUploadPath = contextDir;
+                    $('fileInput').click();
+                }));
+                hasActions = true;
+            }
+            if (canMkdir) {
+                append(buildContextMenuItem('新建文件夹', () => mkdir(contextDir)));
+                hasActions = true;
+            }
+            if (hasActions) {
+                append(buildContextMenuSeparator());
+            }
+            append(buildContextMenuItem('刷新', () => loadList()));
+        } else if (count === 1) {
+            const path = paths[0];
+            const entry = findEntryByPath(path);
+            const isDir = !!entry?.directory;
+            if (isDir) {
+                append(buildContextMenuItem('打开', () => navigateTo(path)));
+            } else {
+                append(buildContextMenuItem('下载', () => downloadFile(path)));
+                if (viewMode !== 'column') {
+                    append(buildContextMenuItem('详情', () => openInspectorDialog()));
+                }
+            }
+            if (canRename) {
+                append(buildContextMenuSeparator());
+                append(buildContextMenuItem('重命名', () => renameSelected()));
+            }
+            if (canDelete) {
+                append(buildContextMenuItem('删除', () => deleteSelected(), {danger: true}));
+            }
+        } else if (count > 1) {
+            const fileCount = countDownloadableFiles(paths);
+            if (fileCount > 0) {
+                append(buildContextMenuItem(
+                    fileCount === count ? `下载 (${count} 项)` : `下载 (${fileCount} 个文件)`,
+                    () => downloadSelected()
+                ));
+            }
+            if (canDelete) {
+                if (fileCount > 0) {
+                    append(buildContextMenuSeparator());
+                }
+                append(buildContextMenuItem(`删除 (${count} 项)`, () => deleteSelected(), {danger: true}));
+            }
+        }
+
+        if (!menu.childElementCount) {
+            return;
+        }
+
+        menu.classList.remove('hidden');
+        menu.style.left = `${clientX}px`;
+        menu.style.top = `${clientY}px`;
+
+        requestAnimationFrame(() => {
+            const rect = menu.getBoundingClientRect();
+            let left = clientX;
+            let top = clientY;
+            if (left + rect.width > window.innerWidth - 8) {
+                left = Math.max(8, window.innerWidth - rect.width - 8);
+            }
+            if (top + rect.height > window.innerHeight - 8) {
+                top = Math.max(8, window.innerHeight - rect.height - 8);
+            }
+            menu.style.left = `${left}px`;
+            menu.style.top = `${top}px`;
+        });
+    };
+
+    const initContextMenu = () => {
+        const wrap = $('fileListWrap');
+        if (!wrap) {
+            return;
+        }
+        wrap.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            if (listLoading) {
+                return;
+            }
+            if (isContextMenuBlockedTarget(e.target)) {
+                return;
+            }
+
+            closeContextMenu();
+            closeUserMenu();
+            $('sortDropdown')?.classList.add('hidden');
+
+            const itemEl = e.target.closest(FILE_ITEM_SELECTOR);
+            let menuType = 'blank';
+
+            if (itemEl) {
+                const path = itemEl.dataset.filePath;
+                if (path) {
+                    const multi = isMultiSelectModifier(e);
+                    if (!selectedPathSet.has(path)) {
+                        if (multi) {
+                            selectedPathSet.add(path);
+                            selectionAnchorPath = path;
+                        } else {
+                            selectedPathSet.clear();
+                            selectedPathSet.add(path);
+                            selectionAnchorPath = path;
+                        }
+                        syncSelectionState();
+                    }
+                    menuType = 'item';
+                }
+            } else {
+                if (viewMode === 'column') {
+                    const panel = resolveMarqueePanel(e.clientX, e.clientY);
+                    if (!panel || panel.classList.contains('column-panel-inspector')) {
+                        return;
+                    }
+                } else if (!e.target.closest('#fileListWrap')) {
+                    return;
+                }
+            }
+
+            contextDir = resolveContextDir(e.clientX, e.clientY);
+            showContextMenu(e.clientX, e.clientY, menuType);
+        });
+    };
+
     const bindEnterDir = (element, name, options = {}) => {
         const {dblclick = false} = options;
         const open = () => enterDir(name);
@@ -1544,7 +1738,6 @@
 
     const bindDirectoryDropZones = () => {
         bindDropTarget($('fileListWrap'), currentPath);
-        bindDropTarget($('breadcrumb'), currentPath);
         bindDropTarget($('breadcrumbBottom'), currentPath);
         for (const panel of document.querySelectorAll('.column-panel')) {
             bindDropTarget(panel, panel.dataset.path);
@@ -1907,7 +2100,7 @@
         return div;
     };
 
-    const uploadSingleFile = (file, itemEl) => new Promise((resolve, reject) => {
+    const uploadSingleFile = (file, itemEl, destPath = currentPath) => new Promise((resolve, reject) => {
         const startTime = performance.now();
         const durationEl = itemEl.querySelector('.progress-item-duration');
         let done = false;
@@ -1937,7 +2130,7 @@
         };
 
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', `/api/files/upload?path=${encodeURIComponent(currentPath)}`);
+        xhr.open('POST', `/api/files/upload?path=${encodeURIComponent(destPath)}`);
         xhr.withCredentials = true;
         xhr.upload.onprogress = (ev) => {
             if (ev.lengthComputable) {
@@ -1965,7 +2158,7 @@
         xhr.send(fd);
     });
 
-    async function uploadFiles(files) {
+    async function uploadFiles(files, destPath = currentPath) {
         if (!files.length || !(await ensureUploadable())) {
             return;
         }
@@ -1982,7 +2175,7 @@
             list.appendChild(itemEl);
 
             try {
-                await uploadSingleFile(file, itemEl);
+                await uploadSingleFile(file, itemEl, destPath);
                 itemEl.classList.remove('uploading');
                 itemEl.classList.add('done');
                 try {
@@ -2081,7 +2274,7 @@
         }
     }
 
-    async function mkdir() {
+    async function mkdir(destPath = currentPath) {
         if (!(await ensureMkdirable())) {
             return;
         }
@@ -2103,7 +2296,7 @@
         await api('/api/files/mkdir', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({path: currentPath, name})
+            body: JSON.stringify({path: destPath, name})
         });
         await loadList();
     }
@@ -2175,9 +2368,9 @@
         initTheme();
         initDialog();
         initMarqueeSelection();
+        initContextMenu();
         initViewMode();
         initSortMenu();
-        updateDetailsButton();
         try {
             const status = await refreshAuthStatus();
             scheduleAuthRefresh();
@@ -2190,6 +2383,8 @@
             const errEl = $('loginError');
             errEl.textContent = e.message || '无法连接服务';
             errEl.style.display = 'block';
+        } finally {
+            document.body.classList.remove('is-bootstrapping');
         }
     }
 
@@ -2206,21 +2401,37 @@
     $('password').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') login();
     });
-    $('btnLogout').addEventListener('click', logout);
-    $('btnUpload').addEventListener('click', () => $('fileInput').click());
-    $('emptyUploadLink').addEventListener('click', () => $('fileInput').click());
-    $('emptyMkdirLink').addEventListener('click', () => mkdir().catch(showError));
     $('fileInput').addEventListener('change', (e) => {
-        uploadFiles(e.target.files).catch(showError);
+        const destPath = pendingUploadPath || currentPath;
+        pendingUploadPath = currentPath;
+        uploadFiles(e.target.files, destPath).catch(showError);
     });
-    $('btnDownload').addEventListener('click', () => downloadSelected().catch(showError));
-    $('btnMkdir').addEventListener('click', () => mkdir().catch(showError));
-    $('btnRename').addEventListener('click', () => renameSelected().catch(showError));
-    $('btnDelete').addEventListener('click', () => deleteSelected().catch(showError));
-    $('btnDetails')?.addEventListener('click', () => openInspectorDialog());
-    $('breadcrumb').addEventListener('click', navigate);
+    window.addEventListener('inspector-dialog-close', onInspectorDialogClosed);
     $('breadcrumbBottom').addEventListener('click', navigate);
     $('btnHome').addEventListener('click', goHome);
+    $('btnUserMenu')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleUserMenu();
+    });
+    $('btnLogout')?.addEventListener('click', () => {
+        closeUserMenu();
+        logout();
+    });
+    document.addEventListener('click', (e) => {
+        const wrap = document.querySelector('.sidebar-user-wrap');
+        if (wrap && !wrap.contains(e.target)) {
+            closeUserMenu();
+        }
+        if (!e.target.closest('#contextMenu')) {
+            closeContextMenu();
+        }
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeUserMenu();
+            closeContextMenu();
+        }
+    });
     for (const btn of document.querySelectorAll('.view-btn')) {
         btn.addEventListener('click', () => setViewMode(btn.dataset.view));
     }
