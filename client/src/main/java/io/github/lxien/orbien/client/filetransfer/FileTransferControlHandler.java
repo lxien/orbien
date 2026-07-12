@@ -77,7 +77,8 @@ public class FileTransferControlHandler {
             sessionManager.startUpload(req.getRequestId(), req.getProxyId(), req.getPath());
         } else {
             InputStream in = fileSystemService.openDownload(ctx.root(), req.getPath());
-            sendChunks(control, req.getRequestId(), req.getProxyId(), in);
+            long maxBytes = req.getMaxBytes();
+            sendChunks(control, req.getRequestId(), req.getProxyId(), in, maxBytes);
         }
     }
 
@@ -127,7 +128,8 @@ public class FileTransferControlHandler {
         send(control, TMSP.MSG_FILE_OP_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build(), req.getProxyId());
     }
 
-    private void sendChunks(Channel control, String requestId, String proxyId, InputStream in) throws Exception {
+    private void sendChunks(Channel control, String requestId, String proxyId, InputStream in,
+                            long maxBytes) throws Exception {
         byte[] buffer = new byte[FileTransferConstants.CHUNK_SIZE];
         long offset = 0;
         try (PushbackInputStream pin = new PushbackInputStream(in, 1)) {
@@ -137,19 +139,35 @@ public class FileTransferControlHandler {
                 if (read == -1) {
                     break;
                 }
-                int next = pin.read();
-                boolean last = next == -1;
-                if (next != -1) {
-                    pin.unread(next);
+                if (maxBytes > 0 && offset >= maxBytes) {
+                    break;
+                }
+                int toSend = read;
+                boolean last;
+                if (maxBytes > 0 && offset + read > maxBytes) {
+                    toSend = (int) (maxBytes - offset);
+                    last = true;
+                } else {
+                    int next = pin.read();
+                    last = next == -1;
+                    if (next != -1) {
+                        pin.unread(next);
+                    }
+                    if (maxBytes > 0 && offset + toSend >= maxBytes) {
+                        last = true;
+                    }
                 }
                 Message.FileChunk chunk = Message.FileChunk.newBuilder()
                         .setRequestId(requestId)
                         .setOffset(offset)
-                        .setData(com.google.protobuf.ByteString.copyFrom(buffer, 0, read))
+                        .setData(com.google.protobuf.ByteString.copyFrom(buffer, 0, toSend))
                         .setLast(last)
                         .build();
                 send(control, TMSP.MSG_FILE_CHUNK, chunk, proxyId);
-                offset += read;
+                offset += toSend;
+                if (last) {
+                    break;
+                }
             }
         }
         sendDone(control, requestId, proxyId);

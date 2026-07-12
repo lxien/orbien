@@ -98,6 +98,7 @@
     const selectedPathSet = new Set();
     let selectionAnchorPath = null;
     const entriesCache = new Map();
+    let inspectorDialogOpen = false;
 
     const $ = (id) => document.getElementById(id);
 
@@ -107,6 +108,80 @@
     const clearSelection = () => {
         selectedPathSet.clear();
         selectionAnchorPath = null;
+        closeInspectorDialog();
+    };
+
+    const getInspectorTarget = () => {
+        if (selectedPathSet.size !== 1) {
+            return null;
+        }
+        const path = [...selectedPathSet][0];
+        const entry = findEntryByPath(path);
+        if (!entry || entry.directory) {
+            return null;
+        }
+        return {path, entry};
+    };
+
+    const updateDetailsButton = () => {
+        const btn = $('btnDetails');
+        if (!btn) {
+            return;
+        }
+        const showBtn = viewMode !== 'column';
+        btn.style.display = showBtn ? '' : 'none';
+        btn.disabled = !getInspectorTarget();
+    };
+
+    const openInspectorDialog = () => {
+        const target = getInspectorTarget();
+        if (!target || viewMode === 'column') {
+            return;
+        }
+        inspectorDialogOpen = true;
+        window.FileInspector?.openDialog(target.path, target.entry);
+    };
+
+    const closeInspectorDialog = () => {
+        inspectorDialogOpen = false;
+        window.FileInspector?.closeDialog();
+    };
+
+    const refreshColumnInspector = async () => {
+        const browser = $('columnBrowser');
+        const mainPanel = $('mainPanel');
+        if (!browser) {
+            return;
+        }
+        browser.querySelector('.column-panel-inspector')?.remove();
+        const target = getInspectorTarget();
+        browser.classList.toggle('has-inspector', !!target);
+        mainPanel?.classList.toggle('has-column-inspector', !!target);
+        if (!target) {
+            return;
+        }
+        const inspectorCol = document.createElement('div');
+        inspectorCol.className = 'column-panel column-panel-inspector';
+        inspectorCol.dataset.path = target.path;
+        browser.appendChild(inspectorCol);
+        await window.FileInspector?.show(inspectorCol, target.path, target.entry, {mode: 'column', silent: true});
+        scrollColumnBrowser(browser);
+    };
+
+    const updateInspectorAfterSelection = () => {
+        updateDetailsButton();
+        if (viewMode === 'column') {
+            closeInspectorDialog();
+            return;
+        }
+        if (inspectorDialogOpen) {
+            const target = getInspectorTarget();
+            if (target) {
+                window.FileInspector?.openDialog(target.path, target.entry);
+            } else {
+                closeInspectorDialog();
+            }
+        }
     };
 
     const pruneSelection = () => {
@@ -871,8 +946,14 @@
         }
         if (mode !== 'column') {
             clearSelection();
+            $('columnBrowser')?.classList.remove('has-inspector');
+            $('mainPanel')?.classList.remove('has-column-inspector');
+            $('columnBrowser')?.querySelector('.column-panel-inspector')?.remove();
+        } else {
+            closeInspectorDialog();
         }
         applyViewMode(mode);
+        updateDetailsButton();
         renderFiles().catch(showError);
     };
 
@@ -881,6 +962,7 @@
             return;
         }
         clearSelection();
+        closeInspectorDialog();
         currentPath = path;
         loadList().catch(showError);
     };
@@ -1033,6 +1115,10 @@
                 checked = false;
             }
             item.classList.toggle('is-checked', checked);
+        }
+        updateInspectorAfterSelection();
+        if (viewMode === 'column') {
+            refreshColumnInspector().catch(showError);
         }
     };
 
@@ -1693,10 +1779,6 @@
             }
             if (pathTrimmed) {
                 loadList().catch(showError);
-                return;
-            }
-            if (!entry.directory && colPath === currentPath) {
-                renderColumnView().catch(showError);
             }
         });
 
@@ -2095,6 +2177,7 @@
         initMarqueeSelection();
         initViewMode();
         initSortMenu();
+        updateDetailsButton();
         try {
             const status = await refreshAuthStatus();
             scheduleAuthRefresh();
@@ -2134,6 +2217,7 @@
     $('btnMkdir').addEventListener('click', () => mkdir().catch(showError));
     $('btnRename').addEventListener('click', () => renameSelected().catch(showError));
     $('btnDelete').addEventListener('click', () => deleteSelected().catch(showError));
+    $('btnDetails')?.addEventListener('click', () => openInspectorDialog());
     $('breadcrumb').addEventListener('click', navigate);
     $('breadcrumbBottom').addEventListener('click', navigate);
     $('btnHome').addEventListener('click', goHome);

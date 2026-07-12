@@ -90,21 +90,28 @@ public class FileTransferCoordinator {
     }
 
     public byte[] download(String agentId, String proxyId, String path) throws Exception {
+        return download(agentId, proxyId, path, 0);
+    }
+
+    public byte[] download(String agentId, String proxyId, String path, long maxBytes) throws Exception {
         String requestId = newRequestId();
         List<byte[]> chunks = Collections.synchronizedList(new ArrayList<>());
         registerChunkListener(requestId, chunk -> chunks.add(chunk.getData().toByteArray()));
-        Message.FileTransferInit init = Message.FileTransferInit.newBuilder()
+        Message.FileTransferInit.Builder initBuilder = Message.FileTransferInit.newBuilder()
                 .setRequestId(requestId)
                 .setProxyId(proxyId)
                 .setPath(path)
-                .setUpload(false)
-                .build();
+                .setUpload(false);
+        if (maxBytes > 0) {
+            initBuilder.setMaxBytes(maxBytes);
+        }
         transferProxyIds.put(requestId, proxyId);
+        long timeoutBytes = maxBytes > 0 ? maxBytes : FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
         CompletableFuture<Message.FileTransferDone> future = register(requestId,
-                FileTransferConstants.transferTimeoutMs(FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE));
-        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, init, proxyId, future);
+                FileTransferConstants.transferTimeoutMs(timeoutBytes));
+        send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, initBuilder.build(), proxyId, future);
         Message.FileTransferDone done = future.get(
-                FileTransferConstants.transferTimeoutMs(FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE),
+                FileTransferConstants.transferTimeoutMs(timeoutBytes),
                 TimeUnit.MILLISECONDS);
         removeChunkListener(requestId);
         transferProxyIds.remove(requestId);

@@ -1733,3 +1733,338 @@ body.dialog-open {
         width: 100%;
     }
 }
+
+/* ── Inspector / 文件详情预览 ── */
+
+.inspector-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.inspector-preview {
+    flex: 1 1 50%;
+    min-height: 160px;
+    max-height: 55%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: var(--bg-page);
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+}
+
+/* 分栏视图：详情列占满右侧剩余空间 */
+.main.is-column-view.has-column-inspector {
+    max-width: none;
+}
+
+.column-browser.has-inspector {
+    padding-right: 0;
+}
+
+.column-panel-inspector {
+    flex: 1 1 360px;
+    width: auto;
+    min-width: 320px;
+    max-width: none;
+    align-self: stretch;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.column-panel-inspector .inspector-panel {
+    height: 100%;
+    border-radius: 8px;
+}
+
+.inspector-panel.is-column .inspector-preview {
+    flex: 1 1 58%;
+    max-height: none;
+    min-height: 220px;
+    padding: 20px 16px;
+}
+
+.inspector-panel.is-column .inspector-preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+}
+
+.inspector-panel.is-column .inspector-preview-unknown-icon {
+    width: 96px;
+    height: 112px;
+}
+
+.inspector-panel.is-column .inspector-preview-folder img {
+    width: 96px;
+    height: 96px;
+}
+
+.inspector-panel.is-column .inspector-preview-text {
+    height: 100%;
+    max-height: none;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+}
+
+.inspector-panel.is-column .inspector-details {
+    flex: 0 1 auto;
+    max-height: 42%;
+}
+
+.inspector-panel.is-column .inspector-details-title {
+    font-size: 16px;
+}
+
+/* 列表/图标视图：弹窗展示详情 */
+.inspector-dialog {
+    position: fixed;
+    inset: 0;
+    z-index: 1900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+}
+
+.inspector-dialog.hidden {
+    display: none !important;
+}
+
+.inspector-dialog-backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--dialog-overlay);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    animation: dialog-fade-in .18s ease;
+}
+
+.inspector-dialog-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(100%, 520px);
+    max-height: min(88vh, 680px);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    box-shadow: var(--dialog-shadow);
+    overflow: hidden;
+    animation: dialog-panel-in .22s cubic-bezier(.22, 1, .36, 1);
+}
+
+.inspector-dialog-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color .15s, color .15s;
+}
+
+.inspector-dialog-close:hover {
+    background: var(--border-input);
+    color: var(--text-primary);
+}
+
+.inspector-dialog-content {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.inspector-dialog-content .inspector-panel {
+    height: 100%;
+}
+
+.inspector-panel.is-dialog .inspector-preview {
+    flex: 0 0 auto;
+    min-height: 200px;
+    max-height: 320px;
+    padding: 24px 20px 16px;
+}
+
+.inspector-panel.is-dialog .inspector-details {
+    flex: 1 1 auto;
+    overflow-y: auto;
+}
+
+body.inspector-open {
+    overflow: hidden;
+}
+
+.inspector-preview-loading,
+.inspector-preview-error {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.inspector-preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.inspector-preview-text {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 10px 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    box-sizing: border-box;
+}
+
+.inspector-preview-truncated {
+    margin: 8px 0 0;
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.inspector-preview-unknown {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.inspector-preview-unknown-icon {
+    width: 72px;
+    height: 84px;
+    object-fit: contain;
+}
+
+.inspector-preview-unknown-ext {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .06em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.inspector-preview-folder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.inspector-preview-folder img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.inspector-details {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    padding: 14px 16px 20px;
+}
+
+.inspector-details-title {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+    line-height: 1.3;
+}
+
+.inspector-details-subtitle {
+    margin: 0 0 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.inspector-details-section {
+    border-top: 1px solid var(--border-light);
+    padding-top: 10px;
+}
+
+.inspector-details-heading {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.inspector-details-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 0;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.inspector-details-row:last-child {
+    border-bottom: none;
+}
+
+.inspector-details-label {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.inspector-details-value {
+    color: var(--text-primary);
+    text-align: right;
+    word-break: break-word;
+}
+
+#btnDetails:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .inspector-dialog {
+        padding: 16px 12px;
+        align-items: flex-end;
+    }
+
+    .inspector-dialog-panel {
+        width: 100%;
+        max-height: 85vh;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .column-panel-inspector {
+        flex: 0 0 280px;
+        min-width: 260px;
+    }
+}

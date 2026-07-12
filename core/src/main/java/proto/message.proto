@@ -155,6 +155,8 @@ message FileTransferInit {
   string path = 3;
   int64 total_size = 4;
   bool upload = 5;
+  // 下载时可选上限，0 表示不限制
+  int64 max_bytes = 6;
 }
 
 message FileChunk {

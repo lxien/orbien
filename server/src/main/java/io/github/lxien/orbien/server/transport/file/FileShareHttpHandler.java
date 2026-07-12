@@ -6,6 +6,7 @@ import io.github.lxien.orbien.core.domain.FileShareAuthConfig;
 import io.github.lxien.orbien.core.domain.FileShareLimitsConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
+import io.github.lxien.orbien.core.filetransfer.FilePreviewPolicy;
 import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.message.Message;
 import io.github.lxien.orbien.server.filetransfer.FileTransferCoordinator;
@@ -168,6 +169,16 @@ public class FileShareHttpHandler {
             if ("GET".equals(req.method()) && path.startsWith("/api/files/download")) {
                 String filePath = queryParam(requestPath, "path");
                 handleDownload(ctx.channel(), agentId, proxyId, filePath);
+                return;
+            }
+            if ("GET".equals(req.method()) && path.startsWith("/api/files/preview-meta")) {
+                String filePath = queryParam(requestPath, "path");
+                handlePreviewMeta(ctx.channel(), agentId, proxyId, filePath);
+                return;
+            }
+            if ("GET".equals(req.method()) && path.startsWith("/api/files/preview")) {
+                String filePath = queryParam(requestPath, "path");
+                handlePreview(ctx.channel(), agentId, proxyId, filePath);
                 return;
             }
 
@@ -464,6 +475,119 @@ public class FileShareHttpHandler {
                 """.formatted(contentType, disposition, data.length);
         channel.write(Unpooled.copiedBuffer(header, CharsetUtil.UTF_8));
         channel.writeAndFlush(Unpooled.wrappedBuffer(data));
+    }
+
+    private void handlePreviewMeta(Channel channel, String agentId, String proxyId, String filePath) throws Exception {
+        Message.FileEntry entry = findFileEntry(agentId, proxyId, filePath);
+        if (entry == null) {
+            writeJson(channel, 404, Map.of("message", "文件不存在"));
+            return;
+        }
+        String filename = entry.getName();
+        FilePreviewPolicy.Decision decision = FilePreviewPolicy.resolve(
+                filename, entry.getSize(), entry.getDirectory());
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("path", filePath);
+        body.put("name", filename);
+        body.put("directory", entry.getDirectory());
+        body.put("size", entry.getSize());
+        body.put("modifiedTime", entry.getModifiedTime());
+        body.put("createdTime", entry.getCreatedTime());
+        body.put("lastAccessTime", entry.getLastAccessTime());
+        body.put("previewKind", decision.kind().name().toLowerCase(Locale.ROOT));
+        body.put("previewable", decision.previewable());
+        body.put("maxPreviewBytes", decision.maxBytes());
+        body.put("mime", decision.mime() != null ? decision.mime() : FilePreviewPolicy.mimeForFilename(filename));
+        if (decision.reason() != null) {
+            body.put("reason", decision.reason());
+        }
+        writeJson(channel, 200, body);
+    }
+
+    private void handlePreview(Channel channel, String agentId, String proxyId, String filePath) throws Exception {
+        Message.FileEntry entry = findFileEntry(agentId, proxyId, filePath);
+        if (entry == null) {
+            writeJson(channel, 404, Map.of("message", "文件不存在"));
+            return;
+        }
+        if (entry.getDirectory()) {
+            writeJson(channel, 400, Map.of("message", "目录不支持预览"));
+            return;
+        }
+        FilePreviewPolicy.Decision decision = FilePreviewPolicy.resolve(
+                entry.getName(), entry.getSize(), false);
+        if (!decision.previewable()) {
+            writeJson(channel, 415, Map.of("message", previewReasonMessage(decision.reason())));
+            return;
+        }
+        byte[] data = fileTransferCoordinator.download(agentId, proxyId, filePath, decision.maxBytes());
+        String filename = entry.getName();
+        String mime = FilePreviewPolicy.mimeForFilename(filename);
+        boolean truncated = entry.getSize() > data.length;
+        writeInlineBinary(channel, mime, filename, data, truncated);
+    }
+
+    private Message.FileEntry findFileEntry(String agentId, String proxyId, String filePath) throws Exception {
+        if (filePath == null || filePath.isBlank() || "/".equals(filePath)) {
+            return null;
+        }
+        String parent = parentDirOf(filePath);
+        String name = filenameFromPath(filePath);
+        Message.FileListResponse resp = fileTransferCoordinator.list(agentId, proxyId, parent, "");
+        if (resp.getStatus().getCode() != 0) {
+            throw new IllegalStateException(resp.getStatus().getMessage());
+        }
+        for (Message.FileEntry entry : resp.getEntriesList()) {
+            if (name.equals(entry.getName())) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    private String parentDirOf(String path) {
+        if (path == null || path.isBlank() || "/".equals(path)) {
+            return "/";
+        }
+        int idx = path.lastIndexOf('/');
+        if (idx <= 0) {
+            return "/";
+        }
+        return path.substring(0, idx);
+    }
+
+    private String previewReasonMessage(String reason) {
+        if ("FILE_TOO_LARGE".equals(reason)) {
+            return "文件过大，无法预览";
+        }
+        if ("TYPE_NOT_ALLOWED".equals(reason)) {
+            return "不支持预览此文件类型";
+        }
+        return "无法预览";
+    }
+
+    private void writeInlineBinary(Channel channel, String contentType, String filename,
+                                   byte[] data, boolean truncated) {
+        String disposition = buildInlineDisposition(filename);
+        StringBuilder header = new StringBuilder();
+        header.append("HTTP/1.1 200 OK\r\n");
+        header.append("Content-Type: ").append(contentType).append("\r\n");
+        header.append("Content-Disposition: ").append(disposition).append("\r\n");
+        header.append("Content-Length: ").append(data.length).append("\r\n");
+        header.append("X-Content-Type-Options: nosniff\r\n");
+        header.append("Cache-Control: private, max-age=60\r\n");
+        if (truncated) {
+            header.append("X-Preview-Truncated: true\r\n");
+        }
+        header.append("Connection: close\r\n\r\n");
+        channel.write(Unpooled.copiedBuffer(header.toString(), CharsetUtil.UTF_8));
+        channel.writeAndFlush(Unpooled.wrappedBuffer(data));
+    }
+
+    private String buildInlineDisposition(String filename) {
+        String asciiFallback = filename.replaceAll("[^\\x20-\\x7E]", "_").replace("\"", "_");
+        String encoded = URLEncoder.encode(filename, StandardCharsets.UTF_8).replace("+", "%20");
+        return "inline; filename=\"" + asciiFallback + "\"; filename*=UTF-8''" + encoded;
     }
 
     private String filenameFromPath(String filePath) {

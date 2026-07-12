@@ -74,6 +74,7 @@
                 <button id="btnMkdir">新建文件夹</button>
                 <button id="btnRename">重命名</button>
                 <button id="btnDelete">删除</button>
+                <button id="btnDetails" type="button" disabled>详情</button>
             </div>
             <div class="toolbar-view-controls">
                 <div class="view-switcher" role="group" aria-label="切换视图">
@@ -183,6 +184,14 @@
     <button id="btnHideProgress" class="btn-block">收起</button>
 </div>
 
+<div id="inspectorDialog" class="inspector-dialog hidden" aria-hidden="true">
+    <div class="inspector-dialog-backdrop" data-inspector-dismiss="true"></div>
+    <div class="inspector-dialog-panel" role="dialog" aria-modal="true" aria-label="文件详情">
+        <button type="button" class="inspector-dialog-close" id="inspectorDialogClose" aria-label="关闭">×</button>
+        <div id="inspectorDialogContent" class="inspector-dialog-content"></div>
+    </div>
+</div>
+
 <div id="appDialog" class="app-dialog hidden" aria-hidden="true">
     <div class="app-dialog-backdrop" data-dialog-dismiss="true"></div>
     <div class="app-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"
@@ -202,6 +211,7 @@
     </div>
 </div>
 
+<script src="/js/inspector.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>
