@@ -4,9 +4,9 @@ import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.socks5.Socks5Constants;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
-import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.UdpSessionKey;
+import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
 import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
@@ -25,11 +25,6 @@ import io.github.lxien.orbien.server.transport.socks5.Socks5ReplyHelper;
 import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
 import io.netty.buffer.ByteBuf;
-import io.github.lxien.orbien.core.transport.IdleCheckHandler;
-import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
-import io.github.lxien.orbien.server.statemachine.agent.AgentManager;
-import io.github.lxien.orbien.server.transport.ControlFrameHandler;
-import io.github.lxien.orbien.server.transport.ControlIdleCheckHandler;
 import io.netty.channel.Channel;
 import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
@@ -38,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.TimeUnit;
 
 @Component
 public class StreamCloseAction extends StreamBaseAction {
@@ -53,10 +47,6 @@ public class StreamCloseAction extends StreamBaseAction {
     private MultiplexConnectionPool multiplexConnectionPool;
     @Autowired
     private MetricsCollector metricsCollector;
-    @Autowired
-    private ControlFrameHandler controlFrameHandler;
-    @Autowired
-    private AgentManager agentManager;
     @Autowired
     private InspectorBuffer inspectorBuffer;
 
@@ -101,43 +91,21 @@ public class StreamCloseAction extends StreamBaseAction {
         AgentContext agentContext = context.getAgentContext();
         TunnelEntry tunnelEntry = context.getTunnelEntry();
         if (tunnelEntry != null) {
-            if (context.isDirectConnection()) {
+            if (context.isDirectConnection() && !context.isDatagram()) {
                 AgentInfo agentInfo = agentContext.getAgentInfo();
                 Channel tunnel = tunnelEntry.getChannel();
-                Runnable release = () -> {
+                logger.debug("独立隧道流关闭，丢弃连接 streamId={} tunnelId={} passthroughActive={}",
+                        streamId, tunnelEntry.getTunnelId(), DirectTunnelLifecycle.isPassthroughActive(tunnel));
+                DirectTunnelLifecycle.closeAfterPassthrough(tunnel);
+                directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
+            } else if (context.isDirectConnection()) {
+                AgentInfo agentInfo = agentContext.getAgentInfo();
+                Channel tunnel = tunnelEntry.getChannel();
+                if (tunnel.isActive()) {
                     logger.debug("回收客户端 {} 独立连接 {}", agentInfo.getAgentId(), tunnelEntry.getTunnelId());
                     directConnectionPool.release(agentInfo.getAgentId(), tunnelEntry);
-                };
-                if (DirectTunnelLifecycle.isPassthroughActive(tunnel)) {
-                    if (!DirectTunnelLifecycle.canRestoreControlStack(tunnel)) {
-                        logger.debug("独立隧道已关闭或 pipeline 不可用，跳过重栈恢复 tunnelId={}", tunnelEntry.getTunnelId());
-                        directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-                    } else {
-                        DirectTunnelLifecycle.restoreControlStack(tunnel, pipeline -> {
-                            if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
-                                pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
-                            }
-                            if (pipeline.get(NettyConstants.CONTROL_IDLE_CHECK_HANDLER) == null) {
-                                pipeline.addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,
-                                        new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS));
-                            }
-                            if (pipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) == null) {
-                                pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
-                            }
-                        }).addListener(f -> {
-                            if (!f.isSuccess()) {
-                                logger.warn("恢复独立隧道控制栈失败 tunnelId={}，关闭隧道", tunnelEntry.getTunnelId(), f.cause());
-                                ChannelUtils.closeOnFlush(tunnel);
-                                directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-                            } else if (tunnel.isActive()) {
-                                release.run();
-                            } else {
-                                directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
-                            }
-                        });
-                    }
                 } else {
-                    release.run();
+                    directConnectionPool.remove(agentInfo.getAgentId(), tunnelEntry.getTunnelId());
                 }
             }
         }

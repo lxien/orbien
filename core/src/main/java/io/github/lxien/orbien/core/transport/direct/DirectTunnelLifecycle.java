@@ -4,10 +4,13 @@ import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.core.codec.TMSPCodec;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.transport.NettyConstants;
+import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelPipeline;
 import io.netty.util.concurrent.Future;
+import io.netty.util.internal.logging.InternalLogger;
+import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.function.Consumer;
 
@@ -18,6 +21,7 @@ import java.util.function.Consumer;
  */
 public final class DirectTunnelLifecycle {
 
+    private static final InternalLogger logger = InternalLoggerFactory.getInstance(DirectTunnelLifecycle.class);
     private static final int DEFAULT_MAX_FRAME = 10 * 1024 * 1024;
 
     private DirectTunnelLifecycle() {
@@ -52,9 +56,27 @@ public final class DirectTunnelLifecycle {
     }
 
     /**
-     * 流关闭后恢复 TMSP 控制栈，以便独立隧道归还连接池后仍可复用。
-     * <p>
-     * 若隧道已关闭或 pipeline 不可恢复（如协议切换并发关闭），静默完成，由调用方回收连接。
+     * 透传结束，拆除 bridge 并关闭物理连接。
+     */
+    public static void closeAfterPassthrough(Channel tunnel) {
+        runOnTunnelLoop(tunnel, () -> {
+            tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
+            if (!tunnel.isOpen()) {
+                return;
+            }
+            ChannelPipeline pipeline = tunnel.pipeline();
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER);
+            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_ENCODER);
+            tunnel.config().setAutoRead(false);
+            logger.debug("[传输] 独立隧道透传结束，关闭连接 channelClass={}",
+                    tunnel.getClass().getSimpleName());
+            ChannelUtils.closeOnFlush(tunnel);
+        });
+    }
+
+    /**
+     * 流关闭后恢复 TMSP 控制栈
      */
     public static Future<Void> restoreControlStack(Channel tunnel, Consumer<ChannelPipeline> tailConfigurer) {
         return toVoidFuture(runOnLoop(tunnel, () -> {
@@ -72,7 +94,12 @@ public final class DirectTunnelLifecycle {
             if (pipeline.get(NettyConstants.TMSP_CODEC) != null) {
                 return;
             }
-            pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
+            String anchor = findControlStackAnchor(pipeline);
+            if (anchor != null) {
+                pipeline.addAfter(anchor, NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
+            } else {
+                pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
+            }
             if (tailConfigurer != null) {
                 tailConfigurer.accept(pipeline);
             }

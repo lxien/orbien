@@ -5,12 +5,9 @@ import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.client.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.client.statemachine.stream.StreamState;
-import io.github.lxien.orbien.client.transport.ControlFrameHandler;
 import io.github.lxien.orbien.client.transport.connection.TransportPoolManager;
 import io.github.lxien.orbien.core.message.TMSP;
 import io.github.lxien.orbien.core.message.TMSPFrame;
-import io.github.lxien.orbien.core.transport.IdleCheckHandler;
-import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
@@ -32,34 +29,15 @@ public class StreamCloseAction extends StreamBaseAction {
             AgentContext agentContext = (AgentContext) context.getAgentContext();
             TransportPoolManager poolManager = agentContext.getPoolManager();
             Channel tunnel = tunnelEntry.getChannel();
-            ControlFrameHandler controlFrameHandler = agentContext.getControlFrameHandler();
-            Runnable release = () -> poolManager.releaseDirect(tunnelEntry);
-            if (DirectTunnelLifecycle.isPassthroughActive(tunnel)) {
-                if (!DirectTunnelLifecycle.canRestoreControlStack(tunnel)) {
-                    logger.debug("独立隧道已关闭或 pipeline 不可用，跳过重栈恢复 tunnelId={}", tunnelEntry.getTunnelId());
-                    poolManager.removeDirect(tunnelEntry.getTunnelId());
-                } else {
-                    DirectTunnelLifecycle.restoreControlStack(tunnel, pipeline -> {
-                        if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
-                            pipeline.addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
-                        }
-                        if (pipeline.get(NettyConstants.CONTROL_FRAME_HANDLER) == null && controlFrameHandler != null) {
-                            pipeline.addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler);
-                        }
-                    }).addListener(f -> {
-                        if (!f.isSuccess()) {
-                            logger.warn("恢复独立隧道控制栈失败 tunnelId={}，关闭隧道", tunnelEntry.getTunnelId(), f.cause());
-                            ChannelUtils.closeOnFlush(tunnel);
-                            poolManager.removeDirect(tunnelEntry.getTunnelId());
-                        } else if (tunnel.isActive()) {
-                            release.run();
-                        } else {
-                            poolManager.removeDirect(tunnelEntry.getTunnelId());
-                        }
-                    });
-                }
+            if (!context.isDatagram()) {
+                logger.debug("独立隧道流关闭，丢弃连接 streamId={} tunnelId={} passthroughActive={}",
+                        streamId, tunnelEntry.getTunnelId(), DirectTunnelLifecycle.isPassthroughActive(tunnel));
+                DirectTunnelLifecycle.closeAfterPassthrough(tunnel);
+                poolManager.removeDirect(tunnelEntry.getTunnelId());
+            } else if (tunnel.isActive()) {
+                poolManager.releaseDirect(tunnelEntry);
             } else {
-                release.run();
+                poolManager.removeDirect(tunnelEntry.getTunnelId());
             }
         }
         ChannelUtils.closeOnFlush(server);

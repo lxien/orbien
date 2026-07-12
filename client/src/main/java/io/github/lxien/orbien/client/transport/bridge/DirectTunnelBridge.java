@@ -6,6 +6,7 @@ import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -52,15 +53,26 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToLocal(ByteBuf payload) {
+        forwardToLocal(payload, true);
+    }
+
+    @Override
+    public void forwardToLocal(ByteBuf payload, boolean sharedWithInbound) {
         if (payload == null || !payload.isReadable()) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             return;
         }
         if (!server.isActive()) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             logger.error("目标服务连接已断开，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        writeOnLoop(server, payload.retain(), success -> {
+        writeOnLoop(server, payload, sharedWithInbound, success -> {
             if (!success) {
                 streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
@@ -69,27 +81,45 @@ public class DirectTunnelBridge implements TunnelBridge {
 
     @Override
     public void forwardToRemote(ByteBuf payload) {
+        forwardToRemote(payload, true);
+    }
+
+    @Override
+    public void forwardToRemote(ByteBuf payload, boolean sharedWithInbound) {
         if (payload == null || !payload.isReadable()) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             return;
         }
         if (!tunnel.isActive()) {
+            if (!sharedWithInbound) {
+                ReferenceCountUtil.release(payload);
+            }
             logger.error("隧道没有激活，关闭流：streamId={}", streamContext.getStreamId());
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             return;
         }
-        writeOnLoop(tunnel, payload.retain(), success -> {
+        writeOnLoop(tunnel, payload, sharedWithInbound, success -> {
             if (!success) {
                 streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
     }
 
-    private void writeOnLoop(Channel channel, ByteBuf payload, java.util.function.Consumer<Boolean> listener) {
-        int bytes = payload.readableBytes();
+    private void writeOnLoop(Channel channel, ByteBuf payload, boolean sharedWithInbound,
+                             java.util.function.Consumer<Boolean> listener) {
+        final ByteBuf outbound = sharedWithInbound ? payload.retain() : payload;
+        int bytes = outbound.readableBytes();
         Runnable writeTask = () -> {
             streamContext.beforeTunnelWrite();
-            channel.writeAndFlush(payload).addListener((ChannelFutureListener) f -> {
+            channel.writeAndFlush(outbound).addListener((ChannelFutureListener) f -> {
                 streamContext.afterTunnelWrite();
+                if (sharedWithInbound && !f.isSuccess()) {
+                    ReferenceCountUtil.release(outbound);
+                } else if (!sharedWithInbound && !f.isSuccess()) {
+                    ReferenceCountUtil.release(outbound);
+                }
                 if (f.isSuccess()) {
                     logger.debug("流 {} 数据转发成功 bytes={}", streamContext.getStreamId(), bytes);
                 } else {

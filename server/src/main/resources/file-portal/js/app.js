@@ -1797,8 +1797,6 @@
 
     const selectedPaths = () => [...selectedPathSet];
 
-    const UPLOAD_CONCURRENCY = 3;
-
     const createUploadProgressItem = (file) => {
         const div = document.createElement('div');
         div.className = 'progress-item uploading';
@@ -1896,7 +1894,6 @@
         const list = $('progressList');
         list.innerHTML = '';
         let hasError = false;
-        let nextIndex = 0;
 
         const uploadOne = async (file) => {
             const itemEl = createUploadProgressItem(file);
@@ -1922,16 +1919,9 @@
             }
         };
 
-        const workers = Array.from(
-            {length: Math.min(UPLOAD_CONCURRENCY, fileArr.length)},
-            async () => {
-                while (nextIndex < fileArr.length) {
-                    const file = fileArr[nextIndex++];
-                    await uploadOne(file);
-                }
-            }
-        );
-        await Promise.all(workers);
+        for (const file of fileArr) {
+            await uploadOne(file);
+        }
 
         try {
             await refreshListQuiet();

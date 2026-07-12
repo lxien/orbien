@@ -33,6 +33,7 @@ import io.github.lxien.orbien.server.statemachine.agent.command.ConnectionCreate
 import io.github.lxien.orbien.server.statemachine.agent.action.CreateConnectionAction;
 import io.github.lxien.orbien.server.statemachine.stream.action.StreamOpenResponseAction;
 import io.github.lxien.orbien.server.statemachine.stream.*;
+import io.github.lxien.orbien.server.transport.connection.DirectConnectionPool;
 import io.github.lxien.orbien.server.transport.connection.MultiplexConnectionPool;
 import io.github.lxien.orbien.server.statemachine.stream.*;
 import io.netty.buffer.ByteBuf;
@@ -69,6 +70,8 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
     private CreateConnectionAction createConnectionAction;
     @Autowired
     private MultiplexConnectionPool multiplexConnectionPool;
+    @Autowired
+    private DirectConnectionPool directConnectionPool;
     @Autowired
     private StreamOpenResponseAction streamOpenResponseAction;
     @Autowired
@@ -314,6 +317,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             });
         } else if (channelType == ChannelType.TUNNEL) {
             logger.warn("[传输] 数据隧道断开 channelClass={}", channel.getClass().getSimpleName());
+            directConnectionPool.removeByChannel(channel);
             multiplexConnectionPool.removeByChannel(channel);
             streamManager.closeStreamsByTunnel(channel);
         }
@@ -324,8 +328,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             return;
         }
         logger.warn("[传输] 数据隧道异常 channelClass={}", channel.getClass().getSimpleName(), cause);
+        directConnectionPool.removeByChannel(channel);
         multiplexConnectionPool.removeByChannel(channel);
         streamManager.closeStreamsByTunnel(channel);
+        if (channel.isActive()) {
+            ChannelUtils.closeOnFlush(channel);
+        }
     }
 
     @Override

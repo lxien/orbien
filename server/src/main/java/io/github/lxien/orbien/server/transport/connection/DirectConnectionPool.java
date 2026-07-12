@@ -75,6 +75,21 @@ public class DirectConnectionPool {
         }
     }
 
+    /**
+     * 按 channel 移除独立隧道（解码异常、连接污染等场景）。
+     */
+    public boolean removeByChannel(Channel channel) {
+        if (channel == null) {
+            return false;
+        }
+        for (Map.Entry<String, Pool> entry : agentPools.entrySet()) {
+            if (entry.getValue().removeByChannel(channel)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean register(String agentId, TunnelEntry tunnelEntry) {
         if (agentId == null || tunnelEntry == null || tunnelEntry.getTunnelId() == null) {
             return false;
@@ -184,6 +199,35 @@ public class DirectConnectionPool {
                 totalConnections.decrementAndGet();
                 encryptConnections.decrementAndGet();
             }
+        }
+
+        boolean removeByChannel(Channel channel) {
+            boolean removed = false;
+            removed |= removeMatching(plainPools, channel, false);
+            removed |= removeMatching(encryptPools, channel, true);
+            return removed;
+        }
+
+        private boolean removeMatching(Map<String, TunnelEntry> pools, Channel channel, boolean encrypt) {
+            String matchedId = null;
+            for (Map.Entry<String, TunnelEntry> entry : pools.entrySet()) {
+                TunnelEntry tunnelEntry = entry.getValue();
+                if (tunnelEntry != null && tunnelEntry.getChannel() == channel) {
+                    matchedId = entry.getKey();
+                    break;
+                }
+            }
+            if (matchedId == null) {
+                return false;
+            }
+            pools.remove(matchedId);
+            totalConnections.decrementAndGet();
+            if (encrypt) {
+                encryptConnections.decrementAndGet();
+            } else {
+                plainConnections.decrementAndGet();
+            }
+            return true;
         }
 
         public void release(String tunnelId, TunnelEntry tunnelEntry) {
