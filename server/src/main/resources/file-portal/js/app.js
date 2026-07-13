@@ -2015,15 +2015,19 @@
             panel.className = 'column-panel';
             panel.dataset.path = colPath;
 
+            const inner = document.createElement('div');
+            inner.className = 'column-panel-inner';
+
             if (!colEntries.length) {
-                panel.appendChild(createColumnEmptyContent());
+                inner.appendChild(createColumnEmptyContent());
             } else {
                 const panelPaths = colEntries.map((entry) => entryPath(entry, colPath));
                 colEntries.forEach((entry, index) => {
-                    panel.appendChild(renderColumnItem(
+                    inner.appendChild(renderColumnItem(
                         entry, colPath, highlightName, index, panelPaths, pathHighlightMode));
                 });
             }
+            panel.appendChild(inner);
             fragment.appendChild(panel);
             panelCount += 1;
         }
@@ -2034,7 +2038,12 @@
             const panel = document.createElement('div');
             panel.className = 'column-panel';
             panel.dataset.path = currentPath;
-            panel.appendChild(createColumnEmptyContent());
+
+            const inner = document.createElement('div');
+            inner.className = 'column-panel-inner';
+            inner.appendChild(createColumnEmptyContent());
+            panel.appendChild(inner);
+
             browser.appendChild(panel);
         }
 
