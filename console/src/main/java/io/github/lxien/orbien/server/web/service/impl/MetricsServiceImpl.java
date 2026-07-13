@@ -22,8 +22,9 @@ import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
-import io.github.lxien.orbien.server.web.dto.metrics.ProxyTrafficQueryResult;
 import io.github.lxien.orbien.server.web.dto.metrics.DailyTrafficQueryResult;
+import io.github.lxien.orbien.server.web.dto.metrics.HourlyTrafficQueryResult;
+import io.github.lxien.orbien.server.web.dto.metrics.ProxyTrafficQueryResult;
 import io.github.lxien.orbien.server.web.dto.metrics.Traffic24LineDTO;
 import io.github.lxien.orbien.server.web.dto.metrics.TrafficChartVO;
 import io.github.lxien.orbien.server.web.dto.metrics.TrafficCountDTO;
@@ -111,8 +112,8 @@ public class MetricsServiceImpl implements MetricsService {
                     throw new BizException("自定义查询天数跨度必须在 1 ~ 15 天之间");
                 }
                 if (spanDays == 1) {
-                    result = buildHistoricalDayHourlyChartVO(metricsRepository.queryHourlyTrafficByRangeMySQL(
-                            proxyId, startDate.atStartOfDay(), startDate.plusDays(1).atStartOfDay()), startDate);
+                    result = buildHistoricalDayHourlyChartVO(metricsRepository.queryHourlyTrafficByRange(
+                            proxyId, startDate.atStartOfDay(), startDate.plusDays(1).atStartOfDay()));
                 } else {
                     List<DailyTrafficQueryResult> results =
                             metricsRepository.queryDailyTrafficByRange(proxyId, startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
@@ -130,11 +131,13 @@ public class MetricsServiceImpl implements MetricsService {
     /**
      * 历史单日图表，24个刻度（01-24）
      */
-    private TrafficChartVO buildHistoricalDayHourlyChartVO(List<HourlyTraffic> sparse, LocalDate date) {
-        Map<Integer, HourlyTraffic> byHour = new HashMap<>(24);
+    private TrafficChartVO buildHistoricalDayHourlyChartVO(List<HourlyTrafficQueryResult> sparse) {
+        Map<Integer, HourlyTrafficQueryResult> byHour = new HashMap<>(24);
         if (sparse != null) {
-            for (HourlyTraffic ht : sparse) {
-                byHour.put(ht.getHour().getHour(), ht);
+            for (HourlyTrafficQueryResult ht : sparse) {
+                if (ht.getStatHour() != null) {
+                    byHour.put(ht.getStatHour().getHour(), ht);
+                }
             }
         }
 
@@ -145,16 +148,14 @@ public class MetricsServiceImpl implements MetricsService {
         List<Long> downYAxis = new ArrayList<>(24);
         long upTotal = 0L;
         long downTotal = 0L;
-        LocalDateTime dayStart = date.atStartOfDay();
 
         for (int slot = 1; slot <= 24; slot++) {
             int hourIndex = slot - 1;
-            HourlyTraffic ht = byHour.getOrDefault(hourIndex,
-                    new HourlyTraffic(dayStart.plusHours(hourIndex), 0L, 0L, 0L, 0L));
+            HourlyTrafficQueryResult ht = byHour.get(hourIndex);
 
             xAxis.add(String.format("%02d", slot));
-            long up = ht.getWriteBytes();
-            long down = ht.getReadBytes();
+            long up = ht != null && ht.getWriteBytes() != null ? ht.getWriteBytes() : 0L;
+            long down = ht != null && ht.getReadBytes() != null ? ht.getReadBytes() : 0L;
             upYAxis.add(up);
             downYAxis.add(down);
             upTotal += up;

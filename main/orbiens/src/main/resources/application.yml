@@ -24,11 +24,8 @@ cache:
 orbien:
   dev: true
   acme:
-    # staging=Let's Encrypt 测试环境（推荐开发测试），production=生产环境
+    # staging=测试环境，production=生产环境
     environment: staging
-    # 也可直接指定目录地址（优先级高于 environment）：
-    # directory-url: acme://letsencrypt.org/staging
-    # directory-url: acme://letsencrypt.org
     dns-poll-interval-seconds: 15
     dns-poll-max-attempts: 40
   scheduled-job:

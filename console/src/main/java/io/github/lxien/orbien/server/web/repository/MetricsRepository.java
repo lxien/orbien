@@ -18,9 +18,9 @@
 
 package io.github.lxien.orbien.server.web.repository;
 
-import io.github.lxien.orbien.server.metrics.HourlyTraffic;
-import io.github.lxien.orbien.server.web.dto.metrics.ProxyTrafficQueryResult;
 import io.github.lxien.orbien.server.web.dto.metrics.DailyTrafficQueryResult;
+import io.github.lxien.orbien.server.web.dto.metrics.HourlyTrafficQueryResult;
+import io.github.lxien.orbien.server.web.dto.metrics.ProxyTrafficQueryResult;
 import io.github.lxien.orbien.server.web.entity.MetricsDO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,9 +55,13 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
                                                            @Param("startTime") LocalDateTime startTime,
                                                            @Param("endTime") LocalDateTime endTime);
 
+    /**
+     * 按小时聚合。TIMESTAMPADD(HOUR, n, DATE(...)) 兼容 H2(MODE=MySQL) / MySQL 8
+     * 用CAST AS TIMESTAMP会出现MySQL语法错误（应用 DATETIME 或不 CAST）
+     */
     @Query(value = """
             SELECT
-                DATE_ADD(DATE(m.created_at), INTERVAL HOUR(m.created_at) HOUR) AS hour,
+                TIMESTAMPADD(HOUR, HOUR(m.created_at), DATE(m.created_at)) AS statHour,
                 SUM(m.read_bytes) AS readBytes,
                 SUM(m.write_bytes) AS writeBytes,
                 SUM(m.read_messages) AS readMessages,
@@ -66,17 +70,17 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
             WHERE m.proxy_id = :proxyId
               AND m.created_at >= :startTime
               AND m.created_at < :endTime
-            GROUP BY DATE_ADD(DATE(m.created_at), INTERVAL HOUR(m.created_at) HOUR)
-            ORDER BY hour ASC
+            GROUP BY TIMESTAMPADD(HOUR, HOUR(m.created_at), DATE(m.created_at))
+            ORDER BY statHour ASC
             """, nativeQuery = true)
     @SuppressWarnings("all")
-    List<HourlyTraffic> queryHourlyTrafficByRangeMySQL(
+    List<HourlyTrafficQueryResult> queryHourlyTrafficByRange(
             @Param("proxyId") String proxyId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime);
 
     /**
-     * 分页查询：按 proxy_id 聚合，对该代理所有快照记录求和，按总流量倒序
+     * 按 proxy_id 聚合，对该代理所有快照记录求和，按总流量倒序
      */
     @Query(value = """
             SELECT
@@ -101,9 +105,6 @@ public interface MetricsRepository extends JpaRepository<MetricsDO, Long> {
     @SuppressWarnings("all")
     Page<ProxyTrafficQueryResult> pageTrafficByProxy(Pageable pageable);
 
-    /**
-     * 删除创建时间早于指定时间的流量记录
-     */
     long countByCreatedAtBefore(LocalDateTime createdAtBefore);
 
     void deleteByCreatedAtBefore(LocalDateTime createdAtBefore);
