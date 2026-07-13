@@ -208,14 +208,14 @@ remote_port = 9071
 [[proxies]]
 name = "home-nas"
 protocol = "file"
-root_path = "/home/user/share"
+root_path = "/"
 custom_domains = ["nas.domain1.com"]
 
 [proxies.file_auth]
 enabled = true
 users = [
-  { user = "guest", pass = "guest123", permission = "read" },
-  { user = "admin", pass = "admin456", permission = "read_write" }
+  { user = "guest", pass = "111", permission = "read" },
+  { user = "admin", pass = "111", permission = "read_write" }
 ]
 
 [proxies.file_limits]

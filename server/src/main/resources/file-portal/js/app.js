@@ -1096,6 +1096,9 @@
 
     const syncSelectionState = () => {
         const fileSelectedInCurrent = viewMode === 'column' && hasFileSelectionInCurrentPanel(entries);
+        if (viewMode === 'column') {
+            syncColumnPathHighlights(fileSelectedInCurrent);
+        }
         for (const item of document.querySelectorAll('.icon-item')) {
             const path = item.dataset.filePath;
             item.classList.toggle('is-checked', !!path && selectedPathSet.has(path));
@@ -1107,7 +1110,9 @@
         for (const item of document.querySelectorAll('.column-item')) {
             const path = item.dataset.filePath;
             let checked = !!path && selectedPathSet.has(path);
-            if (checked && fileSelectedInCurrent && item.classList.contains('is-path')) {
+            // 选中文件时，路径祖先只保留玻璃色，不叠加深蓝选中
+            if (checked && fileSelectedInCurrent
+                && (item.classList.contains('is-path') || item.classList.contains('is-path-active'))) {
                 checked = false;
             }
             item.classList.toggle('is-checked', checked);
@@ -1608,6 +1613,25 @@
             return 'parent';
         }
         return panelIndex === chainLength - 2 ? 'active' : 'parent';
+    };
+    const syncColumnPathHighlights = (fileSelectedInCurrent) => {
+        const browser = $('columnBrowser');
+        if (!browser) {
+            return;
+        }
+        const chain = pathChain(currentPath);
+        const panels = [...browser.querySelectorAll('.column-panel:not(.column-panel-inspector)')];
+        panels.forEach((panel) => {
+            const panelIndex = chain.indexOf(panel.dataset.path);
+            if (panelIndex < 0) {
+                return;
+            }
+            const mode = resolveColumnPathHighlightMode(panelIndex, chain.length, fileSelectedInCurrent);
+            for (const item of panel.querySelectorAll('.column-item.is-path, .column-item.is-path-active')) {
+                item.classList.toggle('is-path', mode === 'parent');
+                item.classList.toggle('is-path-active', mode === 'active');
+            }
+        });
     };
 
     const shouldApplyColumnPathHighlight = (colPath, highlightName, itemName) => {
