@@ -56,24 +56,28 @@ export class ByteUtils {
    * @returns 格式化后的数字
    */
   public static formatNumber(num: number): number {
-    if (num <= 0) return 0
-    let value = num
-    
-    if (value >= 1024 * 1024 * 1024 * 1024) {
-      value /= (1024.0 * 1024 * 1024 * 1024) // 转换为TB单位
-    } else if (value >= 1024 * 1024 * 1024) {
-      value /= (1024.0 * 1024 * 1024) // 转换为GB单位
-    } else if (value >= 1024 * 1024) {
-      value /= (1024.0 * 1024) // 转换为MB单位
-    } else if (value >= 1024) {
-      value /= 1024.0 // 转换为KB单位
+    return this.formatParts(num).value
+  }
+
+  /**
+   * 将字节数拆成可滚动数值 + 单位，便于配合 ArtCountTo / ArtStatsCard 的 suffix
+   * @param bytes 字节数
+   * @returns { value, unit, decimals }
+   */
+  public static formatParts(bytes: number): { value: number; unit: string; decimals: number } {
+    if (bytes <= 0) {
+      return { value: 0, unit: 'B', decimals: 0 }
     }
-    
-    if (value === Math.floor(value)) {
-      return Math.floor(value)
-    } else {
-      return parseFloat(value.toFixed(2).replace(/\.?0*$/, ''))
+
+    const { divisor, unit } = this.getUnitInfo(bytes)
+    const raw = bytes / divisor
+    if (raw === Math.floor(raw)) {
+      return { value: Math.floor(raw), unit, decimals: 0 }
     }
+
+    const value = parseFloat(raw.toFixed(2).replace(/\.?0*$/, ''))
+    const decimals = Number.isInteger(value) ? 0 : (String(value).split('.')[1]?.length ?? 0)
+    return { value, unit, decimals }
   }
 
   /**

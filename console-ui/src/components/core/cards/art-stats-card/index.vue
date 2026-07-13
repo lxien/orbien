@@ -1,33 +1,46 @@
 <!-- 统计卡片 -->
 <template>
   <div
-    class="art-card h-32 flex-c px-5 transition-transform duration-200 hover:-translate-y-0.5"
+    class="art-card w-full min-w-0 px-4 py-4 transition-transform duration-200 hover:-translate-y-0.5"
     :class="boxStyle"
   >
-    <div v-if="icon" class="mr-4 size-11 flex-cc rounded-lg text-xl text-white" :class="iconStyle">
-      <ArtSvgIcon :icon="icon"></ArtSvgIcon>
-    </div>
-    <div class="flex-1">
-      <p class="m-0 text-lg font-medium" :style="{ color: textColor }" v-if="title">
-        {{ title }}
-      </p>
-      <ArtCountTo
-        class="m-0 text-2xl font-medium"
-        v-if="count !== undefined"
-        :target="count"
-        :duration="2000"
-        :decimals="decimals"
-        :separator="separator"
-      />
-      <p
-        class="mt-1 text-sm text-g-500 opacity-90"
-        :style="{ color: textColor }"
-        v-if="description"
-        >{{ description }}</p
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <p
+          class="m-0 text-sm text-g-600 truncate"
+          :style="{ color: textColor }"
+          v-if="title"
+        >
+          {{ title }}
+        </p>
+        <ArtCountTo
+          class="mt-2 block text-2xl font-semibold leading-none truncate"
+          v-if="count !== undefined"
+          :target="count"
+          :duration="2000"
+          :decimals="decimals"
+          :separator="separator"
+          :prefix="prefix"
+          :suffix="suffix"
+        />
+        <p
+          class="mt-1.5 mb-0 text-xs text-g-500 truncate"
+          :style="{ color: textColor }"
+          v-if="description"
+        >
+          {{ description }}
+        </p>
+      </div>
+      <div
+        v-if="icon"
+        class="size-10 shrink-0 flex-cc rounded-lg text-lg text-white"
+        :class="iconStyle"
       >
-    </div>
-    <div v-if="showArrow">
-      <ArtSvgIcon icon="ri:arrow-right-s-line" class="text-xl text-g-500" />
+        <ArtSvgIcon :icon="icon" />
+      </div>
+      <div v-else-if="showArrow" class="shrink-0 self-center">
+        <ArtSvgIcon icon="ri:arrow-right-s-line" class="text-xl text-g-500" />
+      </div>
     </div>
   </div>
 </template>
@@ -50,8 +63,12 @@
     decimals?: number
     /** 分隔符 */
     separator?: string
+    /** 前缀*/
+    prefix?: string
+    /** 后缀 */
+    suffix?: string
     /** 描述 */
-    description: string
+    description?: string
     /** 文本颜色 */
     textColor?: string
     /** 是否显示箭头 */
@@ -59,9 +76,9 @@
   }
 
   withDefaults(defineProps<StatsCardProps>(), {
-    iconSize: 30,
-    iconBgRadius: 50,
     decimals: 0,
-    separator: ','
+    separator: ',',
+    prefix: '',
+    suffix: ''
   })
 </script>

@@ -4,6 +4,13 @@ spring:
     driver-class-name: org.h2.Driver
     username: ${H2_USERNAME:sa}
     password: ${H2_PASSWORD:}
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: false
+        trace: false
   jpa:
     hibernate:
       ddl-auto: update

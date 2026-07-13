@@ -123,7 +123,4 @@ public class BandwidthLimiter {
         return Math.min(waitMs, MAX_SCHEDULE_WAIT_MS);
     }
 
-    public boolean isSharedBucket() {
-        return sharedBucket;
-    }
 }

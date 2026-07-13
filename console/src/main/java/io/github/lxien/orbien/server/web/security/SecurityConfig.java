@@ -28,6 +28,8 @@ import jakarta.servlet.http.HttpServletRequest;
 @EnableWebSecurity
 public class SecurityConfig {
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+    private static final String H2_CONSOLE_PATH = "/h2-console";
+    private static final String H2_CONSOLE_PATH_PATTERN = "/h2-console/**";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final SecurityProperties securityProperties;
@@ -56,11 +58,11 @@ public class SecurityConfig {
     /**
      * JWT 无状态鉴权 + CSRF
      * <p>
-     * CSRF 通过 Cookie 下发 token；对 Bearer JWT 请求跳过校验（浏览器不会自动附带 Authorization 头，无 CSRF 风险）。
+     * CSRF 通过 Cookie 下发 token；对 Bearer JWT 请求跳过校验（浏览器不会自动附带 Authorization 头，无 CSRF 风险）
      * 公开路径（登录、静态资源等）同样跳过，避免未登录 SPA 请求被拦截。
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         csrfTokenRepository.setCookiePath("/");
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
@@ -75,6 +77,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         // SSE 等异步请求在 ASYNC dispatch 阶段不再重复鉴权（初始 REQUEST 已鉴权）
                         .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
+                        .requestMatchers(H2_CONSOLE_PATH, H2_CONSOLE_PATH_PATTERN).permitAll()
                         .requestMatchers(securityProperties.getPermitAll().getPaths().toArray(new String[0])).permitAll()
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
@@ -82,18 +85,25 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(jsonAuthenticationEntryPoint)
                         .accessDeniedHandler(jsonAccessDeniedHandler))
+                // H2 Console 使用 iframe，需允许同源嵌入
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
     private boolean shouldIgnoreCsrf(HttpServletRequest request) {
+        String servletPath = request.getServletPath();
+        // H2 Console 自带登录表单，无法携带 CSRF token
+        if (PATH_MATCHER.match(H2_CONSOLE_PATH, servletPath)
+                || PATH_MATCHER.match(H2_CONSOLE_PATH_PATTERN, servletPath)) {
+            return true;
+        }
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authorization != null && authorization.startsWith("Bearer ")) {
             return true;
         }
         for (String path : securityProperties.getPermitAll().getPaths()) {
-            if (PATH_MATCHER.match(path, request.getServletPath())) {
+            if (PATH_MATCHER.match(path, servletPath)) {
                 return true;
             }
         }

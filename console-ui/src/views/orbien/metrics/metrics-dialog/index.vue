@@ -1,11 +1,30 @@
 <template>
-  <ElDialog v-model="dialogVisible" title="流量统计" width="1050px" align-center>
-    <div v-if="loading" class="my-5">
+  <ElDialog v-model="dialogVisible" title="流量统计" width="1250px" align-center>
+    <div v-if="loading" class="py-2">
       <ElSkeleton :rows="10" animated />
     </div>
-    <div v-else>
-      <div class="flex justify-between items-center mb-5">
-        <h2 class="text-xl font-semibold m-0 text-g-900">流量统计概览</h2>
+    <div v-else class="flex flex-col gap-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div v-if="showTimeRange" class="flex flex-wrap items-center gap-2">
+          <ElSelect v-model="timeRange" placeholder="时间范围" style="width: 140px">
+            <ElOption label="最近24小时" value="24h" />
+            <ElOption label="最近3天" value="3d" />
+            <ElOption label="最近7天" value="7d" />
+            <ElOption label="最近15天" value="15d" />
+            <ElOption label="自定义日期" value="custom" />
+          </ElSelect>
+          <ElDatePicker
+            v-if="timeRange === 'custom'"
+            v-model="customDate"
+            type="daterange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            :disabled-date="disabledDate"
+            @calendar-change="handleCalendarChange"
+          />
+        </div>
+        <div v-else />
         <ElButton type="primary" @click="getData" v-ripple>
           <template #icon>
             <ElIcon><Refresh /></ElIcon>
@@ -13,113 +32,106 @@
           刷新
         </ElButton>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-5 mb-5">
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <ArtStatsCard
           title="连接数"
-          :count="ByteUtils.formatNumber(metricsData.activeChannels || 0)"
+          :count="metricsData.activeChannels || 0"
           description="当前活跃连接"
           icon="ri:share-line"
           iconStyle="bg-cyan-500"
         />
         <ArtStatsCard
           title="上行流量"
-          :count="ByteUtils.formatNumber(metricsData.upTotal || 0)"
-          :description="ByteUtils.formatBytes(metricsData.upTotal || 0)"
+          :count="upTotalParts.value"
+          :decimals="upTotalParts.decimals"
+          :suffix="` ${upTotalParts.unit}`"
+          description="累计上行"
           icon="ri:arrow-up-line"
           iconStyle="bg-green-500"
         />
         <ArtStatsCard
           title="下行流量"
-          :count="ByteUtils.formatNumber(metricsData.downTotal || 0)"
-          :description="ByteUtils.formatBytes(metricsData.downTotal || 0)"
+          :count="downTotalParts.value"
+          :decimals="downTotalParts.decimals"
+          :suffix="` ${downTotalParts.unit}`"
+          description="累计下行"
           icon="ri:arrow-down-line"
           iconStyle="bg-orange-500"
         />
         <ArtStatsCard
           title="上行速率"
-          :count="ByteUtils.formatNumber(metricsData.upRate || 0)"
-          :description="ByteUtils.formatBytes(metricsData.upRate || 0) + '/s'"
+          :count="upRateParts.value"
+          :decimals="upRateParts.decimals"
+          :suffix="` ${upRateParts.unit}/s`"
+          description="实时上行"
           icon="ri:arrow-up-circle-line"
           iconStyle="bg-purple-500"
         />
         <ArtStatsCard
           title="下行速率"
-          :count="ByteUtils.formatNumber(metricsData.downRate || 0)"
-          :description="ByteUtils.formatBytes(metricsData.downRate || 0) + '/s'"
+          :count="downRateParts.value"
+          :decimals="downRateParts.decimals"
+          :suffix="` ${downRateParts.unit}/s`"
+          description="实时下行"
           icon="ri:arrow-down-circle-line"
           iconStyle="bg-indigo-500"
         />
       </div>
-      <div class="pt-1">
-        <div class="art-card-sm p-4 mb-6">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium m-0 text-g-900">流量趋势</h3>
-            <div v-if="showTimeRange" class="flex items-center gap-2">
-              <ElSelect
-                v-model="timeRange"
-                placeholder="选择时间范围"
-                size="default"
-                style="width: 140px"
-              >
-                <ElOption label="最近24小时" value="24h" />
-                <ElOption label="最近3天" value="3d" />
-                <ElOption label="最近7天" value="7d" />
-                <ElOption label="最近15天" value="15d" />
-                <ElOption label="自定义日期" value="custom" />
-              </ElSelect>
-              <ElDatePicker
-                v-if="timeRange === 'custom'"
-                v-model="customDate"
-                type="daterange"
-                range-separator="至"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                size="default"
-                :disabled-date="disabledDate"
-                @calendar-change="handleCalendarChange"
-              />
-            </div>
-          </div>
-          <ArtLineChart
-            height="300px"
-            :data="lineChartData"
-            :xAxisData="lineChartXAxis"
-            :showAreaColor="true"
-            :showAxisLine="false"
+
+      <div class="art-card-sm p-4">
+        <div class="mb-4 flex items-center justify-between gap-3">
+          <h3 class="m-0 text-base font-medium text-g-900">
+            流量趋势
+            <span class="ml-2 text-sm font-normal text-g-500">单位：{{ unitLabel }}</span>
+          </h3>
+        </div>
+        <ArtLineChart
+          height="300px"
+          :data="lineChartData"
+          :xAxisData="lineChartXAxis"
+          :showAreaColor="true"
+          :showAxisLine="false"
+          :showLegend="true"
+          :yAxisLabelFormatter="yAxisLabelFormatter"
+          :tooltipFormatter="tooltipFormatter"
+        />
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="art-card-sm p-4">
+          <h3 class="mb-4 mt-0 text-base font-medium text-g-900">流量对比</h3>
+          <ArtRingChart
+            :data="[
+              { name: '上行流量', value: metricsData.upTotal || 0 },
+              { name: '下行流量', value: metricsData.downTotal || 0 }
+            ]"
+            :colors="['#409EFF', '#67C23A']"
             :showLegend="true"
-            :yAxisLabelFormatter="yAxisLabelFormatter"
-            :tooltipFormatter="tooltipFormatter"
+            :showLabel="true"
+            :centerText="`总流量\n${ByteUtils.formatBytes((metricsData.upTotal || 0) + (metricsData.downTotal || 0))}`"
+            :radius="['40%', '70%']"
+            height="280px"
           />
         </div>
-        <div class="flex gap-5">
-          <div class="art-card-sm p-4 flex-1">
-            <h3 class="text-lg font-medium m-0 mb-4 text-g-900">流量对比</h3>
-            <ArtRingChart
-              :data="[
-                { name: '上行流量', value: metricsData.upTotal || 0 },
-                { name: '下行流量', value: metricsData.downTotal || 0 }
-              ]"
-              :colors="['#409EFF', '#67C23A']"
-              :showLegend="true"
-              :showLabel="true"
-              :centerText="`总流量\n${ByteUtils.formatBytes((metricsData.upTotal || 0) + (metricsData.downTotal || 0))}`"
-              :radius="['40%', '70%']"
-              height="300px"
-            />
-          </div>
-          <div class="art-card-sm p-4 flex-1">
-            <h3 class="text-lg font-medium m-0 mb-4 text-g-900">速率对比</h3>
-            <ArtHBarChart
-              :data="[
-                { name: '上行速率', data: [ByteUtils.formatNumber(metricsData.upRate || 0)] },
-                { name: '下行速率', data: [ByteUtils.formatNumber(metricsData.downRate || 0)] }
-              ]"
-              :xAxisData="['速率']"
-              :colors="['#409EFF', '#67C23A']"
-              :showLegend="true"
-              height="300px"
-            />
-          </div>
+        <div class="art-card-sm p-4">
+          <h3 class="mb-4 mt-0 text-base font-medium text-g-900">速率对比</h3>
+          <ArtHBarChart
+            :data="[
+              {
+                name: `上行 (${upRateParts.unit}/s)`,
+                data: [upRateParts.value]
+              },
+              {
+                name: `下行 (${downRateParts.unit}/s)`,
+                data: [downRateParts.value]
+              }
+            ]"
+            :xAxisData="['速率']"
+            :colors="['#409EFF', '#67C23A']"
+            :showLegend="true"
+            height="280px"
+          />
         </div>
       </div>
     </div>
@@ -190,6 +202,11 @@
   const lineChartXAxis = ref<string[]>([])
   const unitDivisor = ref(1)
   const unitLabel = ref('B')
+
+  const upTotalParts = computed(() => ByteUtils.formatParts(metricsData.value.upTotal || 0))
+  const downTotalParts = computed(() => ByteUtils.formatParts(metricsData.value.downTotal || 0))
+  const upRateParts = computed(() => ByteUtils.formatParts(metricsData.value.upRate || 0))
+  const downRateParts = computed(() => ByteUtils.formatParts(metricsData.value.downRate || 0))
 
   /** 重置 timeRange 时不触发 timeRange 的 watch，避免重复请求 */
   let suppressRangeWatch = false
