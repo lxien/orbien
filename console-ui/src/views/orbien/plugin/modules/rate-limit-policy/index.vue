@@ -13,7 +13,7 @@
     <section class="setting-section">
       <div class="section-header">
         <h3 class="section-title">带宽限制</h3>
-        <p class="section-desc">分别限制入站与出站流量速率，留空表示不限制</p>
+        <p class="section-desc">分别限制下载、上传与总带宽，留空表示不限制</p>
       </div>
 
       <div class="setting-list">
@@ -63,15 +63,21 @@
 
   const LIMIT_FIELDS = [
     {
+      key: 'limitTotal',
+      label: '总带宽',
+      hint: '上下行共享总带宽，与单向限制同时配置时需满足总量约束',
+      placeholder: '不限'
+    },
+    {
       key: 'limitIn',
-      label: '入站带宽',
-      hint: '限制从客户端到内网服务的入站流量速率',
+      label: '下载带宽',
+      hint: '限制客户端下载速率（内网服务 -> 客户端）',
       placeholder: '不限'
     },
     {
       key: 'limitOut',
-      label: '出站带宽',
-      hint: '限制从内网服务到客户端的出站流量速率',
+      label: '上传带宽',
+      hint: '限制客户端上传速率（客户端 -> 内网服务）',
       placeholder: '不限'
     }
   ] as const
@@ -87,6 +93,7 @@
   const saving = ref(false)
   const isInitializing = ref(false)
   const form = reactive<Record<LimitKey, number | undefined> & { bandwidthUnit: BandwidthUnitOption }>({
+    limitTotal: undefined,
     limitIn: undefined,
     limitOut: undefined,
     bandwidthUnit: BandwidthUnit.MBPS
@@ -94,8 +101,12 @@
 
   let detailSnapshot: ProxyDetail | null = null
 
-  const resolveDisplayUnit = (limitIn?: number | null, limitOut?: number | null): BandwidthUnitOption => {
-    const bpsValues = [limitIn, limitOut].filter((v): v is number => v != null)
+  const resolveDisplayUnit = (
+    limitTotal?: number | null,
+    limitIn?: number | null,
+    limitOut?: number | null
+  ): BandwidthUnitOption => {
+    const bpsValues = [limitTotal, limitIn, limitOut].filter((v): v is number => v != null)
     if (bpsValues.length === 0) return BandwidthUnit.MBPS
 
     const maxBps = Math.max(...bpsValues)
@@ -120,8 +131,9 @@
 
   const fillForm = (bandwidth: Api.Proxy.BandwidthDTO | null) => {
     isInitializing.value = true
-    const unit = resolveDisplayUnit(bandwidth?.limitIn, bandwidth?.limitOut)
+    const unit = resolveDisplayUnit(bandwidth?.limitTotal, bandwidth?.limitIn, bandwidth?.limitOut)
     form.bandwidthUnit = unit
+    form.limitTotal = bpsToUnit(bandwidth?.limitTotal, unit)
     form.limitIn = bpsToUnit(bandwidth?.limitIn, unit)
     form.limitOut = bpsToUnit(bandwidth?.limitOut, unit)
     isInitializing.value = false
@@ -163,7 +175,7 @@
     saving.value = true
     try {
       await saveProxyBandwidthConfig(props.protocol, detailSnapshot, {
-        limitTotal: detailSnapshot.bandwidth?.limitTotal ?? null,
+        limitTotal: form.limitTotal ?? null,
         limitIn: form.limitIn ?? null,
         limitOut: form.limitOut ?? null,
         unit: form.bandwidthUnit

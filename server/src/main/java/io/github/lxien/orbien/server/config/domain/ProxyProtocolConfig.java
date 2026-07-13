@@ -15,7 +15,7 @@ public class ProxyProtocolConfig {
      */
     private boolean enabled = false;
     /**
-     * true=无 PROXY 头则拒绝；false=允许直连（开发环境）
+     * true=无 PROXY 头则拒绝；false=允许直连
      */
     private boolean strict = false;
     /**

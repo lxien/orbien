@@ -44,7 +44,7 @@ public final class ConnCreateHelper {
                 context.getControlWorkerGroup(),
                 context.getTlsContext(),
                 pipeline -> pipeline
-                        .addLast(NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler())
+                        .addLast(NettyConstants.IDLE_CHECK_HANDLER, IdleCheckHandler.forDataTunnel())
                         .addLast(NettyConstants.CONTROL_FRAME_HANDLER, context.getControlFrameHandler())
         ).whenComplete((session, error) -> {
             if (error != null) {

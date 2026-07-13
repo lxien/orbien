@@ -2,6 +2,7 @@ package io.github.lxien.orbien.client.transport.bridge;
 
 import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
+import io.github.lxien.orbien.client.statemachine.stream.StreamState;
 import io.github.lxien.orbien.core.message.TMSPFrame;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.core.transport.ChannelBufWriter;
@@ -83,21 +84,30 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         }
         int streamId = streamContext.getStreamId();
         TransportProtocol protocol = streamContext.getTransportProtocol();
-        if (!tunnel.isActive()) {
+        if (!canWriteToTunnel()) {
             if (!sharedWithInbound) {
                 ReferenceCountUtil.release(payload);
             }
-            logger.warn("[传输] 数据隧道未激活，关闭流 streamId={} protocol={} channelClass={}",
-                    streamId, protocol != null ? protocol.getName() : "unknown",
-                    tunnel.getClass().getSimpleName());
-            streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            if (!tunnel.isActive()) {
+                logger.warn("[传输] 数据隧道未激活，关闭流 streamId={} protocol={} channelClass={}",
+                        streamId, protocol != null ? protocol.getName() : "unknown",
+                        tunnel.getClass().getSimpleName());
+                streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+            }
             return;
         }
         if (sharedWithInbound) {
             payload.retain();
         }
+        // 必须在投递到隧道 EventLoop 之前计数：否则 backend 断开时 pending==0 会提前关流，
+        // 已排队的写任务变成关流后的僵尸流量，灌爆 WS+TLS direct memory。
+        streamContext.beforeTunnelWrite();
         Runnable writeTask = () -> {
-            streamContext.beforeTunnelWrite();
+            if (!canWriteToTunnel()) {
+                ReferenceCountUtil.release(payload);
+                streamContext.afterTunnelWrite();
+                return;
+            }
             TMSPFrame frame = TmspPayloadCompressor.encodeStreamData(
                     tunnel, streamId, payload, streamContext.resolveCompressAlgorithm());
             logger.debug("[传输] local->tunnel streamId={} protocol={} bytes={} channelClass={}",
@@ -118,5 +128,12 @@ public class MultiplexTunnelBridge implements TunnelBridge {
         } else {
             tunnel.eventLoop().execute(writeTask);
         }
+    }
+
+    private boolean canWriteToTunnel() {
+        StreamState state = streamContext.getState();
+        return tunnel.isActive()
+                && state != StreamState.CLOSED
+                && state != StreamState.FAILED;
     }
 }

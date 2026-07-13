@@ -61,26 +61,24 @@ public class TransportListenerManager implements Lifecycle {
             bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
             workerGroup = NettyEventLoopFactory.eventLoopGroup();
 
-            MultiplexDownloadRateLimitHandler downloadRateLimitHandler =
-                    SpringContextHolder.getBean(MultiplexDownloadRateLimitHandler.class);
             AgentManager agentManager = SpringContextHolder.getBean(AgentManager.class);
 
             TcpProtocolConfig tcp = transportConfig.getTcp();
             if (tcp.isEnabled()) {
                 startListener(TransportProtocol.TCP, config.getServerPort(), tlsContext, sharedTls,
-                        downloadRateLimitHandler, agentManager, null, transportConfig.getQuic());
+                        agentManager, null, transportConfig.getQuic());
             }
 
             WebSocketProtocolConfig websocket = transportConfig.getWebsocket();
             if (websocket.isEnabled()) {
                 startListener(TransportProtocol.WEBSOCKET, websocket.getPort(), tlsContext, sharedTls,
-                        downloadRateLimitHandler, agentManager, websocket, transportConfig.getQuic());
+                        agentManager, websocket, transportConfig.getQuic());
             }
 
             QuicProtocolConfig quic = transportConfig.getQuic();
             if (quic.isEnabled()) {
                 startListener(TransportProtocol.QUIC, quic.getPort(), tlsContext, sharedTls,
-                        downloadRateLimitHandler, agentManager, transportConfig.getWebsocket(), quic);
+                        agentManager, transportConfig.getWebsocket(), quic);
             }
 
             eventBus.publishAsync(new TunnelServerBindEvent());
@@ -93,7 +91,6 @@ public class TransportListenerManager implements Lifecycle {
                                int port,
                                SslContext tlsContext,
                                TlsConfig tlsConfig,
-                               MultiplexDownloadRateLimitHandler downloadRateLimitHandler,
                                AgentManager agentManager,
                                WebSocketProtocolConfig webSocketConfig,
                                QuicProtocolConfig quicConfig) {
@@ -110,7 +107,6 @@ public class TransportListenerManager implements Lifecycle {
                 .bossGroup(bossGroup)
                 .workerGroup(workerGroup)
                 .pipelineConfigurer((channel, pipeline) -> pipeline
-                      //  .addLast(downloadRateLimitHandler)
                         .addLast(NettyConstants.CONTROL_IDLE_CHECK_HANDLER,
                                 new ControlIdleCheckHandler(agentManager, 90, 0, 0, TimeUnit.SECONDS))
                         .addLast(NettyConstants.CONTROL_FRAME_HANDLER, controlFrameHandler))

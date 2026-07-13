@@ -14,18 +14,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TunnelBridgeFactory {
-
     private static MetricsCollector metricsCollector;
-    private static InspectorProperties inspectorProperties;
 
     @Autowired
     public void setMetricsCollector(MetricsCollector collector) {
         TunnelBridgeFactory.metricsCollector = collector;
-    }
-
-    @Autowired
-    public void setInspectorProperties(InspectorProperties properties) {
-        TunnelBridgeFactory.inspectorProperties = properties;
     }
 
     /**
@@ -62,9 +55,6 @@ public class TunnelBridgeFactory {
         return bridge;
     }
 
-    /**
-     * 如果配置了 MetricsCollector 且存在 proxyId，则包装上流量统计装饰器
-     */
     private static TunnelBridge addMetricsIfNeeded(TunnelBridge bridge, StreamContext ctx) {
         if (metricsCollector != null && ctx.getProxyId() != null) {
             return new MetricsTunnelBridge(bridge, metricsCollector, ctx.getProxyId());

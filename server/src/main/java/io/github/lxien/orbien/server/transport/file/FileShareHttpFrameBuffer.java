@@ -9,17 +9,16 @@ import io.netty.util.ReferenceCountUtil;
 import java.nio.charset.StandardCharsets;
 
 /**
- * 聚合 HTTP 请求帧（支持大 body 分片到达，如 multipart 上传）。
+ * 聚合 HTTP 请求帧（支持大 body 分片到达，如 multipart 上传）
  */
 final class FileShareHttpFrameBuffer {
 
     private ByteBuf buffer;
-    /** 完整 HTTP 报文长度（请求头 + body） */
+    /**
+     * 完整 HTTP 报文长度（请求头 + body）
+     */
     private int requiredBytes = -1;
 
-    /**
-     * @return 完整请求 ByteBuf（调用方负责 release），未完成则返回 null
-     */
     ByteBuf feed(Channel channel, ByteBuf incoming) {
         if (incoming != null) {
             if (!incoming.isReadable()) {

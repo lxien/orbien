@@ -21,8 +21,6 @@ import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.config.AppConfig;
-import io.github.lxien.orbien.server.configuration.SpringContextHolder;
-import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
@@ -67,7 +65,6 @@ public final class TcpProxyServer implements Lifecycle {
         bossGroup = NettyEventLoopFactory.eventLoopGroup(1);
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new ServerBootstrap();
-        UploadRateLimitHandler uploadRateLimitHandler = SpringContextHolder.getBean(UploadRateLimitHandler.class);
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NettyEventLoopFactory.serverSocketChannelClass())
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
@@ -81,7 +78,6 @@ public final class TcpProxyServer implements Lifecycle {
                         VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                         pipeline.addLast(new IdleCheckHandler());
                         pipeline.addLast(tcpIpCheckHandler);
-                        pipeline.addLast(uploadRateLimitHandler);
                         pipeline.addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
                     }
                 });

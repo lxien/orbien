@@ -166,8 +166,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             context.removeVariable(StreamConstants.SOCKS5_AWAIT_REPLY);
             Socks5ReplyHelper.sendConnectSuccess(visitor);
         }
-        visitor.config().setOption(ChannelOption.AUTO_READ, true);
-        visitor.read();
+        context.resumeVisitorRead(StreamContext.VISITOR_PAUSE_OPENING);
         logger.debug("流 {} 打开成功，可以从访问者读数据", context.getStreamId());
     }
 
@@ -218,7 +217,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 context.getTransportProtocol() != null ? context.getTransportProtocol().getName() : "unknown",
                 cached.refCnt());
         // HTTP_FIRST_PACKET 在 HttpVisitorHandler 中已 retain，此处为 sole owner
-        tunnelBridge.forwardToLocal(cached, false);
+        context.forwardToLocal(cached, false);
     }
 
     private static void safeRelease(ByteBuf buf) {
@@ -237,7 +236,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
                 if (pending.isReadable()) {
                     logger.debug("[HTTP] 转发打开期间缓存的数据 streamId={} bytes={}",
                             context.getStreamId(), pending.readableBytes());
-                    tunnelBridge.forwardToLocal(pending, false);
+                    context.forwardToLocal(pending, false);
                 } else {
                     safeRelease(pending);
                 }
@@ -262,6 +261,6 @@ public class StreamOpenResponseAction extends StreamBaseAction {
             return;
         }
         logger.debug("转发 UDP 第一个数据包 streamId={}", context.getStreamId());
-        tunnelBridge.forwardToLocal(cached, false);
+        context.forwardToLocal(cached, false);
     }
 }

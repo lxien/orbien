@@ -6,7 +6,7 @@ import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
 import io.netty.buffer.ByteBuf;
 
 /**
- * Inspector 旁路抓包：读取 {@link ByteBuf} 副本用于展示，不改变转发语义
+ * Inspector 旁路抓包，读取 {@link ByteBuf} 副本用于展示，不改变转发语义
  */
 public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
     private final HttpStreamCapture capture;

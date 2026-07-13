@@ -61,7 +61,7 @@ public class Socks5RelayHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
         Channel tunnel = tunnelEntry.getChannel();
         if (!tunnel.isWritable()) {
-            visitor.config().setOption(ChannelOption.AUTO_READ, false);
+            streamContext.pauseVisitorRead(StreamContext.VISITOR_PAUSE_BACKPRESSURE);
             streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
         }
         streamContext.forwardToLocal(msg);
@@ -71,6 +71,13 @@ public class Socks5RelayHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("[SOCKS5] 流异常", cause);
         ctx.fireExceptionCaught(cause);
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
+        streamManager.getStreamContext(ctx.channel()).ifPresent(context ->
+                context.onVisitorWritabilityChanged(ctx.channel().isWritable()));
+        ctx.fireChannelWritabilityChanged();
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.github.lxien.orbien.client.statemachine.stream;
 import com.alibaba.cola.statemachine.StateMachine;
 import io.github.lxien.orbien.client.statemachine.agent.AgentContext;
 import io.github.lxien.orbien.core.transport.AbstractStreamContext;
+import io.github.lxien.orbien.core.transport.ChannelReadGate;
 import io.netty.channel.Channel;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
@@ -17,6 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Setter
 public class StreamContext extends AbstractStreamContext {
     private final InternalLogger logger = InternalLoggerFactory.getInstance(StreamContext.class);
+
+    public static final int BACKEND_PAUSE_RATE_LIMIT = ChannelReadGate.PAUSE_RATE_LIMIT;
+    public static final int BACKEND_PAUSE_BACKPRESSURE = ChannelReadGate.PAUSE_BACKPRESSURE;
+    public static final int BACKEND_PAUSE_OPENING = ChannelReadGate.PAUSE_OPENING;
+
     private StreamState state = StreamState.IDLE;
     private Channel server;
     private String localIp;
@@ -26,6 +32,7 @@ public class StreamContext extends AbstractStreamContext {
     @Setter(AccessLevel.NONE)
     private StateMachine<StreamState, StreamEvent, StreamContext> stateMachine;
 
+    private final ChannelReadGate backendReadGate = new ChannelReadGate();
     private final AtomicInteger pendingTunnelWrites = new AtomicInteger(0);
     private final AtomicBoolean backendDisconnected = new AtomicBoolean(false);
 
@@ -43,6 +50,26 @@ public class StreamContext extends AbstractStreamContext {
         stateMachine.fireEvent(state, event, this);
     }
 
+    public void pauseBackendRead(int reason) {
+        if (datagram) {
+            return;
+        }
+        backendReadGate.pause(server, reason);
+    }
+
+    public void resumeBackendRead(int reason) {
+        if (datagram) {
+            return;
+        }
+        backendReadGate.resume(server, reason, canResumeBackendRead());
+    }
+
+    public boolean canResumeBackendRead() {
+        return !backendDisconnected.get()
+                && state != StreamState.CLOSED
+                && state != StreamState.FAILED;
+    }
+
     public void beforeTunnelWrite() {
         pendingTunnelWrites.incrementAndGet();
     }
@@ -51,7 +78,29 @@ public class StreamContext extends AbstractStreamContext {
         if (pendingTunnelWrites.decrementAndGet() < 0) {
             pendingTunnelWrites.set(0);
         }
+        maybeResumeAfterTunnelDrain();
         tryCloseAfterBackendDisconnected();
+    }
+
+    /**
+     * pending 背压在隧道仍 isWritable 时不会触发 writabilityChanged，需在写完成时主动恢复
+     */
+    private void maybeResumeAfterTunnelDrain() {
+        if (pendingTunnelWrites.get() >= 2 || !canResumeBackendRead()) {
+            return;
+        }
+        if (tunnelEntry == null) {
+            return;
+        }
+        Channel tunnel = tunnelEntry.getChannel();
+        if (tunnel == null || !tunnel.isActive() || !tunnel.isWritable()) {
+            return;
+        }
+        if (!backendReadGate.hasReason(BACKEND_PAUSE_BACKPRESSURE)) {
+            return;
+        }
+        resumeBackendRead(BACKEND_PAUSE_BACKPRESSURE);
+        StreamManager.removePausedStream(tunnel, streamId);
     }
 
     public void markBackendDisconnected() {

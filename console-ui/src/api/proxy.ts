@@ -229,6 +229,14 @@ export function fetchUpdateSocks5Proxy(data: Api.Proxy.Socks5ProxyUpdateParam) {
     })
 }
 
+export function fetchUpdateProxyBandwidth(proxyId: string, data: Api.Proxy.BandwidthSaveParam) {
+    return request.put({
+        url: `/api/proxies/${proxyId}/bandwidth`,
+        data,
+        showSuccessMessage: true
+    })
+}
+
 /**
  * 更新代理状态
  * @param id 代理 ID

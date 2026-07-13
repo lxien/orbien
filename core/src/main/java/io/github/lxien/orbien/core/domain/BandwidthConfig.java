@@ -69,14 +69,18 @@ public class BandwidthConfig {
     }
 
     public boolean hasLimitConfigured() {
-        return limitTotal != null;
+        return totalBps != null || inBps != null || outBps != null;
     }
 
     public boolean hasLimitInConfigured() {
-        return limitIn != null;
+        return inBps != null && inBps > 0;
     }
 
     public boolean hasLimitOutConfigured() {
-        return limitOut != null;
+        return outBps != null && outBps > 0;
+    }
+
+    public boolean hasLimitTotalConfigured() {
+        return totalBps != null && totalBps > 0;
     }
 }

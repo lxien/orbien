@@ -133,20 +133,52 @@ public class MultiplexTunnelBridge implements TunnelBridge {
             return;
         }
         int bytes = payload.readableBytes();
-        if (sharedWithInbound) {
-            payload.retain();
+        final ByteBuf outbound = sharedWithInbound ? payload.retain() : payload;
+        Runnable writeTask = () -> {
+            if (!StreamForwardHelper.shouldForward(streamContext) || !visitor.isActive()) {
+                ReferenceCountUtil.safeRelease(outbound);
+                return;
+            }
+            if (!visitor.isWritable()) {
+                streamContext.pauseRemoteProducer(StreamContext.REMOTE_PAUSE_VISITOR_BACKPRESSURE);
+            }
+            // writeAndFlush 一旦调用，outbound 所有权交给 Netty（成功或 failFlushed 都会释放）
+            // 监听器里再 release 会与 ChannelOutboundBuffer 双释，尤其是共享 parent refCnt 的 slice
+            visitor.writeAndFlush(outbound).addListener((ChannelFutureListener) future -> {
+                if (!future.isSuccess()) {
+                    if (!isBenignWriteFailure(future.cause())) {
+                        logger.warn("[传输] 数据转发到访问者失败 streamId={}", streamId, future.cause());
+                    } else {
+                        logger.debug("[传输] 数据转发到访问者失败（对端关闭） streamId={}", streamId);
+                    }
+                    StreamForwardHelper.abortAndClose(streamContext, logger,
+                            "[传输] 数据转发到访问者失败 streamId=" + streamId, null);
+                    return;
+                }
+                logger.debug("[传输] 数据转发到访问者成功 streamId={} bytes={}", streamId, bytes);
+                if (!visitor.isWritable()) {
+                    streamContext.pauseRemoteProducer(StreamContext.REMOTE_PAUSE_VISITOR_BACKPRESSURE);
+                }
+            });
+        };
+        if (visitor.eventLoop().inEventLoop()) {
+            writeTask.run();
+        } else {
+            visitor.eventLoop().execute(writeTask);
         }
-        visitor.writeAndFlush(payload).addListener((ChannelFutureListener) future -> {
-            if (sharedWithInbound && !future.isSuccess()) {
-                ReferenceCountUtil.release(payload);
+    }
+
+    private static boolean isBenignWriteFailure(Throwable cause) {
+        for (Throwable c = cause; c != null; c = c.getCause()) {
+            if (c instanceof java.nio.channels.ClosedChannelException
+                    || c instanceof io.netty.channel.StacklessClosedChannelException) {
+                return true;
             }
-            if (!future.isSuccess()) {
-                StreamForwardHelper.abortAndClose(streamContext, logger,
-                        "[传输] 数据转发到访问者失败 streamId=" + streamId, future.cause());
-            } else {
-                logger.debug("[传输] 数据转发到访问者成功 streamId={} bytes={}",
-                        streamId, bytes);
+            String msg = c.getMessage();
+            if (msg != null && (msg.contains("Broken pipe") || msg.contains("Connection reset"))) {
+                return true;
             }
-        });
+        }
+        return false;
     }
 }

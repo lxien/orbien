@@ -29,15 +29,23 @@ public class DirectTunnelBridge implements TunnelBridge {
 
             @Override
             public void channelWritabilityChanged(ChannelHandlerContext ctx) {
-                if (ctx.channel().isWritable() && visitor.isActive()) {
-                    visitor.config().setOption(ChannelOption.AUTO_READ, true);
-                    visitor.read();
+                if (visitor.isActive()) {
+                    streamContext.onVisitorWritabilityChanged(ctx.channel().isWritable());
+                    if (ctx.channel().isWritable()) {
+                        streamContext.resumeVisitorRead(StreamContext.VISITOR_PAUSE_BACKPRESSURE);
+                    }
                 }
                 ctx.fireChannelWritabilityChanged();
             }
 
             @Override
             public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                if (isBenignWriteFailure(cause)) {
+                    logger.debug("独立隧道写出时对端已关闭 streamId={}", streamContext.getStreamId());
+                    StreamForwardHelper.abortAndClose(streamContext, logger,
+                            "独立隧道对端关闭 streamId=" + streamContext.getStreamId(), null);
+                    return;
+                }
                 logger.error("独立隧道传输发生异常 streamId={}", streamContext.getStreamId(), cause);
                 StreamForwardHelper.abortAndClose(streamContext, logger,
                         "独立隧道异常 streamId=" + streamContext.getStreamId(), cause);
@@ -117,26 +125,48 @@ public class DirectTunnelBridge implements TunnelBridge {
             if (!success) {
                 StreamForwardHelper.abortAndClose(streamContext, logger,
                         "数据转发给访问者失败：streamId=" + streamContext.getStreamId(), null);
+            } else if (!visitor.isWritable()) {
+                streamContext.pauseRemoteProducer(StreamContext.REMOTE_PAUSE_VISITOR_BACKPRESSURE);
             }
         });
     }
+
     private void writeOnLoop(Channel channel, ByteBuf payload, boolean sharedWithInbound,
                              java.util.function.Consumer<Boolean> listener) {
         final ByteBuf outbound = sharedWithInbound ? payload.retain() : payload;
         int bytes = outbound.readableBytes();
-        Runnable writeTask = () -> channel.writeAndFlush(outbound).addListener((ChannelFutureListener) f -> {
-            if (sharedWithInbound && !f.isSuccess()) {
-                ReferenceCountUtil.release(outbound);
-            } else if (!sharedWithInbound && !f.isSuccess()) {
-                ReferenceCountUtil.release(outbound);
+        Runnable writeTask = () -> {
+            if (!channel.isActive() || !StreamForwardHelper.shouldForward(streamContext)) {
+                ReferenceCountUtil.safeRelease(outbound);
+                listener.accept(false);
+                return;
             }
-            if (f.isSuccess()) {
-                logger.debug("数据转发成功 streamId={} bytes={}", streamContext.getStreamId(), bytes);
-            } else {
-                logger.warn("数据转发失败 streamId={}", streamContext.getStreamId(), f.cause());
-            }
-            listener.accept(f.isSuccess());
-        });
+            channel.writeAndFlush(outbound).addListener((ChannelFutureListener) f -> {
+                // writeAndFlush 后由 Netty 负责释放，监听器不再 release
+                if (f.isSuccess()) {
+                    logger.debug("数据转发成功 streamId={} bytes={}", streamContext.getStreamId(), bytes);
+                } else if (!isBenignWriteFailure(f.cause())) {
+                    logger.warn("数据转发失败 streamId={}", streamContext.getStreamId(), f.cause());
+                } else {
+                    logger.debug("数据转发失败（对端关闭） streamId={}", streamContext.getStreamId());
+                }
+                listener.accept(f.isSuccess());
+            });
+        };
         DirectTunnelLifecycle.runOnTunnelLoop(channel, writeTask);
+    }
+
+    private static boolean isBenignWriteFailure(Throwable cause) {
+        for (Throwable c = cause; c != null; c = c.getCause()) {
+            if (c instanceof java.nio.channels.ClosedChannelException
+                    || c instanceof io.netty.channel.StacklessClosedChannelException) {
+                return true;
+            }
+            String msg = c.getMessage();
+            if (msg != null && (msg.contains("Broken pipe") || msg.contains("Connection reset"))) {
+                return true;
+            }
+        }
+        return false;
     }
 }

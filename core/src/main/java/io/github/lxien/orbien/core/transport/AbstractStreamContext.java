@@ -24,8 +24,8 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 
 @Getter
@@ -45,7 +45,7 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
     /**
      * 流打开前（OPENING）暂存的上传数据
      */
-    private final Queue<ByteBuf> pendingQueue = new ConcurrentLinkedQueue<>();
+    private final Deque<ByteBuf> pendingQueue = new ConcurrentLinkedDeque<>();
 
     public void forwardToRemote(ByteBuf payload) {
         forwardToRemote(payload, true);
@@ -94,6 +94,14 @@ public abstract class AbstractStreamContext extends ProcessContextImpl {
 
     public ByteBuf pollPending() {
         return pendingQueue.poll();
+    }
+
+    public ByteBuf peekPending() {
+        return pendingQueue.peek();
+    }
+
+    public void enqueueFirst(ByteBuf byteBuf) {
+        pendingQueue.offerFirst(byteBuf);
     }
 
     public void flushPendingToLocal() {

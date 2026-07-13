@@ -4,8 +4,6 @@ import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.notify.EventBus;
-import io.github.lxien.orbien.server.configuration.SpringContextHolder;
-import io.github.lxien.orbien.server.transport.UploadRateLimitHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -43,7 +41,6 @@ public final class UdpProxyServer implements Lifecycle {
         }
         workerGroup = NettyEventLoopFactory.eventLoopGroup();
         serverBootstrap = new Bootstrap();
-        UploadRateLimitHandler uploadRateLimitHandler = SpringContextHolder.getBean(UploadRateLimitHandler.class);
         serverBootstrap.group(workerGroup)
                 .channel(NettyEventLoopFactory.datagramChannelClass())
                 .option(ChannelOption.SO_BROADCAST, false)
@@ -53,7 +50,6 @@ public final class UdpProxyServer implements Lifecycle {
                     protected void initChannel(DatagramChannel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
                         pipeline.addLast(udpIpCheckHandler);
-                        pipeline.addLast(uploadRateLimitHandler);
                         pipeline.addLast(NettyConstants.UDP_VISITOR_HANDLER, udpVisitorHandler);
                     }
                 });

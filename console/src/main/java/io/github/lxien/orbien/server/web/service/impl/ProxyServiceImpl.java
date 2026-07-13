@@ -35,6 +35,7 @@ import io.github.lxien.orbien.server.web.dto.socks5auth.Socks5UserDTO;
 import io.github.lxien.orbien.server.web.dto.transport.TransportDTO;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.param.proxy.*;
+import io.github.lxien.orbien.server.web.param.bandwidth.BandwidthSaveParam;
 import io.github.lxien.orbien.server.web.dto.loadbalance.LoadBalanceDTO;
 import io.github.lxien.orbien.server.web.proxy.service.ProxyConfigSyncService;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
@@ -1044,6 +1045,30 @@ public class ProxyServiceImpl implements ProxyService {
         if (limitOut != null) {
             proxyDO.setLimitOut(limitOut > 0 ? limitOut : null);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProxyBandwidth(String proxyId, BandwidthSaveParam param) {
+        param.valid();
+        ProxyDO proxyDO = proxyRepository.findById(proxyId)
+                .orElseThrow(() -> new BizException("代理配置不存在"));
+        BandwidthUnit unit = BandwidthUnit.fromCode(param.getUnit());
+        proxyDO.setLimitTotal(resolveBandwidthBps(param.getLimitTotal(), unit));
+        proxyDO.setLimitIn(resolveBandwidthBps(param.getLimitIn(), unit));
+        proxyDO.setLimitOut(resolveBandwidthBps(param.getLimitOut(), unit));
+        proxyRepository.save(proxyDO);
+        transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, false));
+    }
+
+    private Long resolveBandwidthBps(Long value, BandwidthUnit unit) {
+        if (value == null) {
+            return null;
+        }
+        if (value <= 0) {
+            return null;
+        }
+        return unit.toBps(value);
     }
 
     private TransportDTO buildTransportDTO(ProxyDO proxyDO) {

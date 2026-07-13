@@ -22,7 +22,6 @@ import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,9 +34,8 @@ public class StreamResumeAction extends StreamBaseAction {
     protected void doExecute(StreamState from, StreamState to, StreamEvent event, StreamContext context) {
         logger.debug("恢复流 {} 读取",context.getStreamId());
         Channel visitor = context.getVisitor();
-        if (event == StreamEvent.STREAM_REMOTE_RESUME) {
-            visitor.config().setOption(ChannelOption.AUTO_READ, true);
-            visitor.read();
+        if (event == StreamEvent.STREAM_REMOTE_RESUME && visitor != null) {
+            context.resumeVisitorRead(StreamContext.VISITOR_PAUSE_REMOTE);
         }
 
         if (event == StreamEvent.STREAM_LOCAL_RESUME) {

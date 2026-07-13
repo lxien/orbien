@@ -20,7 +20,7 @@ public interface NettyConstants {
     String DIRECT_TUNNEL_COMPRESSION_DECODER = "directTunnelCompressionDecoder";
     String DIRECT_TUNNEL_COMPRESSION_ENCODER = "directTunnelCompressionEncoder";
     String WEBSOCKET_HANDLER = "webSocketHandler";
+    String WEBSOCKET_FRAME_AGGREGATOR = "webSocketFrameAggregator";
     String WEBSOCKET_FRAME_CODEC = "webSocketFrameCodec";
-    String DOWNLOAD_RATE_LIMIT_HANDLER = "downloadRateLimitHandler";
 
 }

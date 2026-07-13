@@ -9,7 +9,7 @@ import io.github.lxien.orbien.core.transport.PausedStreamRegistry;
 import io.github.lxien.orbien.core.transport.TunnelEntry;
 import io.github.lxien.orbien.core.transport.UdpSessionKey;
 import io.github.lxien.orbien.server.generator.StreamIdGenerator;
-import io.github.lxien.orbien.server.transport.BandwidthLimiter;
+import io.github.lxien.orbien.server.transport.traffic.BandwidthLimiter;
 import io.github.lxien.orbien.core.transport.VisitorAddressResolver;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -155,8 +155,7 @@ public class StreamManager {
         StreamContext streamContext = visitors.remove(streamId);
         if (!Objects.isNull(streamContext)) {
             String proxyId = streamContext.getProxyId();
-            //关闭代理连接计数
-            if (StringUtils.hasText(proxyId)) {
+            if (StringUtils.hasText(proxyId) && streamContext.getBandwidthLimiter() != null) {
                 decrementStreamCount(proxyId);
             }
             //清理所有索引映射

@@ -85,7 +85,7 @@ public class StreamStateMachineBuilder {
                     .perform(streamResumeAction);
             // 本地关闭流
             builder.externalTransitions()
-                    .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED)
+                    .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED, StreamState.PAUSED)
                     .to(StreamState.CLOSED)
                     .on(StreamEvent.STREAM_LOCAL_CLOSE)
                     .when(ctx -> true)
@@ -93,7 +93,7 @@ public class StreamStateMachineBuilder {
 
             // 来自远程关闭流
             builder.externalTransitions()
-                    .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED)
+                    .fromAmong(StreamState.OPENED, StreamState.OPENING, StreamState.FAILED, StreamState.PAUSED)
                     .to(StreamState.CLOSED)
                     .on(StreamEvent.STREAM_REMOTE_CLOSE)
                     .when(ctx -> true)

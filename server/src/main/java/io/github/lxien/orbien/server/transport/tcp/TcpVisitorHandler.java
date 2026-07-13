@@ -64,7 +64,7 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             Channel tunnel = tunnelEntry.getChannel();
             if (!tunnel.isWritable()) {
                 logger.debug("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");
-                visitor.config().setOption(ChannelOption.AUTO_READ, false);
+                streamContext.pauseVisitorRead(StreamContext.VISITOR_PAUSE_BACKPRESSURE);
                 streamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
             }
             logger.debug("[TCP] 流 {} 引用计数为：{}", streamContext.getStreamId(), msg.refCnt());
@@ -79,6 +79,13 @@ public class TcpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         logger.error("[TCP]流异常",cause);
         ctx.fireExceptionCaught(cause);
+    }
+
+    @Override
+    public void channelWritabilityChanged(ChannelHandlerContext ctx) {
+        streamManager.getStreamContext(ctx.channel()).ifPresent(context ->
+                context.onVisitorWritabilityChanged(ctx.channel().isWritable()));
+        ctx.fireChannelWritabilityChanged();
     }
 
     @Override

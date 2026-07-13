@@ -43,7 +43,6 @@ public final class DirectTunnelLifecycle {
             removeIfPresent(pipeline, NettyConstants.CONTROL_FRAME_HANDLER);
             removeIfPresent(pipeline, NettyConstants.CONTROL_IDLE_CHECK_HANDLER);
             removeIfPresent(pipeline, NettyConstants.IDLE_CHECK_HANDLER);
-            removeIfPresent(pipeline, NettyConstants.DOWNLOAD_RATE_LIMIT_HANDLER);
             if (algorithm.isCompressed()) {
                 pipeline.addLast(NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER,
                         new DirectTunnelCompressionDecoder(algorithm));
@@ -74,38 +73,6 @@ public final class DirectTunnelLifecycle {
             ChannelUtils.closeOnFlush(tunnel);
         });
     }
-
-    /**
-     * 流关闭后恢复 TMSP 控制栈
-     */
-    public static Future<Void> restoreControlStack(Channel tunnel, Consumer<ChannelPipeline> tailConfigurer) {
-        return toVoidFuture(runOnLoop(tunnel, () -> {
-            tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).set(Boolean.FALSE);
-            if (!tunnel.isOpen()) {
-                return;
-            }
-            ChannelPipeline pipeline = tunnel.pipeline();
-            if (pipeline.firstContext() == null) {
-                return;
-            }
-            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER);
-            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_DECODER);
-            removeIfPresent(pipeline, NettyConstants.DIRECT_TUNNEL_COMPRESSION_ENCODER);
-            if (pipeline.get(NettyConstants.TMSP_CODEC) != null) {
-                return;
-            }
-            String anchor = findControlStackAnchor(pipeline);
-            if (anchor != null) {
-                pipeline.addAfter(anchor, NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
-            } else {
-                pipeline.addLast(NettyConstants.TMSP_CODEC, TMSPCodec.create(DEFAULT_MAX_FRAME));
-            }
-            if (tailConfigurer != null) {
-                tailConfigurer.accept(pipeline);
-            }
-        }));
-    }
-
     public static boolean isPassthroughActive(Channel tunnel) {
         if (tunnel == null) {
             return false;
@@ -113,13 +80,6 @@ public final class DirectTunnelLifecycle {
         Boolean active = tunnel.attr(AttributeKeys.DIRECT_PASSTHROUGH).get();
         return Boolean.TRUE.equals(active)
                 || tunnel.pipeline().get(NettyConstants.DIRECT_TUNNEL_BRIDGE_HANDLER) != null;
-    }
-
-    /**
-     * 独立隧道是否仍可恢复控制栈（未关闭且 pipeline 可用）。
-     */
-    public static boolean canRestoreControlStack(Channel tunnel) {
-        return tunnel != null && tunnel.isOpen() && tunnel.pipeline().firstContext() != null;
     }
 
     public static void runOnTunnelLoop(Channel tunnel, Runnable task) {
@@ -159,6 +119,9 @@ public final class DirectTunnelLifecycle {
     private static String findControlStackAnchor(ChannelPipeline pipeline) {
         if (pipeline.get(NettyConstants.WEBSOCKET_FRAME_CODEC) != null) {
             return NettyConstants.WEBSOCKET_FRAME_CODEC;
+        }
+        if (pipeline.get(NettyConstants.WEBSOCKET_FRAME_AGGREGATOR) != null) {
+            return NettyConstants.WEBSOCKET_FRAME_AGGREGATOR;
         }
         if (pipeline.get(NettyConstants.WEBSOCKET_HANDLER) != null) {
             return NettyConstants.WEBSOCKET_HANDLER;

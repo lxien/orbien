@@ -16,10 +16,9 @@ import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.github.lxien.orbien.server.statemachine.stream.StreamManager;
 import io.github.lxien.orbien.server.statemachine.stream.StreamState;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
-import io.github.lxien.orbien.server.transport.BandwidthLimiter;
+import io.github.lxien.orbien.server.transport.traffic.BandwidthLimiter;
 import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelOption;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import jakarta.annotation.Resource;
@@ -52,7 +51,7 @@ public class TargetResolverAction extends StreamBaseAction {
         Channel visitor = context.getVisitor();
         // UDP 代理复用同一 DatagramChannel，不能关闭 AUTO_READ，否则后续包永远进不了 UdpVisitorHandler
         if (!context.isDatagram()) {
-            visitor.config().setOption(ChannelOption.AUTO_READ, false);
+            context.pauseVisitorRead(StreamContext.VISITOR_PAUSE_OPENING);
         }
         ProxyConfigExt ext = resolveProxyConfig(context);
         if (ext == null || ext.getProxyConfig().getStatus().isClosed()) {
@@ -93,7 +92,7 @@ public class TargetResolverAction extends StreamBaseAction {
                 context.setTarget(selectedTarget);
             }
             BandwidthConfig bandwidth = config.getBandwidth();
-            if (bandwidth != null) {
+            if (bandwidth != null && bandwidth.hasLimitConfigured()) {
                 StreamManager streamManager = context.getStreamManager();
                 BandwidthLimiter bandwidthLimiter = streamManager.getOrCreateProxyLimiter(config.getProxyId(), bandwidth);
                 context.setBandwidthLimiter(bandwidthLimiter);

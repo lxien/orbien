@@ -124,7 +124,8 @@ public class CreateConnectionAction extends AgentBaseAction {
             PipelineConfigure.removeControlIdleCheckHandler(tunnel);
             ChannelPipeline pipeline = tunnel.pipeline();
             if (pipeline.get(NettyConstants.IDLE_CHECK_HANDLER) == null) {
-                pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER, NettyConstants.IDLE_CHECK_HANDLER, new IdleCheckHandler());
+                pipeline.addBefore(NettyConstants.CONTROL_FRAME_HANDLER, NettyConstants.IDLE_CHECK_HANDLER,
+                        IdleCheckHandler.forDataTunnel());
             }
             multiplexConnectionPool.setChannel(agentId, protocol, isEncrypt, poolEntry);
         } else {

@@ -36,7 +36,6 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import javax.net.ssl.SSLException;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -182,14 +181,12 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         });
                 break;
             }
-            //暂停流
+            //暂停流：只停后端读，不进入 StreamState.PAUSED（否则会丢弃对端 STREAM_DATA 且无法 CLOSE）
             case TMSP.MSG_STREAM_PAUSE: {
                 int streamId = frame.getStreamId();
                 logger.debug("收到来自远程暂停流 {} 消息", streamId);
-                StreamManager.getStreamContext(streamId)
-                        .ifPresent(streamContext -> {
-                            streamContext.fireEvent(StreamEvent.STREAM_REMOTE_PAUSE);
-                        });
+                StreamManager.getStreamContext(streamId).ifPresent(streamContext ->
+                        streamContext.pauseBackendRead(StreamContext.BACKEND_PAUSE_RATE_LIMIT));
                 break;
             }
             //恢复流 / 独立隧道透传就绪
@@ -203,7 +200,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         completeDirectPassthroughOpen(streamContext);
                     } else {
                         logger.debug("收到来自远程恢复流 {} 消息", streamId);
-                        streamContext.fireEvent(StreamEvent.STREAM_REMOTE_RESUME);
+                        resumeBackendAfterRemoteResume(streamContext);
                     }
                 });
                 break;
@@ -252,6 +249,19 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
             // ChannelUtils.closeOnFlush(channel);
         }
         logger.error(cause.getMessage(), cause);
+    }
+
+    private void resumeBackendAfterRemoteResume(StreamContext streamContext) {
+        Channel tunnel = streamContext.getTunnelEntry() != null
+                ? streamContext.getTunnelEntry().getChannel()
+                : null;
+        int pending = streamContext.getPendingTunnelWrites().get();
+        if (tunnel != null && tunnel.isActive()
+                && (!tunnel.isWritable() || pending >= 2)) {
+            streamContext.pauseBackendRead(StreamContext.BACKEND_PAUSE_BACKPRESSURE);
+            StreamManager.addPausedStreamId(tunnel, streamContext.getStreamId());
+        }
+        streamContext.resumeBackendRead(StreamContext.BACKEND_PAUSE_RATE_LIMIT);
     }
 
     private void completeDirectPassthroughOpen(StreamContext streamContext) {
@@ -329,35 +339,26 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
 
     @Override
     public void channelWritabilityChanged(ChannelHandlerContext ctx) throws Exception {
-        logger.debug("隧道可写性发生变化：{}", ctx.channel().isWritable());
         Channel tunnel = ctx.channel();
         if (tunnel == agentContext.getControl()) {
-            logger.debug("控制隧道可写性发生变化，暂不处理");
             return;
         }
         boolean writable = tunnel.isWritable();
+        if (logger.isDebugEnabled()) {
+            logger.debug("数据隧道可写性变化：{} channel={}", writable, tunnel.id());
+        }
         if (writable) {
-            //数据隧道恢复可写，恢复暂停的从服务器读取
             Set<Integer> pausedStreamIds = StreamManager.getPausedStreamIds(tunnel);
             if (!pausedStreamIds.isEmpty()) {
-                logger.debug("控制隧道恢复可写，恢复 {} 个访问者读取", pausedStreamIds.size());
+                logger.debug("数据隧道恢复可写，恢复 {} 个后端读取", pausedStreamIds.size());
                 pausedStreamIds.forEach(streamId -> {
-                    Optional<StreamContext> streamContextOpt = StreamManager.getStreamContext(streamId);
-                    if (streamContextOpt.isPresent()) {
-                        StreamContext streamContext = streamContextOpt.get();
-                        Channel server = streamContext.getServer();
-                        if (server != null && server.isActive()) {
-                            server.config().setOption(ChannelOption.AUTO_READ, true);
-                            server.read();
-                        }
+                    StreamManager.getStreamContext(streamId).ifPresent(streamContext -> {
+                        streamContext.resumeBackendRead(StreamContext.BACKEND_PAUSE_BACKPRESSURE);
                         StreamManager.removePausedStream(tunnel, streamId);
-                    }
+                    });
                 });
             }
         }
         super.channelWritabilityChanged(ctx);
     }
 }
-
-
-

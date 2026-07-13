@@ -65,7 +65,6 @@ public class StreamCloseAction extends StreamBaseAction {
         if (byteBuf != null && byteBuf.refCnt() > 0) {
             byteBuf.release();
         }
-        context.drainMessagesQueue();
         ByteBuf httpFirst = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);
         if (httpFirst != null && httpFirst.refCnt() > 0) {
             ReferenceCountUtil.release(httpFirst);

@@ -364,8 +364,7 @@ public class ControlFrameHandler extends SimpleChannelInboundHandler<TMSPFrame> 
                         if (streamContext != null) {
                             Channel visitor = streamContext.getVisitor();
                             if (visitor != null && visitor.isActive()) {
-                                visitor.config().setOption(ChannelOption.AUTO_READ, true);
-                                visitor.read();
+                                streamContext.resumeVisitorRead(StreamContext.VISITOR_PAUSE_BACKPRESSURE);
                             }
                             streamManager.removePausedStream(channel, streamId);
                         }

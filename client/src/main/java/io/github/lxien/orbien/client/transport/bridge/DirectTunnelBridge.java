@@ -2,6 +2,7 @@ package io.github.lxien.orbien.client.transport.bridge;
 
 import io.github.lxien.orbien.client.statemachine.stream.StreamContext;
 import io.github.lxien.orbien.client.statemachine.stream.StreamEvent;
+import io.github.lxien.orbien.client.statemachine.stream.StreamState;
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.core.transport.direct.DirectTunnelLifecycle;
 import io.netty.buffer.ByteBuf;
@@ -31,8 +32,7 @@ public class DirectTunnelBridge implements TunnelBridge {
             @Override
             public void channelWritabilityChanged(ChannelHandlerContext ctx) {
                 if (ctx.channel().isWritable() && server.isActive()) {
-                    server.config().setOption(ChannelOption.AUTO_READ, true);
-                    server.read();
+                    streamContext.resumeBackendRead(StreamContext.BACKEND_PAUSE_BACKPRESSURE);
                 }
                 ctx.fireChannelWritabilityChanged();
             }
@@ -111,14 +111,21 @@ public class DirectTunnelBridge implements TunnelBridge {
                              java.util.function.Consumer<Boolean> listener) {
         final ByteBuf outbound = sharedWithInbound ? payload.retain() : payload;
         int bytes = outbound.readableBytes();
+        // 投递前计数，避免 backend 断开时 pending 低估导致提前关流
+        streamContext.beforeTunnelWrite();
         Runnable writeTask = () -> {
-            streamContext.beforeTunnelWrite();
+            if (streamContext.getState() == StreamState.CLOSED
+                    || streamContext.getState() == StreamState.FAILED
+                    || !channel.isActive()) {
+                ReferenceCountUtil.safeRelease(outbound);
+                streamContext.afterTunnelWrite();
+                listener.accept(false);
+                return;
+            }
             channel.writeAndFlush(outbound).addListener((ChannelFutureListener) f -> {
                 streamContext.afterTunnelWrite();
-                if (sharedWithInbound && !f.isSuccess()) {
-                    ReferenceCountUtil.release(outbound);
-                } else if (!sharedWithInbound && !f.isSuccess()) {
-                    ReferenceCountUtil.release(outbound);
+                if (!f.isSuccess() && outbound.refCnt() > 0) {
+                    ReferenceCountUtil.safeRelease(outbound);
                 }
                 if (f.isSuccess()) {
                     logger.debug("流 {} 数据转发成功 bytes={}", streamContext.getStreamId(), bytes);

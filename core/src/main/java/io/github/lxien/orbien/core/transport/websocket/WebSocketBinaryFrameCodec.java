@@ -13,9 +13,7 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.util.List;
 
 /**
- * WebSocket 二进制帧与 TMSP/Snappy 字节流之间的桥接编解码器。
- * Netty WebSocket 协议 handler 在握手后向下游传递 {@link WebSocketFrame}，
- * 而 TMSP 栈期望 {@link ByteBuf}，缺少此转换会导致服务端立即关闭连接。
+ * WebSocket 二进制帧与 TMSP 字节流桥接。
  */
 public final class WebSocketBinaryFrameCodec extends CombinedChannelDuplexHandler<
         WebSocketBinaryFrameCodec.Decoder, WebSocketBinaryFrameCodec.Encoder> {
@@ -29,15 +27,13 @@ public final class WebSocketBinaryFrameCodec extends CombinedChannelDuplexHandle
 
         @Override
         protected void decode(ChannelHandlerContext ctx, WebSocketFrame frame, List<Object> out) {
-            if (frame instanceof BinaryWebSocketFrame) {
+            if (frame instanceof BinaryWebSocketFrame && frame.isFinalFragment()) {
                 out.add(frame.content().retain());
                 return;
             }
-            if (!frame.isFinalFragment()) {
-                logger.warn("忽略非 final WebSocket 分片帧");
-                return;
-            }
-            logger.warn("忽略非二进制 WebSocket 帧: {}", frame.getClass().getSimpleName());
+            logger.error("非法 WebSocket 帧，关闭通道 type={} final={} rsv={}",
+                    frame.getClass().getSimpleName(), frame.isFinalFragment(), frame.rsv());
+            ctx.close();
         }
     }
 
