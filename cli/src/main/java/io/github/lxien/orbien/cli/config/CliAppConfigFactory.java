@@ -15,7 +15,7 @@ import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.enums.ProxyStatus;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.github.lxien.orbien.core.utils.StringUtils;
-import io.github.lxien.orbien.credentials.Credentials;
+import io.github.lxien.orbien.cli.credentials.Credentials;
 
 public final class CliAppConfigFactory {
 

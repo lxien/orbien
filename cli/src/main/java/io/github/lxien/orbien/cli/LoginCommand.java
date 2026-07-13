@@ -1,8 +1,8 @@
 package io.github.lxien.orbien.cli;
 
 import io.github.lxien.orbien.cli.support.ServerAddressParser;
-import io.github.lxien.orbien.credentials.Credentials;
-import io.github.lxien.orbien.credentials.CredentialsStore;
+import io.github.lxien.orbien.cli.credentials.Credentials;
+import io.github.lxien.orbien.cli.credentials.CredentialsStore;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 

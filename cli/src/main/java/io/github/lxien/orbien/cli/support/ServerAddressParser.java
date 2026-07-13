@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.cli.support;
 
-import io.github.lxien.orbien.credentials.CredentialsStore;
+import io.github.lxien.orbien.cli.credentials.CredentialsStore;
 import io.github.lxien.orbien.core.utils.StringUtils;
 
 public final class ServerAddressParser {

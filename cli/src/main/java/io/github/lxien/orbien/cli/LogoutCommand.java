@@ -1,6 +1,6 @@
 package io.github.lxien.orbien.cli;
 
-import io.github.lxien.orbien.credentials.CredentialsStore;
+import io.github.lxien.orbien.cli.credentials.CredentialsStore;
 import picocli.CommandLine.Command;
 
 import java.util.concurrent.Callable;

@@ -6,8 +6,8 @@ import io.github.lxien.orbien.client.config.TomlConfigLoader;
 import io.github.lxien.orbien.client.config.domain.AuthConfig;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.core.utils.StringUtils;
-import io.github.lxien.orbien.credentials.Credentials;
-import io.github.lxien.orbien.credentials.CredentialsStore;
+import io.github.lxien.orbien.cli.credentials.Credentials;
+import io.github.lxien.orbien.cli.credentials.CredentialsStore;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
