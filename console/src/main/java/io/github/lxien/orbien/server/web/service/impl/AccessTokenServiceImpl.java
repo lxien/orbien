@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,7 +68,7 @@ public class AccessTokenServiceImpl implements AccessTokenService {
     @Override
     public PageResult<AccessTokenDTO> findByPage(PageQuery pageQuery) {
         int currentPage = Math.max(0, pageQuery.getCurrent() - 1);
-        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize());
+        Pageable pageable = PageRequest.of(currentPage, pageQuery.getSize(), Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<AccessTokenDO> tokenPage = accessTokenRepository.findAll(pageable);
 
         if (tokenPage.isEmpty()) {

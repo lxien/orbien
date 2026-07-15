@@ -31,4 +31,5 @@ public class ProxyListDTO implements Serializable {
     private Integer status;
     private Integer transportProtocol;
     private List<TargetDTO> targets;
+    private ProxyTrafficSnippetDTO traffic;
 }

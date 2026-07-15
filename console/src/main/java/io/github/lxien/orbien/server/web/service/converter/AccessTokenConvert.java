@@ -36,9 +36,15 @@ public interface AccessTokenConvert {
     @IterableMapping(qualifiedByName = "desensitized")
     List<AccessTokenDTO> toDTOList(List<AccessTokenDO> accessTokenDOS);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "token", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     AccessTokenDO toDO(AccessTokenCreateParam param);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "token", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     void updateDO(@MappingTarget AccessTokenDO accessTokenDO, AccessTokenUpdateParam request);
 }

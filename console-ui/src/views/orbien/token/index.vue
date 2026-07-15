@@ -103,7 +103,14 @@ import { ElMessageBox, ElMessage } from 'element-plus'
         {
           prop: 'remark',
           label: '描述',
-          minWidth: 150
+        },
+        {
+          prop: 'createdAt',
+          label: '创建时间',
+        },
+        {
+          prop: 'updatedAt',
+          label: '更新时间',
         },
         {
           prop: 'operation',

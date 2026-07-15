@@ -68,6 +68,7 @@ import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../metrics/metrics-dialog/index.vue'
 import InspectorDrawer from '../inspector/inspector-drawer/index.vue'
 import {renderTransportProtocolTag} from '../proxy/shared/render-transport-protocol-tag'
+import {renderTrafficRate} from '../proxy/shared/render-traffic-rate'
 import {renderTlsCertSummaryTag} from '../https/render-tls-cert-summary'
 import {useProxyStatusToggle} from '../proxy/shared/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
@@ -176,6 +177,13 @@ const {
         formatter: (row: FileShareItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
+        prop: 'traffic',
+        label: '流量',
+        width: 130,
+        formatter: (row: FileShareItem) =>
+          renderTrafficRate(row.traffic, () => handleMetrics(row))
+      },
+      {
         prop: 'authEnabled',
         label: '认证状态',
         formatter: (row: FileShareItem) =>
@@ -199,7 +207,7 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 190,
+        width: 150,
         fixed: 'right',
         formatter: (row: FileShareItem) =>
             h('div', [
@@ -207,11 +215,6 @@ const {
                 type: 'link',
                 text: '设置',
                 onClick: () => handleSettings(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '统计',
-                onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',

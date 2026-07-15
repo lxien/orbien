@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
     title: 'Orbien',
-    tagline: '☕ Orbien 内网穿透平台',
+    tagline: 'Orbien 内网穿透平台',
     favicon: 'img/favicon.ico',
 
     // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -76,7 +76,7 @@ const config: Config = {
             title: '首页',
             logo: {
                 alt: 'orbien',
-                src: 'img/logo.webp',
+                src: 'img/logo.png',
             },
             items: [
                 {

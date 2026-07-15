@@ -61,7 +61,10 @@ public class AccessTokenDO {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+    /**
+     * 更新时间
+     */
     @UpdateTimestamp
-    @Column(name = "updated_at", nullable = true)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 }

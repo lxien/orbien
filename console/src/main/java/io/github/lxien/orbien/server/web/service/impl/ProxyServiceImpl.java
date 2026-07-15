@@ -46,6 +46,7 @@ import io.github.lxien.orbien.server.web.service.CertBindingSyncService;
 import io.github.lxien.orbien.server.web.service.CertBindingService;
 import io.github.lxien.orbien.server.web.service.MetricsService;
 import io.github.lxien.orbien.server.web.service.ProxyService;
+import io.github.lxien.orbien.server.web.service.support.ProxyTrafficEnricher;
 import io.github.lxien.orbien.server.web.service.support.TargetHealthEnricher;
 import io.github.lxien.orbien.server.web.service.converter.*;
 import io.github.lxien.orbien.server.web.service.converter.ProxyConvert;
@@ -126,6 +127,8 @@ public class ProxyServiceImpl implements ProxyService {
     private CertBindingService certBindingService;
     @Autowired
     private TargetHealthEnricher targetHealthEnricher;
+    @Autowired
+    private ProxyTrafficEnricher proxyTrafficEnricher;
     @Autowired
     private ProxyRuntimeSyncService proxyRuntimeSyncService;
     @Autowired
@@ -276,6 +279,7 @@ public class ProxyServiceImpl implements ProxyService {
             res.add(httpsDTO);
         }
         targetHealthEnricher.enrichBatch(targetDtoMap);
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -320,6 +324,7 @@ public class ProxyServiceImpl implements ProxyService {
             res.add(httpDTO);
         }
         targetHealthEnricher.enrichBatch(targetDtoMap);
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -492,6 +497,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setAuthUserCount(userCountMap.getOrDefault(proxyDO.getId(), 0L).intValue());
             res.add(dto);
         }
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -620,6 +626,7 @@ public class ProxyServiceImpl implements ProxyService {
             dto.setAuthUserCount(userCountMap.getOrDefault(proxyDO.getId(), 0L).intValue());
             res.add(dto);
         }
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -1300,6 +1307,7 @@ public class ProxyServiceImpl implements ProxyService {
             res.add(tcpListDTO);
         }
         targetHealthEnricher.enrichBatch(targetDtoMap);
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 
@@ -1324,6 +1332,7 @@ public class ProxyServiceImpl implements ProxyService {
             udpListDTO.setTargets(targets);
             res.add(udpListDTO);
         }
+        proxyTrafficEnricher.enrich(res);
         return PageResult.wrap(resultPage, res);
     }
 

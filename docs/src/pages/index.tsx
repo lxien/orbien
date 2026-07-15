@@ -123,7 +123,7 @@ function FeatureIcon({id}: { id: (typeof features)[number]['id'] }) {
 
 export default function Home() {
     const {siteConfig} = useDocusaurusContext();
-    const logoUrl = useBaseUrl('img/logo.webp');
+    const logoUrl = useBaseUrl('img/logo.png');
 
     return (
         <Layout title={siteConfig.title} description={siteConfig.tagline}>

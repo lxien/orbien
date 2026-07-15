@@ -48,24 +48,27 @@
             <span class="setting-name">数据压缩</span>
             <ElSwitch v-model="form.compress"/>
           </div>
-          <p class="setting-hint">开启后仅压缩大于 1KB 的s数据包</p>
-        </div>
 
-        <div v-if="form.compress" class="setting-item setting-item--nested">
-          <span class="setting-name">压缩算法</span>
-          <ElSelect v-model="form.compressAlgorithm" class="algorithm-select">
-            <ElOption
-                v-for="item in algorithmOptions"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-            >
-              <div class="algorithm-option">
-                <span class="algorithm-option__name">{{ item.label }}</span>
-                <span class="algorithm-option__desc">{{ item.desc }}</span>
+          <Transition name="compress-expand">
+            <div v-if="form.compress" class="compress-panel">
+              <div class="algorithm-grid" role="radiogroup" aria-label="压缩算法">
+                <button
+                    v-for="item in algorithmOptions"
+                    :key="item.value"
+                    type="button"
+                    class="algorithm-card"
+                    :class="{ 'algorithm-card--active': form.compressAlgorithm === item.value }"
+                    role="radio"
+                    :aria-checked="form.compressAlgorithm === item.value"
+                    @click="form.compressAlgorithm = item.value"
+                >
+                  <span class="algorithm-card__name">{{ item.label }}</span>
+                  <span class="algorithm-card__tag">{{ item.tag }}</span>
+                </button>
               </div>
-            </ElOption>
-          </ElSelect>
+              <p class="setting-hint">仅压缩大于 1KB 的数据包</p>
+            </div>
+          </Transition>
         </div>
       </div>
     </section>
@@ -109,9 +112,9 @@ const form = reactive({
 })
 
 const algorithmOptions = [
-  {value: 'snappy', label: 'Snappy', desc: '兼容性好，适合通用文本流量'},
-  {value: 'lz4', label: 'LZ4', desc: '压缩速度快，CPU 开销更低'},
-  {value: 'zstd', label: 'Zstd', desc: '压缩率高，适合带宽敏感场景'}
+  {value: 'snappy', label: 'Snappy', tag: '均衡'},
+  {value: 'lz4', label: 'LZ4', tag: '速度'},
+  {value: 'zstd', label: 'Zstd', tag: '压缩率'}
 ]
 
 const isUdpProtocol = computed(() => props.protocol === ProtocolType.UDP)
@@ -361,44 +364,80 @@ watch(
   gap: 12px;
 }
 
-.setting-item--nested {
-  padding-left: 12px;
-  border-left: 2px solid var(--el-color-primary-light-7);
+.compress-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.algorithm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.algorithm-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--el-border-color);
+  border-radius: 8px;
+  background: var(--el-bg-color);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: var(--el-color-primary-light-5);
+  }
+
+  &--active {
+    border-color: var(--el-color-primary);
+    box-shadow: 0 0 0 1px var(--el-color-primary-light-7);
+    background: var(--el-color-primary-light-9);
+  }
+}
+
+.algorithm-card__name {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.algorithm-card__tag {
+  font-size: 11px;
+  color: var(--el-text-color-secondary);
+  line-height: 1.3;
 }
 
 .setting-hint {
   margin: 0;
   font-size: 12px;
   color: var(--el-text-color-secondary);
-  line-height: 1.5;
-}
-
-.algorithm-select {
-  width: 100%;
-}
-
-.algorithm-option {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 2px 0;
-}
-
-.algorithm-option__name {
-  font-weight: 500;
-}
-
-.algorithm-option__desc {
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
+  line-height: 1.4;
 }
 
 .setting-name {
   font-weight: 500;
 }
 
+.compress-expand-enter-active,
+.compress-expand-leave-active {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.compress-expand-enter-from,
+.compress-expand-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
 @media (max-width: 720px) {
-  .protocol-grid {
+  .protocol-grid,
+  .algorithm-grid {
     grid-template-columns: 1fr;
   }
 }

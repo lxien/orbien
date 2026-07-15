@@ -65,6 +65,7 @@ import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../metrics/metrics-dialog/index.vue'
 import {renderTargetTags} from '../proxy/shared/render-target-tag'
 import {renderTransportProtocolTag} from '../proxy/shared/render-transport-protocol-tag'
+import {renderTrafficRate} from '../proxy/shared/render-traffic-rate'
 import {useProxyStatusToggle} from '../proxy/shared/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -132,6 +133,13 @@ const {
         formatter: (row: UdpProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
+        prop: 'traffic',
+        label: '流量',
+        width: 130,
+        formatter: (row: UdpProxyItem) =>
+          renderTrafficRate(row.traffic, () => handleMetrics(row))
+      },
+      {
         prop: 'status',
         label: '状态',
         width: 80,
@@ -146,7 +154,7 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 190,
+        width: 150,
         fixed: 'right',
         formatter: (row: UdpProxyItem) =>
             h('div', [
@@ -154,11 +162,6 @@ const {
                 type: 'link',
                 text: '设置',
                 onClick: () => handleSettings(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '统计',
-                onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',

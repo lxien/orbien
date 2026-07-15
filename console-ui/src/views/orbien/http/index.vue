@@ -70,9 +70,10 @@ import HttpDialog from './modules/http-dialog.vue'
 import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../metrics/metrics-dialog/index.vue'
 import InspectorDrawer from '../inspector/inspector-drawer/index.vue'
-import {renderTargetTags} from '../proxy/shared/render-target-tag'
-import {renderTransportProtocolTag} from '../proxy/shared/render-transport-protocol-tag'
-import {useProxyStatusToggle} from '../proxy/shared/use-proxy-status-toggle'
+  import { renderTargetTags } from '../proxy/shared/render-target-tag'
+  import { renderTransportProtocolTag } from '../proxy/shared/render-transport-protocol-tag'
+  import { renderTrafficRate } from '../proxy/shared/render-traffic-rate'
+  import { useProxyStatusToggle } from '../proxy/shared/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
 import {ProtocolType, ProxyStatus} from '@/enums/orbien/business'
@@ -166,6 +167,13 @@ const {
         formatter: (row: HttpProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
+        prop: 'traffic',
+        label: '流量',
+        width: 130,
+        formatter: (row: HttpProxyItem) =>
+          renderTrafficRate(row.traffic, () => handleMetrics(row))
+      },
+      {
         prop: 'status',
         label: '状态',
         width: 80,
@@ -180,7 +188,7 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 230,
+        width: 200,
         fixed: 'right',
         formatter: (row: HttpProxyItem) =>
             h('div', [
@@ -191,12 +199,7 @@ const {
               }),
               h(ArtButtonTable, {
                 type: 'link',
-                text: '统计',
-                onClick: () => handleMetrics(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '流量',
+                text: '抓包',
                 onClick: () => handleInspector(row)
               }),
               h(ArtButtonTable, {

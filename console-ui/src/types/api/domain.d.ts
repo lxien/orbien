@@ -21,9 +21,10 @@ declare namespace Api.Domain {
     id: number
     fullDomain: string
     domain: string
-    baseDomain?: string
+    rootDomain?: string
     domainType: number
     proxyId: string
     proxyName?: string
+    protocol?: number | null
   }
 }

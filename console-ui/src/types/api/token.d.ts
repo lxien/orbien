@@ -4,8 +4,8 @@ declare namespace Api.AccessToken {
     name: string
     token: string
     remark?: string
-    createdAt: string
-    updatedAt: string
+    createdAt?: string
+    updatedAt?: string
   }
 
   interface AccessTokenCreateParam {

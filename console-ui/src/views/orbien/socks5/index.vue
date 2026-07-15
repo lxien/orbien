@@ -66,6 +66,7 @@ import Socks5Dialog from './modules/socks5-dialog.vue'
 import PluginDialog from '../plugin/index.vue'
 import MetricsDialog from '../metrics/metrics-dialog/index.vue'
 import {renderTransportProtocolTag} from '../proxy/shared/render-transport-protocol-tag'
+import {renderTrafficRate} from '../proxy/shared/render-traffic-rate'
 import {useProxyStatusToggle} from '../proxy/shared/use-proxy-status-toggle'
 import {ElTag, ElSwitch, ElMessage, ElMessageBox, ElSpace} from 'element-plus'
 import {DialogType} from '@/types'
@@ -144,6 +145,13 @@ const {
         formatter: (row: Socks5ProxyItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
+        prop: 'traffic',
+        label: '流量',
+        width: 130,
+        formatter: (row: Socks5ProxyItem) =>
+          renderTrafficRate(row.traffic, () => handleMetrics(row))
+      },
+      {
         prop: 'status',
         label: '状态',
         width: 80,
@@ -158,7 +166,7 @@ const {
       {
         prop: 'operation',
         label: '操作',
-        width: 190,
+        width: 150,
         fixed: 'right',
         formatter: (row: Socks5ProxyItem) =>
             h('div', [
@@ -166,11 +174,6 @@ const {
                 type: 'link',
                 text: '设置',
                 onClick: () => handleSettings(row)
-              }),
-              h(ArtButtonTable, {
-                type: 'link',
-                text: '统计',
-                onClick: () => handleMetrics(row)
               }),
               h(ArtButtonTable, {
                 type: 'link',

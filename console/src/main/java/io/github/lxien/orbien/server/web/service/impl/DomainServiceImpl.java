@@ -105,6 +105,9 @@ public class DomainServiceImpl implements DomainService {
             ProxyDO proxyDO = proxyMap.get(domainDO.getProxyId());
             if (proxyDO != null) {
                 dto.setProxyName(proxyDO.getName());
+                if (proxyDO.getProtocol() != null) {
+                    dto.setProtocol(proxyDO.getProtocol().getCode());
+                }
             }
             return dto;
         }).toList();

@@ -13,19 +13,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-package io.github.lxien.orbien.server.web.dto.domain;
+package io.github.lxien.orbien.server.web.dto.proxy;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
+/**
+ * 列表页瞬时上下行速率
+ */
 @Data
-public class UsedDomainDTO {
-    private Long id;
-    private String fullDomain;
-    private String domain;
-    private String rootDomain;
-    private Integer domainType;
-    private String proxyId;
-    private String proxyName;
-    private Integer protocol;
+public class ProxyTrafficSnippetDTO implements Serializable {
+    /**
+     * 上行速率（字节/秒）
+     */
+    private double upRate;
+    /**
+     * 下行速率（字节/秒）
+     */
+    private double downRate;
 }

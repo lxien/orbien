@@ -56,6 +56,13 @@ declare namespace Api.Proxy {
         /** 数据隧道传输协议：1 TCP，2 WebSocket，3 QUIC */
         transportProtocol?: number
         targets: TargetDTO[]
+        traffic?: ProxyTrafficSnippet
+    }
+
+    /** 列表流量摘要 */
+    interface ProxyTrafficSnippet {
+        upRate: number
+        downRate: number
     }
 
     /** HTTP 代理列表 */
