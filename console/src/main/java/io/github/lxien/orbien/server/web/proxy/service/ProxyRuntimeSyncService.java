@@ -55,9 +55,6 @@ public class ProxyRuntimeSyncService {
     @Autowired
     private IpAccessChecker ipAccessChecker;
 
-    /**
-     * 公网入口策略（访问控制、Basic Auth）变更后刷新服务端缓存。
-     */
     public void refreshServerEntryPolicy(String proxyId) {
         if (proxyId == null) {
             return;

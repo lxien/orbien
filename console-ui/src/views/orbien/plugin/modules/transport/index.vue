@@ -66,7 +66,6 @@
                   <span class="algorithm-card__tag">{{ item.tag }}</span>
                 </button>
               </div>
-              <p class="setting-hint">仅压缩大于 1KB 的数据包</p>
             </div>
           </Transition>
         </div>

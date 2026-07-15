@@ -10,7 +10,7 @@
     <div v-loading="configLoading" class="inspector-page">
       <div class="inspector-toolbar">
         <div class="inspector-toolbar__left">
-          <span class="inspector-toolbar__label">流量抓包</span>
+          <span class="inspector-toolbar__label">抓包</span>
           <ElSwitch
               v-model="inspectorEnabled"
               :loading="switchLoading"
@@ -234,7 +234,7 @@ const handleToggleInspector = async (enabled: boolean) => {
       inspectorEnabled: enabled
     })
     inspectorEnabled.value = config.inspectorEnabled
-    ElMessage.success(config.inspectorEnabled ? '已开启流量抓包' : '已关闭流量抓包')
+    ElMessage.success(config.inspectorEnabled ? '已开启抓包' : '已关闭抓包')
   } catch {
     inspectorEnabled.value = !enabled
   } finally {
