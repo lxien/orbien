@@ -166,7 +166,15 @@
       </div>
     </div>
 
-    <p class="text-sm text-gray-500">可用变量：{{ VAR_HINT }}</p>
+    <div class="mt-4 text-sm text-gray-500 space-y-1">
+      <p class="font-medium text-gray-600">动作说明</p>
+      <ul class="list-disc pl-5 space-y-0.5">
+        <li><span class="font-medium text-gray-600">SET</span>：覆盖同名头；不存在则创建</li>
+        <li><span class="font-medium text-gray-600">ADD</span>：仅当不存在时写入，已有则跳过</li>
+        <li><span class="font-medium text-gray-600">REMOVE</span>：删除同名头</li>
+      </ul>
+      <p class="pt-1">可用变量：{{ VAR_HINT }}</p>
+    </div>
   </div>
 </template>
 
