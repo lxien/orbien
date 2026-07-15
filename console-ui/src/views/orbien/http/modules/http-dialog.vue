@@ -73,17 +73,7 @@
         </ElRow>
       </BackendServiceField>
 
-      <ElFormItem label="带宽限制" prop="limitTotal">
-        <el-input
-            v-model.number="formData.limitTotal"
-            placeholder="总带宽"
-            type="number"
-            :precision="0"
-            style="width: 200px"
-        >
-          <template #append>Mbps</template>
-        </el-input>
-      </ElFormItem>
+      <BandwidthLimitField v-model="formData.limitTotal"/>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -111,6 +101,12 @@ import {
 import SubdomainBindingRows from '@/views/orbien/proxy/shared/subdomain-binding-rows.vue'
 import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-field.vue'
 import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
+import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
+import {
+  LIMIT_TOTAL_RULES,
+  toLimitTotalPayload,
+  type LimitTotalMbps
+} from '@/views/orbien/proxy/shared/bandwidth-limit'
 import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
@@ -124,7 +120,7 @@ interface FormDataState {
   customDomains: string
   localHost: string
   localPort: number | undefined
-  limitTotal: number
+  limitTotal: LimitTotalMbps
 }
 
 interface Props {
@@ -172,7 +168,7 @@ const createDefaultFormData = (): FormDataState => ({
   customDomains: '',
   localHost: '127.0.0.1',
   localPort: undefined,
-  limitTotal: 1
+  limitTotal: undefined
 })
 
 const formData = reactive<FormDataState>(createDefaultFormData())
@@ -215,10 +211,7 @@ const rules = computed<FormRules>(() => ({
           {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
         ]
       }),
-  limitTotal: [
-    {required: true, message: '请输入带宽限制', trigger: 'blur'},
-    {type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur'}
-  ]
+  limitTotal: LIMIT_TOTAL_RULES
 }))
 
 const parseLines = (value: string): string[] =>
@@ -245,7 +238,7 @@ const applyDetail = (detail: Api.Proxy.HttpProxyDetailDTO) => {
     customDomains: (detail.customDomains || []).join('\n'),
     localHost: detail.localHost || '127.0.0.1',
     localPort: detail.localPort,
-    limitTotal: detail.limitTotal ?? 1
+    limitTotal: detail.limitTotal ?? undefined
   })
   refreshSubdomainBindings()
 }
@@ -391,7 +384,7 @@ const handleSubmit = async () => {
       domainType: parseInt(formData.domainType, 10),
       localHost: formData.localHost,
       localPort: formData.localPort!,
-      limitTotal: formData.limitTotal,
+      limitTotal: toLimitTotalPayload(formData.limitTotal),
       ...buildDomainPayload()
     }
 

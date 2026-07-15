@@ -1,7 +1,6 @@
 package io.github.lxien.orbien.server.transport.traffic;
 
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
-import io.github.lxien.orbien.server.statemachine.stream.StreamEvent;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoop;
@@ -54,13 +53,6 @@ public final class StreamTrafficShaper {
                 readGate.resume(context.getVisitor(), VisitorReadGate.PAUSE_RATE_LIMIT,
                         context.canResumeVisitorRead());
             }
-
-            @Override
-            public void onUploadRejected() {
-                context.rejectVisitorUpload();
-                context.abortLocalForwarding();
-                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
-            }
         });
         this.downloadShaper = new DownloadTrafficShaper(limiter, new DownloadTrafficShaper.DownloadCallbacks() {
             @Override
@@ -91,12 +83,6 @@ public final class StreamTrafficShaper {
             @Override
             public void resumeRemoteDownload() {
                 context.resumeRemoteProducer(StreamContext.REMOTE_PAUSE_RATE_LIMIT);
-            }
-
-            @Override
-            public void onDownloadRejected() {
-                context.abortLocalForwarding();
-                context.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
             }
         });
     }

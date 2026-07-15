@@ -8,31 +8,36 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * 访客下载方向整形。
- * <p>有排队即 pause 远端；队列清空后仍延迟到下一令牌窗口再 resume，
- * 避免 WebSocket 上 PAUSE/RESUME 抖动把 TLS 出站缓冲灌爆。
- */
+
 final class DownloadTrafficShaper {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(DownloadTrafficShaper.class);
-    private static final int MAX_QUEUE_FRAMES = 64;
-    private static final long MAX_QUEUE_BYTES = 512 * 1024L;
-    /**
-     * 至少等待一个令牌窗口再 RESUME，避免 nanosToWait(1)==0 时立刻放开灌爆 WS
-     */
-    private static final long MIN_RESUME_HOLD_MS = 50;
+
+    private static final long MIN_QUEUE_BYTES = 2 * 1024 * 1024L;
+    private static final long MAX_QUEUE_BYTES_CAP = 16 * 1024 * 1024L;
+    private static final int MAX_QUEUE_FRAMES = 4096;
+
+    private static final long EMERGENCY_DROP_BYTES = 32 * 1024 * 1024L;
 
     private final BandwidthLimiter limiter;
     private final TrafficBufferQueue queue = new TrafficBufferQueue();
     private final AtomicBoolean drainScheduled = new AtomicBoolean();
-    private final AtomicBoolean resumeScheduled = new AtomicBoolean();
+    private final AtomicInteger epoch = new AtomicInteger();
     private final DownloadCallbacks callbacks;
+    private final long maxQueueBytes;
+    private final long highWaterBytes;
+    private final long lowWaterBytes;
 
     DownloadTrafficShaper(BandwidthLimiter limiter, DownloadCallbacks callbacks) {
         this.limiter = limiter;
         this.callbacks = callbacks;
+        long bps = limiter != null ? Math.max(0, limiter.getBytesPerSecond()) : 0;
+        // 约 8 秒带宽，夹在 [2MB, 16MB]
+        this.maxQueueBytes = Math.min(MAX_QUEUE_BYTES_CAP, Math.max(MIN_QUEUE_BYTES, bps * 8));
+        this.highWaterBytes = Math.max(256 * 1024L, maxQueueBytes / 2);
+        this.lowWaterBytes = Math.max(64 * 1024L, maxQueueBytes / 8);
     }
 
     /**
@@ -49,6 +54,11 @@ final class DownloadTrafficShaper {
         }
         if (callbacks.isAborted()) {
             ReferenceCountUtil.release(payload);
+            return;
+        }
+
+        if (!queue.isEmpty()) {
+            enqueueAll(payload);
             return;
         }
 
@@ -71,24 +81,49 @@ final class DownloadTrafficShaper {
         int remainderIndex = readerIndex + allowed;
         ByteBuf queued = payload.retainedSlice(remainderIndex, remainderBytes);
         ReferenceCountUtil.release(payload);
-        if (!queue.offer(queued, MAX_QUEUE_FRAMES, MAX_QUEUE_BYTES)) {
-            ReferenceCountUtil.release(queued);
-            logger.warn("[限流][下载] 队列溢出 streamId={} queueBytes={}",
-                    callbacks.streamId(), queue.bytes());
-            callbacks.onDownloadRejected();
+        enqueueAll(queued);
+    }
+
+    private void enqueueAll(ByteBuf payload) {
+        if (payload == null || !payload.isReadable()) {
+            ReferenceCountUtil.release(payload);
             return;
         }
+        if (callbacks.isAborted()) {
+            ReferenceCountUtil.release(payload);
+            return;
+        }
+        int enqueuedBytes = payload.readableBytes();
+        if (queue.offer(payload, MAX_QUEUE_FRAMES, maxQueueBytes)) {
+            afterEnqueue(enqueuedBytes);
+            return;
+        }
+        if (queue.bytes() + enqueuedBytes <= EMERGENCY_DROP_BYTES
+                && queue.offer(payload, MAX_QUEUE_FRAMES * 2, EMERGENCY_DROP_BYTES)) {
+            logger.warn("[限流][下载] 队列超过软上限，继续背压 streamId={} queueBytes={} softMax={}",
+                    callbacks.streamId(), queue.bytes(), maxQueueBytes);
+            afterEnqueue(enqueuedBytes);
+            return;
+        }
+        ReferenceCountUtil.release(payload);
+        logger.error("[限流][下载] 队列触及内存硬顶，丢弃本块但保持连接 streamId={} dropped={} queueBytes={}",
+                callbacks.streamId(), enqueuedBytes, queue.bytes());
+        callbacks.pauseRemoteDownload();
+        scheduleDrain(limiter.scheduleWaitMs(TrafficDirection.DOWNLOAD));
+    }
+
+    private void afterEnqueue(int enqueuedBytes) {
         logger.debug("[限流][下载] 入队 streamId={} bytes={} queueBytes={}",
-                callbacks.streamId(), remainderBytes, queue.bytes());
+                callbacks.streamId(), enqueuedBytes, queue.bytes());
         callbacks.pauseRemoteDownload();
         scheduleDrain(limiter.scheduleWaitMs(TrafficDirection.DOWNLOAD));
     }
 
     void drain() {
         drainScheduled.set(false);
+        int currentEpoch = epoch.get();
         if (callbacks.isAborted()) {
             queue.clear();
-            resumeScheduled.set(false);
             callbacks.resumeRemoteDownload();
             return;
         }
@@ -115,16 +150,24 @@ final class DownloadTrafficShaper {
                         callbacks.streamId(), slice.readableBytes(), queue.bytes());
                 callbacks.forwardDownload(slice, false);
             }
+            long queued = queue.bytes();
+            if (queued <= lowWaterBytes) {
+                callbacks.resumeRemoteDownload();
+            } else if (queued >= highWaterBytes) {
+                callbacks.pauseRemoteDownload();
+            }
         }
-        // 队列已空：保持 PAUSE 到下一令牌窗口，再决定是否 RESUME
-        callbacks.pauseRemoteDownload();
-        scheduleDeferredResume();
+        if (currentEpoch != epoch.get()) {
+            return;
+        }
+        logger.debug("[限流][下载] 队列排空，恢复远端 streamId={}", callbacks.streamId());
+        callbacks.resumeRemoteDownload();
     }
 
     void clear() {
+        epoch.incrementAndGet();
         queue.clear();
         drainScheduled.set(false);
-        resumeScheduled.set(false);
         callbacks.resumeRemoteDownload();
     }
 
@@ -138,46 +181,22 @@ final class DownloadTrafficShaper {
         if (!drainScheduled.compareAndSet(false, true)) {
             return;
         }
+        int scheduledEpoch = epoch.get();
         loop.schedule(() -> {
+            if (scheduledEpoch != epoch.get()) {
+                drainScheduled.set(false);
+                return;
+            }
             try {
                 drain();
             } catch (Throwable t) {
                 drainScheduled.set(false);
                 logger.error("[限流][下载] drain 异常 streamId={}", callbacks.streamId(), t);
-                if (!queue.isEmpty()) {
+                if (!queue.isEmpty() && scheduledEpoch == epoch.get()) {
                     scheduleDrain(Math.max(1, waitMs));
                 }
             }
         }, Math.max(1, waitMs), TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * 队列排空后延迟 RESUME，等令牌回补，避免立刻放开导致客户端在 WS+TLS 上突发灌缓冲
-     */
-    private void scheduleDeferredResume() {
-        EventLoop loop = callbacks.eventLoop();
-        if (loop == null || loop.isShuttingDown()) {
-            callbacks.resumeRemoteDownload();
-            return;
-        }
-        if (!resumeScheduled.compareAndSet(false, true)) {
-            return;
-        }
-        long waitMs = Math.max(MIN_RESUME_HOLD_MS, limiter.scheduleWaitMs(TrafficDirection.DOWNLOAD));
-        loop.schedule(() -> {
-            resumeScheduled.set(false);
-            if (callbacks.isAborted()) {
-                callbacks.resumeRemoteDownload();
-                return;
-            }
-            if (!queue.isEmpty()) {
-                scheduleDrain(1);
-                return;
-            }
-            logger.debug("[限流][下载] 延迟恢复远端 streamId={} holdMs={}",
-                    callbacks.streamId(), waitMs);
-            callbacks.resumeRemoteDownload();
-        }, waitMs, TimeUnit.MILLISECONDS);
     }
 
     interface DownloadCallbacks {
@@ -192,7 +211,5 @@ final class DownloadTrafficShaper {
         void pauseRemoteDownload();
 
         void resumeRemoteDownload();
-
-        void onDownloadRejected();
     }
 }

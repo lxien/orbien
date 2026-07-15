@@ -77,19 +77,7 @@
           </ElButton>
         </div>
       </ElFormItem>
-      <ElFormItem label="带宽限制" prop="limitTotal">
-        <el-input
-            v-model.number="formData.limitTotal"
-            placeholder="总带宽"
-            :controls="false"
-            :min="1"
-            type="number"
-            :precision="0"
-            style="width: 200px"
-        >
-          <template #append>Mbps</template>
-        </el-input>
-      </ElFormItem>
+      <BandwidthLimitField v-model="formData.limitTotal"/>
     </ElForm>
     <template #footer>
       <div class="dialog-footer">
@@ -112,6 +100,12 @@ import {PortPoolType} from '@/enums/orbien/business'
 import {formatAgentOptionLabel} from '@/views/orbien/agent/shared/format-agent-option'
 import BackendServiceField from '@/views/orbien/proxy/shared/backend-service-field.vue'
 import LocalPortInput from '@/views/orbien/proxy/shared/local-port-input.vue'
+import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
+import {
+  LIMIT_TOTAL_RULES,
+  toLimitTotalPayload,
+  type LimitTotalMbps
+} from '@/views/orbien/proxy/shared/bandwidth-limit'
 import {COMMON_LOCAL_PORT_PRESETS} from '@/views/orbien/proxy/shared/port-presets'
 import {isClusterMode} from '@/views/orbien/proxy/shared/is-cluster-mode'
 
@@ -122,7 +116,7 @@ interface FormDataState {
   name: string
   localHost: string
   localPort: number | undefined
-  limitTotal: number
+  limitTotal: LimitTotalMbps
 }
 
 interface Props {
@@ -172,7 +166,7 @@ const DEFAULT_FORM_DATA: FormDataState = {
   name: '',
   localHost: '127.0.0.1',
   localPort: undefined,
-  limitTotal: 1
+  limitTotal: undefined
 }
 const formData = reactive<FormDataState>({...DEFAULT_FORM_DATA})
 const targets = ref<Api.Proxy.TargetDTO[]>([])
@@ -211,10 +205,7 @@ const rules = computed<FormRules>(() => ({
           {min: 1, max: 65535, message: '端口必须在 1-65535 之间', trigger: 'blur'}
         ]
       }),
-  limitTotal: [
-    {required: true, message: '请输入带宽限制', trigger: 'blur'},
-    {type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur'}
-  ]
+  limitTotal: LIMIT_TOTAL_RULES
 }))
 
 const parseRemotePort = (): number | undefined => {
@@ -298,7 +289,7 @@ const initFormData = async () => {
         name: proxyDetail.name || '',
         localHost: proxyDetail.localHost || '127.0.0.1',
         localPort: proxyDetail.localPort,
-        limitTotal: proxyDetail.limitTotal ?? 1
+        limitTotal: proxyDetail.limitTotal ?? undefined
       })
       const displayPort = proxyDetail.remotePort ?? proxyDetail.listenPort
       remotePortInput.value = displayPort != null ? String(displayPort) : ''
@@ -356,7 +347,7 @@ const handleSubmit = async () => {
           name: formData.name,
           localHost: formData.localHost,
           localPort: formData.localPort!,
-          limitTotal: formData.limitTotal,
+          limitTotal: toLimitTotalPayload(formData.limitTotal),
           ...(remotePort != null ? {remotePort} : {})
         }
 

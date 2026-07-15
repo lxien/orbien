@@ -140,6 +140,8 @@
         </ElInput>
       </ElFormItem>
 
+      <BandwidthLimitField v-model="formData.limitTotal"/>
+
       <ElFormItem label="操作权限">
         <ElSpace wrap>
           <ElCheckbox v-model="formData.allowUpload">允许上传</ElCheckbox>
@@ -174,6 +176,12 @@ import {
   buildSubdomainBindingsPayload
 } from '@/views/orbien/proxy/shared/use-root-domain-options'
 import SubdomainBindingRows from '@/views/orbien/proxy/shared/subdomain-binding-rows.vue'
+import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
+import {
+  LIMIT_TOTAL_RULES,
+  toLimitTotalPayload,
+  type LimitTotalMbps
+} from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'FileShareDialog'})
 
@@ -191,6 +199,7 @@ interface FormDataState {
   customDomains: string
   authEnabled: boolean
   maxUploadSizeMb: number
+  limitTotal: LimitTotalMbps
   allowUpload: boolean
   allowDelete: boolean
   allowMkdir: boolean
@@ -248,6 +257,7 @@ const createDefaultFormData = (): FormDataState => ({
   customDomains: '',
   authEnabled: false,
   maxUploadSizeMb: DEFAULT_MAX_UPLOAD_MB,
+  limitTotal: undefined,
   allowUpload: true,
   allowDelete: true,
   allowMkdir: true,
@@ -285,7 +295,8 @@ const rules = computed<FormRules>(() => ({
   maxUploadSizeMb: [
     {required: true, message: '请输入上传限制', trigger: 'blur'},
     {type: 'number', min: 1, message: '上传限制必须大于 0', trigger: 'blur'}
-  ]
+  ],
+  limitTotal: LIMIT_TOTAL_RULES
 }))
 
 const resetSubdomainErrors = () => {
@@ -382,6 +393,7 @@ const applyDetail = (detail: Api.FileShare.FileShareDetailDTO) => {
     customDomains: (detail.customDomains || []).join('\n'),
     authEnabled: detail.authEnabled ?? false,
     maxUploadSizeMb: bytesToMb(detail.maxUploadSize),
+    limitTotal: detail.limitTotal ?? undefined,
     allowUpload: detail.allowUpload ?? true,
     allowDelete: detail.allowDelete ?? true,
     allowMkdir: detail.allowMkdir ?? true,
@@ -505,7 +517,7 @@ const handleSubmit = async () => {
       name: formData.name,
       domainType: parseInt(formData.domainType, 10),
       rootPath: formData.rootPath.trim(),
-      limitTotal: 1,
+      limitTotal: toLimitTotalPayload(formData.limitTotal),
       authEnabled: formData.authEnabled,
       authUsers: buildAuthPayload(),
       maxUploadSize: mbToBytes(formData.maxUploadSizeMb),

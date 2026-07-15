@@ -298,7 +298,7 @@ declare namespace Api.Proxy {
         customDomains?: string[]
         localHost: string
         localPort: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** HTTP 代理更新参数 */
@@ -310,7 +310,7 @@ declare namespace Api.Proxy {
         customDomains?: string[]
         localHost: string
         localPort: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** HTTPS 代理创建参数 */
@@ -323,7 +323,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         forceHttps?: boolean
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** HTTPS 代理更新参数 */
@@ -336,7 +336,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         forceHttps?: boolean
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** TCP 代理创建参数 */
@@ -346,7 +346,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** TCP 代理更新参数 */
@@ -356,7 +356,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** UDP 代理创建参数 */
@@ -366,7 +366,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** UDP 代理更新参数 */
@@ -376,7 +376,7 @@ declare namespace Api.Proxy {
         localHost: string
         localPort: number
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
     }
 
     /** SOCKS5 代理创建参数 */
@@ -384,7 +384,7 @@ declare namespace Api.Proxy {
         agentId: string
         name: string
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
         authEnabled?: boolean
         authUsers?: Socks5AuthUserParam[]
     }
@@ -394,7 +394,7 @@ declare namespace Api.Proxy {
         id: string
         name: string
         remotePort?: number
-        limitTotal?: number
+        limitTotal?: number | null
         authEnabled?: boolean
         authUsers?: Socks5AuthUserParam[]
     }

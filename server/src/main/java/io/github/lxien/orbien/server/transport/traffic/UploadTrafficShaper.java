@@ -8,25 +8,28 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * 访客上传方向（limit_out）整形
- */
 final class UploadTrafficShaper {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(UploadTrafficShaper.class);
-    private static final int MAX_QUEUE_FRAMES = 256;
-    private static final long MAX_QUEUE_BYTES = 2 * 1024 * 1024L;
-    private static final long HARD_REJECT_WAIT_MS = 500;
+    private static final long MIN_QUEUE_BYTES = 1 * 1024 * 1024L;
+    private static final long MAX_QUEUE_BYTES_CAP = 8 * 1024 * 1024L;
+    private static final int MAX_QUEUE_FRAMES = 4096;
+    private static final long EMERGENCY_DROP_BYTES = 16 * 1024 * 1024L;
 
     private final BandwidthLimiter limiter;
     private final TrafficBufferQueue queue = new TrafficBufferQueue();
     private final AtomicBoolean drainScheduled = new AtomicBoolean();
+    private final AtomicInteger epoch = new AtomicInteger();
     private final UploadCallbacks callbacks;
+    private final long maxQueueBytes;
 
     UploadTrafficShaper(BandwidthLimiter limiter, UploadCallbacks callbacks) {
         this.limiter = limiter;
         this.callbacks = callbacks;
+        long bps = limiter != null ? Math.max(0, limiter.getBytesPerSecond()) : 0;
+        this.maxQueueBytes = Math.min(MAX_QUEUE_BYTES_CAP, Math.max(MIN_QUEUE_BYTES, bps * 4));
     }
 
     /**
@@ -66,6 +69,12 @@ final class UploadTrafficShaper {
             ReferenceCountUtil.release(payload);
             return;
         }
+
+        if (!queue.isEmpty()) {
+            enqueueAll(payload);
+            return;
+        }
+
         int readable = payload.readableBytes();
         int readerIndex = payload.readerIndex();
         int allowed = limiter.consumeUpTo(TrafficDirection.UPLOAD, readable);
@@ -89,25 +98,47 @@ final class UploadTrafficShaper {
         int remainderIndex = readerIndex + allowed;
         ByteBuf queued = payload.retainedSlice(remainderIndex, remainderBytes);
         ReferenceCountUtil.release(payload);
+        enqueueAll(queued);
+    }
+
+    private void enqueueAll(ByteBuf payload) {
+        if (payload == null || !payload.isReadable()) {
+            ReferenceCountUtil.release(payload);
+            return;
+        }
         if (callbacks.isAborted()) {
-            ReferenceCountUtil.release(queued);
+            ReferenceCountUtil.release(payload);
             return;
         }
-        if (!queue.offer(queued, MAX_QUEUE_FRAMES, MAX_QUEUE_BYTES)) {
-            ReferenceCountUtil.release(queued);
-            logger.warn("[限流][上传] 队列溢出 streamId={} queueBytes={}",
-                    callbacks.streamId(), queue.bytes());
-            callbacks.onUploadRejected();
+        if (queue.offer(payload, MAX_QUEUE_FRAMES, maxQueueBytes)) {
+            afterEnqueue(payload.readableBytes());
             return;
         }
+        if (queue.bytes() + payload.readableBytes() <= EMERGENCY_DROP_BYTES
+                && queue.offer(payload, MAX_QUEUE_FRAMES * 2, EMERGENCY_DROP_BYTES)) {
+            logger.warn("[限流][上传] 队列超过软上限，继续背压 streamId={} queueBytes={} softMax={}",
+                    callbacks.streamId(), queue.bytes(), maxQueueBytes);
+            afterEnqueue(payload.readableBytes());
+            return;
+        }
+        int dropped = payload.readableBytes();
+        ReferenceCountUtil.release(payload);
+        logger.error("[限流][上传] 队列触及内存硬顶，丢弃本块但保持连接 streamId={} dropped={} queueBytes={}",
+                callbacks.streamId(), dropped, queue.bytes());
+        callbacks.pauseVisitorRead();
+        scheduleDrain(limiter.scheduleWaitMs(TrafficDirection.UPLOAD));
+    }
+
+    private void afterEnqueue(int enqueuedBytes) {
         logger.debug("[限流][上传] 入队 streamId={} bytes={} queueBytes={}",
-                callbacks.streamId(), remainderBytes, queue.bytes());
+                callbacks.streamId(), enqueuedBytes, queue.bytes());
         callbacks.pauseVisitorRead();
         scheduleDrain(limiter.scheduleWaitMs(TrafficDirection.UPLOAD));
     }
 
     void drain() {
         drainScheduled.set(false);
+        int currentEpoch = epoch.get();
         if (callbacks.isAborted()) {
             queue.clear();
             callbacks.resumeVisitorRead();
@@ -121,16 +152,8 @@ final class UploadTrafficShaper {
             }
             int allowed = limiter.consumeUpTo(TrafficDirection.UPLOAD, front.readableBytes());
             if (allowed <= 0) {
-                long waitMs = limiter.scheduleWaitMs(TrafficDirection.UPLOAD);
-                if (waitMs > HARD_REJECT_WAIT_MS) {
-                    logger.warn("[限流][上传] 等待过久，拒绝 streamId={} waitMs={} queueBytes={}",
-                            callbacks.streamId(), waitMs, queue.bytes());
-                    queue.clear();
-                    callbacks.onUploadRejected();
-                    return;
-                }
                 callbacks.pauseVisitorRead();
-                scheduleDrain(waitMs);
+                scheduleDrain(limiter.scheduleWaitMs(TrafficDirection.UPLOAD));
                 return;
             }
             ByteBuf slice = queue.pollSlice(allowed);
@@ -145,12 +168,17 @@ final class UploadTrafficShaper {
                 callbacks.forwardUpload(slice, false);
             }
         }
+        if (currentEpoch != epoch.get()) {
+            return;
+        }
         callbacks.resumeVisitorRead();
     }
 
     void clear() {
+        epoch.incrementAndGet();
         queue.clear();
         drainScheduled.set(false);
+        callbacks.resumeVisitorRead();
     }
 
     private void scheduleDrain(long waitMs) {
@@ -161,13 +189,18 @@ final class UploadTrafficShaper {
         if (!drainScheduled.compareAndSet(false, true)) {
             return;
         }
+        int scheduledEpoch = epoch.get();
         loop.schedule(() -> {
+            if (scheduledEpoch != epoch.get()) {
+                drainScheduled.set(false);
+                return;
+            }
             try {
                 drain();
             } catch (Throwable t) {
                 drainScheduled.set(false);
                 logger.error("[限流][上传] drain 异常 streamId={}", callbacks.streamId(), t);
-                if (!queue.isEmpty()) {
+                if (!queue.isEmpty() && scheduledEpoch == epoch.get()) {
                     scheduleDrain(Math.max(1, waitMs));
                 }
             }
@@ -186,7 +219,5 @@ final class UploadTrafficShaper {
         void pauseVisitorRead();
 
         void resumeVisitorRead();
-
-        void onUploadRejected();
     }
 }

@@ -60,19 +60,7 @@
         </div>
       </ElFormItem>
 
-      <ElFormItem label="带宽限制" prop="limitTotal">
-        <el-input
-            v-model.number="formData.limitTotal"
-            placeholder="总带宽"
-            :controls="false"
-            :min="1"
-            type="number"
-            :precision="0"
-            style="width: 200px"
-        >
-          <template #append>Mbps</template>
-        </el-input>
-      </ElFormItem>
+      <BandwidthLimitField v-model="formData.limitTotal"/>
 
       <ElFormItem label="启用认证">
         <div class="auth-switch-row">
@@ -142,6 +130,12 @@ import {fetchCreateSocks5Proxy, fetchUpdateSocks5Proxy, fetchGetSocks5ProxyById}
 import {fetchSuggestAvailablePorts} from '@/api/port-pool'
 import {PortPoolType} from '@/enums/orbien/business'
 import {formatAgentOptionLabel} from '@/views/orbien/agent/shared/format-agent-option'
+import BandwidthLimitField from '@/views/orbien/proxy/shared/bandwidth-limit-field.vue'
+import {
+  LIMIT_TOTAL_RULES,
+  toLimitTotalPayload,
+  type LimitTotalMbps
+} from '@/views/orbien/proxy/shared/bandwidth-limit'
 
 defineOptions({name: 'Socks5Dialog'})
 
@@ -150,7 +144,7 @@ type AuthUserForm = Api.Proxy.Socks5AuthUserParam & { id?: number }
 interface FormDataState {
   agentId: string
   name: string
-  limitTotal: number
+  limitTotal: LimitTotalMbps
   authEnabled: boolean
 }
 
@@ -188,7 +182,7 @@ let openSession = 0
 const DEFAULT_FORM: FormDataState = {
   agentId: '',
   name: '',
-  limitTotal: 1,
+  limitTotal: undefined,
   authEnabled: false
 }
 
@@ -213,10 +207,7 @@ const rules = computed<FormRules>(() => ({
     },
     trigger: 'blur'
   }],
-  limitTotal: [
-    {required: true, message: '请输入带宽限制', trigger: 'blur'},
-    {type: 'number', min: 1, message: '带宽必须大于 0', trigger: 'blur'}
-  ]
+  limitTotal: LIMIT_TOTAL_RULES
 }))
 
 const resetForm = () => {
@@ -303,7 +294,7 @@ const loadEditForm = async (session: number, proxyId: string) => {
     Object.assign(formData, {
       agentId: detail.agentId || '',
       name: detail.name || '',
-      limitTotal: detail.limitTotal ?? 1,
+      limitTotal: detail.limitTotal ?? undefined,
       authEnabled: detail.authEnabled ?? false
     })
     const displayPort = detail.remotePort ?? detail.listenPort
@@ -372,7 +363,7 @@ const handleSubmit = async () => {
       const remotePort = parseRemotePort()
       const payload: Omit<Api.Proxy.Socks5ProxyUpdateParam, 'id'> = {
         name: formData.name,
-        limitTotal: formData.limitTotal,
+        limitTotal: toLimitTotalPayload(formData.limitTotal),
         authEnabled: formData.authEnabled,
         authUsers: buildAuthPayload(),
         ...(remotePort != null ? {remotePort} : {})

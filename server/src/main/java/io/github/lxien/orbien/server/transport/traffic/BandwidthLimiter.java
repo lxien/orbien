@@ -9,20 +9,21 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.time.Duration;
 
 /**
- * 基于 Bucket4j 的代理级带宽令牌桶，按字节平滑消费
+ * 基于 Bucket4j 的代理级带宽令牌桶，按字节平滑消费。
  */
 public class BandwidthLimiter {
 
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(BandwidthLimiter.class);
-    /**
-     * 每秒切 20 段，避免 1 秒级突发后长时间归零
-     */
+
     private static final int REFILL_TICKS_PER_SECOND = 20;
-    private static final long MAX_SCHEDULE_WAIT_MS = 50;
+
+    private static final long MAX_SCHEDULE_WAIT_MS = 1000L / REFILL_TICKS_PER_SECOND;
+    private static final long MIN_BURST_BYTES = 16 * 1024L;
 
     private final Bucket uploadBucket;
     private final Bucket downloadBucket;
     private final boolean sharedBucket;
+    private final long bytesPerSecond;
 
     public BandwidthLimiter(BandwidthConfig config) {
         Long totalBps = config.getTotalBps();
@@ -34,12 +35,14 @@ public class BandwidthLimiter {
             this.uploadBucket = shared;
             this.downloadBucket = shared;
             this.sharedBucket = true;
+            this.bytesPerSecond = toBytesPerSecond(totalBps);
             return;
         }
         if (inBps != null && outBps != null) {
             this.uploadBucket = buildBucket(outBps);
             this.downloadBucket = buildBucket(inBps);
             this.sharedBucket = false;
+            this.bytesPerSecond = Math.max(toBytesPerSecond(inBps), toBytesPerSecond(outBps));
             return;
         }
         if (totalBps != null) {
@@ -48,6 +51,7 @@ public class BandwidthLimiter {
                 this.uploadBucket = buildBucket(out);
                 this.downloadBucket = buildBucket(inBps);
                 this.sharedBucket = false;
+                this.bytesPerSecond = toBytesPerSecond(totalBps);
                 return;
             }
             if (outBps != null) {
@@ -55,25 +59,37 @@ public class BandwidthLimiter {
                 this.uploadBucket = buildBucket(outBps);
                 this.downloadBucket = buildBucket(in);
                 this.sharedBucket = false;
+                this.bytesPerSecond = toBytesPerSecond(totalBps);
                 return;
             }
         }
         this.uploadBucket = buildBucket(outBps);
         this.downloadBucket = buildBucket(inBps);
         this.sharedBucket = false;
+        this.bytesPerSecond = Math.max(toBytesPerSecond(inBps), toBytesPerSecond(outBps));
+    }
+
+    private static long toBytesPerSecond(Long bps) {
+        if (bps == null || bps <= 0) {
+            return 0;
+        }
+        return Math.max(1, bps / 8);
     }
 
     private static Bucket buildBucket(Long bps) {
         if (bps == null || bps <= 0) {
             return null;
         }
-        long bytesPerSecond = Math.max(1, bps / 8);
-        long chunk = Math.max(1, bytesPerSecond / REFILL_TICKS_PER_SECOND);
+        long bytesPerSecond = toBytesPerSecond(bps);
+        // 容量 = 整秒带宽（不低于 MIN_BURST），回补按 tick 切分
+        long capacity = Math.max(MIN_BURST_BYTES, bytesPerSecond);
+        long refillChunk = Math.max(1, bytesPerSecond / REFILL_TICKS_PER_SECOND);
         Duration period = Duration.ofMillis(1000 / REFILL_TICKS_PER_SECOND);
         return Bucket.builder()
                 .addLimit(BandwidthBuilder.builder()
-                        .capacity(chunk)
-                        .refillGreedy(chunk, period)
+                        .capacity(capacity)
+                        .refillGreedy(refillChunk, period)
+                        .initialTokens(capacity)
                         .build())
                 .build();
     }
@@ -82,9 +98,15 @@ public class BandwidthLimiter {
         return uploadBucket != null || downloadBucket != null;
     }
 
-    /**
-     * 尽可能消费令牌，返回实际允许转发的字节数。
-     */
+    public boolean isSharedBucket() {
+        return sharedBucket;
+    }
+
+    public long getBytesPerSecond() {
+        return bytesPerSecond;
+    }
+
+
     public int consumeUpTo(TrafficDirection direction, int bytes) {
         if (bytes <= 0) {
             return 0;
@@ -101,11 +123,6 @@ public class BandwidthLimiter {
         return (int) consumed;
     }
 
-    /**
-     * 等待下一枚可用令牌的纳秒数。
-     * <p>对超过桶容量的请求，bucket4j 的 {@code estimateAbilityToConsume(n)}
-     * 会返回 {@link Long#MAX_VALUE}，因此这里只探测 1 个 token
-     */
     public long nanosToWait(TrafficDirection direction) {
         Bucket bucket = direction == TrafficDirection.UPLOAD ? uploadBucket : downloadBucket;
         if (bucket == null) {
