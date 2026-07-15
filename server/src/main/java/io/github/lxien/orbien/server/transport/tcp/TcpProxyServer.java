@@ -48,11 +48,16 @@ public final class TcpProxyServer implements Lifecycle {
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final TcpVisitorHandler tcpVisitorHandler;
     private final TcpIpCheckHandler tcpIpCheckHandler;
+    private final TcpTimeAccessHandler tcpTimeAccessHandler;
     private final AppConfig appConfig;
 
-    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler, AppConfig appConfig) {
+    public TcpProxyServer(TcpVisitorHandler tcpVisitorHandler,
+                          TcpIpCheckHandler tcpIpCheckHandler,
+                          TcpTimeAccessHandler tcpTimeAccessHandler,
+                          AppConfig appConfig) {
         this.tcpVisitorHandler = tcpVisitorHandler;
         this.tcpIpCheckHandler = tcpIpCheckHandler;
+        this.tcpTimeAccessHandler = tcpTimeAccessHandler;
         this.appConfig = appConfig;
     }
 
@@ -78,6 +83,7 @@ public final class TcpProxyServer implements Lifecycle {
                         VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                         pipeline.addLast(new IdleCheckHandler());
                         pipeline.addLast(tcpIpCheckHandler);
+                        pipeline.addLast(tcpTimeAccessHandler);
                         pipeline.addLast(NettyConstants.TCP_VISITOR_HANDLER, tcpVisitorHandler);
                     }
                 });

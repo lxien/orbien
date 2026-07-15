@@ -59,3 +59,13 @@ orbien:
         deny:
           - 192.168.31.88/32    # 被封禁的测试设备
           - 10.10.5.23/32       # 异常访问机器
+
+      time-access:
+        enabled: false
+        mode: allow
+        time-enabled: true
+        timezone: Asia/Shanghai
+        days: [1, 2, 3, 4, 5]
+        windows:
+          - start: "09:00:00"
+            end: "18:00:00"

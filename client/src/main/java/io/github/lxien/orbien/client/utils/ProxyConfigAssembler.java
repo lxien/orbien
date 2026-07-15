@@ -18,6 +18,7 @@
 
 package io.github.lxien.orbien.client.utils;
 
+import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.HeaderAction;
 import io.github.lxien.orbien.core.enums.HeaderDirection;
 import io.github.lxien.orbien.core.utils.StringUtils;
@@ -218,6 +219,32 @@ public class ProxyConfigAssembler {
             }
             proxyBuilder.setAccessControl(accessControlbuilder.build());
         }
+
+        //时间周期访问限制
+        if (config.hasTimeAccess()) {
+            TimeAccessConfig timeAccess = config.getTimeAccess();
+            Message.TimeAccess.Builder builder = Message.TimeAccess.newBuilder()
+                    .setEnabled(timeAccess.isEnabled())
+                    .setMode(Message.AccessMode.valueOf(
+                            (timeAccess.getMode() != null ? timeAccess.getMode() : AccessControl.ALLOW).name()))
+                    .setTimeEnabled(timeAccess.isTimeEnabled());
+            if (StringUtils.hasText(timeAccess.getTimezone())) {
+                builder.setTimezone(timeAccess.getTimezone());
+            }
+            for (Integer day : timeAccess.getDaysView()) {
+                if (day != null) {
+                    builder.addDays(day);
+                }
+            }
+            for (TimeAccessWindow window : timeAccess.getWindowsView()) {
+                builder.addWindows(Message.TimeAccessWindow.newBuilder()
+                        .setStart(window.getStart() == null ? "" : window.getStart())
+                        .setEnd(window.getEnd() == null ? "" : window.getEnd())
+                        .build());
+            }
+            proxyBuilder.setTimeAccess(builder.build());
+        }
+
         //带宽限制
         if (config.hasBandwidthLimit()) {
             BandwidthConfig bandwidth = config.getBandwidth();

@@ -19,6 +19,7 @@ package io.github.lxien.orbien.server.web.proxy.repository.assembler;
 import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.DomainType;
+import io.github.lxien.orbien.core.time.TimeAccessSupport;
 import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.proxy.converter.ProxyModelConvert;
@@ -51,6 +52,7 @@ public class ProxyConfigAssembler {
         assembleTransport(config, detail.getProxyDO());
         assembleTargets(config, relations.targets());
         assembleAccessControlRules(config, relations.accessControlRules());
+        assembleTimeAccess(config, relations.timeAccess(), relations.timeAccessWindows());
 
         if (config.isHttpOrHttps()) {
             assembleDomains(config, relations.domains());
@@ -226,6 +228,30 @@ public class ProxyConfigAssembler {
             }
         }
         config.setHeaderRewrite(rewriteConfig);
+    }
+
+    public void assembleTimeAccess(ProxyConfig config, TimeAccessDO timeAccessDO,
+                                   List<TimeAccessWindowDO> windowDOS) {
+        if (timeAccessDO == null) {
+            return;
+        }
+        AccessControl mode = timeAccessDO.getMode() == null ? AccessControl.ALLOW : timeAccessDO.getMode();
+        Set<Integer> days = TimeAccessSupport.fromDaysMask(
+                timeAccessDO.getDaysMask() == null ? 0 : timeAccessDO.getDaysMask());
+        List<TimeAccessWindow> windows = new java.util.ArrayList<>();
+        if (!CollectionUtils.isEmpty(windowDOS)) {
+            for (TimeAccessWindowDO windowDO : windowDOS) {
+                windows.add(new TimeAccessWindow(windowDO.getStartTime(), windowDO.getEndTime()));
+            }
+        }
+        config.setTimeAccess(new TimeAccessConfig(
+                Boolean.TRUE.equals(timeAccessDO.getEnabled()),
+                mode,
+                timeAccessDO.getTimeEnabled() == null || Boolean.TRUE.equals(timeAccessDO.getTimeEnabled()),
+                timeAccessDO.getTimezone(),
+                days,
+                windows
+        ));
     }
 
     public void assembleAccessControlRules(ProxyConfig config, List<AccessControlRuleDO> accessControlRuleDOS) {

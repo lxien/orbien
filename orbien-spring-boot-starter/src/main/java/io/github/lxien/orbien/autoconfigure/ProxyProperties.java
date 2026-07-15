@@ -63,6 +63,9 @@ public class ProxyProperties implements Serializable {
     @NestedConfigurationProperty
     private AccessControlProperties accessControl = new AccessControlProperties();
 
+    @NestedConfigurationProperty
+    private TimeAccessProperties timeAccess = new TimeAccessProperties();
+
     /**
      * 基础认证
      */

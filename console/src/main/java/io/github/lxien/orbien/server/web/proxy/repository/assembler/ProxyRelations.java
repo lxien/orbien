@@ -36,10 +36,12 @@ public record ProxyRelations(
         List<FileShareUserDO> fileShareUsers,
         FileShareLimitsDO fileShareLimits,
         HeaderRewriteDO headerRewrite,
-        List<HeaderRewriteRuleDO> headerRewriteRules
+        List<HeaderRewriteRuleDO> headerRewriteRules,
+        TimeAccessDO timeAccess,
+        List<TimeAccessWindowDO> timeAccessWindows
 ) {
     public static ProxyRelations empty() {
         return new ProxyRelations(List.of(), List.of(), List.of(), List.of(), null, null, List.of(),
-                null, List.of(), null, null, List.of());
+                null, List.of(), null, null, List.of(), null, List.of());
     }
 }

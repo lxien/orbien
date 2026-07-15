@@ -68,6 +68,7 @@ import TransportPage from './modules/transport/index.vue'
 import RateLimitPolicyPage from './modules/rate-limit-policy/index.vue'
 import HealthCheckPage from './modules/health-check/index.vue'
 import HeaderRewritePage from './modules/header-rewrite/index.vue'
+import TimeAccessPage from './modules/time-access/index.vue'
 import {type ProxyConfigProtocol, getProtocolMenus} from './menus'
 
 defineOptions({name: 'PluginDialog'})
@@ -119,6 +120,7 @@ const dialogTitle = computed(() => {
 
 const pageComponents: Record<string, Component> = {
   access: AccessControlPage,
+  time: TimeAccessPage,
   load: ClusterPage,
   trans: TransportPage,
   limit: RateLimitPolicyPage,

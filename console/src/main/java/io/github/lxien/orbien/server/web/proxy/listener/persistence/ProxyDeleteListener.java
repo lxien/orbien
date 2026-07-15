@@ -60,6 +60,10 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private HeaderRewriteRuleRepository headerRewriteRuleRepository;
     @Autowired
+    private TimeAccessRepository timeAccessRepository;
+    @Autowired
+    private TimeAccessWindowRepository timeAccessWindowRepository;
+    @Autowired
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
@@ -108,6 +112,8 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
         proxyTargetRepository.deleteByProxyIdIn(ids);
         accessControlRepository.deleteByProxyIdIn(ids);
         accessControlRuleRepository.deleteByProxyIdIn(ids);
+        timeAccessWindowRepository.deleteByProxyIdIn(ids);
+        timeAccessRepository.deleteByProxyIdIn(ids);
         healthCheckRepository.deleteByProxyIdIn(ids);
 
         if (proxyDO.getProtocol().isHttpOrHttps()) {

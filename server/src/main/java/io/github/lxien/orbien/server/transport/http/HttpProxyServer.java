@@ -50,6 +50,7 @@ public class HttpProxyServer implements Lifecycle {
     private final HttpVisitorHandler httpVisitorHandler;
     private final AppConfig appConfig;
     private final HttpIpCheckHandler httpIpCheckHandler;
+    private final HttpTimeAccessHandler httpTimeAccessHandler;
     private final BasicAuthHandler basicAuthHandler;
     private final ForceHttpsRedirectHandler forceHttpsRedirectHandler;
     private final FileShareDispatchHandler fileShareDispatchHandler;
@@ -59,6 +60,7 @@ public class HttpProxyServer implements Lifecycle {
     public HttpProxyServer(AppConfig config,
                            HttpVisitorHandler httpVisitorHandler,
                            HttpIpCheckHandler httpIpCheckHandler,
+                           HttpTimeAccessHandler httpTimeAccessHandler,
                            BasicAuthHandler basicAuthHandler,
                            ForceHttpsRedirectHandler forceHttpsRedirectHandler,
                            FileShareDispatchHandler fileShareDispatchHandler,
@@ -67,6 +69,7 @@ public class HttpProxyServer implements Lifecycle {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
+        this.httpTimeAccessHandler = httpTimeAccessHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.forceHttpsRedirectHandler = forceHttpsRedirectHandler;
         this.fileShareDispatchHandler = fileShareDispatchHandler;
@@ -98,6 +101,7 @@ public class HttpProxyServer implements Lifecycle {
                             pipeline.addLast(new HeaderInjectDecoder());
                             pipeline.addLast(new HeaderRewriteRequestDecoder(proxyConfigService, domainRegistry, "http"));
                             pipeline.addLast(httpIpCheckHandler);
+                            pipeline.addLast(httpTimeAccessHandler);
                             pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(fileShareDispatchHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);

@@ -4,6 +4,7 @@ import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.domain.*;
 import io.github.lxien.orbien.core.http.HeaderRewriteSupport;
+import io.github.lxien.orbien.core.time.TimeAccessSupport;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -335,6 +336,12 @@ public class TomlConfigLoader implements ConfigSource {
                     proxyConfig.setAccessControl(accessControlConfig);
                 }
 
+                //时间周期访问限制
+                Toml timeAccess = proxyTable.getTable("time_access");
+                if (timeAccess != null) {
+                    proxyConfig.setTimeAccess(parseTimeAccess(timeAccess));
+                }
+
                 //HTTP(S) BASIC AUTH
                 if (ProtocolType.isHttpOrHttps(protocol)) {
                     Toml basicAuth = proxyTable.getTable("basic_auth");
@@ -572,6 +579,47 @@ public class TomlConfigLoader implements ConfigSource {
             throw new IllegalArgumentException("header_rewrite 规则超过限制: "
                     + HeaderRewriteSupport.MAX_RULES);
         }
+        return config;
+    }
+
+    private TimeAccessConfig parseTimeAccess(Toml table) {
+        Boolean enabled = table.getBoolean("enabled", false);
+        String mode = table.getString("mode", "allow");
+        Boolean timeEnabled = table.getBoolean("time_enabled", true);
+        String timezone = table.getString("timezone", TimeAccessSupport.DEFAULT_TIMEZONE);
+
+        Set<Integer> days = new LinkedHashSet<>();
+        List<?> rawDays = table.getList("days", new ArrayList<>());
+        for (Object raw : rawDays) {
+            if (raw instanceof Number number) {
+                days.add(number.intValue());
+            } else if (raw != null) {
+                days.add(Integer.parseInt(String.valueOf(raw)));
+            }
+        }
+
+        List<TimeAccessWindow> windows = new ArrayList<>();
+        List<?> rawWindows = table.getList("windows", new ArrayList<>());
+        for (Object item : rawWindows) {
+            if (!(item instanceof Map<?, ?> map)) {
+                continue;
+            }
+            Object start = map.get("start");
+            Object end = map.get("end");
+            windows.add(new TimeAccessWindow(
+                    start == null ? null : String.valueOf(start),
+                    end == null ? null : String.valueOf(end)));
+        }
+
+        TimeAccessConfig config = new TimeAccessConfig(
+                Boolean.TRUE.equals(enabled),
+                AccessControl.fromValue(mode),
+                timeEnabled == null || Boolean.TRUE.equals(timeEnabled),
+                timezone,
+                days,
+                windows
+        );
+        TimeAccessSupport.validateConfig(config);
         return config;
     }
 

@@ -59,6 +59,10 @@ public class ProxyRelationsLoader {
     private HeaderRewriteRepository headerRewriteRepository;
     @Autowired
     private HeaderRewriteRuleRepository headerRewriteRuleRepository;
+    @Autowired
+    private TimeAccessRepository timeAccessRepository;
+    @Autowired
+    private TimeAccessWindowRepository timeAccessWindowRepository;
 
     public ProxyRelations loadOne(String proxyId) {
         return new ProxyRelations(
@@ -73,7 +77,9 @@ public class ProxyRelationsLoader {
                 fileShareUserRepository.findByProxyId(proxyId),
                 fileShareLimitsRepository.findById(proxyId).orElse(null),
                 headerRewriteRepository.findById(proxyId).orElse(null),
-                headerRewriteRuleRepository.findByProxyIdOrderByIdAsc(proxyId)
+                headerRewriteRuleRepository.findByProxyIdOrderByIdAsc(proxyId),
+                timeAccessRepository.findById(proxyId).orElse(null),
+                timeAccessWindowRepository.findByProxyIdOrderByIdAsc(proxyId)
         );
     }
 
@@ -107,6 +113,10 @@ public class ProxyRelationsLoader {
                 .collect(Collectors.toMap(HeaderRewriteDO::getProxyId, Function.identity()));
         Map<String, List<HeaderRewriteRuleDO>> headerRewriteRulesMap = groupByProxyId(
                 headerRewriteRuleRepository.findByProxyIdInOrderByIdAsc(ids), HeaderRewriteRuleDO::getProxyId);
+        Map<String, TimeAccessDO> timeAccessMap = timeAccessRepository.findByProxyIdIn(ids).stream()
+                .collect(Collectors.toMap(TimeAccessDO::getProxyId, Function.identity()));
+        Map<String, List<TimeAccessWindowDO>> timeAccessWindowsMap = groupByProxyId(
+                timeAccessWindowRepository.findByProxyIdInOrderByIdAsc(ids), TimeAccessWindowDO::getProxyId);
 
         return ids.stream().collect(Collectors.toMap(
                 Function.identity(),
@@ -122,7 +132,9 @@ public class ProxyRelationsLoader {
                         fileShareUsersMap.getOrDefault(id, List.of()),
                         fileShareLimitsMap.get(id),
                         headerRewriteMap.get(id),
-                        headerRewriteRulesMap.getOrDefault(id, List.of())
+                        headerRewriteRulesMap.getOrDefault(id, List.of()),
+                        timeAccessMap.get(id),
+                        timeAccessWindowsMap.getOrDefault(id, List.of())
                 )
         ));
     }

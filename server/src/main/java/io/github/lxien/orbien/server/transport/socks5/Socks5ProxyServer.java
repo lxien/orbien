@@ -46,15 +46,18 @@ public final class Socks5ProxyServer implements Lifecycle {
     private final Socks5HandshakeHandler handshakeHandler;
     private final Socks5RelayHandler relayHandler;
     private final Socks5IpCheckHandler ipCheckHandler;
+    private final Socks5TimeAccessHandler timeAccessHandler;
     private final AppConfig appConfig;
 
     public Socks5ProxyServer(Socks5HandshakeHandler handshakeHandler,
                                Socks5RelayHandler relayHandler,
                                Socks5IpCheckHandler ipCheckHandler,
+                               Socks5TimeAccessHandler timeAccessHandler,
                                AppConfig appConfig) {
         this.handshakeHandler = handshakeHandler;
         this.relayHandler = relayHandler;
         this.ipCheckHandler = ipCheckHandler;
+        this.timeAccessHandler = timeAccessHandler;
         this.appConfig = appConfig;
     }
 
@@ -79,6 +82,7 @@ public final class Socks5ProxyServer implements Lifecycle {
                         VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                         pipeline.addLast(new IdleCheckHandler());
                         pipeline.addLast(ipCheckHandler);
+                        pipeline.addLast(timeAccessHandler);
                         pipeline.addLast(NettyConstants.SOCKS5_HANDSHAKE_HANDLER, handshakeHandler);
                         pipeline.addLast(NettyConstants.SOCKS5_RELAY_HANDLER, relayHandler);
                     }

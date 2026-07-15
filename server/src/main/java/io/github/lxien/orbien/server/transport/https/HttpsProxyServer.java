@@ -31,6 +31,7 @@ import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.transport.http.HeaderInjectDecoder;
 import io.github.lxien.orbien.server.transport.http.HeaderRewriteRequestDecoder;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
+import io.github.lxien.orbien.server.transport.http.HttpTimeAccessHandler;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
 import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.bootstrap.ServerBootstrap;
@@ -58,6 +59,7 @@ public class HttpsProxyServer implements Lifecycle {
     private final HttpVisitorHandler httpVisitorHandler;
     private final AppConfig appConfig;
     private final HttpIpCheckHandler httpIpCheckHandler;
+    private final HttpTimeAccessHandler httpTimeAccessHandler;
     private final BasicAuthHandler basicAuthHandler;
     private final TlsCertificateManager tlsCertificateManager;
     private final FileShareDispatchHandler fileShareDispatchHandler;
@@ -67,6 +69,7 @@ public class HttpsProxyServer implements Lifecycle {
     public HttpsProxyServer(AppConfig config,
                             HttpVisitorHandler httpVisitorHandler,
                             HttpIpCheckHandler httpIpCheckHandler,
+                            HttpTimeAccessHandler httpTimeAccessHandler,
                             BasicAuthHandler basicAuthHandler,
                             TlsCertificateManager tlsCertificateManager,
                             FileShareDispatchHandler fileShareDispatchHandler,
@@ -75,6 +78,7 @@ public class HttpsProxyServer implements Lifecycle {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
+        this.httpTimeAccessHandler = httpTimeAccessHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.tlsCertificateManager = tlsCertificateManager;
         this.fileShareDispatchHandler = fileShareDispatchHandler;
@@ -105,6 +109,7 @@ public class HttpsProxyServer implements Lifecycle {
                             pipeline.addLast(new HeaderInjectDecoder());
                             pipeline.addLast(new HeaderRewriteRequestDecoder(proxyConfigService, domainRegistry, "https"));
                             pipeline.addLast(httpIpCheckHandler);
+                            pipeline.addLast(httpTimeAccessHandler);
                             pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(fileShareDispatchHandler);
                             pipeline.addLast(NettyConstants.HTTP_VISITOR_HANDLER, httpVisitorHandler);

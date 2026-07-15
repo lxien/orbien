@@ -15,17 +15,21 @@ import io.github.lxien.orbien.core.domain.HttpUser;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.RouteConfig;
 import io.github.lxien.orbien.core.domain.Target;
+import io.github.lxien.orbien.core.domain.TimeAccessConfig;
+import io.github.lxien.orbien.core.domain.TimeAccessWindow;
 import io.github.lxien.orbien.core.domain.TlsConfig;
 import io.github.lxien.orbien.core.domain.TransportCustomConfig;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.AgentType;
 import io.github.lxien.orbien.core.enums.ProxyStatus;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
+import io.github.lxien.orbien.core.time.TimeAccessSupport;
 import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -157,6 +161,25 @@ final class AppConfigBuilder {
                 accessControl.getAllow(),
                 accessControl.getDeny()
         ));
+
+        TimeAccessProperties timeAccess = proxy.getTimeAccess();
+        if (timeAccess != null && timeAccess.isEnabled()) {
+            List<TimeAccessWindow> windows = timeAccess.getWindows() == null
+                    ? List.of()
+                    : timeAccess.getWindows().stream()
+                    .map(w -> new TimeAccessWindow(w.getStart(), w.getEnd()))
+                    .collect(Collectors.toList());
+            TimeAccessConfig timeAccessConfig = new TimeAccessConfig(
+                    timeAccess.isEnabled(),
+                    timeAccess.getMode() != null ? timeAccess.getMode() : AccessControl.ALLOW,
+                    timeAccess.isTimeEnabled(),
+                    timeAccess.getTimezone(),
+                    timeAccess.getDays(),
+                    windows
+            );
+            TimeAccessSupport.validateConfig(timeAccessConfig);
+            proxyConfig.setTimeAccess(timeAccessConfig);
+        }
 
         BandwidthProperties bandwidth = proxy.getBandwidth();
         if (StringUtils.hasText(bandwidth.getLimitTotal())

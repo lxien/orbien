@@ -111,6 +111,11 @@ public class ProxyConfig implements Serializable {
     @Setter
     private HeaderRewriteConfig headerRewrite;
     /**
+     * 时间周期访问限制
+     */
+    @Setter
+    private TimeAccessConfig timeAccess;
+    /**
      * 带宽限制配置
      */
     @Setter
@@ -203,6 +208,10 @@ public class ProxyConfig implements Serializable {
 
     public boolean hasHeaderRewrite() {
         return headerRewrite != null;
+    }
+
+    public boolean hasTimeAccess() {
+        return timeAccess != null;
     }
 
     public boolean hasSocks5Auth() {

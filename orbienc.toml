@@ -195,6 +195,17 @@ users = [
 enabled = false
 mode = "allow"
 
+# 时间周期访问限制示例
+# [proxies.time_access]
+# enabled = true
+# mode = "allow"
+# time_enabled = true
+# timezone = "Asia/Shanghai"
+# days = [1, 2, 3, 4, 5]
+# windows = [
+#   { start = "09:00:00", end = "18:00:00" }
+# ]
+
 [proxies.transport]
 multiplex = true
 encrypt = false

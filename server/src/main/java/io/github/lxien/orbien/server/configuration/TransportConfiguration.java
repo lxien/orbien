@@ -7,20 +7,24 @@ import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.transport.http.ForceHttpsRedirectHandler;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.http.HttpProxyServer;
+import io.github.lxien.orbien.server.transport.http.HttpTimeAccessHandler;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
 import io.github.lxien.orbien.server.transport.https.TlsCertificateManager;
 import io.github.lxien.orbien.server.transport.https.HttpsProxyServer;
 import io.github.lxien.orbien.server.transport.tcp.TcpIpCheckHandler;
+import io.github.lxien.orbien.server.transport.tcp.TcpTimeAccessHandler;
 import io.github.lxien.orbien.server.transport.tcp.TcpVisitorHandler;
 import io.github.lxien.orbien.server.transport.tcp.TcpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpProxyServer;
 import io.github.lxien.orbien.server.transport.udp.UdpIpCheckHandler;
+import io.github.lxien.orbien.server.transport.udp.UdpTimeAccessHandler;
 import io.github.lxien.orbien.server.transport.udp.UdpVisitorHandler;
 import io.github.lxien.orbien.server.transport.ControlFrameHandler;
 import io.github.lxien.orbien.server.transport.socks5.Socks5HandshakeHandler;
 import io.github.lxien.orbien.server.transport.socks5.Socks5IpCheckHandler;
 import io.github.lxien.orbien.server.transport.socks5.Socks5ProxyServer;
 import io.github.lxien.orbien.server.transport.socks5.Socks5RelayHandler;
+import io.github.lxien.orbien.server.transport.socks5.Socks5TimeAccessHandler;
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,25 +42,32 @@ public class TransportConfiguration {
     }
 
     @Bean
-    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler, TcpIpCheckHandler tcpIpCheckHandler) {
-        return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, config);
+    public TcpProxyServer tcpProxyServer(TcpVisitorHandler tcpVisitorHandler,
+                                         TcpIpCheckHandler tcpIpCheckHandler,
+                                         TcpTimeAccessHandler tcpTimeAccessHandler) {
+        return new TcpProxyServer(tcpVisitorHandler, tcpIpCheckHandler, tcpTimeAccessHandler, config);
     }
 
     @Bean
     public Socks5ProxyServer socks5ProxyServer(Socks5HandshakeHandler handshakeHandler,
                                                Socks5RelayHandler relayHandler,
-                                               Socks5IpCheckHandler ipCheckHandler) {
-        return new Socks5ProxyServer(handshakeHandler, relayHandler, ipCheckHandler, config);
+                                               Socks5IpCheckHandler ipCheckHandler,
+                                               Socks5TimeAccessHandler timeAccessHandler) {
+        return new Socks5ProxyServer(handshakeHandler, relayHandler, ipCheckHandler, timeAccessHandler, config);
     }
 
     @Bean
-    public UdpProxyServer udpProxyServer(UdpVisitorHandler udpVisitorHandler, UdpIpCheckHandler udpIpCheckHandler, EventBus eventBus) {
-        return new UdpProxyServer(udpVisitorHandler, udpIpCheckHandler, eventBus);
+    public UdpProxyServer udpProxyServer(UdpVisitorHandler udpVisitorHandler,
+                                         UdpIpCheckHandler udpIpCheckHandler,
+                                         UdpTimeAccessHandler udpTimeAccessHandler,
+                                         EventBus eventBus) {
+        return new UdpProxyServer(udpVisitorHandler, udpIpCheckHandler, udpTimeAccessHandler);
     }
 
     @Bean
     public HttpProxyServer httpProxyServer(HttpVisitorHandler httpVisitorHandler,
                                            HttpIpCheckHandler httpIpCheckHandler,
+                                           HttpTimeAccessHandler httpTimeAccessHandler,
                                            BasicAuthHandler basicAuthHandler,
                                            ForceHttpsRedirectHandler forceHttpsRedirectHandler,
                                            io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler,
@@ -65,6 +76,7 @@ public class TransportConfiguration {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
+                httpTimeAccessHandler,
                 basicAuthHandler,
                 forceHttpsRedirectHandler,
                 fileShareDispatchHandler,
@@ -75,6 +87,7 @@ public class TransportConfiguration {
     @Bean
     public HttpsProxyServer httpsProxyServer(HttpVisitorHandler httpVisitorHandler,
                                              HttpIpCheckHandler httpIpCheckHandler,
+                                             HttpTimeAccessHandler httpTimeAccessHandler,
                                              BasicAuthHandler basicAuthHandler,
                                              TlsCertificateManager tlsCertificateManager,
                                              io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler,
@@ -83,6 +96,7 @@ public class TransportConfiguration {
         return new HttpsProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
+                httpTimeAccessHandler,
                 basicAuthHandler,
                 tlsCertificateManager,
                 fileShareDispatchHandler,

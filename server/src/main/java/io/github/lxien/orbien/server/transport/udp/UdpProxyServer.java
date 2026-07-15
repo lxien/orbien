@@ -3,7 +3,6 @@ package io.github.lxien.orbien.server.transport.udp;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
-import io.github.lxien.orbien.server.notify.EventBus;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.*;
@@ -27,10 +26,14 @@ public final class UdpProxyServer implements Lifecycle {
     private final AtomicBoolean init = new AtomicBoolean(false);
     private final UdpVisitorHandler udpVisitorHandler;
     private final UdpIpCheckHandler udpIpCheckHandler;
+    private final UdpTimeAccessHandler udpTimeAccessHandler;
 
-    public UdpProxyServer(UdpVisitorHandler udpVisitorHandler, UdpIpCheckHandler udpIpCheckHandler, EventBus eventBus) {
+    public UdpProxyServer(UdpVisitorHandler udpVisitorHandler,
+                          UdpIpCheckHandler udpIpCheckHandler,
+                          UdpTimeAccessHandler udpTimeAccessHandler) {
         this.udpVisitorHandler = udpVisitorHandler;
         this.udpIpCheckHandler = udpIpCheckHandler;
+        this.udpTimeAccessHandler = udpTimeAccessHandler;
     }
 
     @Override
@@ -50,6 +53,7 @@ public final class UdpProxyServer implements Lifecycle {
                     protected void initChannel(DatagramChannel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
                         pipeline.addLast(udpIpCheckHandler);
+                        pipeline.addLast(udpTimeAccessHandler);
                         pipeline.addLast(NettyConstants.UDP_VISITOR_HANDLER, udpVisitorHandler);
                     }
                 });

@@ -17,10 +17,12 @@
 package io.github.lxien.orbien.server.web.proxy.listener.persistence;
 
 import io.github.lxien.orbien.core.domain.DomainInfo;
+import io.github.lxien.orbien.core.domain.TimeAccessWindow;
 import io.github.lxien.orbien.core.enums.AccessControl;
 import io.github.lxien.orbien.core.enums.HealthCheckType;
 import io.github.lxien.orbien.core.enums.ProtocolType;
 import io.github.lxien.orbien.core.message.Message;
+import io.github.lxien.orbien.core.time.TimeAccessSupport;
 import io.github.lxien.orbien.server.notify.EventBus;
 import io.github.lxien.orbien.server.notify.EventListener;
 import io.github.lxien.orbien.server.event.ProxyAddEvent;
@@ -75,6 +77,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     private HeaderRewriteRepository headerRewriteRepository;
     @Autowired
     private HeaderRewriteRuleRepository headerRewriteRuleRepository;
+    @Autowired
+    private TimeAccessRepository timeAccessRepository;
+    @Autowired
+    private TimeAccessWindowRepository timeAccessWindowRepository;
     @Autowired
     private HealthCheckRepository healthCheckRepository;
     @Autowired
@@ -137,6 +143,7 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
             persistTargets(proxyId, proxy);
         }
         persistAccessControl(proxyId, proxy);
+        persistTimeAccess(proxyId, proxy);
         if (!protocol.isSocks5() && !protocol.isFile()) {
             persistHealthCheck(proxyId, proxy);
         }
@@ -199,6 +206,60 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         AccessControlDO accessControlDO = new AccessControlDO(proxyId, AccessControl.DENY);
         accessControlDO.setEnabled(false);
         accessControlRepository.save(accessControlDO);
+    }
+
+    private void persistTimeAccess(String proxyId, Message.Proxy proxy) {
+        // Agent TOML 未声明 time_access 时不得清空控制台已配置
+        if (!proxy.hasTimeAccess()) {
+            if (!timeAccessRepository.existsById(proxyId)) {
+                timeAccessRepository.save(new TimeAccessDO(proxyId));
+            }
+            return;
+        }
+
+        timeAccessWindowRepository.deleteByProxyIdIn(List.of(proxyId));
+        timeAccessWindowRepository.flush();
+
+        Message.TimeAccess timeAccess = proxy.getTimeAccess();
+        TimeAccessDO timeAccessDO = new TimeAccessDO(proxyId);
+        timeAccessDO.setEnabled(timeAccess.getEnabled());
+        timeAccessDO.setMode(switch (timeAccess.getMode()) {
+            case ALLOW -> AccessControl.ALLOW;
+            default -> AccessControl.DENY;
+        });
+        timeAccessDO.setTimeEnabled(timeAccess.getTimeEnabled());
+        String timezone = StringUtils.hasText(timeAccess.getTimezone())
+                ? timeAccess.getTimezone().trim()
+                : TimeAccessSupport.DEFAULT_TIMEZONE;
+        TimeAccessSupport.validateTimezone(timezone);
+        timeAccessDO.setTimezone(timezone);
+
+        Set<Integer> days = new HashSet<>();
+        for (int day : timeAccess.getDaysList()) {
+            days.add(day);
+        }
+        TimeAccessSupport.validateDays(days);
+        timeAccessDO.setDaysMask(TimeAccessSupport.toDaysMask(days));
+        timeAccessRepository.save(timeAccessDO);
+
+        if (timeAccess.getWindowsList().isEmpty()) {
+            return;
+        }
+        if (timeAccess.getWindowsCount() > TimeAccessSupport.MAX_WINDOWS) {
+            throw new IllegalArgumentException("time_access 时间窗超过限制");
+        }
+        List<TimeAccessWindowDO> windows = new ArrayList<>();
+        for (Message.TimeAccessWindow window : timeAccess.getWindowsList()) {
+            TimeAccessWindow domainWindow =
+                    new TimeAccessWindow(window.getStart(), window.getEnd());
+            TimeAccessSupport.validateWindow(domainWindow);
+            TimeAccessWindowDO windowDO = new TimeAccessWindowDO();
+            windowDO.setProxyId(proxyId);
+            windowDO.setStartTime(domainWindow.getStart());
+            windowDO.setEndTime(domainWindow.getEnd());
+            windows.add(windowDO);
+        }
+        timeAccessWindowRepository.saveAll(windows);
     }
 
     private void persistHealthCheck(String proxyId, Message.Proxy proxy) {

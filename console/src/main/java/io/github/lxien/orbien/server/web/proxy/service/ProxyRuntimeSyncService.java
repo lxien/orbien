@@ -24,6 +24,7 @@ import io.github.lxien.orbien.core.message.support.RuntimeInfoSupport;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.loadbalance.HealthManager;
 import io.github.lxien.orbien.server.security.IpAccessChecker;
+import io.github.lxien.orbien.server.security.TimeAccessChecker;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.service.repository.ProxyQueryRepository;
 import jakarta.annotation.Resource;
@@ -54,6 +55,8 @@ public class ProxyRuntimeSyncService {
 
     @Autowired
     private IpAccessChecker ipAccessChecker;
+    @Autowired
+    private TimeAccessChecker timeAccessChecker;
 
     public void refreshServerEntryPolicy(String proxyId) {
         if (proxyId == null) {
@@ -61,6 +64,7 @@ public class ProxyRuntimeSyncService {
         }
         proxyConfigService.evictByProxyId(proxyId);
         ipAccessChecker.invalidate(proxyId);
+        timeAccessChecker.invalidate(proxyId);
     }
 
     public void syncProxyCreated(String proxyId) {

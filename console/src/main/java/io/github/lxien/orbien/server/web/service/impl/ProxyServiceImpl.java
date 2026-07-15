@@ -88,6 +88,10 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private HeaderRewriteRuleRepository headerRewriteRuleRepository;
     @Autowired
+    private TimeAccessRepository timeAccessRepository;
+    @Autowired
+    private TimeAccessWindowRepository timeAccessWindowRepository;
+    @Autowired
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
@@ -171,6 +175,7 @@ public class ProxyServiceImpl implements ProxyService {
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
         headerRewriteRepository.save(new HeaderRewriteDO(proxyId, false));
+        timeAccessRepository.save(new TimeAccessDO(proxyId));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.HTTP));
 
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
@@ -394,6 +399,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         proxyTargetRepository.save(buildTcpTarget(param, proxyId));
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        timeAccessRepository.save(new TimeAccessDO(proxyId));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("TCP 代理创建成功：{}", proxyDO.getName());
@@ -411,6 +417,7 @@ public class ProxyServiceImpl implements ProxyService {
         applyTcpLimitTotal(proxyDO, param.getLimitTotal());
         proxyRepository.save(proxyDO);
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        timeAccessRepository.save(new TimeAccessDO(proxyId));
         saveSocks5AuthConfig(proxyId, param.getAuthEnabled(), param.getAuthUsers(), true);
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("SOCKS5 代理创建成功：{}", proxyDO.getName());
@@ -524,6 +531,7 @@ public class ProxyServiceImpl implements ProxyService {
                 param.getAllowMove(), param.getAllowRename());
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         saveFileShareAuthConfig(proxyId, param.getAuthEnabled(), param.getAuthUsers(), true);
+        timeAccessRepository.save(new TimeAccessDO(proxyId));
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("文件共享创建成功：{}", proxyDO.getName());
     }
@@ -650,6 +658,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         proxyTargetRepository.save(buildUdpTarget(param, proxyId));
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
+        timeAccessRepository.save(new TimeAccessDO(proxyId));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.TCP));
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
         logger.debug("UDP 代理创建成功：{}", proxyDO.getName());
@@ -1356,6 +1365,8 @@ public class ProxyServiceImpl implements ProxyService {
         //IP CIDR
         accessControlRepository.deleteByProxyIdIn(ids);
         accessControlRuleRepository.deleteByProxyIdIn(ids);
+        timeAccessWindowRepository.deleteByProxyIdIn(ids);
+        timeAccessRepository.deleteByProxyIdIn(ids);
         //HTTP / HTTPS
         if (protocolType.isHttpOrHttps()) {
             if (protocolType.isHttps()) {
