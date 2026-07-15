@@ -3,6 +3,7 @@ import io.github.lxien.orbien.core.filetransfer.FileTransferConstants;
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 
 import io.github.lxien.orbien.client.config.domain.*;
+import io.github.lxien.orbien.core.http.HeaderRewriteSupport;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.common.utils.TomlUtils;
 import com.moandjiezana.toml.Toml;
@@ -353,6 +354,11 @@ public class TomlConfigLoader implements ConfigSource {
                         basicAuthConfig.addUsers(httpUsers);
                         proxyConfig.setBasicAuth(basicAuthConfig);
                     }
+
+                    Toml headerRewrite = proxyTable.getTable("header_rewrite");
+                    if (headerRewrite != null) {
+                        proxyConfig.setHeaderRewrite(parseHeaderRewrite(headerRewrite));
+                    }
                 }
                 if (protocolType.isHttps() || protocolType.isFile()) {
                     applyTlsCertConfig(proxyTable, proxyConfig);
@@ -544,6 +550,38 @@ public class TomlConfigLoader implements ConfigSource {
         }
         transportConfig.setTlsConfig(
                 TlsConfigSupport.resolveAbsolutePaths(transportConfig.getTlsConfig(), configDir));
+    }
+
+    private HeaderRewriteConfig parseHeaderRewrite(Toml table) {
+        Boolean enabled = table.getBoolean("enabled", false);
+        HeaderRewriteConfig config = new HeaderRewriteConfig(Boolean.TRUE.equals(enabled));
+        List<Toml> requestRules = table.getTables("request");
+        if (requestRules != null) {
+            for (Toml ruleTable : requestRules) {
+                config.addRequestRule(parseHeaderRewriteRule(ruleTable));
+            }
+        }
+        List<Toml> responseRules = table.getTables("response");
+        if (responseRules != null) {
+            for (Toml ruleTable : responseRules) {
+                config.addResponseRule(parseHeaderRewriteRule(ruleTable));
+            }
+        }
+        int total = config.getRequestRulesView().size() + config.getResponseRulesView().size();
+        if (total > HeaderRewriteSupport.MAX_RULES) {
+            throw new IllegalArgumentException("header_rewrite 规则超过限制: "
+                    + HeaderRewriteSupport.MAX_RULES);
+        }
+        return config;
+    }
+
+    private HeaderRewriteRule parseHeaderRewriteRule(Toml ruleTable) {
+        String action = ruleTable.getString("action");
+        String name = ruleTable.getString("name");
+        String value = ruleTable.getString("value");
+        HeaderRewriteRule rule = new HeaderRewriteRule(HeaderAction.fromValue(action), name, value);
+        HeaderRewriteSupport.validateRule(rule);
+        return rule;
     }
 
     private long parseSize(String value) {

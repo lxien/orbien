@@ -18,6 +18,8 @@
 
 package io.github.lxien.orbien.client.utils;
 
+import io.github.lxien.orbien.core.enums.HeaderAction;
+import io.github.lxien.orbien.core.enums.HeaderDirection;
 import io.github.lxien.orbien.core.utils.StringUtils;
 import io.github.lxien.orbien.core.domain.*;
 import io.github.lxien.orbien.core.http.ForceHttpsPolicy;
@@ -157,6 +159,18 @@ public class ProxyConfigAssembler {
                     }
                     proxyBuilder.setBasicAuth(basicAuthBuilder);
                 }
+                if (config.hasHeaderRewrite()) {
+                    HeaderRewriteConfig headerRewrite = config.getHeaderRewrite();
+                    Message.HeaderRewrite.Builder hrBuilder = Message.HeaderRewrite.newBuilder()
+                            .setEnabled(headerRewrite.isEnabled());
+                    for (HeaderRewriteRule rule : headerRewrite.getRequestRulesView()) {
+                        hrBuilder.addRules(toProtoHeaderRewriteRule(HeaderDirection.REQUEST, rule));
+                    }
+                    for (HeaderRewriteRule rule : headerRewrite.getResponseRulesView()) {
+                        hrBuilder.addRules(toProtoHeaderRewriteRule(HeaderDirection.RESPONSE, rule));
+                    }
+                    proxyBuilder.setHeaderRewrite(hrBuilder);
+                }
                 break;
         }
         if (config.requiresVisitorTls()) {
@@ -255,5 +269,31 @@ public class ProxyConfigAssembler {
             default:
                 throw new IllegalArgumentException("未知负载均衡策略: " + strategy);
         }
+    }
+
+    private static Message.HeaderRewriteRule toProtoHeaderRewriteRule(HeaderDirection direction, HeaderRewriteRule rule) {
+        Message.HeaderRewriteRule.Builder rb = Message.HeaderRewriteRule.newBuilder()
+                .setDirection(toProtoHeaderDirection(direction))
+                .setAction(toProtoHeaderAction(rule.getAction()))
+                .setName(rule.getName());
+        if (rule.getValue() != null) {
+            rb.setValue(rule.getValue());
+        }
+        return rb.build();
+    }
+
+    private static Message.HeaderDirection toProtoHeaderDirection(HeaderDirection direction) {
+        return switch (direction) {
+            case REQUEST -> Message.HeaderDirection.HEADER_DIRECTION_REQUEST;
+            case RESPONSE -> Message.HeaderDirection.HEADER_DIRECTION_RESPONSE;
+        };
+    }
+
+    private static Message.HeaderAction toProtoHeaderAction(HeaderAction action) {
+        return switch (action) {
+            case SET -> Message.HeaderAction.HEADER_ACTION_SET;
+            case ADD -> Message.HeaderAction.HEADER_ACTION_ADD;
+            case REMOVE -> Message.HeaderAction.HEADER_ACTION_REMOVE;
+        };
     }
 }

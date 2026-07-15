@@ -55,6 +55,10 @@ public class ProxyRelationsLoader {
     private FileShareUserRepository fileShareUserRepository;
     @Autowired
     private FileShareLimitsRepository fileShareLimitsRepository;
+    @Autowired
+    private HeaderRewriteRepository headerRewriteRepository;
+    @Autowired
+    private HeaderRewriteRuleRepository headerRewriteRuleRepository;
 
     public ProxyRelations loadOne(String proxyId) {
         return new ProxyRelations(
@@ -67,7 +71,9 @@ public class ProxyRelationsLoader {
                 socks5UserRepository.findByProxyId(proxyId),
                 fileShareAuthRepository.findById(proxyId).orElse(null),
                 fileShareUserRepository.findByProxyId(proxyId),
-                fileShareLimitsRepository.findById(proxyId).orElse(null)
+                fileShareLimitsRepository.findById(proxyId).orElse(null),
+                headerRewriteRepository.findById(proxyId).orElse(null),
+                headerRewriteRuleRepository.findByProxyIdOrderByIdAsc(proxyId)
         );
     }
 
@@ -97,6 +103,10 @@ public class ProxyRelationsLoader {
                 fileShareUserRepository.findByProxyIdIn(ids), FileShareUserDO::getProxyId);
         Map<String, FileShareLimitsDO> fileShareLimitsMap = fileShareLimitsRepository.findByProxyIdIn(ids).stream()
                 .collect(Collectors.toMap(FileShareLimitsDO::getProxyId, Function.identity()));
+        Map<String, HeaderRewriteDO> headerRewriteMap = headerRewriteRepository.findByProxyIdIn(ids).stream()
+                .collect(Collectors.toMap(HeaderRewriteDO::getProxyId, Function.identity()));
+        Map<String, List<HeaderRewriteRuleDO>> headerRewriteRulesMap = groupByProxyId(
+                headerRewriteRuleRepository.findByProxyIdInOrderByIdAsc(ids), HeaderRewriteRuleDO::getProxyId);
 
         return ids.stream().collect(Collectors.toMap(
                 Function.identity(),
@@ -110,7 +120,9 @@ public class ProxyRelationsLoader {
                         socks5UsersMap.getOrDefault(id, List.of()),
                         fileShareAuthMap.get(id),
                         fileShareUsersMap.getOrDefault(id, List.of()),
-                        fileShareLimitsMap.get(id)
+                        fileShareLimitsMap.get(id),
+                        headerRewriteMap.get(id),
+                        headerRewriteRulesMap.getOrDefault(id, List.of())
                 )
         ));
     }

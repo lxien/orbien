@@ -218,6 +218,23 @@ public class ProxyReportConvert {
         return HealthCheckType.TCP;
     }
 
+    public HeaderDirection toHeaderDirection(Message.HeaderDirection direction) {
+        return switch (direction) {
+            case HEADER_DIRECTION_REQUEST -> HeaderDirection.REQUEST;
+            case HEADER_DIRECTION_RESPONSE -> HeaderDirection.RESPONSE;
+            default -> throw new IllegalArgumentException("未知 Header 方向: " + direction);
+        };
+    }
+
+    public HeaderAction toHeaderAction(Message.HeaderAction action) {
+        return switch (action) {
+            case HEADER_ACTION_SET -> HeaderAction.SET;
+            case HEADER_ACTION_ADD -> HeaderAction.ADD;
+            case HEADER_ACTION_REMOVE -> HeaderAction.REMOVE;
+            default -> throw new IllegalArgumentException("未知 Header 动作: " + action);
+        };
+    }
+
     private int resolvePositive(int value, int defaultValue) {
         return value > 0 ? value : defaultValue;
     }

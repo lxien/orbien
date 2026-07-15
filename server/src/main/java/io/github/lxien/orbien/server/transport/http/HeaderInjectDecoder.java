@@ -145,7 +145,20 @@ public class HeaderInjectDecoder extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        logger.error("[HTTP] HeaderInjectDecoder异常", cause);
+        Throwable root = unwrap(cause);
+        if (root instanceof javax.net.ssl.SSLException) {
+            logger.debug("[HTTPS] TLS 握手失败: {}", root.getMessage());
+        } else {
+            logger.error("[HTTP] HeaderInjectDecoder异常", cause);
+        }
         ChannelUtils.closeOnFlush(ctx.channel());
+    }
+
+    private static Throwable unwrap(Throwable cause) {
+        Throwable current = cause;
+        while (current.getCause() != null && current.getCause() != current) {
+            current = current.getCause();
+        }
+        return current;
     }
 }

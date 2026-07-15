@@ -23,13 +23,16 @@ import io.github.lxien.orbien.core.transport.IdleCheckHandler;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.config.AppConfig;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
 import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler;
 import io.github.lxien.orbien.server.transport.http.BasicAuthHandler;
 import io.github.lxien.orbien.server.transport.http.HeaderInjectDecoder;
+import io.github.lxien.orbien.server.transport.http.HeaderRewriteRequestDecoder;
 import io.github.lxien.orbien.server.transport.http.HttpIpCheckHandler;
 import io.github.lxien.orbien.server.transport.http.HttpVisitorHandler;
+import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -44,7 +47,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
 /**
- * Http proxy server
+ * Https proxy server
  *
  * @author lxien
  */
@@ -58,14 +61,25 @@ public class HttpsProxyServer implements Lifecycle {
     private final BasicAuthHandler basicAuthHandler;
     private final TlsCertificateManager tlsCertificateManager;
     private final FileShareDispatchHandler fileShareDispatchHandler;
+    private final ProxyConfigService proxyConfigService;
+    private final DomainRegistry domainRegistry;
 
-    public HttpsProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, TlsCertificateManager tlsCertificateManager, FileShareDispatchHandler fileShareDispatchHandler) {
+    public HttpsProxyServer(AppConfig config,
+                            HttpVisitorHandler httpVisitorHandler,
+                            HttpIpCheckHandler httpIpCheckHandler,
+                            BasicAuthHandler basicAuthHandler,
+                            TlsCertificateManager tlsCertificateManager,
+                            FileShareDispatchHandler fileShareDispatchHandler,
+                            ProxyConfigService proxyConfigService,
+                            DomainRegistry domainRegistry) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.tlsCertificateManager = tlsCertificateManager;
         this.fileShareDispatchHandler = fileShareDispatchHandler;
+        this.proxyConfigService = proxyConfigService;
+        this.domainRegistry = domainRegistry;
     }
 
     @Override
@@ -84,12 +98,12 @@ public class HttpsProxyServer implements Lifecycle {
                         @Override
                         protected void initChannel(SocketChannel sc) {
                             ChannelPipeline pipeline = sc.pipeline();
-                            // PROXY 必须在 TLS 之前
                             VisitorPipelineSupport.prependProxyProtocol(pipeline, appConfig.getProxyProtocol());
                             pipeline.addLast(new SniHandler(tlsCertificateManager::getSslContext));
                             pipeline.addLast(new IdleCheckHandler());
                             pipeline.addLast(new VisitorInfoDecoder());
                             pipeline.addLast(new HeaderInjectDecoder());
+                            pipeline.addLast(new HeaderRewriteRequestDecoder(proxyConfigService, domainRegistry, "https"));
                             pipeline.addLast(httpIpCheckHandler);
                             pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(fileShareDispatchHandler);
@@ -99,14 +113,14 @@ public class HttpsProxyServer implements Lifecycle {
             serverBootstrap.bind(httpsProxyPort).syncUninterruptibly().get();
             logger.debug("HTTPS 隧道代理服务启动成功，端口为：{}", httpsProxyPort);
         } catch (Exception e) {
-            logger.error("HTTPS 隧道代理服务启动失败", e);
+            logger.error("HTTPS 隧道代理服务启动失败!", e);
         }
     }
 
     @Override
     @PreDestroy
     public void stop() {
-        logger.debug("清理 HTTP 代理线程资源");
+        logger.debug("清理 HTTPS 代理线程资源");
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }

@@ -35,58 +35,46 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 测试控制器
- * 提供示例 API 接口和页面路由
- */
+
 @Controller
 @RequestMapping("/")
 public class TestController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @Value("${spring.application.name}")
     private String appName;
 
-    /**
-     * REST API 控制器
-     * 提供后端接口服务
-     */
     @RestController
     @RequestMapping("/api")
     public static class ApiController {
-        
+
         @Value("${spring.application.name}")
         private String appName;
 
-        /**
-         * 打招呼接口
-         * @return 问候信息
-         */
+
         @GetMapping("/hello")
         public String sayHello() {
             return "Hello " + appName;
         }
 
-        /**
-         * 获取请求头信息接口
-         * @param request HTTP 请求对象
-         * @return 包含 X-Forwarded-For 的响应
-         */
+
         @GetMapping("/headers")
         public ResponseEntity<Map<String, Object>> getHeaders(HttpServletRequest request) {
             Map<String, Object> response = new HashMap<>();
-            String visitorIp = request.getHeader("X-Forwarded-For");
-            response.put("X-Forwarded-For", visitorIp);
-            logger.info("X-Forwarded-For: {}", visitorIp);
+
+            Map<String, String> requestHeaders = new HashMap<>();
+            request.getHeaderNames().asIterator().forEachRemaining(headerName -> {
+                requestHeaders.put(headerName, request.getHeader(headerName));
+            });
+            response.put("requestHeaders", requestHeaders);
+
+            logger.info("X-Forwarded-For: {}", request.getHeader("X-Forwarded-For"));
+
             return ResponseEntity.ok(response);
         }
 
-        /**
-         * 文件上传接口
-         * @param file 上传的文件
-         * @return 上传结果
-         */
+
         @PostMapping("/upload")
         public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
             Map<String, Object> response = new HashMap<>();
@@ -115,11 +103,6 @@ public class TestController {
         }
     }
 
-    /**
-     * 首页路由
-     * 转发到 index.html
-     * @return ModelAndView
-     */
     @GetMapping("")
     public ModelAndView index() {
         ModelAndView modelAndView = new ModelAndView();

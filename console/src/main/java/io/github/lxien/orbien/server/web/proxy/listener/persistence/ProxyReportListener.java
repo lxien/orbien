@@ -72,6 +72,10 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
     @Autowired
     private BasicUserRepository basicUserRepository;
     @Autowired
+    private HeaderRewriteRepository headerRewriteRepository;
+    @Autowired
+    private HeaderRewriteRuleRepository headerRewriteRuleRepository;
+    @Autowired
     private HealthCheckRepository healthCheckRepository;
     @Autowired
     private Socks5AuthRepository socks5AuthRepository;
@@ -139,6 +143,7 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
 
         if (protocol.isHttpOrHttps()) {
             persistBasicAuth(proxyId, proxy);
+            persistHeaderRewrite(proxyId, proxy);
             persistDomains(proxyId, event.getDomains());
         }
         if (protocol.isSocks5()) {
@@ -223,6 +228,42 @@ public class ProxyReportListener implements EventListener<ProxyAddEvent> {
         }
 
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
+    }
+
+    private void persistHeaderRewrite(String proxyId, Message.Proxy proxy) {
+        // Agent TOML 未声明 header_rewrite 时不得清空控制台已配置的规则
+        if (!proxy.hasHeaderRewrite()) {
+            if (!headerRewriteRepository.existsById(proxyId)) {
+                headerRewriteRepository.save(new HeaderRewriteDO(proxyId, false));
+            }
+            return;
+        }
+
+        headerRewriteRuleRepository.deleteByProxyIdIn(List.of(proxyId));
+        headerRewriteRuleRepository.flush();
+
+        Message.HeaderRewrite headerRewrite = proxy.getHeaderRewrite();
+        headerRewriteRepository.save(new HeaderRewriteDO(proxyId, headerRewrite.getEnabled()));
+        if (headerRewrite.getRulesList().isEmpty()) {
+            return;
+        }
+        List<HeaderRewriteRuleDO> rules = new ArrayList<>();
+        for (Message.HeaderRewriteRule rule : headerRewrite.getRulesList()) {
+            HeaderRewriteRuleDO ruleDO = new HeaderRewriteRuleDO();
+            ruleDO.setProxyId(proxyId);
+            ruleDO.setDirection(proxyReportConvert.toHeaderDirection(rule.getDirection()));
+            ruleDO.setAction(proxyReportConvert.toHeaderAction(rule.getAction()));
+            ruleDO.setName(rule.getName());
+            ruleDO.setValue(rule.getValue().isEmpty() ? null : rule.getValue());
+            io.github.lxien.orbien.core.http.HeaderRewriteSupport.validateRule(
+                    new io.github.lxien.orbien.core.domain.HeaderRewriteRule(
+                            ruleDO.getAction(), ruleDO.getName(), ruleDO.getValue()));
+            rules.add(ruleDO);
+        }
+        if (rules.size() > io.github.lxien.orbien.core.http.HeaderRewriteSupport.MAX_RULES) {
+            throw new IllegalArgumentException("header_rewrite 规则超过限制");
+        }
+        headerRewriteRuleRepository.saveAll(rules);
     }
 
     private void persistSocks5Auth(String proxyId, Message.Proxy proxy) {

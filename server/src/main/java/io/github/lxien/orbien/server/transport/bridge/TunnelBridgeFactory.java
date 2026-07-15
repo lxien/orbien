@@ -2,49 +2,48 @@ package io.github.lxien.orbien.server.transport.bridge;
 
 import io.github.lxien.orbien.core.transport.TunnelBridge;
 import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
-import io.github.lxien.orbien.server.inspector.InspectorProperties;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-/**
- * TunnelBridge 工厂类
- * 负责创建 Direct / Mux 类型的隧道桥接，并统一添加流量统计装饰器
- */
 @Component
 public class TunnelBridgeFactory {
     private static MetricsCollector metricsCollector;
+    private static ProxyConfigService proxyConfigService;
 
     @Autowired
     public void setMetricsCollector(MetricsCollector collector) {
         TunnelBridgeFactory.metricsCollector = collector;
     }
 
-    /**
-     * 创建直接（Direct）隧道桥接
-     */
+    @Autowired
+    public void setProxyConfigService(ProxyConfigService service) {
+        TunnelBridgeFactory.proxyConfigService = service;
+    }
+
     public static TunnelBridge buildDirect(StreamContext streamContext) {
         TunnelBridge bridge = new DirectTunnelBridge(streamContext);
+        bridge = wrapHeaderRewrite(bridge, streamContext);
         bridge = wrapInspection(bridge, streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
     }
 
-    /**
-     * 创建多路复用（Mux）隧道桥接
-     */
     public static TunnelBridge buildMux(StreamContext streamContext) {
         TunnelBridge bridge = new MultiplexTunnelBridge(streamContext);
+        bridge = wrapHeaderRewrite(bridge, streamContext);
         bridge = wrapInspection(bridge, streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
     }
 
-    /**
-     * 创建 UDP 多路复用隧道桥接
-     */
     public static TunnelBridge buildUdpMux(StreamContext streamContext) {
         TunnelBridge bridge = new UdpMultiplexTunnelBridge(streamContext);
         return addMetricsIfNeeded(bridge, streamContext);
+    }
+
+    private static TunnelBridge wrapHeaderRewrite(TunnelBridge bridge, StreamContext ctx) {
+        return HeaderRewriteResponseBridge.wrapIfNeeded(bridge, ctx, proxyConfigService);
     }
 
     private static TunnelBridge wrapInspection(TunnelBridge bridge, StreamContext ctx) {

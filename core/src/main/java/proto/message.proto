@@ -41,6 +41,21 @@ enum HealthCheckType {
   HEALTH_CHECK_TYPE_TCP = 0;
   HEALTH_CHECK_TYPE_HTTP = 1;
 }
+
+// 数值与 domain HeaderDirection.code 对齐：1=REQUEST 2=RESPONSE
+enum HeaderDirection {
+  HEADER_DIRECTION_UNSPECIFIED = 0;
+  HEADER_DIRECTION_REQUEST = 1;
+  HEADER_DIRECTION_RESPONSE = 2;
+}
+
+// 数值与 domain HeaderAction.code 对齐：1=SET 2=ADD 3=REMOVE
+enum HeaderAction {
+  HEADER_ACTION_UNSPECIFIED = 0;
+  HEADER_ACTION_SET = 1;
+  HEADER_ACTION_ADD = 2;
+  HEADER_ACTION_REMOVE = 3;
+}
 message Status {
   int32 code = 1;
   optional string message = 2;
@@ -91,6 +106,18 @@ message HttpUser {
 message BasicAuth {
   bool enabled = 1;
   repeated HttpUser http_users = 2;
+}
+
+message HeaderRewriteRule {
+  HeaderDirection direction = 1;
+  HeaderAction action = 2;
+  string name = 3;
+  string value = 4;
+}
+
+message HeaderRewrite {
+  bool enabled = 1;
+  repeated HeaderRewriteRule rules = 2;
 }
 
 message Socks5User {
@@ -242,6 +269,7 @@ message Proxy {
   optional Socks5Auth socks5_auth = 16;
   optional FileShareAuth file_auth = 17;
   optional FileShareLimits file_limits = 18;
+  optional HeaderRewrite header_rewrite = 19;
 }
 
 message RuntimeInfo {

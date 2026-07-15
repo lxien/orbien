@@ -106,6 +106,11 @@ public class ProxyConfig implements Serializable {
     @Setter
     private BasicAuthConfig basicAuth;
     /**
+     * HTTP(S) Header 改写
+     */
+    @Setter
+    private HeaderRewriteConfig headerRewrite;
+    /**
      * 带宽限制配置
      */
     @Setter
@@ -194,6 +199,10 @@ public class ProxyConfig implements Serializable {
 
     public boolean hasBasicAuth() {
         return basicAuth != null;
+    }
+
+    public boolean hasHeaderRewrite() {
+        return headerRewrite != null;
     }
 
     public boolean hasSocks5Auth() {

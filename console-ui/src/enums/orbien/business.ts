@@ -30,6 +30,17 @@ export enum AccessControl {
     ALLOW = 1
 }
 
+export enum HeaderDirection {
+    REQUEST = 1,
+    RESPONSE = 2
+}
+
+export enum HeaderAction {
+    SET = 1,
+    ADD = 2,
+    REMOVE = 3
+}
+
 export enum HealthCheckType {
     TCP = 0,
     HTTP = 1
@@ -86,6 +97,25 @@ export const LOAD_BALANCE_OPTIONS = [
     {label: '随机 (random)', value: LoadBalanceType.RANDOM},
     {label: '最少连接 (leastconn)', value: LoadBalanceType.LEAST_CONN}
 ] as const
+
+export const HEADER_ACTION_OPTIONS = [
+    {label: 'SET', value: HeaderAction.SET},
+    {label: 'ADD', value: HeaderAction.ADD},
+    {label: 'REMOVE', value: HeaderAction.REMOVE}
+] as const
+
+export function getHeaderActionLabel(action?: number) {
+    switch (action) {
+        case HeaderAction.SET:
+            return 'SET'
+        case HeaderAction.ADD:
+            return 'ADD'
+        case HeaderAction.REMOVE:
+            return 'REMOVE'
+        default:
+            return action == null ? '' : String(action)
+    }
+}
 
 export const BANDWIDTH_UNIT_OPTIONS = [
     BandwidthUnit.KBPS,

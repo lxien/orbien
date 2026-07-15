@@ -56,6 +56,10 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
     @Autowired
     private BasicUserRepository basicUserRepository;
     @Autowired
+    private HeaderRewriteRepository headerRewriteRepository;
+    @Autowired
+    private HeaderRewriteRuleRepository headerRewriteRuleRepository;
+    @Autowired
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
@@ -113,6 +117,8 @@ public class ProxyDeleteListener implements EventListener<ProxyDeleteEvent> {
             proxyDomainRepository.deleteByProxyId(proxyId);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
+            headerRewriteRuleRepository.deleteByProxyIdIn(ids);
+            headerRewriteRepository.deleteByProxyIdIn(ids);
         }
         if (proxyDO.getProtocol().isFile()) {
             certBindingSyncService.removeBindingsByProxyId(proxyId);

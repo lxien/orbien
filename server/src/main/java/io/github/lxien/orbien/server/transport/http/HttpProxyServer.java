@@ -21,9 +21,11 @@ import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.server.config.AppConfig;
+import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.transport.VisitorPipelineSupport;
 import io.github.lxien.orbien.server.transport.VisitorInfoDecoder;
 import io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler;
+import io.github.lxien.orbien.server.vhost.DomainRegistry;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelInitializer;
@@ -51,14 +53,25 @@ public class HttpProxyServer implements Lifecycle {
     private final BasicAuthHandler basicAuthHandler;
     private final ForceHttpsRedirectHandler forceHttpsRedirectHandler;
     private final FileShareDispatchHandler fileShareDispatchHandler;
+    private final ProxyConfigService proxyConfigService;
+    private final DomainRegistry domainRegistry;
 
-    public HttpProxyServer(AppConfig config, HttpVisitorHandler httpVisitorHandler, HttpIpCheckHandler httpIpCheckHandler, BasicAuthHandler basicAuthHandler, ForceHttpsRedirectHandler forceHttpsRedirectHandler, FileShareDispatchHandler fileShareDispatchHandler) {
+    public HttpProxyServer(AppConfig config,
+                           HttpVisitorHandler httpVisitorHandler,
+                           HttpIpCheckHandler httpIpCheckHandler,
+                           BasicAuthHandler basicAuthHandler,
+                           ForceHttpsRedirectHandler forceHttpsRedirectHandler,
+                           FileShareDispatchHandler fileShareDispatchHandler,
+                           ProxyConfigService proxyConfigService,
+                           DomainRegistry domainRegistry) {
         this.appConfig = config;
         this.httpVisitorHandler = httpVisitorHandler;
         this.httpIpCheckHandler = httpIpCheckHandler;
         this.basicAuthHandler = basicAuthHandler;
         this.forceHttpsRedirectHandler = forceHttpsRedirectHandler;
         this.fileShareDispatchHandler = fileShareDispatchHandler;
+        this.proxyConfigService = proxyConfigService;
+        this.domainRegistry = domainRegistry;
     }
 
     @Override
@@ -83,6 +96,7 @@ public class HttpProxyServer implements Lifecycle {
                             pipeline.addLast(new VisitorInfoDecoder());
                             pipeline.addLast(forceHttpsRedirectHandler);
                             pipeline.addLast(new HeaderInjectDecoder());
+                            pipeline.addLast(new HeaderRewriteRequestDecoder(proxyConfigService, domainRegistry, "http"));
                             pipeline.addLast(httpIpCheckHandler);
                             pipeline.addLast(basicAuthHandler);
                             pipeline.addLast(fileShareDispatchHandler);

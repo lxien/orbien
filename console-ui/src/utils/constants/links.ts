@@ -12,11 +12,6 @@ export const WEB_LINKS = {
   // 项目 Github 主页
   GITHUB: 'https://github.com/lxien/orbien',
 
-  // 个人博客
-  BLOG: 'https://github.com/lxien/orbien',
-
   // 项目文档
   DOCS: 'https://lxien.github.io/orbien/',
-  // v2.6.1版本
-  OldVersion: 'https://www.artd.pro/v2/',
 }

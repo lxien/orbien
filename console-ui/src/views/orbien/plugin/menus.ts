@@ -21,6 +21,7 @@ export interface ProxyConfigMenuItem {
 const commonMenus = {
     access: {key: 'access', label: '访问控制', icon: 'ri:shield-line'},
     auth: {key: 'auth', label: '认证鉴权', icon: 'ri:key-line'},
+    headers: {key: 'headers', label: 'Header 改写', icon: 'ri:edit-box-line'},
     load: {key: 'load', label: '负载均衡', icon: 'ri:server-line'},
     health: {key: 'health', label: '健康检查', icon: 'ri:heart-pulse-line'},
     tls: {key: 'tls', label: 'TLS 加密', icon: 'ri:shield-check-line'},
@@ -46,6 +47,7 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     [ProtocolType.HTTP]: [
         commonMenus.access,
         commonMenus.auth,
+        commonMenus.headers,
         commonMenus.load,
         commonMenus.trans,
         commonMenus.health,
@@ -54,6 +56,7 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
     [ProtocolType.HTTPS]: [
         commonMenus.access,
         commonMenus.auth,
+        commonMenus.headers,
         commonMenus.load,
         commonMenus.tls,
         commonMenus.health,
@@ -72,21 +75,6 @@ export const protocolMenuMap: Record<ProxyConfigProtocol, ProxyConfigMenuItem[]>
         commonMenus.limit
     ]
 }
-
-/** 各协议弹窗标题 */
-export const protocolTitleMap: Record<ProxyConfigProtocol, string> = {
-    [ProtocolType.TCP]: 'TCP 代理配置',
-    [ProtocolType.UDP]: 'UDP 代理配置',
-    [ProtocolType.HTTP]: 'HTTP 代理配置',
-    [ProtocolType.HTTPS]: 'HTTPS 代理配置',
-    [ProtocolType.SOCKS5]: 'SOCKS5 代理配置',
-    [ProtocolType.FILE]: '文件共享配置'
-}
-
 export function getProtocolMenus(protocol: ProxyConfigProtocol): ProxyConfigMenuItem[] {
     return protocolMenuMap[protocol] ?? protocolMenuMap[ProtocolType.HTTP]
-}
-
-export function getProtocolTitle(protocol: ProxyConfigProtocol): string {
-    return protocolTitleMap[protocol] ?? protocolTitleMap[ProtocolType.HTTP]
 }

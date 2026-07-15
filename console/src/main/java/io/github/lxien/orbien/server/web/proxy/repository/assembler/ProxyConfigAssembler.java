@@ -23,7 +23,6 @@ import io.github.lxien.orbien.core.transport.compress.CompressionType;
 import io.github.lxien.orbien.server.web.entity.*;
 import io.github.lxien.orbien.server.web.proxy.converter.ProxyModelConvert;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyDetailQueryResult;
-import io.github.lxien.orbien.server.web.entity.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -58,6 +57,7 @@ public class ProxyConfigAssembler {
             if (config.hasBasicAuth()) {
                 assembleBasicAuthUsers(config, relations.basicUsers());
             }
+            assembleHeaderRewrite(config, relations.headerRewrite(), relations.headerRewriteRules());
         }
         if (config.isFile()) {
             assembleDomains(config, relations.domains());
@@ -207,6 +207,25 @@ public class ProxyConfigAssembler {
         if (basicAuth != null) {
             basicAuth.addUsers(proxyModelConvert.toBasicAuthUserConfig(basicUsers));
         }
+    }
+
+    public void assembleHeaderRewrite(ProxyConfig config, HeaderRewriteDO headerRewriteDO,
+                                      List<HeaderRewriteRuleDO> ruleDOS) {
+        if (headerRewriteDO == null) {
+            return;
+        }
+        HeaderRewriteConfig rewriteConfig = new HeaderRewriteConfig(Boolean.TRUE.equals(headerRewriteDO.getEnabled()));
+        if (!CollectionUtils.isEmpty(ruleDOS)) {
+            for (HeaderRewriteRuleDO ruleDO : ruleDOS) {
+                HeaderRewriteRule rule = new HeaderRewriteRule(ruleDO.getAction(), ruleDO.getName(), ruleDO.getValue());
+                if (ruleDO.getDirection() != null && ruleDO.getDirection().isResponse()) {
+                    rewriteConfig.addResponseRule(rule);
+                } else {
+                    rewriteConfig.addRequestRule(rule);
+                }
+            }
+        }
+        config.setHeaderRewrite(rewriteConfig);
     }
 
     public void assembleAccessControlRules(ProxyConfig config, List<AccessControlRuleDO> accessControlRuleDOS) {

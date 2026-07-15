@@ -84,6 +84,10 @@ public class ProxyServiceImpl implements ProxyService {
     @Autowired
     private BasicUserRepository basicUserRepository;
     @Autowired
+    private HeaderRewriteRepository headerRewriteRepository;
+    @Autowired
+    private HeaderRewriteRuleRepository headerRewriteRuleRepository;
+    @Autowired
     private Socks5AuthRepository socks5AuthRepository;
     @Autowired
     private Socks5UserRepository socks5UserRepository;
@@ -166,6 +170,7 @@ public class ProxyServiceImpl implements ProxyService {
 
         accessControlRepository.save(new AccessControlDO(proxyId, AccessControl.DENY));
         basicAuthRepository.save(new BasicAuthDO(proxyId, false));
+        headerRewriteRepository.save(new HeaderRewriteDO(proxyId, false));
         healthCheckRepository.save(HealthCheckDO.createDefault(proxyId, HealthCheckType.HTTP));
 
         transactionHelper.afterCommit(() -> refreshRuntimeProxy(proxyId, true));
@@ -1359,6 +1364,8 @@ public class ProxyServiceImpl implements ProxyService {
             proxyDomainRepository.deleteByProxyIdIn(ids);
             basicAuthRepository.deleteByProxyIdIn(ids);
             basicUserRepository.deleteByProxyIdIn(ids);
+            headerRewriteRuleRepository.deleteByProxyIdIn(ids);
+            headerRewriteRepository.deleteByProxyIdIn(ids);
         }
         if (protocolType.isSocks5()) {
             socks5AuthRepository.deleteByProxyIdIn(ids);

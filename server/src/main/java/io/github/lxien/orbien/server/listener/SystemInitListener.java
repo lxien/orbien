@@ -51,7 +51,6 @@ public class SystemInitListener implements EventListener<TunnelServerBindEvent> 
 
     @Override
     public void onEvent(TunnelServerBindEvent event) {
-        // 启动回填：已有代理 listenPort 标记为占用
         logger.debug("回填已占用端口");
         List<Integer> tcpPorts = proxyConfigService.getListenPorts(ProtocolType.TCP);
         for (Integer port : tcpPorts) {

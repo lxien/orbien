@@ -59,13 +59,17 @@ public class TransportConfiguration {
                                            HttpIpCheckHandler httpIpCheckHandler,
                                            BasicAuthHandler basicAuthHandler,
                                            ForceHttpsRedirectHandler forceHttpsRedirectHandler,
-                                           io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler) {
+                                           io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler,
+                                           io.github.lxien.orbien.server.service.ProxyConfigService proxyConfigService,
+                                           io.github.lxien.orbien.server.vhost.DomainRegistry domainRegistry) {
         return new HttpProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
                 forceHttpsRedirectHandler,
-                fileShareDispatchHandler
+                fileShareDispatchHandler,
+                proxyConfigService,
+                domainRegistry
         );
     }
     @Bean
@@ -73,12 +77,16 @@ public class TransportConfiguration {
                                              HttpIpCheckHandler httpIpCheckHandler,
                                              BasicAuthHandler basicAuthHandler,
                                              TlsCertificateManager tlsCertificateManager,
-                                             io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler) {
+                                             io.github.lxien.orbien.server.transport.file.FileShareDispatchHandler fileShareDispatchHandler,
+                                             io.github.lxien.orbien.server.service.ProxyConfigService proxyConfigService,
+                                             io.github.lxien.orbien.server.vhost.DomainRegistry domainRegistry) {
         return new HttpsProxyServer(config,
                 httpVisitorHandler,
                 httpIpCheckHandler,
                 basicAuthHandler,
                 tlsCertificateManager,
-                fileShareDispatchHandler);
+                fileShareDispatchHandler,
+                proxyConfigService,
+                domainRegistry);
     }
 }
