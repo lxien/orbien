@@ -94,6 +94,30 @@ public class MetricsCollector {
         return pm != null ? pm.toMetrics() : null;
     }
 
+    /**
+     * 文件共享：统计访问者 -> 服务端字节（下行 / read）
+     */
+    public void recordInbound(String proxyId, AgentType agentType, long bytes) {
+        if (!StringUtils.hasText(proxyId) || bytes <= 0) {
+            return;
+        }
+        ProxyMetrics metrics = getOrCreate(proxyId, agentType != null ? agentType : AgentType.STANDALONE);
+        metrics.incReadBytes(bytes);
+        metrics.incReadMessages(1);
+    }
+
+    /**
+     * 文件共享: 统计服务端 -> 访问者字节（上行 / write）
+     */
+    public void recordOutbound(String proxyId, AgentType agentType, long bytes) {
+        if (!StringUtils.hasText(proxyId) || bytes <= 0) {
+            return;
+        }
+        ProxyMetrics metrics = getOrCreate(proxyId, agentType != null ? agentType : AgentType.STANDALONE);
+        metrics.incWriteBytes(bytes);
+        metrics.incWriteMessages(1);
+    }
+
     public MetricsPageResult<Metrics> listAllMetrics(int page, int size) {
         List<Metrics> pageData = PROXY_METRICS.values().stream()
                 .sorted(Comparator.comparingLong(m ->
