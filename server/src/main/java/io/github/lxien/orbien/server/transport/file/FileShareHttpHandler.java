@@ -206,6 +206,90 @@ public class FileShareHttpHandler {
         }
     }
 
+    PreparedUpload prepareUpload(ProxyConfigExt ext, String requestPath, String cookie)
+            throws FileAuthService.AuthException, UploadDeniedException {
+        ProxyConfig config = ext.getProxyConfig();
+        String sessionId = parseSession(cookie);
+        FileAuthService.FileSession session = resolveSession(config, sessionId);
+        if (!session.canWrite()) {
+            throw new UploadDeniedException(403, "只读用户");
+        }
+        if (!resolveCanUpload(config, session)) {
+            throw new UploadDeniedException(403, "不允许上传");
+        }
+        String dir = queryParam(requestPath, "path");
+        return new PreparedUpload(config.getAgentId(), config.getProxyId(), dir);
+    }
+
+    void writeJsonHttp(Channel channel, int status, Object body) {
+        writeJson(channel, status, body);
+    }
+
+    static String parseFilenameFromContentDisposition(String header) {
+        Matcher star = FILENAME_STAR.matcher(header);
+        if (star.find()) {
+            String charset = star.group(1);
+            if (charset == null || charset.isBlank()) {
+                charset = "UTF-8";
+            }
+            try {
+                return URLDecoder.decode(star.group(2).trim(), charset);
+            } catch (Exception e) {
+                logger.debug("解析 filename* 失败: {}", e.getMessage());
+            }
+        }
+        Matcher quoted = FILENAME_QUOTED.matcher(header);
+        if (quoted.find()) {
+            return normalizeFilenameStatic(quoted.group(1));
+        }
+        Matcher plain = FILENAME_PLAIN.matcher(header);
+        if (plain.find()) {
+            return normalizeFilenameStatic(plain.group(1).trim());
+        }
+        return "upload.bin";
+    }
+
+    private static String normalizeFilenameStatic(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return "upload.bin";
+        }
+        String name = raw.trim();
+        if (name.contains("\uFFFD") || looksLikeLatin1MojibakeStatic(name)) {
+            name = new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+        }
+        int slash = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
+        if (slash >= 0) {
+            name = name.substring(slash + 1);
+        }
+        return name.isBlank() ? "upload.bin" : name;
+    }
+
+    private static boolean looksLikeLatin1MojibakeStatic(String name) {
+        for (int i = 0; i < name.length(); i++) {
+            char c = name.charAt(i);
+            if (c >= 0x80 && c <= 0xFF) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    record PreparedUpload(String agentId, String proxyId, String dir) {
+    }
+
+    static final class UploadDeniedException extends Exception {
+        private final int status;
+
+        UploadDeniedException(int status, String message) {
+            super(message);
+            this.status = status;
+        }
+
+        int status() {
+            return status;
+        }
+    }
+
     private void writeAuthStatus(Channel channel, ProxyConfig config, String sessionId) {
         FileShareAuthConfig auth = config.getFileShareAuth();
         boolean authRequired = auth != null && auth.isEnabled();
@@ -430,23 +514,22 @@ public class FileShareHttpHandler {
 
     private void handleUpload(Channel channel, String agentId, String proxyId, String path, SimpleHttpRequest req) throws Exception {
         String dir = queryParam(path, "path");
-        byte[] fileData = extractMultipartFile(req);
-        if (fileData == null) {
+        MultipartFilePart file = extractMultipartFile(req);
+        if (file == null) {
             writeJson(channel, 400, Map.of("message", "无效的上传"));
             return;
         }
-        String filename = extractMultipartFilename(req);
+        String filename = file.filename();
         String filePath = "/".equals(dir) || dir.isEmpty() ? "/" + filename : (dir.endsWith("/") ? dir + filename : dir + "/" + filename);
         FileTransferCoordinator.UploadSession uploadSession =
-                fileTransferCoordinator.startUpload(agentId, proxyId, filePath, fileData.length);
+                fileTransferCoordinator.startUpload(agentId, proxyId, filePath, file.length());
         String requestId = uploadSession.requestId();
         int chunkSize = FileTransferConstants.CHUNK_SIZE;
         long offset = 0;
-        for (int i = 0; i < fileData.length; i += chunkSize) {
-            int len = Math.min(chunkSize, fileData.length - i);
-            byte[] chunk = Arrays.copyOfRange(fileData, i, i + len);
-            boolean last = i + len >= fileData.length;
-            fileTransferCoordinator.uploadChunk(agentId, requestId, offset, chunk, last);
+        for (int i = 0; i < file.length(); i += chunkSize) {
+            int len = Math.min(chunkSize, file.length() - i);
+            boolean last = i + len >= file.length();
+            fileTransferCoordinator.uploadChunk(agentId, requestId, offset, file.data(), file.offset() + i, len, last);
             offset += len;
         }
         fileTransferCoordinator.awaitUpload(uploadSession);
@@ -766,7 +849,10 @@ public class FileShareHttpHandler {
         return "/";
     }
 
-    private byte[] extractMultipartFile(SimpleHttpRequest req) {
+    private record MultipartFilePart(byte[] data, int offset, int length, String filename) {
+    }
+
+    private MultipartFilePart extractMultipartFile(SimpleHttpRequest req) {
         String ct = req.header("Content-Type");
         if (ct == null || !ct.contains("multipart/form-data")) {
             return null;
@@ -804,52 +890,14 @@ public class FileShareHttpHandler {
                 if (contentEnd - 2 >= contentStart && body[contentEnd - 2] == '\r' && body[contentEnd - 1] == '\n') {
                     contentEnd -= 2;
                 }
-                return Arrays.copyOfRange(body, contentStart, contentEnd);
-            }
-            searchFrom = headerEnd + 4;
-        }
-        return null;
-    }
-
-    private String extractMultipartFilename(SimpleHttpRequest req) {
-        String partHeader = findFilePartHeader(req);
-        if (partHeader == null) {
-            return "upload.bin";
-        }
-        return parseFilenameFromContentDisposition(partHeader);
-    }
-
-    private String findFilePartHeader(SimpleHttpRequest req) {
-        String ct = req.header("Content-Type");
-        if (ct == null || !ct.contains("multipart/form-data")) {
-            return null;
-        }
-        String boundary = extractBoundary(ct);
-        if (boundary == null) {
-            return null;
-        }
-        byte[] body = req.bodyBytes();
-        byte[] boundaryMarker = ("--" + boundary).getBytes(StandardCharsets.US_ASCII);
-        int searchFrom = 0;
-        while (searchFrom < body.length) {
-            int partStart = indexOf(body, boundaryMarker, searchFrom);
-            if (partStart < 0) {
-                break;
-            }
-            partStart += boundaryMarker.length;
-            if (partStart + 1 < body.length && body[partStart] == '-' && body[partStart + 1] == '-') {
-                break;
-            }
-            if (partStart + 1 < body.length && (body[partStart] == '\r' || body[partStart] == '\n')) {
-                partStart = skipLineBreak(body, partStart);
-            }
-            int headerEnd = indexOf(body, "\r\n\r\n".getBytes(StandardCharsets.US_ASCII), partStart);
-            if (headerEnd < 0) {
-                break;
-            }
-            String partHeader = new String(body, partStart, headerEnd - partStart, StandardCharsets.UTF_8);
-            if (partHeader.contains("filename=") || partHeader.contains("filename*=")) {
-                return partHeader;
+                if (contentEnd < contentStart) {
+                    return null;
+                }
+                return new MultipartFilePart(
+                        body,
+                        contentStart,
+                        contentEnd - contentStart,
+                        parseFilenameFromContentDisposition(partHeader));
             }
             searchFrom = headerEnd + 4;
         }
@@ -870,55 +918,6 @@ public class FileShareHttpHandler {
             boundary = boundary.substring(0, semi).trim();
         }
         return boundary.isEmpty() ? null : boundary;
-    }
-
-    private String parseFilenameFromContentDisposition(String header) {
-        Matcher star = FILENAME_STAR.matcher(header);
-        if (star.find()) {
-            String charset = star.group(1);
-            if (charset == null || charset.isBlank()) {
-                charset = "UTF-8";
-            }
-            try {
-                return URLDecoder.decode(star.group(2).trim(), charset);
-            } catch (Exception e) {
-                logger.debug("解析 filename* 失败: {}", e.getMessage());
-            }
-        }
-        Matcher quoted = FILENAME_QUOTED.matcher(header);
-        if (quoted.find()) {
-            return normalizeFilename(quoted.group(1));
-        }
-        Matcher plain = FILENAME_PLAIN.matcher(header);
-        if (plain.find()) {
-            return normalizeFilename(plain.group(1).trim());
-        }
-        return "upload.bin";
-    }
-
-    private String normalizeFilename(String raw) {
-        if (raw == null || raw.isBlank()) {
-            return "upload.bin";
-        }
-        String name = raw.trim();
-        if (name.contains("\uFFFD") || looksLikeLatin1Mojibake(name)) {
-            name = new String(name.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-        }
-        int slash = Math.max(name.lastIndexOf('/'), name.lastIndexOf('\\'));
-        if (slash >= 0) {
-            name = name.substring(slash + 1);
-        }
-        return name.isBlank() ? "upload.bin" : name;
-    }
-
-    private boolean looksLikeLatin1Mojibake(String name) {
-        for (int i = 0; i < name.length(); i++) {
-            char c = name.charAt(i);
-            if (c >= 0x80 && c <= 0xFF) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private int indexOf(byte[] source, byte[] target, int from) {
@@ -963,14 +962,23 @@ public class FileShareHttpHandler {
         String header(String name) { return headers.get(name.toLowerCase()); }
 
         static SimpleHttpRequest parse(ByteBuf buf) {
-            byte[] raw = new byte[buf.readableBytes()];
-            buf.getBytes(buf.readerIndex(), raw);
-            int headerEnd = indexOf(raw, "\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            int readerIndex = buf.readerIndex();
+            int readable = buf.readableBytes();
+            if (readable <= 0 || readable > Integer.MAX_VALUE / 2) {
+                return null;
+            }
+            int headerEnd = indexOf(buf, readerIndex, readable, CRLFCRLF);
             if (headerEnd < 0) {
                 return null;
             }
-            String headerPart = new String(raw, 0, headerEnd, StandardCharsets.US_ASCII);
-            byte[] body = Arrays.copyOfRange(raw, headerEnd + 4, raw.length);
+            int headerLen = headerEnd - readerIndex;
+            String headerPart = buf.toString(readerIndex, headerLen, StandardCharsets.US_ASCII);
+            int bodyStart = headerEnd + 4;
+            int bodyLen = readerIndex + readable - bodyStart;
+            byte[] body = bodyLen > 0 ? new byte[bodyLen] : EMPTY_BODY;
+            if (bodyLen > 0) {
+                buf.getBytes(bodyStart, body);
+            }
             String[] lines = headerPart.split("\r\n");
             if (lines.length == 0) {
                 return null;
@@ -990,18 +998,19 @@ public class FileShareHttpHandler {
             return req;
         }
 
-        private static int indexOf(byte[] source, byte[] target) {
-            for (int i = 0; i <= source.length - target.length; i++) {
-                boolean match = true;
+        private static final byte[] EMPTY_BODY = new byte[0];
+        private static final byte[] CRLFCRLF = "\r\n\r\n".getBytes(StandardCharsets.US_ASCII);
+
+        private static int indexOf(ByteBuf buf, int start, int readable, byte[] target) {
+            int end = start + readable - target.length;
+            outer:
+            for (int i = start; i <= end; i++) {
                 for (int j = 0; j < target.length; j++) {
-                    if (source[i + j] != target[j]) {
-                        match = false;
-                        break;
+                    if (buf.getByte(i + j) != target[j]) {
+                        continue outer;
                     }
                 }
-                if (match) {
-                    return i;
-                }
+                return i;
             }
             return -1;
         }

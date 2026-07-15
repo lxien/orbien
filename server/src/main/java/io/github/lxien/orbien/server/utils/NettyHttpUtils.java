@@ -103,6 +103,17 @@ public class NettyHttpUtils {
         return writeAndFlush(channel, buildResponse(channel, response));
     }
 
+    public static ChannelFuture sendHttp413(Channel channel) {
+        String response = """
+                HTTP/1.1 413 Content Too Large\r
+                Content-Type: text/plain\r
+                Content-Length: 17\r
+                Connection: close\r
+                \r
+                Content Too Large""";
+        return writeAndFlush(channel, buildResponse(channel, response));
+    }
+
     /**
      * 发送 HTTP 重定向（默认 308 Permanent Redirect）。
      */

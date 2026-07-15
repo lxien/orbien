@@ -536,10 +536,30 @@ body.is-bootstrapping #appView {
     outline-offset: 2px;
 }
 
-.file-browser.drop-target,
-.column-panel.drop-target {
+.file-browser.drop-target {
     outline: 2px dashed var(--text-link);
     outline-offset: -4px;
+}
+
+/* 分栏右侧 gutter（::after）会盖住 inset outline，改在内容区画完整虚线框 */
+.column-panel.drop-target {
+    isolation: isolate;
+    z-index: 1;
+}
+
+.column-panel.drop-target::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    /* 避开右侧 gutter，避免虚线右边被分隔条遮住 */
+    right: calc(var(--column-gutter-width) + 4px);
+    bottom: 4px;
+    left: 4px;
+    border: 2px dashed var(--text-link);
+    border-radius: 4px;
+    pointer-events: none;
+    z-index: 3;
+    box-sizing: border-box;
 }
 
 .breadcrumb {

@@ -1,3 +1,18 @@
+/*
+ *    Copyright 2026 lxien
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
 package io.github.lxien.orbien.server.transport.file;
 
 import io.netty.buffer.ByteBuf;
@@ -8,18 +23,28 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.nio.charset.StandardCharsets;
 
-/**
- * 聚合 HTTP 请求帧（支持大 body 分片到达，如 multipart 上传）
- */
 final class FileShareHttpFrameBuffer {
 
+    static final int MAX_HEADER_BYTES = 64 * 1024;
+
+    private final long maxRequestBytes;
     private ByteBuf buffer;
-    /**
-     * 完整 HTTP 报文长度（请求头 + body）
-     */
-    private int requiredBytes = -1;
+    private long requiredBytes = -1;
+    private boolean overflow;
+
+    FileShareHttpFrameBuffer(long maxRequestBytes) {
+        this.maxRequestBytes = Math.max(MAX_HEADER_BYTES, maxRequestBytes);
+    }
+
+    boolean isOverflow() {
+        return overflow;
+    }
 
     ByteBuf feed(Channel channel, ByteBuf incoming) {
+        if (overflow) {
+            ReferenceCountUtil.release(incoming);
+            return null;
+        }
         if (incoming != null) {
             if (!incoming.isReadable()) {
                 ReferenceCountUtil.release(incoming);
@@ -28,7 +53,12 @@ final class FileShareHttpFrameBuffer {
                 }
             } else {
                 if (buffer == null) {
-                    buffer = Unpooled.buffer(incoming.readableBytes());
+                    buffer = Unpooled.buffer(Math.min(incoming.readableBytes(), 8192));
+                }
+                if ((long) buffer.readableBytes() + incoming.readableBytes() > maxRequestBytes) {
+                    ReferenceCountUtil.release(incoming);
+                    markOverflow(channel);
+                    return null;
                 }
                 buffer.writeBytes(incoming);
                 ReferenceCountUtil.release(incoming);
@@ -38,15 +68,26 @@ final class FileShareHttpFrameBuffer {
         }
 
         if (requiredBytes < 0) {
-            int headerEndIndex = indexOf(buffer, "\r\n\r\n".getBytes(StandardCharsets.US_ASCII));
+            int headerEndIndex = indexOf(buffer, CRLFCRLF);
             if (headerEndIndex < 0) {
+                if (buffer.readableBytes() >= MAX_HEADER_BYTES) {
+                    markOverflow(channel);
+                }
                 return null;
             }
             int headerBytes = headerEndIndex + 4;
-            int contentLength = parseContentLength(buffer, headerBytes);
+            if (headerBytes > MAX_HEADER_BYTES) {
+                markOverflow(channel);
+                return null;
+            }
+            long contentLength = parseContentLength(buffer, headerBytes);
+            if (contentLength < 0) {
+                markOverflow(channel);
+                return null;
+            }
             requiredBytes = headerBytes + contentLength;
-            if (requiredBytes <= 0) {
-                discard(channel);
+            if (requiredBytes > maxRequestBytes || requiredBytes > Integer.MAX_VALUE) {
+                markOverflow(channel);
                 return null;
             }
         }
@@ -55,19 +96,20 @@ final class FileShareHttpFrameBuffer {
             return null;
         }
 
+        int take = (int) requiredBytes;
         ByteBuf complete;
-        if (buffer.readableBytes() == requiredBytes) {
+        if (buffer.readableBytes() == take) {
             complete = buffer;
             buffer = null;
         } else {
-            complete = buffer.readRetainedSlice(requiredBytes);
+            complete = buffer.readRetainedSlice(take);
         }
         requiredBytes = -1;
         return complete;
     }
 
     boolean hasBuffered() {
-        return buffer != null && buffer.isReadable();
+        return !overflow && buffer != null && buffer.isReadable();
     }
 
     void discard(Channel channel) {
@@ -78,14 +120,22 @@ final class FileShareHttpFrameBuffer {
         requiredBytes = -1;
     }
 
-    private static int parseContentLength(ByteBuf buf, int headerBytes) {
+    private void markOverflow(Channel channel) {
+        overflow = true;
+        discard(channel);
+    }
+
+    private static final byte[] CRLFCRLF = "\r\n\r\n".getBytes(StandardCharsets.US_ASCII);
+
+    private static long parseContentLength(ByteBuf buf, int headerBytes) {
         String headers = buf.toString(buf.readerIndex(), headerBytes, CharsetUtil.US_ASCII);
         for (String line : headers.split("\r\n")) {
             if (line.regionMatches(true, 0, "Content-Length:", 0, 15)) {
                 try {
-                    return Integer.parseInt(line.substring(15).trim());
+                    long value = Long.parseLong(line.substring(15).trim());
+                    return value < 0 ? -1 : value;
                 } catch (NumberFormatException ignored) {
-                    return 0;
+                    return -1;
                 }
             }
         }

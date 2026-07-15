@@ -88,6 +88,11 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        if (isOutOfMemoryError(cause)) {
+            logger.debug("[HTTP]内存不足，关闭连接");
+            ChannelUtils.closeOnFlush(ctx.channel());
+            return;
+        }
         if (isCertificateUnknownError(cause)) {
             ChannelUtils.closeOnFlush(ctx.channel());
             logger.debug("证书未知错误，可能是客户端未信任自签名证书");
@@ -99,6 +104,16 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
         });
         ctx.fireExceptionCaught(cause);
+    }
+
+    private boolean isOutOfMemoryError(Throwable cause) {
+        while (cause != null) {
+            if (cause instanceof OutOfMemoryError) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 
     /**

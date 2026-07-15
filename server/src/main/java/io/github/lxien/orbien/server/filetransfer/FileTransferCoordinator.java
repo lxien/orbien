@@ -71,10 +71,15 @@ public class FileTransferCoordinator {
     }
 
     public void uploadChunk(String agentId, String requestId, long offset, byte[] data, boolean last) throws Exception {
+        uploadChunk(agentId, requestId, offset, data, 0, data == null ? 0 : data.length, last);
+    }
+
+    public void uploadChunk(String agentId, String requestId, long offset, byte[] data, int dataOffset, int length,
+                            boolean last) throws Exception {
         Message.FileChunk chunk = Message.FileChunk.newBuilder()
                 .setRequestId(requestId)
                 .setOffset(offset)
-                .setData(com.google.protobuf.ByteString.copyFrom(data))
+                .setData(com.google.protobuf.ByteString.copyFrom(data, dataOffset, length))
                 .setLast(last)
                 .build();
         sendAndAwait(agentId, TMSP.MSG_FILE_CHUNK, chunk,
