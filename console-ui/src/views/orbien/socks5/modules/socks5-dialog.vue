@@ -41,22 +41,29 @@
               class="remote-port-input"
               @input="selectedSuggestPort = null"
           />
-          <ElButton
-              v-for="port in suggestedPorts"
-              :key="port"
-              size="small"
-              :type="selectedSuggestPort === port ? 'primary' : 'default'"
-              plain
-              @click="selectSuggestedPort(port)"
+          <template v-if="suggestedPorts.length">
+            <ElButton
+                v-for="port in suggestedPorts"
+                :key="port"
+                size="small"
+                :type="selectedSuggestPort === port ? 'primary' : 'default'"
+                plain
+                @click="selectSuggestedPort(port)"
+            >
+              {{ port }}
+            </ElButton>
+            <ElButton link type="primary" :loading="suggestLoading" @click="loadSuggestedPorts()">
+              换一批
+            </ElButton>
+          </template>
+          <ElLink
+              v-else-if="!suggestLoading"
+              type="primary"
+              :underline="false"
+              @click="goToPortPool"
           >
-            {{ port }}
-          </ElButton>
-          <span v-if="!suggestLoading && !suggestedPorts.length" class="port-suggestions-empty">
-            暂无
-          </span>
-          <ElButton link type="primary" :loading="suggestLoading" @click="loadSuggestedPorts()">
-            换一批
-          </ElButton>
+            去添加端口
+          </ElLink>
         </div>
       </ElFormItem>
 
@@ -122,6 +129,7 @@
 
 <script setup lang="ts">
 import {ref, reactive, watch, computed} from 'vue'
+import {useRouter} from 'vue-router'
 import {ElMessage} from 'element-plus'
 import type {FormInstance, FormRules} from 'element-plus'
 import {DialogType} from '@/types'
@@ -176,6 +184,7 @@ const selectedSuggestPort = ref<number | null>(null)
 const suggestLoading = ref(false)
 const remotePortInput = ref('')
 const authUsers = ref<AuthUserForm[]>([])
+const router = useRouter()
 
 let openSession = 0
 
@@ -284,6 +293,11 @@ const loadSuggestedPorts = async (session = openSession) => {
       suggestLoading.value = false
     }
   }
+}
+
+const goToPortPool = () => {
+  dialogVisible.value = false
+  router.push('/port-pool')
 }
 
 const loadEditForm = async (session: number, proxyId: string) => {
@@ -396,12 +410,6 @@ const handleSubmit = async () => {
 .remote-port-input {
   width: 146px;
   flex-shrink: 0;
-}
-
-.port-suggestions-empty {
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
-  white-space: nowrap;
 }
 
 .auth-switch-row {
