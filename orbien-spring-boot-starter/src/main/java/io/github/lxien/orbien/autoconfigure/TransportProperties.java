@@ -8,9 +8,7 @@ import java.io.Serializable;
 
 @Data
 public class TransportProperties implements Serializable {
-    /**
-     * 控制连接与数据隧道传输协议。
-     */
+
     private TransportProtocol protocol = TransportProtocol.TCP;
 
     @NestedConfigurationProperty

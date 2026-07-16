@@ -2,6 +2,7 @@ package io.github.lxien.orbien.autoconfigure;
 
 import io.github.lxien.orbien.client.TunnelClient;
 import io.github.lxien.orbien.client.config.AppConfig;
+import io.github.lxien.orbien.client.console.SessionConsole;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -10,6 +11,7 @@ import org.springframework.core.io.ResourceLoader;
 
 public class ClientBootstrap implements DisposableBean {
     private TunnelClient tunnelClient;
+    private SessionConsole sessionConsole;
     private final PortHolder portHolder;
     private final Environment environment;
     private final OrbienClientProperties properties;
@@ -43,11 +45,15 @@ public class ClientBootstrap implements DisposableBean {
         AppConfig config = AppConfigBuilder.build(properties, resourceLoader, appName, localPort);
         tunnelClient = new TunnelClient(config);
         tunnelClient.start();
+        sessionConsole = SessionConsole.start(config.getServerAddr(), config.getServerPort());
         started = true;
     }
 
     @Override
     public void destroy() {
+        if (sessionConsole != null) {
+            sessionConsole.stop();
+        }
         if (tunnelClient != null) {
             try {
                 tunnelClient.stop();

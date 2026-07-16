@@ -36,11 +36,6 @@ public class PortHolder {
         return port.get();
     }
 
-    /**
-     * 早期获取（兼容 Boot 2/3/4）
-     *
-     * @param event
-     */
     @EventListener
     public void onWebServerInit(Object event) {
         try {

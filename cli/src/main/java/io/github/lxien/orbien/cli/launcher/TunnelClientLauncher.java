@@ -1,11 +1,11 @@
 package io.github.lxien.orbien.cli.launcher;
 
 import ch.qos.logback.classic.Level;
-import io.github.lxien.orbien.cli.support.CliSessionConsole;
 import io.github.lxien.orbien.client.TunnelClient;
 import io.github.lxien.orbien.client.config.AppConfig;
 import io.github.lxien.orbien.client.config.TomlConfigLoader;
 import io.github.lxien.orbien.client.config.domain.LogConfig;
+import io.github.lxien.orbien.client.console.SessionConsole;
 import io.github.lxien.orbien.client.logging.LogbackConfigurator;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
@@ -21,7 +21,7 @@ public final class TunnelClientLauncher {
     private static final CountDownLatch SHUTDOWN_LATCH = new CountDownLatch(1);
 
     private static TunnelClient tunnelClient;
-    private static CliSessionConsole sessionConsole;
+    private static SessionConsole sessionConsole;
 
     private TunnelClientLauncher() {
     }
@@ -46,7 +46,7 @@ public final class TunnelClientLauncher {
     public static int launchSession(AppConfig config) {
         try {
             startTunnel(config, true);
-            sessionConsole = CliSessionConsole.start(config);
+            sessionConsole = SessionConsole.start(config.getServerAddr(), config.getServerPort());
             awaitShutdown();
             return 0;
         } catch (IllegalArgumentException e) {

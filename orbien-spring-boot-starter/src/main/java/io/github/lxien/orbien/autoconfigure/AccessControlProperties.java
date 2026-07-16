@@ -26,9 +26,6 @@ import java.util.Set;
 @Data
 public class AccessControlProperties implements Serializable {
     private boolean enabled = false;
-    /**
-     * 访问控制模式：ALLOW（白名单）/ DENY（黑名单）。
-     */
     private AccessControl mode = AccessControl.ALLOW;
     private final Set<String> allow = new HashSet<>();
     private final Set<String> deny = new HashSet<>();

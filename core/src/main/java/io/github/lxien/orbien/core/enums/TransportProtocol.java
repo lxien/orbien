@@ -7,9 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 数据隧道传输协议（控制/数据通道）
- */
+
 @Getter
 public enum TransportProtocol {
     TCP(1, "tcp", 9527, true, true),
@@ -64,9 +62,6 @@ public enum TransportProtocol {
         return protocol != null ? protocol : defaultValue;
     }
 
-    /**
-     * 线上帧编码仍使用 ordinal，保持与既有客户端/服务端兼容。
-     */
     public byte toWire() {
         return (byte) ordinal();
     }

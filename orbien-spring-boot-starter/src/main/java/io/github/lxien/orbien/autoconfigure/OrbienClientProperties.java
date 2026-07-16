@@ -31,12 +31,12 @@ public class OrbienClientProperties {
     private Boolean enabled = false;
 
     /**
-     * 代理服务地址
+     * TCP传输地址
      */
     private String serverAddr = "127.0.0.1";
 
     /**
-     * 代理服务端口
+     * TCP传输端口
      */
     private Integer serverPort = 9527;
 

@@ -37,7 +37,7 @@ public class ProxyProperties implements Serializable {
     private String localIp = "127.0.0.1";
 
     /**
-     * 代理协议，仅支持 HTTP / HTTPS（对应内嵌 Web 容器）
+     * 代理协议
      */
     private WebProxyProtocol protocol = WebProxyProtocol.HTTP;
     private Boolean forceHttps = false;
