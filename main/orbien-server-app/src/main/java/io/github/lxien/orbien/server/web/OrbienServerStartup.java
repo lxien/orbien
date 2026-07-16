@@ -33,19 +33,19 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @SpringBootApplication
 @ComponentScan("io.github.lxien.orbien")
-public class TunnelServerStartup {
+public class OrbienServerStartup {
     public static void main(String[] args) {
         AppConfig config = ConfigParser.parse(args);
         DashboardConfig dashboard = config.getDashboard();
-        SpringApplicationBuilder builder = new SpringApplicationBuilder(TunnelServerStartup.class)
-                .main(TunnelServerStartup.class);
+        SpringApplicationBuilder builder = new SpringApplicationBuilder(OrbienServerStartup.class)
+                .main(OrbienServerStartup.class);
         if (Boolean.TRUE.equals(dashboard.getEnabled())) {
             DashboardSpringBootSupport.apply(builder, dashboard);
         } else {
             builder.properties("spring.main.web-application-type=none");
         }
 
-        builder.sources(TunnelServerStartup.class)
+        builder.sources(OrbienServerStartup.class)
                 .initializers(context ->
                         context.getBeanFactory().registerSingleton("appConfig", config))
                 .run(args);

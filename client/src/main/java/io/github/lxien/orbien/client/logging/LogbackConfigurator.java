@@ -271,7 +271,7 @@ public class LogbackConfigurator {
             return loggerContext;
         }
         LoggerContext context = new LoggerContext();
-        context.setName("orbienc");
+        context.setName("orbien");
         context.start();
         return context;
     }

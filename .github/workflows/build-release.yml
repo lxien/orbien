@@ -132,17 +132,17 @@ jobs:
       - name: 复制前端资源到 Spring Boot (Unix)
         if: matrix.platform != 'windows'
         run: |
-          mkdir -p main/orbiens/src/main/resources/static
-          cp -r console-ui/dist/* main/orbiens/src/main/resources/static/
+          mkdir -p main/orbien-server-app/src/main/resources/static
+          cp -r console-ui/dist/* main/orbien-server-app/src/main/resources/static/
           echo "✅ 前端资源已复制到 static 目录"
-          ls -la main/orbiens/src/main/resources/static/
+          ls -la main/orbien-server-app/src/main/resources/static/
 
       - name: 复制前端资源到 Spring Boot (Windows)
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path main\orbiens\src\main\resources\static
-          Copy-Item -Recurse -Force console-ui\dist\* main\orbiens\src\main\resources\static\
+          New-Item -ItemType Directory -Force -Path main\orbien-server-app\src\main\resources\static
+          Copy-Item -Recurse -Force console-ui\dist\* main\orbien-server-app\src\main\resources\static\
           Write-Host "✅ 前端资源已复制到 static 目录"
 
       - name: 设置 GraalVM 环境
@@ -166,11 +166,11 @@ jobs:
 
       - name: 构建服务端 JAR 包
         shell: bash
-        run: cd main && mvn clean package -pl orbiens -DskipTests --no-transfer-progress
+        run: cd main && mvn clean package -pl orbien-server-app -DskipTests --no-transfer-progress
 
       - name: 构建客户端原生镜像
         shell: bash
-        run: mvn clean package -pl main/orbienc,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
+        run: mvn clean package -pl main/orbien-client-app,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
 
       # Linux/macOS 打包
       - name: 打包 Unix 发布文件
@@ -178,26 +178,26 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ github.ref_name }}"
-          ORBIENS_RELEASE_NAME="orbiens_${VERSION}_${{ matrix.artifact_suffix }}"
-          ORBIENC_RELEASE_NAME="orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
+          SERVER_RELEASE_NAME="orbien-server_${VERSION}_${{ matrix.artifact_suffix }}"
+          CLIENT_RELEASE_NAME="orbien_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          mkdir -p "$ORBIENS_RELEASE_NAME/config"
-          mkdir -p "$ORBIENC_RELEASE_NAME"
+          mkdir -p "$SERVER_RELEASE_NAME/config"
+          mkdir -p "$CLIENT_RELEASE_NAME"
 
           # 打包服务端
-          cp main/orbiens/target/orbiens-[0-9]*.jar "$ORBIENS_RELEASE_NAME/orbiens.jar"
-          cp "main/orbiens/src/main/resources/orbiens.toml" "$ORBIENS_RELEASE_NAME/orbiens.toml"
-          cp "main/orbiens/src/main/resources/application.yml" "$ORBIENS_RELEASE_NAME/config/application.yml"
-          cp "main/orbiens/src/main/resources/application-mysql.yml" "$ORBIENS_RELEASE_NAME/config/application-mysql.yml"
-          cp "main/orbiens/src/main/resources/logback-spring.xml" "$ORBIENS_RELEASE_NAME/config/logback-spring.xml"
+          cp main/orbien-server-app/target/orbien-server.jar "$SERVER_RELEASE_NAME/orbien-server.jar"
+          cp "main/orbien-server-app/src/main/resources/orbien-server.toml" "$SERVER_RELEASE_NAME/orbien-server.toml"
+          cp "main/orbien-server-app/src/main/resources/application.yml" "$SERVER_RELEASE_NAME/config/application.yml"
+          cp "main/orbien-server-app/src/main/resources/application-mysql.yml" "$SERVER_RELEASE_NAME/config/application-mysql.yml"
+          cp "main/orbien-server-app/src/main/resources/logback-spring.xml" "$SERVER_RELEASE_NAME/config/logback-spring.xml"
 
           # 打包客户端
-          cp "main/orbienc/target/orbienc" "$ORBIENC_RELEASE_NAME/orbienc"
-          cp "main/orbienc/src/main/resources/orbienc.toml" "$ORBIENC_RELEASE_NAME/orbienc.toml"
+          cp "main/orbien-client-app/target/orbien" "$CLIENT_RELEASE_NAME/orbien"
+          cp "main/orbien-client-app/src/main/resources/orbien.toml" "$CLIENT_RELEASE_NAME/orbien.toml"
 
-          tar -czf "$ORBIENS_RELEASE_NAME.tar.gz" "$ORBIENS_RELEASE_NAME"
-          tar -czf "$ORBIENC_RELEASE_NAME.tar.gz" "$ORBIENC_RELEASE_NAME"
-          echo "✅ Unix打包完成: $ORBIENS_RELEASE_NAME.tar.gz, $ORBIENC_RELEASE_NAME.tar.gz"
+          tar -czf "$SERVER_RELEASE_NAME.tar.gz" "$SERVER_RELEASE_NAME"
+          tar -czf "$CLIENT_RELEASE_NAME.tar.gz" "$CLIENT_RELEASE_NAME"
+          echo "✅ Unix打包完成: $SERVER_RELEASE_NAME.tar.gz, $CLIENT_RELEASE_NAME.tar.gz"
 
       # Windows 打包
       - name: 打包 Windows 发布文件
@@ -205,38 +205,38 @@ jobs:
         shell: pwsh
         run: |
           $VERSION = "${{ github.ref_name }}"
-          $ORBIENS_RELEASE_NAME = "orbiens_${VERSION}_${{ matrix.artifact_suffix }}"
-          $ORBIENC_RELEASE_NAME = "orbienc_${VERSION}_${{ matrix.artifact_suffix }}"
+          $SERVER_RELEASE_NAME = "orbien-server_${VERSION}_${{ matrix.artifact_suffix }}"
+          $CLIENT_RELEASE_NAME = "orbien_${VERSION}_${{ matrix.artifact_suffix }}"
 
-          New-Item -ItemType Directory -Force -Path "$ORBIENS_RELEASE_NAME\config"
-          New-Item -ItemType Directory -Force -Path $ORBIENC_RELEASE_NAME
+          New-Item -ItemType Directory -Force -Path "$SERVER_RELEASE_NAME\config"
+          New-Item -ItemType Directory -Force -Path $CLIENT_RELEASE_NAME
 
           # 打包服务端
-          Copy-Item "main\orbiens\target\orbiens-[0-9]*.jar" "$ORBIENS_RELEASE_NAME\orbiens.jar"
-          Copy-Item "main\orbiens\src\main\resources\orbiens.toml" "$ORBIENS_RELEASE_NAME\orbiens.toml"
-          Copy-Item "main\orbiens\src\main\resources\application.yml" "$ORBIENS_RELEASE_NAME\config\application.yml"
-          Copy-Item "main\orbiens\src\main\resources\application-mysql.yml" "$ORBIENS_RELEASE_NAME\config\application-mysql.yml"
-          Copy-Item "main\orbiens\src\main\resources\logback-spring.xml" "$ORBIENS_RELEASE_NAME\config\logback-spring.xml"
+          Copy-Item "main\orbien-server-app\target\orbien-server.jar" "$SERVER_RELEASE_NAME\orbien-server.jar"
+          Copy-Item "main\orbien-server-app\src\main\resources\orbien-server.toml" "$SERVER_RELEASE_NAME\orbien-server.toml"
+          Copy-Item "main\orbien-server-app\src\main\resources\application.yml" "$SERVER_RELEASE_NAME\config\application.yml"
+          Copy-Item "main\orbien-server-app\src\main\resources\application-mysql.yml" "$SERVER_RELEASE_NAME\config\application-mysql.yml"
+          Copy-Item "main\orbien-server-app\src\main\resources\logback-spring.xml" "$SERVER_RELEASE_NAME\config\logback-spring.xml"
 
           # 打包客户端
-          Copy-Item "main\orbienc\target\orbienc.exe" "$ORBIENC_RELEASE_NAME\orbienc.exe"
-          Copy-Item "main\orbienc\src\main\resources\orbienc.toml" "$ORBIENC_RELEASE_NAME\orbienc.toml"
+          Copy-Item "main\orbien-client-app\target\orbien.exe" "$CLIENT_RELEASE_NAME\orbien.exe"
+          Copy-Item "main\orbien-client-app\src\main\resources\orbien.toml" "$CLIENT_RELEASE_NAME\orbien.toml"
 
-          Compress-Archive -Path "$ORBIENS_RELEASE_NAME\*" -DestinationPath "$ORBIENS_RELEASE_NAME.zip"
-          Compress-Archive -Path "$ORBIENC_RELEASE_NAME\*" -DestinationPath "$ORBIENC_RELEASE_NAME.zip"
-          Write-Host "✅ Windows打包完成: $ORBIENS_RELEASE_NAME.zip, $ORBIENC_RELEASE_NAME.zip"
-
-      - name: 上传构件
-        uses: actions/upload-artifact@v4
-        with:
-          name: orbiens-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
-          path: orbiens_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+          Compress-Archive -Path "$SERVER_RELEASE_NAME\*" -DestinationPath "$SERVER_RELEASE_NAME.zip"
+          Compress-Archive -Path "$CLIENT_RELEASE_NAME\*" -DestinationPath "$CLIENT_RELEASE_NAME.zip"
+          Write-Host "✅ Windows打包完成: $SERVER_RELEASE_NAME.zip, $CLIENT_RELEASE_NAME.zip"
 
       - name: 上传构件
         uses: actions/upload-artifact@v4
         with:
-          name: orbienc-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
-          path: orbienc_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+          name: orbien-server-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: orbien-server_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
+
+      - name: 上传构件
+        uses: actions/upload-artifact@v4
+        with:
+          name: orbien-${{ matrix.artifact_suffix }}-${{ github.ref_name }}
+          path: orbien_${{ github.ref_name }}_${{ matrix.artifact_suffix }}.*
 
   # =============================================
   # 阶段3：构建并推送 Docker 镜像
@@ -253,17 +253,17 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
-      - name: 下载 Docker 镜像构建所需的 orbiens tar.gz
+      - name: 下载 Docker 镜像构建所需的 orbien-server tar.gz
         uses: actions/download-artifact@v4
         with:
-          name: orbiens-linux_amd64-${{ github.ref_name }}
+          name: orbien-server-linux_amd64-${{ github.ref_name }}
           path: ./
 
       - name: 创建工作目录并解压 tar.gz
         run: |
-          mkdir -p main/orbiens/target
-          tar -xzf orbiens_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
-          cp /tmp/orbiens_${{ github.ref_name }}_linux_amd64/orbiens.jar main/orbiens/target/orbiens.jar
+          mkdir -p main/orbien-server-app/target
+          tar -xzf orbien-server_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
+          cp /tmp/orbien-server_${{ github.ref_name }}_linux_amd64/orbien-server.jar main/orbien-server-app/target/orbien-server.jar
 
       - name: 提取版本号
         id: version
@@ -272,7 +272,7 @@ jobs:
       - name: 构建 Docker 镜像
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          docker build -t lxien/orbiens:latest -t lxien/orbiens:$VERSION .
+          docker build -t lxien/orbien-server:latest -t lxien/orbien-server:$VERSION .
 
       - name: 登录到 Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
@@ -280,8 +280,8 @@ jobs:
       - name: 推送 Docker 镜像
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          docker push lxien/orbiens:$VERSION
-          docker push lxien/orbiens:latest
+          docker push lxien/orbien-server:$VERSION
+          docker push lxien/orbien-server:latest
 
   # =============================================
   # 阶段4：统一发布阶段
@@ -300,7 +300,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ./artifacts
-          pattern: 'orbien?-*'
+          pattern: 'orbien*'
           merge-multiple: true
 
       - name: 读取发布信息模板

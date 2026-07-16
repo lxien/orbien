@@ -49,8 +49,7 @@ public class ConfigParser {
     }
 
     private static AppConfig loadConfigFromDefaultLocations() {
-        String configFileName = "orbiens.toml";
-        String[] searchPaths = {"config/" + configFileName, configFileName};
+        String[] searchPaths = {"config/orbien-server.toml", "orbien-server.toml"};
         for (String path : searchPaths) {
             if (Files.exists(Paths.get(path))) {
                 logger.info("找到配置文件: {}", path);
@@ -58,7 +57,7 @@ public class ConfigParser {
             }
         }
         throw new IllegalArgumentException("未找到配置文件，请使用 -c 选项指定配置文件路径。\n" +
-            "搜索路径: config/orbiens.toml, orbiens.toml");
+            "搜索路径: config/orbien-server.toml, orbien-server.toml");
     }
 
     private static AppConfig loadConfigFromFile(String configPath) {

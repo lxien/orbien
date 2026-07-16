@@ -6,9 +6,9 @@
         <artifactId>orbien-main</artifactId>
         <version>0.20.0</version>
     </parent>
-    <artifactId>orbienc</artifactId>
+    <artifactId>orbien-client-app</artifactId>
     <packaging>jar</packaging>
-    <name>orbienc</name>
+    <name>orbien-client-app</name>
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -51,8 +51,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <mainClass>io.github.lxien.orbien.client.TunnelClientStartup</mainClass>
-                            <imageName>orbienc</imageName>
+                            <mainClass>io.github.lxien.orbien.client.OrbienClientStartup</mainClass>
+                            <imageName>orbien</imageName>
                             <buildArgs>
                                 <buildArg>-Os</buildArg>
                                 <buildArg>--no-fallback</buildArg>
@@ -93,7 +93,7 @@
                                     <skip>${shade.skip}</skip>
                                     <transformers>
                                         <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                            <mainClass>io.github.lxien.orbien.client.TunnelClientStartup</mainClass>
+                                            <mainClass>io.github.lxien.orbien.client.OrbienClientStartup</mainClass>
                                             <manifestEntries>
                                                 <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
                                             </manifestEntries>
@@ -119,6 +119,7 @@
         </profile>
     </profiles>
     <build>
+        <finalName>orbien</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

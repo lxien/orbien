@@ -56,7 +56,7 @@
 - Docker 20+
 - Linux x86_64
 
-Docker一键启动`orbiens`服务端:
+Docker一键启动`orbien-server`服务端:
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
@@ -67,10 +67,10 @@ curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.s
 
 从 [GitHub Releases](https://github.com/lxien/orbien/tags)页面下载最新版本，根据您的操作系统下载对应的二进制文件。
 
-下载到本地解压后编辑配置文件`orbienc.toml`，
+下载到本地解压后编辑配置文件`orbien.toml`，
 
 ```toml
-server_addr = "orbiens所在服务IP或域名"
+server_addr = "orbien-server所在服务IP或域名"
 [auth]
 token = "身份认证令牌"
 ```
@@ -78,9 +78,9 @@ token = "身份认证令牌"
 运行客户端:
 
 ```shell
-./orbienc -c orbienc.toml # Linux / MacOS
+./orbien -c orbien.toml # Linux / MacOS
 
-orbienc.exe -c orbienc.toml # Windows
+orbien.exe -c orbien.toml # Windows
 ```
 
 更多使用细节请查阅[文档网站](https://lxien.github.io/orbien/)。

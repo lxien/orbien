@@ -6,9 +6,9 @@
         <artifactId>orbien-main</artifactId>
         <version>0.20.0</version>
     </parent>
-    <artifactId>orbiens</artifactId>
+    <artifactId>orbien-server-app</artifactId>
     <packaging>jar</packaging>
-    <name>orbiens</name>
+    <name>orbien-server-app</name>
     <properties>
         <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
@@ -25,6 +25,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>orbien-server</finalName>
         <plugins>
             <plugin>
                 <groupId>org.graalvm.buildtools</groupId>
@@ -36,8 +37,8 @@
                         <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                         <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>
-                    <mainClass>io.github.lxien.orbien.server.web.TunnelServerStartup</mainClass>
-                    <imageName>orbiens</imageName>
+                    <mainClass>io.github.lxien.orbien.server.web.OrbienServerStartup</mainClass>
+                    <imageName>orbien-server</imageName>
                 </configuration>
             </plugin>
             <plugin>
@@ -69,7 +70,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>io.github.lxien.orbien.server.web.TunnelServerStartup</mainClass>
+                    <mainClass>io.github.lxien.orbien.server.web.OrbienServerStartup</mainClass>
                     <jvmArguments>--enable-native-access=ALL-UNNAMED</jvmArguments>
                     <excludes>
                         <exclude>

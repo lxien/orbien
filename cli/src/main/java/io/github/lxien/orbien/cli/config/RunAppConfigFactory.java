@@ -37,16 +37,15 @@ public final class RunAppConfigFactory {
             return resolved;
         }
 
-        String configFileName = "orbienc.toml";
-        String[] searchPaths = {"config/" + configFileName, configFileName};
+        String[] searchPaths = {"config/orbien.toml", "orbien.toml"};
         for (String path : searchPaths) {
             Path candidate = Paths.get(path);
             if (Files.exists(candidate)) {
                 return candidate.toAbsolutePath().normalize();
             }
         }
-        throw new IllegalArgumentException("未找到配置文件，例如: orbien run orbienc.toml\n" +
-                "搜索路径: config/orbienc.toml, orbienc.toml");
+        throw new IllegalArgumentException("未找到配置文件，例如: orbien run orbien.toml\n" +
+                "搜索路径: config/orbien.toml, orbien.toml");
     }
 
     private static void mergeAuth(DefaultAppConfig.Builder builder, AuthConfig fileAuth) {

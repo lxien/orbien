@@ -87,8 +87,7 @@ public final class TunnelClientLauncher {
     }
 
     private static AppConfig loadConfigFromDefaultLocations() {
-        String configFileName = "orbienc.toml";
-        String[] searchPaths = {"config/" + configFileName, configFileName};
+        String[] searchPaths = {"config/orbien.toml", "orbien.toml"};
         for (String path : searchPaths) {
             if (Files.exists(Paths.get(path))) {
                 System.err.println("使用配置文件: " + path);
@@ -97,7 +96,7 @@ public final class TunnelClientLauncher {
             }
         }
         throw new IllegalArgumentException("未找到配置文件，使用 -c 指定路径。\n" +
-                "搜索路径: config/orbienc.toml, orbienc.toml");
+                "搜索路径: config/orbien.toml, orbien.toml");
     }
 
     private static void initFileLogging(AppConfig config) {

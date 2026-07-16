@@ -18,7 +18,7 @@ public class RunCommand implements Callable<Integer> {
             index = "0",
             arity = "0..1",
             paramLabel = "CONFIG",
-            description = "配置文件路径；默认查找 ./orbienc.toml、./config/orbienc.toml"
+            description = "配置文件路径；默认查找 ./orbien.toml、./config/orbien.toml"
     )
     String configFile;
 

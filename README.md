@@ -56,7 +56,7 @@ Requirements:
 - Docker 20+
 - Linux x86_64
 
-One-command Docker startup for `orbiens` server:
+One-command Docker startup for `orbien-server` server:
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
@@ -68,10 +68,10 @@ Management dashboard access: `http://server_ip:8020` (admin: 123456)
 
 Download the latest version from the [GitHub Releases](https://github.com/lxien/orbien/tags) page and select the binary file for your operating system.
 
-After extracting locally, edit the configuration file `orbienc.toml`:
+After extracting locally, edit the configuration file `orbien.toml`:
 
 ```toml
-server_addr = "orbiens server IP or domain"
+server_addr = "orbien-server server IP or domain"
 [auth]
 token = "authentication token"
 ```
@@ -79,9 +79,9 @@ token = "authentication token"
 Run the client:
 
 ```shell
-./orbienc -c orbienc.toml # Linux / MacOS
+./orbien -c orbien.toml # Linux / MacOS
 
-orbienc.exe -c orbienc.toml # Windows
+orbien.exe -c orbien.toml # Windows
 ```
 
 For more usage details, please refer to the [documentation website](https://lxien.github.io/orbien/).

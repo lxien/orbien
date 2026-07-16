@@ -17,8 +17,8 @@ client/dependency-reduced-pom.xml
 /orbien-test/dependency-reduced-pom.xml
 /common/dependency-reduced-pom.xml
 /core/dependency-reduced-pom.xml
-orbiens.log
-orbienc.log
+orbien-server.log
+orbien.log
 /scripts/
 .idea
 /cert/

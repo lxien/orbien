@@ -64,7 +64,7 @@ public final class CliLogbackSupport {
             return loggerContext;
         }
         LoggerContext context = new LoggerContext();
-        context.setName("orbienc-cli");
+        context.setName("orbien-cli");
         context.start();
         return context;
     }

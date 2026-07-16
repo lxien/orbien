@@ -12,8 +12,8 @@
         <cyclonedx-maven-plugin.version>2.8.0</cyclonedx-maven-plugin.version>
     </properties>
     <modules>
-        <module>orbiens</module>
-        <module>orbienc</module>
+        <module>orbien-client-app</module>
+        <module>orbien-server-app</module>
     </modules>
     <build>
         <plugins>
