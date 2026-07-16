@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.math.BigInteger;
+import java.nio.file.Files;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -75,6 +76,8 @@ public final class SelfSignedCertificateGenerator {
     }
 
     public static void writeToPemFiles(Result result, File privateKey, File certificate) throws IOException {
+        ensureParentDirectory(privateKey);
+        ensureParentDirectory(certificate);
         try (Writer w = new FileWriter(privateKey);
              JcaPEMWriter pemWriter = new JcaPEMWriter(w)) {
             pemWriter.writeObject(result.privateKey());
@@ -83,5 +86,13 @@ public final class SelfSignedCertificateGenerator {
              JcaPEMWriter pemWriter = new JcaPEMWriter(w)) {
             pemWriter.writeObject(result.certificate());
         }
+    }
+
+    private static void ensureParentDirectory(File file) throws IOException {
+        File parent = file.getParentFile();
+        if (parent == null) {
+            return;
+        }
+        Files.createDirectories(parent.toPath());
     }
 }

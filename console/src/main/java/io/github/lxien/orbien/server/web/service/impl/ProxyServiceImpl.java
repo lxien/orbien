@@ -66,6 +66,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Service
@@ -1117,23 +1118,26 @@ public class ProxyServiceImpl implements ProxyService {
         }
     }
 
+    /**
+     * 随机选择一个可用根域名
+     */
     private String resolveRootDomainForAuto() {
-        List<String> rootDomains = appConfig.getRootDomains().stream().toList();
-        if (!CollectionUtils.isEmpty(rootDomains)) {
-            return rootDomains.getFirst();
-        }
-        return domainRepository.findAll().stream()
-                .findFirst()
+        List<String> rootDomains = domainRepository.findAll().stream()
                 .map(DomainDO::getDomain)
-                .orElse(null);
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .toList();
+        if (rootDomains.isEmpty()) {
+            throw new BizException("未配置可用根域名，无法使用自动域名");
+        }
+        return rootDomains.get(ThreadLocalRandom.current().nextInt(rootDomains.size()));
     }
 
     private void validateHttpDomainInput(DomainType domainType, List<SubdomainBindingParam> subdomainBindings,
                                          List<String> customDomains) {
         if (domainType.isAuto()) {
-            if (!StringUtils.hasText(resolveRootDomainForAuto())) {
-                throw new BizException("未配置根域名，无法使用自动域名");
-            }
+            resolveRootDomainForAuto();
             return;
         }
         if (domainType.isSubdomain()) {

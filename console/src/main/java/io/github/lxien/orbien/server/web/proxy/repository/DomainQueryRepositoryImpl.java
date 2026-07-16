@@ -24,6 +24,7 @@ import io.github.lxien.orbien.server.web.repository.DomainRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyDomainRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -41,6 +42,11 @@ public class DomainQueryRepositoryImpl implements DomainQueryRepository {
 
     @Override
     public List<String> findAllRootDomains() {
-        return domainRepository.findAll().stream().map(DomainDO::getDomain).toList();
+        return domainRepository.findAll().stream()
+                .map(DomainDO::getDomain)
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .toList();
     }
 }

@@ -21,23 +21,31 @@ import io.github.lxien.orbien.core.domain.transport.WebSocketProtocolConfig;
 import io.github.lxien.orbien.server.config.AppConfig;
 import io.github.lxien.orbien.server.config.domain.TransportConfig;
 import io.github.lxien.orbien.server.web.dto.app.AppConfigInfoDTO;
+import io.github.lxien.orbien.server.web.entity.DomainDO;
+import io.github.lxien.orbien.server.web.repository.DomainRepository;
 import io.github.lxien.orbien.server.web.service.AppService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class AppServiceImpl implements AppService {
     @Resource
     private AppConfig appConfig;
+    @Autowired
+    private DomainRepository domainRepository;
 
     @Override
     public AppConfigInfoDTO getAppConfigInfo() {
         AppConfigInfoDTO dto = new AppConfigInfoDTO();
         dto.setServerAddr(appConfig.getServerAddr());
         dto.setServerPort(appConfig.getServerPort());
-        if (appConfig.getRootDomains() != null && !appConfig.getRootDomains().isEmpty()) {
-            dto.setRootDomain(appConfig.getRootDomains().iterator().next());
-        }
+        domainRepository.findAll().stream()
+                .map(DomainDO::getDomain)
+                .filter(StringUtils::hasText)
+                .findFirst()
+                .ifPresent(dto::setRootDomain);
         dto.setHttpProxyPort(appConfig.getHttpProxyPort());
         dto.setHttpsProxyPort(appConfig.getHttpsProxyPort());
 

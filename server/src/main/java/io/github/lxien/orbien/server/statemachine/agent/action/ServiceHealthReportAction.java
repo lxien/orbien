@@ -41,7 +41,7 @@ public class ServiceHealthReportAction extends AgentBaseAction {
             updated++;
         }
         if (updated > 0) {
-            logger.debug("批量更新健康状态完成，条数: {}", updated);
+            logger.debug("更新健康状态完成，条数: {}", updated);
         }
     }
 }

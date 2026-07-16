@@ -58,10 +58,6 @@ export const SETTING_DEFAULT_CONFIG = {
   showNprogress: true,
   /** 是否显示设置引导 */
   showSettingGuide: true,
-  /** 是否显示节日文本 */
-  showFestivalText: false,
-  /** 是否显示水印 */
-  watermarkVisible: false,
   /** 是否自动关闭 */
   autoClose: false,
   /** 是否唯一展开 */
@@ -70,8 +66,6 @@ export const SETTING_DEFAULT_CONFIG = {
   colorWeak: false,
   /** 是否刷新 */
   refresh: false,
-  /** 是否加载节日烟花 */
-  holidayFireworksLoaded: false,
   /** 边框模式 */
   boxBorderMode: false,
   /** 页面过渡效果 */
@@ -81,9 +75,7 @@ export const SETTING_DEFAULT_CONFIG = {
   /** 自定义圆角 */
   customRadius: '0.25',
   /** 容器宽度 */
-  containerWidth: ContainerWidthEnum.FULL,
-  /** 节日日期 */
-  festivalDate: ''
+  containerWidth: ContainerWidthEnum.FULL
 }
 
 /**

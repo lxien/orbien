@@ -176,6 +176,9 @@ public abstract class AbstractHttpProxyProcessor implements ProxyProcessor {
 
     private String randomBaseDomain() {
         List<String> allRootDomains = domainConfigService.findAllRootDomains();
+        if (CollectionUtils.isEmpty(allRootDomains)) {
+            return null;
+        }
         int index = ThreadLocalRandom.current().nextInt(allRootDomains.size());
         return allRootDomains.get(index);
     }

@@ -54,24 +54,39 @@ public class TlsCertificateManager {
     private final ReadWriteLock rwLock = new ReentrantReadWriteLock();
 
     /**
-     * 加载默认证书，如果不存在则自动生成
+     * 加载默认证书，如果不存在则自动生成并持久化到磁盘
      */
     @PostConstruct
     public void init() {
+        File keyFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "privkey.pem");
+        File certFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "fullchain.pem");
         try {
-            File keyFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "privkey.pem");
-            File certFile = new File(SystemConstants.DEFAULT_GATEWAY_TLS_CERT_PATH, "fullchain.pem");
-            if (certFile.exists() && keyFile.exists()) {
+            if (certFile.isFile() && keyFile.isFile()) {
                 this.defaultSslContext = SslContextBuilder.forServer(certFile, keyFile).build();
-                logger.info("默认TLS 证书已加载");
-            } else {
-                SelfSignedCertificateGenerator.Result result = SelfSignedCertificateGenerator.generate();
-                this.defaultSslContext = SslContextBuilder.forServer(result.privateKey(), result.certificate()).build();
-                SelfSignedCertificateGenerator.writeToPemFiles(result, keyFile, certFile);
-                logger.info("生成HTTPS自签名TLS 证书");
+                logger.info("默认TLS 证书已加载: {}", certFile.getAbsolutePath());
+                return;
             }
+
+            // 仅有一方存在时视为损坏，清理后重新生成
+            if (certFile.exists() || keyFile.exists()) {
+                logger.warn("默认TLS 证书不完整(cert={}, key={})，将重新生成",
+                        certFile.exists(), keyFile.exists());
+                deleteQuietly(certFile);
+                deleteQuietly(keyFile);
+            }
+
+            SelfSignedCertificateGenerator.Result result = SelfSignedCertificateGenerator.generate();
+            SelfSignedCertificateGenerator.writeToPemFiles(result, keyFile, certFile);
+            this.defaultSslContext = SslContextBuilder.forServer(result.privateKey(), result.certificate()).build();
+            logger.info("已生成并持久化HTTPS自签名TLS 证书: {}", certFile.getAbsolutePath());
         } catch (Exception e) {
             logger.error("HTTPS默认证书加载错误", e);
+        }
+    }
+
+    private void deleteQuietly(File file) {
+        if (file != null && file.exists() && !file.delete()) {
+            logger.warn("无法删除损坏的证书文件: {}", file.getAbsolutePath());
         }
     }
 

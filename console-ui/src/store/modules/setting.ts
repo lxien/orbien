@@ -9,9 +9,8 @@
  * - 主题管理（亮色、暗色、自动）
  * - 菜单主题样式配置
  * - 界面显示开关（面包屑、标签页、语言切换等）
- * - 功能开关（手风琴模式、色弱模式、水印等）
+ * - 功能开关（手风琴模式、色弱模式等）
  * - 样式配置（边框、圆角、容器宽度、页面过渡）
- * - 节日功能配置
  * - Element Plus 主题色动态设置
  *
  * ## 使用场景
@@ -83,10 +82,6 @@ export const useSettingStore = defineStore(
     const showNprogress = ref(SETTING_DEFAULT_CONFIG.showNprogress)
     /** 是否显示设置引导 */
     const showSettingGuide = ref(SETTING_DEFAULT_CONFIG.showSettingGuide)
-    /** 是否显示节日文本 */
-    const showFestivalText = ref(SETTING_DEFAULT_CONFIG.showFestivalText)
-    /** 是否显示水印 */
-    const watermarkVisible = ref(SETTING_DEFAULT_CONFIG.watermarkVisible)
 
     // 功能设置
     /** 是否自动关闭 */
@@ -97,8 +92,6 @@ export const useSettingStore = defineStore(
     const colorWeak = ref(SETTING_DEFAULT_CONFIG.colorWeak)
     /** 是否刷新 */
     const refresh = ref(SETTING_DEFAULT_CONFIG.refresh)
-    /** 是否加载节日烟花 */
-    const holidayFireworksLoaded = ref(SETTING_DEFAULT_CONFIG.holidayFireworksLoaded)
 
     // 样式设置
     /** 边框模式 */
@@ -111,10 +104,6 @@ export const useSettingStore = defineStore(
     const customRadius = ref(SETTING_DEFAULT_CONFIG.customRadius)
     /** 容器宽度 */
     const containerWidth = ref(SETTING_DEFAULT_CONFIG.containerWidth)
-
-    // 节日相关
-    /** 节日日期 */
-    const festivalDate = ref('')
 
     /**
      * 获取菜单主题
@@ -326,40 +315,12 @@ export const useSettingStore = defineStore(
     }
 
     /**
-     * 设置水印显示
-     * @param visible 是否显示
-     */
-    const setWatermarkVisible = (visible: boolean) => {
-      watermarkVisible.value = visible
-    }
-
-    /**
      * 设置自定义圆角
      * @param radius 圆角值
      */
     const setCustomRadius = (radius: string) => {
       customRadius.value = radius
       document.documentElement.style.setProperty('--custom-radius', `${radius}rem`)
-    }
-
-    /**
-     * 设置节日烟花加载状态
-     * @param isLoad 是否已加载
-     */
-    const setholidayFireworksLoaded = (isLoad: boolean) => {
-      holidayFireworksLoaded.value = isLoad
-    }
-
-    /**
-     * 设置节日文本显示
-     * @param show 是否显示
-     */
-    const setShowFestivalText = (show: boolean) => {
-      showFestivalText.value = show
-    }
-
-    const setFestivalDate = (date: string) => {
-      festivalDate.value = date
     }
 
     const setDualMenuShowText = (show: boolean) => {
@@ -389,11 +350,7 @@ export const useSettingStore = defineStore(
       tabStyle,
       menuOpen,
       refresh,
-      watermarkVisible,
       customRadius,
-      holidayFireworksLoaded,
-      showFestivalText,
-      festivalDate,
       dualMenuShowText,
       containerWidth,
       getMenuTheme,
@@ -423,11 +380,7 @@ export const useSettingStore = defineStore(
       setTabStyle,
       setMenuOpen,
       reload,
-      setWatermarkVisible,
       setCustomRadius,
-      setholidayFireworksLoaded,
-      setShowFestivalText,
-      setFestivalDate,
       setDualMenuShowText
     }
   },

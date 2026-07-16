@@ -26,7 +26,7 @@ public class OrbienCommand implements Callable<Integer> {
 
     @Option(
             names = "-c",
-            description = "配置文件路径（文件日志模式）"
+            description = "配置文件路径"
     )
     String configFile;
 
