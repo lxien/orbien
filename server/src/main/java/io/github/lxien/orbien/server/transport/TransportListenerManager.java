@@ -10,6 +10,7 @@ import io.github.lxien.orbien.core.server.Lifecycle;
 import io.github.lxien.orbien.core.transport.NettyConstants;
 import io.github.lxien.orbien.core.transport.NettyEventLoopFactory;
 import io.github.lxien.orbien.core.transport.api.*;
+import io.github.lxien.orbien.core.transport.tls.TlsConfigSupport;
 import io.github.lxien.orbien.core.transport.tls.TlsHelper;
 import io.github.lxien.orbien.core.transport.TlsContextHolder;
 import io.github.lxien.orbien.server.config.AppConfig;
@@ -126,9 +127,13 @@ public class TransportListenerManager implements Lifecycle {
     }
 
     private SslContext buildSharedTlsContext(TlsConfig tlsConfig) throws Exception {
-        if (tlsConfig != null && tlsConfig.isEnabled()) {
+        if (tlsConfig == null || !tlsConfig.isEnabled()) {
+            return TlsHelper.buildSslContext(false, tlsConfig, true);
+        }
+        if (TlsConfigSupport.hasClientCredentials(tlsConfig)) {
             return TlsHelper.buildSslContext(false, tlsConfig, false);
         }
+        logger.info("[传输] TLS 已启用但未配置证书，使用自签名证书（非 mTLS）");
         return TlsHelper.buildSslContext(false, tlsConfig, true);
     }
 

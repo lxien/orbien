@@ -47,9 +47,7 @@ server_port = 9529
 name = "http-tcp"
 protocol = "http"
 custom_domains = ["33.domain1.com"]
-targets = [
-    { port = 8084 }
-]
+local_port=8084
 #[proxies.transport]
 #multiplex =true
 #encrypt = true

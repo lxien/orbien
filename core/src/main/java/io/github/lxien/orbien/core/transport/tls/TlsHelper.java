@@ -85,15 +85,20 @@ public class TlsHelper {
                 .forServer(selfSignedCertificate.certificate(), selfSignedCertificate.privateKey())
                 .sslProvider(provider)
                 .protocols(getSupportedProtocols())
-                .clientAuth(ClientAuth.OPTIONAL)
+                .clientAuth(ClientAuth.NONE)
                 .build();
     }
 
     private static SslContext createSslContextForServer(TlsConfig tlsConfig, SslProvider provider) throws IOException {
+        if (tlsConfig == null
+                || !StringUtils.hasText(tlsConfig.getCertFile())
+                || !StringUtils.hasText(tlsConfig.getKeyFile())) {
+            throw new IllegalArgumentException("服务端 TLS 已启用，必须同时配置 cert_file 与 key_file");
+        }
         SslContextBuilder sslContextBuilder = SslContextBuilder
                 .forServer(
-                        StringUtils.hasText(tlsConfig.getCertFile()) ? new FileInputStream(tlsConfig.getCertFile()) : null,
-                        StringUtils.hasText(tlsConfig.getKeyFile()) ? new FileInputStream(tlsConfig.getKeyFile()) : null
+                        new FileInputStream(tlsConfig.getCertFile()),
+                        new FileInputStream(tlsConfig.getKeyFile())
                 )
                 .protocols(getSupportedProtocols())
                 .sslProvider(provider);
