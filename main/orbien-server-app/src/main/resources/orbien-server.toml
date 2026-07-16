@@ -1,0 +1,4 @@
+server_addr = "0.0.0.0"
+server_port = 9527
+http_proxy_port = 80
+http_proxy_port = 443

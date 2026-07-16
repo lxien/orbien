@@ -1,0 +1,13 @@
+server_addr = "127.0.0.1"
+server_port = 9527
+
+[auth]
+token = "token"
+
+[[proxies]]
+name = "MySQL"
+protocol = "tcp"
+remote_port = 9050
+targets = [
+    { host = "127.0.0.1", port = 3306, weight = 1, name = "mysql" }
+]

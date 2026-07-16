@@ -166,12 +166,19 @@
         if (!browser) {
             return;
         }
-        browser.querySelector('.column-panel-inspector')?.remove();
         const target = getInspectorTarget();
-        browser.classList.toggle('has-inspector', !!target);
+        const existing = browser.querySelector('.column-panel-inspector');
         if (!target) {
+            existing?.remove();
+            browser.classList.remove('has-inspector');
             return;
         }
+        if (existing?.dataset.path === target.path) {
+            browser.classList.add('has-inspector');
+            return;
+        }
+        existing?.remove();
+        browser.classList.add('has-inspector');
         const inspectorCol = document.createElement('div');
         inspectorCol.className = 'column-panel column-panel-inspector';
         inspectorCol.dataset.path = target.path;
@@ -1156,6 +1163,10 @@
         if (target.closest('#fileList tr[data-file-path], .icon-item[data-file-path], .column-item[data-file-path]')) {
             return true;
         }
+        // 详情面板需可选中/复制文本，不能当作空白区域启动框选
+        if (target.closest('.column-panel-inspector, .inspector-panel, .inspector-dialog')) {
+            return true;
+        }
         if (target.closest('button, input, a, label, .name-link, thead, .empty-action')) {
             return true;
         }
@@ -1190,7 +1201,7 @@
         if (viewMode !== 'column') {
             return null;
         }
-        const panels = [...document.querySelectorAll('#columnBrowser .column-panel')];
+        const panels = [...document.querySelectorAll('#columnBrowser .column-panel:not(.column-panel-inspector)')];
         for (const panel of panels) {
             const rect = panel.getBoundingClientRect();
             if (clientX >= rect.left && clientX <= rect.right

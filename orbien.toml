@@ -1,0 +1,252 @@
+server_addr = "localhost"
+server_port = 9527
+
+[auth]
+token = "414083A8563774142CAC91DDB5C9A2ED"
+########################################################################################################################
+
+#[connection]
+#[connection.retry]
+#initial_delay = 2
+#max_delay = 8
+#max_retries = 5
+#
+#[connection.pool]
+#enabled = true
+#
+#[connection.pool.multiplex]
+#plain = true
+#encrypt = true
+#
+#[connection.pool.direct]
+#plain_count = 1
+#encrypt_count = 1
+#########################################################################################################################
+#
+#[transport]
+#protocol = "tcp"
+
+#[transport.multiplex]
+#enabled = true
+#
+#[transport.tls]
+#enabled = true
+#cert_file = "cert/transport/client.crt"
+#key_file = "cert/transport/client.key"
+#ca_file = "cert/transport/ca.crt"
+
+[transport.websocket]
+server_port = 9528
+path = "/tunnel"
+
+[transport.quic]
+server_port = 9529
+
+########################################################################################################################
+[[proxies]]
+name = "http-tcp"
+protocol = "http"
+custom_domains = ["33.domain1.com"]
+targets = [
+    { port = 8084 }
+]
+#[proxies.transport]
+#multiplex =true
+#encrypt = true
+#compress = false
+#
+#[[proxies]]
+#name = "tcp-tcp"
+#protocol = "tcp"
+#targets = [
+#    { host = "127.0.0.1", port = 3306, weight = 1, name = "backend-tcp" }
+#]
+#[proxies.transport]
+#protocol = "tcp"
+#multiplex =false
+#encrypt = false
+#compress = false
+#
+#[[proxies]]
+#name = "http-websocket"
+#protocol = "http"
+#custom_domains = ["34.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 8084, weight = 1, name = "backend-ws" }
+#]
+#
+#[proxies.transport]
+#protocol = "websocket"
+#multiplex = true
+#encrypt = true
+#compress = true
+#
+#[[proxies]]
+#name = "http-quic"
+#protocol = "http"
+#custom_domains = ["35.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+#]
+#
+#[proxies.transport]
+#protocol = "quic"
+#multiplex = true
+#encrypt = true
+#compress = true
+#[[proxies]]
+#name = "http-quic2"
+#protocol = "http"
+#custom_domains = ["36.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+#]
+#
+#[proxies.transport]
+#protocol = "websocket"
+#multiplex = true
+#encrypt = true
+#compress = true
+#
+#[[proxies]]
+#name = "http-tcp2"
+#protocol = "http"
+#custom_domains = ["37.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+#]
+#
+#[proxies.transport]
+#protocol = "tcp"
+#multiplex = true
+#encrypt = true
+#compress = true
+#
+#[[proxies]]
+#name = "http-websockt2"
+#protocol = "http"
+#custom_domains = ["38.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 3006, weight = 1, name = "backend-quic" }
+#]
+#
+#[proxies.transport]
+#protocol = "websocket"
+#multiplex = true
+#encrypt = true
+#compress = true
+#
+#[[proxies]]
+#name = "web-https"
+#protocol = "https"
+#custom_domains = ["a.domain1.com", "b.domain1.com"]
+#targets = [
+#    { host = "127.0.0.1", port = 8084, weight = 1, name = "web-https-backend" }
+#]
+#force_https = true
+#
+#
+#
+#[[proxies]]
+#name = "tcp-proxy"
+#protocol = "tcp"
+#local_ip = "127.0.0.1"
+#local_port = 8084
+#remote_port=9080
+#
+#[proxies.transport]
+#multiplex = true
+#
+#
+#[[proxies]]
+#name = "tcp-quic2"
+#protocol = "tcp"
+#local_ip = "127.0.0.1"
+#local_port = 8084
+#
+#
+#[proxies.transport]
+#multiplex = true
+#protocol = "quic"
+#
+#
+#[[proxies]]
+#name = "udp-proxy"
+#protocol = "udp"
+#local_ip = "127.0.0.1"
+#local_port = 9999
+#remote_port = 9060
+#
+#[proxies.transport]
+#multiplex = true
+#
+#[[proxies]]
+#name = "socks5-proxy"
+#protocol = "socks5"
+#remote_port = 9070
+#
+#[proxies.socks5_auth]
+#enabled = true
+#users = [
+#    { user = "demo", pass = "demo123" }
+#]
+#
+#[proxies.access_control]
+#enabled = false
+#mode = "allow"
+#
+## [proxies.time_access]
+## enabled = true
+## mode = "allow"
+## time_enabled = true
+## timezone = "Asia/Shanghai"
+## days = [1, 2, 3, 4, 5]
+## windows = [
+##   { start = "09:00:00", end = "18:00:00" }
+## ]
+#
+#[proxies.transport]
+#multiplex = true
+#encrypt = false
+#compress = false
+#
+#[[proxies]]
+#name = "socks5-proxy2"
+#protocol = "socks5"
+#remote_port = 9071
+#
+#[[proxies]]
+#name = "home-nas"
+#protocol = "file"
+#root_path = "/"
+#custom_domains = ["nas.domain1.com"]
+#
+#[proxies.file_auth]
+#enabled = true
+#users = [
+#  { user = "guest", pass = "111", permission = "read" },
+#  { user = "admin", pass = "111", permission = "read_write" }
+#]
+#
+#[proxies.file_limits]
+#max_upload_size = "5MB"
+#allow_upload = true
+#allow_delete = true
+#allow_mkdir = true
+#
+#[proxies.transport]
+#multiplex = true
+#encrypt = true
+#[proxies.tls]
+#cert_file = "cert/transport/client.crt"
+#key_file = "cert/transport/client.key"
+########################################################################################################################
+
+[log]
+level = "debug"
+path = "logs"
+name = "orbien.log"
+archive_pattern = "orbien.%d{yyyy-MM-dd}.log"
+log_pattern = "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+max_history = 7
+total_size_cap = "50MB"

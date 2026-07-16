@@ -181,20 +181,26 @@ body.is-bootstrapping #appView {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 14px 8px 10px;
+    min-height: 56px;
+    padding: 10px 8px;
     border-bottom: 1px solid var(--border-light);
+    box-sizing: border-box;
 }
 
 .sidebar-logo-btn {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
     border: none;
     background: transparent;
-    padding: 6px 10px;
+    padding: 6px;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color .15s;
+    box-sizing: border-box;
 }
 
 .sidebar-logo-btn:hover {
@@ -206,9 +212,9 @@ body.is-bootstrapping #appView {
     outline-offset: 2px;
 }
 
-.sidebar-logo {
-    height: 28px;
-    max-width: 72px;
+.sidebar-logo-slot {
+    width: 100%;
+    height: 32px;
 }
 
 .sidebar-body {
@@ -340,12 +346,24 @@ body.is-bootstrapping #appView {
     background: var(--bg-card);
 }
 
+/* 固定槽位：无论方形图标还是宽幅字标，都居中等比缩放，避免撑破布局 */
+.logo-slot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    overflow: hidden;
+}
+
 .site-logo {
-    height: 28px;
+    display: block;
     width: auto;
-    max-width: 120px;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    flex-shrink: 0;
+    object-position: center;
+    flex-shrink: 1;
 }
 
 .main {
@@ -1647,9 +1665,10 @@ tr.drop-target,
     margin-bottom: 24px;
 }
 
-.login-brand .site-logo {
-    height: 40px;
-    max-width: 160px;
+.login-logo-slot {
+    width: 100%;
+    max-width: 220px;
+    height: 48px;
 }
 
 .login-wrap h2 {
@@ -1806,9 +1825,18 @@ tr.drop-target,
         --sidebar-width: 200px;
     }
 
-    .sidebar-logo {
-        height: 30px;
-        max-width: 120px;
+    .sidebar-brand {
+        min-height: 52px;
+        padding: 8px;
+    }
+
+    .sidebar-logo-slot {
+        height: 28px;
+    }
+
+    .login-logo-slot {
+        max-width: 180px;
+        height: 40px;
     }
 
     .main {
@@ -1823,11 +1851,6 @@ tr.drop-target,
 
     .path-footer .file-summary {
         align-self: flex-end;
-    }
-
-    .site-logo {
-        height: 24px;
-        max-width: 96px;
     }
 
     .path-nav {
@@ -2318,6 +2341,8 @@ body.dialog-open {
     white-space: pre-wrap;
     word-break: break-word;
     box-sizing: border-box;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .inspector-preview-truncated {
@@ -2365,6 +2390,8 @@ body.dialog-open {
     min-height: 0;
     overflow-y: auto;
     padding: 14px 16px 20px;
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .inspector-details-title {
