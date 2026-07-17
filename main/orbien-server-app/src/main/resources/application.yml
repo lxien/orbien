@@ -22,7 +22,11 @@ cache:
 
 
 orbien:
-  dev: true
+  console:
+    # 开发模式
+    dev: true
+    # 演示模式：可登录查看，禁止一切更新类操作
+    preview-mode: false
   acme:
     # staging=测试证书，production=正式证书
     environment: production

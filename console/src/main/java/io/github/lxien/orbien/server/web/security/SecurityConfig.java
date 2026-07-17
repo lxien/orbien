@@ -32,13 +32,19 @@ public class SecurityConfig {
     private static final String H2_CONSOLE_PATH_PATTERN = "/h2-console/**";
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final PreviewModeFilter previewModeFilter;
     private final SecurityProperties securityProperties;
     private final JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint;
     private final JsonAccessDeniedHandler jsonAccessDeniedHandler;
 
     @Autowired
-    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter, SecurityProperties securityProperties, JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint, JsonAccessDeniedHandler jsonAccessDeniedHandler) {
+    public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthenticationFilter,
+                          PreviewModeFilter previewModeFilter,
+                          SecurityProperties securityProperties,
+                          JsonAuthenticationEntryPoint jsonAuthenticationEntryPoint,
+                          JsonAccessDeniedHandler jsonAccessDeniedHandler) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.previewModeFilter = previewModeFilter;
         this.securityProperties = securityProperties;
         this.jsonAuthenticationEntryPoint = jsonAuthenticationEntryPoint;
         this.jsonAccessDeniedHandler = jsonAccessDeniedHandler;
@@ -59,7 +65,6 @@ public class SecurityConfig {
      * JWT 无状态鉴权 + CSRF
      * <p>
      * CSRF 通过 Cookie 下发 token；对 Bearer JWT 请求跳过校验（浏览器不会自动附带 Authorization 头，无 CSRF 风险）
-     * 公开路径（登录、静态资源等）同样跳过，避免未登录 SPA 请求被拦截。
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -86,8 +91,10 @@ public class SecurityConfig {
                         .authenticationEntryPoint(jsonAuthenticationEntryPoint)
                         .accessDeniedHandler(jsonAccessDeniedHandler))
                 // H2 Console 使用 iframe，需允许同源嵌入
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
+                .headers(headers ->
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(previewModeFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
