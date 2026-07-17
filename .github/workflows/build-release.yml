@@ -5,7 +5,7 @@ on:
     inputs:
       build_docker:
         description: '是否构建并推送 Docker 镜像'
-        required: false
+        required: true
         type: boolean
         default: false
   push:
