@@ -2,12 +2,6 @@ name: Build release version
 
 on:
   workflow_dispatch:
-    inputs:
-      build_docker:
-        description: '是否构建并推送 Docker 镜像'
-        required: true
-        type: boolean
-        default: false
   push:
     tags:
       - 'v*'
@@ -250,9 +244,6 @@ jobs:
   docker-build:
     name: 构建并推送 Docker 镜像
     needs: [build-native]
-    if: >-
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && inputs.build_docker)
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -4,6 +4,7 @@ import io.github.lxien.orbien.server.web.common.exception.BizException;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.common.utils.JsonUtils;
+import io.github.lxien.orbien.server.web.config.AcmeAsyncConfig;
 import io.github.lxien.orbien.server.web.config.AcmeProperties;
 import io.github.lxien.orbien.server.web.dto.acme.AcmeDnsChallengeDTO;
 import io.github.lxien.orbien.server.web.dto.acme.AcmeOrderDTO;
@@ -31,6 +32,7 @@ import io.github.lxien.orbien.server.web.service.dns.DnsProviderAdapter;
 import io.github.lxien.orbien.server.web.service.dns.DnsProviderConfig;
 import io.github.lxien.orbien.server.web.service.dns.DnsProviderRegistry;
 import io.github.lxien.orbien.server.web.service.dns.DnsRecordRef;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.shredzone.acme4j.Login;
 import org.shredzone.acme4j.Session;
@@ -55,6 +57,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
 @Service
@@ -75,6 +78,9 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
     private final TlsCertificateService tlsCertificateService;
     private final CertBindingService certBindingService;
     private final AcmeProperties acmeProperties;
+
+    @Resource(name = AcmeAsyncConfig.ACME_VERIFICATION_EXECUTOR)
+    private Executor acmeVerificationExecutor;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -186,12 +192,16 @@ public class AcmeOrderServiceImpl implements AcmeOrderService {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    CompletableFuture.runAsync(() -> processVerification(orderId));
+                    submitVerification(orderId);
                 }
             });
         } else {
-            CompletableFuture.runAsync(() -> processVerification(orderId));
+            submitVerification(orderId);
         }
+    }
+
+    private void submitVerification(Long orderId) {
+        CompletableFuture.runAsync(() -> processVerification(orderId), acmeVerificationExecutor);
     }
 
     private void submitOrder(Long orderId) {
