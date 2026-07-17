@@ -37,3 +37,15 @@ export function fetchGetProxyMetrics(params: {
     data: params
   })
 }
+
+/**
+ * 批量删除指定代理流量统计数据
+ * @param data ID 列表
+ */
+export function fetchBatchDeleteMetrics(data: Api.Metrics.MetricsBatchDeleteParam) {
+  return request.del({
+    url: '/api/metrics',
+    data,
+    showSuccessMessage: true
+  })
+}

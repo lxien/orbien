@@ -31,6 +31,7 @@ import io.github.lxien.orbien.server.web.dto.metrics.TrafficCountDTO;
 import io.github.lxien.orbien.server.web.dto.proxy.ProxyListQueryResult;
 import io.github.lxien.orbien.server.web.enums.MetricQueryType;
 import io.github.lxien.orbien.server.web.enums.TimeUnit;
+import io.github.lxien.orbien.server.web.param.metrics.MetricsBatchDeleteParam;
 import io.github.lxien.orbien.server.web.param.metrics.ProxyQueryParam;
 import io.github.lxien.orbien.server.web.repository.MetricsRepository;
 import io.github.lxien.orbien.server.web.repository.ProxyRepository;
@@ -42,6 +43,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -266,6 +268,17 @@ public class MetricsServiceImpl implements MetricsService {
     public void deleteByProxyId(String proxyId) {
         metricsRepository.deleteByProxyId(proxyId);
         metricsCollector.removeByProxyId(proxyId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatch(MetricsBatchDeleteParam param) {
+        List<String> ids = param.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            return;
+        }
+        metricsRepository.deleteByProxyIdIn(ids);
+        ids.forEach(metricsCollector::removeByProxyId);
     }
 
     @Override

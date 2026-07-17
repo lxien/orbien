@@ -18,6 +18,7 @@ import io.github.lxien.orbien.server.web.common.message.PageQuery;
 import io.github.lxien.orbien.server.web.common.message.PageResult;
 import io.github.lxien.orbien.server.web.dto.metrics.TrafficChartVO;
 import io.github.lxien.orbien.server.web.dto.metrics.TrafficCountDTO;
+import io.github.lxien.orbien.server.web.param.metrics.MetricsBatchDeleteParam;
 import io.github.lxien.orbien.server.web.param.metrics.ProxyQueryParam;
 
 public interface MetricsService {
@@ -29,6 +30,11 @@ public interface MetricsService {
 
     TrafficChartVO getProxy24hTraffic(ProxyQueryParam param);
     void deleteByProxyId(String proxyId);
+
+    /**
+     * 批量删除指定代理的流量统计数据
+     */
+    void deleteBatch(MetricsBatchDeleteParam param);
 
     PageResult<TrafficCountDTO> queryPage(PageQuery pageQuery);
 

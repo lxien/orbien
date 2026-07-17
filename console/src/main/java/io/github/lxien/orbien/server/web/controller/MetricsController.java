@@ -17,11 +17,14 @@ package io.github.lxien.orbien.server.web.controller;
 
 import io.github.lxien.orbien.server.web.common.message.Ajax;
 import io.github.lxien.orbien.server.web.common.message.PageQuery;
+import io.github.lxien.orbien.server.web.param.metrics.MetricsBatchDeleteParam;
 import io.github.lxien.orbien.server.web.param.metrics.ProxyQueryParam;
 import io.github.lxien.orbien.server.web.service.MetricsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/api/metrics")
 public class MetricsController {
@@ -39,7 +42,13 @@ public class MetricsController {
     }
 
     @PostMapping("proxy/24h")
-    public Ajax getProxy24hMetrics(@RequestBody ProxyQueryParam param) {
+    public Ajax getProxy24hMetrics(@RequestBody @Validated ProxyQueryParam param) {
         return Ajax.success(metricsService.getProxy24hTraffic(param));
+    }
+
+    @DeleteMapping
+    public Ajax batchDelete(@RequestBody @Validated MetricsBatchDeleteParam param) {
+        metricsService.deleteBatch(param);
+        return Ajax.success();
     }
 }

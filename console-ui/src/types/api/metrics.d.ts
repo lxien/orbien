@@ -50,9 +50,12 @@ declare namespace Api.Metrics {
     downTotal: number
     downRate: number
     upRate: number
-    /** 当前活跃连接数 */
     activeChannels?: number
     /** 时间刻度单位：hour=小时粒度，day=天粒度 */
     timeUnit?: 'hour' | 'day'
+  }
+
+  interface MetricsBatchDeleteParam {
+    ids: string[]
   }
 }
