@@ -17,6 +17,7 @@
 package io.github.lxien.orbien.server.transport.socks5;
 
 import com.alibaba.cola.statemachine.StateMachine;
+import io.github.lxien.orbien.core.codec.NewStreamCodec;
 import io.github.lxien.orbien.core.domain.ProxyConfig;
 import io.github.lxien.orbien.core.domain.ProxyConfigExt;
 import io.github.lxien.orbien.core.domain.Target;
@@ -220,13 +221,14 @@ public class Socks5HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf>
         visitor.attr(STATE).set(HandshakeState.DONE);
         visitor.attr(AttributeKeys.PROTOCOL_TYPE).set(ProtocolType.SOCKS5);
 
+        String targetHost = normalizeSocks5Host(address.host());
         StreamContext streamContext = streamManager.createStreamContext(visitor, stateMachine);
         streamContext.setProtocol(ProtocolType.SOCKS5);
         streamContext.setStreamManager(streamManager);
-        streamContext.setTarget(new Target(address.host(), address.port()));
+        streamContext.setTarget(new Target(targetHost, address.port()));
         streamContext.setVariable(StreamConstants.SOCKS5_AWAIT_REPLY, Boolean.TRUE);
 
-        logger.debug("[SOCKS5] CONNECT {}:{} streamId={}", address.host(), address.port(), streamContext.getStreamId());
+        logger.debug("[SOCKS5] CONNECT {}:{} streamId={}", targetHost, address.port(), streamContext.getStreamId());
         streamContext.fireEvent(StreamEvent.STREAM_OPEN);
     }
 
@@ -239,6 +241,13 @@ public class Socks5HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf>
     private int getListenerPort(Channel visitor) {
         InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
         return sa.getPort();
+    }
+
+    /**
+     * localhost / IPv6 loopback 归一为 127.0.0.1
+     */
+    static String normalizeSocks5Host(String host) {
+        return NewStreamCodec.normalizeLocalIp(host);
     }
 
     private enum HandshakeState {

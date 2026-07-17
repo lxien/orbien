@@ -2,14 +2,18 @@ package io.github.lxien.orbien.core.codec;
 
 import io.github.lxien.orbien.core.enums.TransportProtocol;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.NetUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class NewStreamCodec {
 
     public static void encode(ByteBuf buffer, String localIp, int localPort, TransportProtocol protocol) {
-        buffer.writeInt(ipToInt(localIp));
+        buffer.writeInt(ipToInt(normalizeLocalIp(localIp)));
         buffer.writeShort(localPort);
         buffer.writeByte(protocol.toWire());
     }
@@ -19,6 +23,30 @@ public class NewStreamCodec {
         String localIp = intToIp(ipInt);
         int localPort = buffer.readUnsignedShort();
         return new NewStreamInfo(localIp, localPort, TransportProtocol.fromWire(buffer.readByte()));
+    }
+
+    /**
+     * 协议仅支持 IPv4，将 localhost / IPv6 loopback 归一为 127.0.0.1
+     */
+    public static String normalizeLocalIp(String ip) {
+        if (ip == null || ip.isEmpty()) {
+            return ip;
+        }
+        String host = ip.trim();
+        if ("localhost".equalsIgnoreCase(host)) {
+            return "127.0.0.1";
+        }
+        if (NetUtil.isValidIpV6Address(host)) {
+            try {
+                InetAddress address = InetAddress.getByName(host);
+                if (address.isLoopbackAddress()) {
+                    return "127.0.0.1";
+                }
+            } catch (UnknownHostException ignored) {
+                // literal IPv6 should not throw; keep original and let ipToInt fail clearly
+            }
+        }
+        return host;
     }
 
     private static int ipToInt(String ip) {
