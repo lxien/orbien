@@ -32,6 +32,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -90,9 +91,12 @@ public class TlsCertificateManager {
         }
     }
 
-    public void addDeployedDomains(String certId,Set<String> domains) {
+    public void addDeployedDomains(String certId, Set<String> domains) {
         for (String domain : domains) {
-            activeCert.put(domain,certId);
+            String normalized = normalizeDomain(domain);
+            if (normalized != null) {
+                activeCert.put(normalized, certId);
+            }
         }
     }
 
@@ -105,12 +109,13 @@ public class TlsCertificateManager {
      * @throws Exception
      */
     public void deploy(String certId, String domain, File keyFile, File certFile) throws Exception {
+        String normalized = requireNormalizedDomain(domain);
         rwLock.writeLock().lock();
         try {
             SslContext sslCtx = SslContextBuilder.forServer(certFile, keyFile).build();
-            l1Cache.put(domain, sslCtx);
-            activeCert.put(domain, certId);
-            logger.info("证书已部署到域名: {}", domain);
+            l1Cache.put(normalized, sslCtx);
+            activeCert.put(normalized, certId);
+            logger.info("证书已部署到域名: {}", normalized);
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -122,11 +127,15 @@ public class TlsCertificateManager {
      * @param domain 具体域名
      */
     public void cancelDeploy(String domain) {
+        String normalized = normalizeDomain(domain);
+        if (normalized == null) {
+            return;
+        }
         rwLock.writeLock().lock();
         try {
-            activeCert.remove(domain);
-            l1Cache.invalidate(domain);
-            logger.info("域名证书已取消部署: {}", domain);
+            activeCert.remove(normalized);
+            l1Cache.invalidate(normalized);
+            logger.info("域名证书已取消部署: {}", normalized);
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -138,19 +147,20 @@ public class TlsCertificateManager {
     public SslContext getSslContext(String domain) {
         rwLock.readLock().lock();
         try {
-            if (!StringUtils.hasText(domain)) {
+            String normalized = normalizeDomain(domain);
+            if (normalized == null) {
                 logger.debug("SNI 域名为空，使用默认证书");
                 return defaultSslContext;
             }
-            SslContext ctx = l1Cache.getIfPresent(domain);
+            SslContext ctx = l1Cache.getIfPresent(normalized);
             if (ctx != null) {
-                logger.debug("从缓存获取证书成功: {}", domain);
+                logger.debug("从缓存获取证书成功: {}", normalized);
                 return ctx;
             }
-            ctx = loadFromFileSystem(domain);
+            ctx = loadFromFileSystem(normalized);
             if (ctx != null) {
-                logger.debug("从文件系统加载证书成功: {}", domain);
-                l1Cache.put(domain, ctx);
+                logger.debug("从文件系统加载证书成功: {}", normalized);
+                l1Cache.put(normalized, ctx);
                 return ctx;
             }
 
@@ -183,5 +193,20 @@ public class TlsCertificateManager {
             logger.debug("从文件系统加载证书失败: {}", domain, e);
             return null;
         }
+    }
+
+    private static String normalizeDomain(String domain) {
+        if (!StringUtils.hasText(domain)) {
+            return null;
+        }
+        return domain.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static String requireNormalizedDomain(String domain) {
+        String normalized = normalizeDomain(domain);
+        if (normalized == null) {
+            throw new IllegalArgumentException("domain must not be blank");
+        }
+        return normalized;
     }
 }

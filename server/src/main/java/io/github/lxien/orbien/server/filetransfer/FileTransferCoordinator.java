@@ -20,11 +20,16 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.io.ByteArrayOutputStream;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class FileTransferCoordinator {
@@ -94,14 +99,29 @@ public class FileTransferCoordinator {
         }
     }
 
-    public byte[] download(String agentId, String proxyId, String path) throws Exception {
-        return download(agentId, proxyId, path, 0);
+    /**
+     * 下载并拼成完整字节数组。仅用于已限制大小的场景
+     */
+    public byte[] download(String agentId, String proxyId, String path, long maxBytes) throws Exception {
+        if (maxBytes <= 0) {
+            throw new IllegalArgumentException("download(byte[]) 必须指定 maxBytes");
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream((int) Math.min(maxBytes, 64 * 1024));
+        download(agentId, proxyId, path, maxBytes, maxBytes, out::write);
+        return out.toByteArray();
     }
 
-    public byte[] download(String agentId, String proxyId, String path, long maxBytes) throws Exception {
+    /**
+     * 流式下载
+     */
+    public void download(String agentId, String proxyId, String path, long maxBytes, long expectedBytes,
+                         ChunkHandler handler) throws Exception {
         String requestId = newRequestId();
-        List<byte[]> chunks = Collections.synchronizedList(new ArrayList<>());
-        registerChunkListener(requestId, chunk -> chunks.add(chunk.getData().toByteArray()));
+        // HTTP 写出慢时 offer 等待，配合 client 背压避免堆上堆积分块
+        ArrayBlockingQueue<Object> queue = new ArrayBlockingQueue<>(2);
+        Object end = new Object();
+        AtomicReference<Exception> handoffError = new AtomicReference<>();
+
         Message.FileTransferInit.Builder initBuilder = Message.FileTransferInit.newBuilder()
                 .setRequestId(requestId)
                 .setProxyId(proxyId)
@@ -111,26 +131,57 @@ public class FileTransferCoordinator {
             initBuilder.setMaxBytes(maxBytes);
         }
         transferProxyIds.put(requestId, proxyId);
-        long timeoutBytes = maxBytes > 0 ? maxBytes : FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
-        CompletableFuture<Message.FileTransferDone> future = register(requestId,
-                FileTransferConstants.transferTimeoutMs(timeoutBytes));
+        long timeoutBytes = expectedBytes > 0 ? expectedBytes
+                : (maxBytes > 0 ? maxBytes : FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE);
+        long timeoutMs = FileTransferConstants.transferTimeoutMs(timeoutBytes);
+        CompletableFuture<Message.FileTransferDone> future = register(requestId, timeoutMs);
+
+        registerChunkListener(requestId, chunk -> {
+            try {
+                if (!queue.offer(chunk.getData().toByteArray(),
+                        FileTransferConstants.CHUNK_SEND_TIMEOUT_MS, TimeUnit.MILLISECONDS)) {
+                    TimeoutException te = new TimeoutException("下载写出超时");
+                    handoffError.compareAndSet(null, te);
+                    future.completeExceptionally(te);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                handoffError.compareAndSet(null, e);
+                future.completeExceptionally(e);
+            }
+        });
+        future.whenComplete((done, err) -> {
+            try {
+                queue.put(end);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
         send(agentId, TMSP.MSG_FILE_TRANSFER_INIT, initBuilder.build(), proxyId, future);
-        Message.FileTransferDone done = future.get(
-                FileTransferConstants.transferTimeoutMs(timeoutBytes),
-                TimeUnit.MILLISECONDS);
-        removeChunkListener(requestId);
-        transferProxyIds.remove(requestId);
-        if (done.getStatus().getCode() != 0) {
-            throw new IllegalStateException(done.getStatus().getMessage());
+
+        try {
+            while (true) {
+                Object item = queue.poll(1, TimeUnit.SECONDS);
+                Exception he = handoffError.get();
+                if (he != null) {
+                    throw he;
+                }
+                if (item == end) {
+                    break;
+                }
+                if (item != null) {
+                    handler.onChunk((byte[]) item);
+                }
+            }
+            Message.FileTransferDone done = future.get(timeoutMs, TimeUnit.MILLISECONDS);
+            if (done.getStatus().getCode() != 0) {
+                throw new IllegalStateException(done.getStatus().getMessage());
+            }
+        } finally {
+            removeChunkListener(requestId);
+            transferProxyIds.remove(requestId);
+            queue.clear();
         }
-        int total = chunks.stream().mapToInt(c -> c.length).sum();
-        byte[] result = new byte[total];
-        int pos = 0;
-        for (byte[] c : chunks) {
-            System.arraycopy(c, 0, result, pos, c.length);
-            pos += c.length;
-        }
-        return result;
     }
 
     public Message.FileOpResponse op(String agentId, String proxyId, String op, String path, String name) throws Exception {
@@ -180,6 +231,11 @@ public class FileTransferCoordinator {
 
     public void removeChunkListener(String requestId) {
         chunkListeners.remove(requestId);
+    }
+
+    @FunctionalInterface
+    public interface ChunkHandler {
+        void onChunk(byte[] data) throws Exception;
     }
 
     public interface ChunkListener {

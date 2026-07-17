@@ -317,7 +317,7 @@ public class CertBindingServiceImpl implements CertBindingService {
         }
         binding.setProxyDomainId(proxyDomainId);
         binding.setCertId(cert.getId());
-        binding.setDomain(proxyDomain.getFullDomain());
+        binding.setDomain(proxyDomain.getFullDomain().trim().toLowerCase(Locale.ROOT));
         binding.setEnabled(true);
 
         try {

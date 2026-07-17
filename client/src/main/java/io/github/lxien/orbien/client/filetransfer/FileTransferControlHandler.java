@@ -18,6 +18,8 @@ import io.netty.util.internal.logging.InternalLoggerFactory;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class FileTransferControlHandler {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(FileTransferControlHandler.class);
@@ -77,8 +79,23 @@ public class FileTransferControlHandler {
             sessionManager.startUpload(req.getRequestId(), req.getProxyId(), req.getPath());
         } else {
             InputStream in = fileSystemService.openDownload(ctx.root(), req.getPath());
+            String requestId = req.getRequestId();
+            String proxyId = req.getProxyId();
             long maxBytes = req.getMaxBytes();
-            sendChunks(control, req.getRequestId(), req.getProxyId(), in, maxBytes);
+            // 在后台发送，避免阻塞控制通道 event loop；sendAndAwait 提供背压
+            CompletableFuture.runAsync(() -> {
+                try {
+                    sendChunks(control, requestId, proxyId, in, maxBytes);
+                } catch (Exception e) {
+                    logger.error("文件下载发送失败 requestId={}", requestId, e);
+                    try {
+                        in.close();
+                    } catch (Exception ignored) {
+                        // ignore
+                    }
+                    failDone(control, requestId, proxyId, "下载失败");
+                }
+            });
         }
     }
 
@@ -163,7 +180,7 @@ public class FileTransferControlHandler {
                         .setData(com.google.protobuf.ByteString.copyFrom(buffer, 0, toSend))
                         .setLast(last)
                         .build();
-                send(control, TMSP.MSG_FILE_CHUNK, chunk, proxyId);
+                sendAndAwait(control, TMSP.MSG_FILE_CHUNK, chunk, proxyId);
                 offset += toSend;
                 if (last) {
                     break;
@@ -239,6 +256,28 @@ public class FileTransferControlHandler {
             TmspPayloadCompressor.encodeControlPayload(control, frame, resolveAlgorithm(proxyId));
             control.writeAndFlush(frame);
         });
+    }
+
+    private void sendAndAwait(Channel control, byte type, com.google.protobuf.MessageLite message, String proxyId)
+            throws Exception {
+        CompletableFuture<Void> done = new CompletableFuture<>();
+        control.eventLoop().execute(() -> {
+            try {
+                ByteBuf buf = ProtobufUtil.toByteBuf(message, control.alloc());
+                TMSPFrame frame = new TMSPFrame(0, type, buf);
+                TmspPayloadCompressor.encodeControlPayload(control, frame, resolveAlgorithm(proxyId));
+                control.writeAndFlush(frame).addListener(future -> {
+                    if (future.isSuccess()) {
+                        done.complete(null);
+                    } else {
+                        done.completeExceptionally(new IllegalStateException("分块发送失败", future.cause()));
+                    }
+                });
+            } catch (Exception e) {
+                done.completeExceptionally(e);
+            }
+        });
+        done.get(FileTransferConstants.CHUNK_SEND_TIMEOUT_MS, TimeUnit.MILLISECONDS);
     }
 
     private CompressionType resolveAlgorithm(String proxyId) {

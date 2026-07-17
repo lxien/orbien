@@ -24,8 +24,8 @@ cache:
 orbien:
   dev: true
   acme:
-    # staging=测试环境，production=生产环境
-    environment: staging
+    # staging=测试证书，production=正式证书
+    environment: production
     dns-poll-interval-seconds: 15
     dns-poll-max-attempts: 40
   scheduled-job:

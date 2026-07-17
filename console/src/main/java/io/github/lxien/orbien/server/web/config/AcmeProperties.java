@@ -11,19 +11,27 @@ import org.springframework.util.StringUtils;
 public class AcmeProperties {
 
     /**
-     * ACME 环境：staging（Let's Encrypt 测试）或 production（生产）。
+     * Let's Encrypt 生产目录
+     */
+    public static final String LETSENCRYPT_PRODUCTION_DIRECTORY = "https://acme-v02.api.letsencrypt.org/directory";
+    /**
+     * Let's Encrypt staging 目录
+     */
+    public static final String LETSENCRYPT_STAGING_DIRECTORY = "https://acme-staging-v02.api.letsencrypt.org/directory";
+
+    /**
      * 未显式配置 directory-url 时，将根据该值选择默认 ACME 目录地址。
      */
     private Environment environment = Environment.STAGING;
 
     /**
-     * 可选：直接指定 ACME 目录地址，支持 acme:// 协议。
-     * 示例：acme://letsencrypt.org/staging、acme://letsencrypt.org
+     * 直接指定 ACME 目录地址。
+     * 示例：https://acme-v02.api.letsencrypt.org/directory
      */
     private String directoryUrl;
 
     /**
-     * 可选：ACME 账户私钥路径；未配置时按 environment 分目录存储。
+     *  ACME 账户私钥路径；未配置时按 environment 分目录存储。
      */
     private String accountKeyPath;
 
@@ -43,17 +51,38 @@ public class AcmeProperties {
     private int dnsPollMaxAttempts = 20;
 
     public enum Environment {
+        /**
+         * 测试环境
+         */
         STAGING,
+        /**
+         * 生产环境
+         */
         PRODUCTION
     }
 
     public String resolveDirectoryUrl() {
         if (StringUtils.hasText(directoryUrl)) {
-            return directoryUrl.trim();
+            return normalizeDirectoryUrl(directoryUrl.trim());
         }
         return environment == Environment.PRODUCTION
-                ? "acme://letsencrypt.org"
-                : "acme://letsencrypt.org/staging";
+                ? LETSENCRYPT_PRODUCTION_DIRECTORY
+                : LETSENCRYPT_STAGING_DIRECTORY;
+    }
+
+    /**
+     * 将 acme:// 快捷 URI 转为 https 目录 URL，避免依赖 SPI 加载 CA Provider。
+     */
+    static String normalizeDirectoryUrl(String url) {
+        if ("acme://letsencrypt.org".equals(url)
+                || "acme://letsencrypt.org/".equals(url)
+                || "acme://letsencrypt.org/v02".equals(url)) {
+            return LETSENCRYPT_PRODUCTION_DIRECTORY;
+        }
+        if ("acme://letsencrypt.org/staging".equals(url)) {
+            return LETSENCRYPT_STAGING_DIRECTORY;
+        }
+        return url;
     }
 
     public String resolveAccountKeyPath() {

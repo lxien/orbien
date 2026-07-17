@@ -40,7 +40,8 @@ export default ({mode}: { mode: string }) => {
                 "36.domain1.com",
                 "38.domain2.com",
                 "37.domain2.com",
-                "36.domain2.com"
+                "36.domain2.com",
+                "aa.xnkfz.com"
             ]
         },
         // 路径别名

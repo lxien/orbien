@@ -168,7 +168,23 @@ public class FileShareHttpHandler {
             }
             if ("GET".equals(req.method()) && path.startsWith("/api/files/download")) {
                 String filePath = queryParam(requestPath, "path");
-                handleDownload(ctx.channel(), agentId, proxyId, filePath);
+                Channel channel = ctx.channel();
+                // 下载在后台线程执行，避免在 event loop 上 sync 写出导致死锁
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        handleDownload(channel, config, agentId, proxyId, filePath);
+                    } catch (Exception e) {
+                        logger.error("文件下载失败 path={}", filePath, e);
+                        if (channel.isActive()) {
+                            try {
+                                writeJson(channel, 503, Map.of("message",
+                                        e.getMessage() != null ? e.getMessage() : "下载失败"));
+                            } catch (Exception ignored) {
+                                channel.close();
+                            }
+                        }
+                    }
+                });
                 return;
             }
             if ("GET".equals(req.method()) && path.startsWith("/api/files/preview-meta")) {
@@ -540,9 +556,24 @@ public class FileShareHttpHandler {
     private static final Pattern FILENAME_QUOTED = Pattern.compile("filename=\"([^\"]*)\"", Pattern.CASE_INSENSITIVE);
     private static final Pattern FILENAME_PLAIN = Pattern.compile("filename=([^;\\r\\n]+)", Pattern.CASE_INSENSITIVE);
 
-    private void handleDownload(Channel channel, String agentId, String proxyId, String filePath) throws Exception {
-        byte[] data = fileTransferCoordinator.download(agentId, proxyId, filePath);
-        String filename = filenameFromPath(filePath);
+    private void handleDownload(Channel channel, ProxyConfig config, String agentId, String proxyId,
+                                String filePath) throws Exception {
+        Message.FileEntry entry = findFileEntry(agentId, proxyId, filePath);
+        if (entry == null) {
+            writeJson(channel, 404, Map.of("message", "文件不存在"));
+            return;
+        }
+        if (entry.getDirectory()) {
+            writeJson(channel, 400, Map.of("message", "目录不支持下载"));
+            return;
+        }
+        long maxSize = resolveMaxTransferSize(config);
+        if (entry.getSize() > maxSize) {
+            writeJson(channel, 413, Map.of("message", "文件超过大小限制"));
+            return;
+        }
+
+        String filename = entry.getName();
         String contentType = URLConnection.guessContentTypeFromName(filename);
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -555,9 +586,33 @@ public class FileShareHttpHandler {
                 Content-Length: %d\r
                 Connection: close\r
                 \r
-                """.formatted(contentType, disposition, data.length);
-        channel.write(Unpooled.copiedBuffer(header, CharsetUtil.UTF_8));
-        channel.writeAndFlush(Unpooled.wrappedBuffer(data));
+                """.formatted(contentType, disposition, entry.getSize());
+        channel.writeAndFlush(Unpooled.copiedBuffer(header, CharsetUtil.UTF_8)).sync();
+
+        try {
+            fileTransferCoordinator.download(agentId, proxyId, filePath, 0, entry.getSize(), data -> {
+                if (!channel.isActive()) {
+                    throw new IllegalStateException("下载连接已关闭");
+                }
+                channel.writeAndFlush(Unpooled.wrappedBuffer(data)).sync();
+            });
+        } catch (Exception e) {
+            // 响应头已发出，只能关闭连接，避免再写 JSON 破坏 HTTP 帧
+            logger.warn("文件下载中断 path={} msg={}", filePath, e.getMessage());
+            if (channel.isActive()) {
+                channel.close();
+            }
+        }
+    }
+
+    private long resolveMaxTransferSize(ProxyConfig config) {
+        if (config.hasFileShareLimits()) {
+            Long max = config.getFileShareLimits().getMaxUploadSize();
+            if (max != null && max > 0) {
+                return max;
+            }
+        }
+        return FileShareLimitsConfig.DEFAULT_MAX_UPLOAD_SIZE;
     }
 
     private void handlePreviewMeta(Channel channel, String agentId, String proxyId, String filePath) throws Exception {
