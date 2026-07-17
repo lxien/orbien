@@ -11,9 +11,6 @@ import java.util.function.Consumer;
 /**
  * Snappy 块压缩实现，用于 TMSP 帧级 payload 压缩。
  * <p>
- * 使用 {@code snappy-java}（JNI）替代 Netty 纯 Java {@link io.netty.handler.codec.compression.Snappy}，
- * 避免静态/共享实例的线程安全问题，并显著提升吞吐。
- * <p>
  * 格式：{@code [int 原始长度][Snappy 压缩字节]}
  */
 public class SnappyCompressor implements Compressor {

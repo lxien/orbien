@@ -1,0 +1,19 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "org/xerial/snappy/native/.*"
+      },
+      {
+        "pattern": "org/xerial/snappy/VERSION"
+      },
+      {
+        "pattern": "net/jpountz/util/.*/liblz4-java\\.(so|dylib|dll)"
+      },
+      {
+        "pattern": ".*/libzstd-jni-.*\\.(so|dylib|dll)"
+      }
+    ]
+  },
+  "bundles": []
+}

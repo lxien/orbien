@@ -1,0 +1,42 @@
+[
+  {
+    "name": "org.xerial.snappy.SnappyNative",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "org.xerial.snappy.BitShuffleNative",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "net.jpountz.util.Native",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "net.jpountz.lz4.LZ4JNI",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.github.luben.zstd.Zstd",
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.github.luben.zstd.ZstdCompressCtx",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "com.github.luben.zstd.ZstdDecompressCtx",
+    "allDeclaredFields": true,
+    "allDeclaredConstructors": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "byte[]"
+  }
+]

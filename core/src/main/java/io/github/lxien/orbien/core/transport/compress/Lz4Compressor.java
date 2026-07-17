@@ -13,10 +13,25 @@ import java.util.function.Consumer;
  * LZ4 块压缩实现，用于 TMSP 帧级 payload 压缩。
  * <p>
  * 格式：{@code [int 原始长度][LZ4 压缩字节]}
+ * <p>
+ * 不使用 {@link LZ4Factory#fastestInstance()}：其在运行时按类名动态加载多种实现，
+ * GraalVM native image 下容易因反射类未注册而初始化失败。
  */
 public class Lz4Compressor implements Compressor {
 
-    private static final LZ4Factory LZ4 = LZ4Factory.fastestInstance();
+    private static final class Engines {
+        static final LZ4Factory LZ4;
+
+        static {
+            LZ4Factory factory;
+            try {
+                factory = LZ4Factory.nativeInstance();
+            } catch (Throwable ignored) {
+                factory = LZ4Factory.safeInstance();
+            }
+            LZ4 = factory;
+        }
+    }
 
     @Override
     public void compress(Channel channel, ByteBuf in, Consumer<ByteBuf> consumer, int level) {
@@ -37,7 +52,7 @@ public class Lz4Compressor implements Compressor {
         byte[] input = new byte[originalLen];
         in.getBytes(in.readerIndex(), input);
 
-        LZ4Compressor compressor = LZ4.fastCompressor();
+        LZ4Compressor compressor = Engines.LZ4.fastCompressor();
         int maxCompressed = compressor.maxCompressedLength(originalLen);
         byte[] compressed = new byte[maxCompressed];
         int compressedLen = compressor.compress(input, 0, originalLen, compressed, 0, maxCompressed);
@@ -63,7 +78,7 @@ public class Lz4Compressor implements Compressor {
         byte[] compressed = new byte[compressedLen];
         in.readBytes(compressed);
 
-        LZ4FastDecompressor decompressor = LZ4.fastDecompressor();
+        LZ4FastDecompressor decompressor = Engines.LZ4.fastDecompressor();
         byte[] restored = new byte[originalLen];
         // 返回值是从 compressed 中读取的字节数，不是解压后的长度
         int compressedBytesRead = decompressor.decompress(compressed, 0, restored, 0, originalLen);

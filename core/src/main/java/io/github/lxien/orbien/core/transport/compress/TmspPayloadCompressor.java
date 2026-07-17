@@ -8,9 +8,7 @@ import io.netty.util.ReferenceCountUtil;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
-/**
- * TMSP 帧级压缩/解压入口。
- */
+
 public final class TmspPayloadCompressor {
 
     public static final int MIN_COMPRESSIBLE_LENGTH = 1024;

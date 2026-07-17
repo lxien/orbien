@@ -34,6 +34,9 @@
                 <configuration>
                     <buildArgs>
                         <buildArg>--initialize-at-build-time=org.sqlite.util.ProcessRunner</buildArg>
+                        <buildArg>--initialize-at-run-time=org.xerial.snappy</buildArg>
+                        <buildArg>--initialize-at-run-time=net.jpountz</buildArg>
+                        <buildArg>--initialize-at-run-time=com.github.luben.zstd</buildArg>
                         <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
                         <arg>-Dio.netty.handler.ssl.noOpenSsl=true</arg>
                     </buildArgs>

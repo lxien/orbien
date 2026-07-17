@@ -895,6 +895,18 @@
           "parameterTypes": [
             "java.nio.Buffer"
           ]
+        },
+        {
+          "name": "ofAddress",
+          "parameterTypes": [
+            "long"
+          ]
+        },
+        {
+          "name": "reinterpret",
+          "parameterTypes": [
+            "long"
+          ]
         }
       ]
     },
@@ -1524,6 +1536,359 @@
     },
     {
       "type": "sun.util.resources.cldr.TimeZoneNames_en_US"
+    },
+    {
+      "type": "com.github.luben.zstd.AutoCloseBase"
+    },
+    {
+      "type": "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "groovy.lang.Closure"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.HttpCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.LoginCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.LogoutCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.OrbienCommand",
+      "fields": [
+        {
+          "name": "configFile"
+        },
+        {
+          "name": "spec"
+        }
+      ]
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.RunCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.TcpCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.cli.UdpCommand"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.TunnelClient$1"
+    },
+    {
+      "type": "io.github.lxien.orbien.client.transport.RealServerHandler"
+    },
+    {
+      "type": "java.lang.foreign.AddressLayout",
+      "methods": [
+        {
+          "name": "byteSize",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.FunctionDescriptor",
+      "methods": [
+        {
+          "name": "of",
+          "parameterTypes": [
+            "java.lang.foreign.MemoryLayout",
+            "java.lang.foreign.MemoryLayout[]"
+          ]
+        },
+        {
+          "name": "ofVoid",
+          "parameterTypes": [
+            "java.lang.foreign.MemoryLayout[]"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.Linker",
+      "methods": [
+        {
+          "name": "defaultLookup",
+          "parameterTypes": []
+        },
+        {
+          "name": "downcallHandle",
+          "parameterTypes": [
+            "java.lang.foreign.MemorySegment",
+            "java.lang.foreign.FunctionDescriptor",
+            "java.lang.foreign.Linker$Option[]"
+          ]
+        },
+        {
+          "name": "nativeLinker",
+          "parameterTypes": []
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.Linker$Option"
+    },
+    {
+      "type": "java.lang.foreign.Linker$Option[]"
+    },
+    {
+      "type": "java.lang.foreign.MemoryLayout"
+    },
+    {
+      "type": "java.lang.foreign.MemoryLayout[]"
+    },
+    {
+      "type": "java.lang.foreign.SymbolLookup",
+      "methods": [
+        {
+          "name": "findOrThrow",
+          "parameterTypes": [
+            "java.lang.String"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.ValueLayout",
+      "fields": [
+        {
+          "name": "ADDRESS"
+        },
+        {
+          "name": "JAVA_LONG"
+        }
+      ]
+    },
+    {
+      "type": "java.lang.foreign.ValueLayout$OfLong"
+    },
+    {
+      "type": "java.nio.file.Path"
+    },
+    {
+      "type": "java.nio.file.Paths"
+    },
+    {
+      "type": "java.sql.Connection"
+    },
+    {
+      "type": "java.sql.Driver"
+    },
+    {
+      "type": "java.sql.DriverManager"
+    },
+    {
+      "type": "java.sql.Time"
+    },
+    {
+      "type": "java.sql.Timestamp"
+    },
+    {
+      "type": "java.time.Duration"
+    },
+    {
+      "type": "java.time.Instant"
+    },
+    {
+      "type": "java.time.LocalDate"
+    },
+    {
+      "type": "java.time.LocalDateTime"
+    },
+    {
+      "type": "java.time.LocalTime"
+    },
+    {
+      "type": "java.time.MonthDay"
+    },
+    {
+      "type": "java.time.OffsetDateTime"
+    },
+    {
+      "type": "java.time.OffsetTime"
+    },
+    {
+      "type": "java.time.Period"
+    },
+    {
+      "type": "java.time.Year"
+    },
+    {
+      "type": "java.time.YearMonth"
+    },
+    {
+      "type": "java.time.ZoneId"
+    },
+    {
+      "type": "java.time.ZoneOffset"
+    },
+    {
+      "type": "java.time.ZonedDateTime"
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4HCJNICompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JNICompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JNISafeDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "picocli.CommandLine$AutoHelpMixin",
+      "fields": [
+        {
+          "name": "helpRequested"
+        },
+        {
+          "name": "versionRequested"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JNIFastDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaSafeCompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4HCJavaSafeCompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaSafeFastDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaSafeSafeDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaUnsafeCompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4HCJavaUnsafeCompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ],
+      "methods": [
+        {
+          "name": "<init>",
+          "parameterTypes": [
+            "int"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaUnsafeFastDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JavaUnsafeSafeDecompressor",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4JNI",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.lz4.LZ4Factory",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
+    },
+    {
+      "type": "net.jpountz.util.Native",
+      "fields": [
+        {
+          "name": "INSTANCE"
+        }
+      ]
     }
   ],
   "resources": [
@@ -1538,6 +1903,24 @@
     },
     {
       "glob": "META-INF/native/libnetty_transport_native_kqueue_aarch_64.jnilib"
+    },
+    {
+      "glob": "org/xerial/snappy/native/**"
+    },
+    {
+      "glob": "org/xerial/snappy/VERSION"
+    },
+    {
+      "glob": "net/jpountz/util/**/liblz4-java.*"
+    },
+    {
+      "glob": "**/libzstd-jni-*.so"
+    },
+    {
+      "glob": "**/libzstd-jni-*.dylib"
+    },
+    {
+      "glob": "**/libzstd-jni-*.dll"
     },
     {
       "glob": "META-INF/services/ch.qos.logback.classic.spi.Configurator"
@@ -1585,6 +1968,24 @@
     {
       "module": "jdk.jfr",
       "glob": "jdk/jfr/internal/types/metadata.bin"
+    },
+    {
+      "glob": "META-INF/maven/org.xerial.snappy/snappy-java/pom.properties"
+    },
+    {
+      "glob": "META-INF/services/javax.xml.parsers.SAXParserFactory"
+    },
+    {
+      "glob": "darwin/aarch64/libzstd-jni-1.5.7-11.dylib"
+    },
+    {
+      "glob": "net/jpountz/util/darwin/aarch64/liblz4-java.dylib"
+    },
+    {
+      "glob": "org-xerial-snappy.properties"
+    },
+    {
+      "glob": "org/xerial/snappy/native/Mac/aarch64/libsnappyjava.dylib"
     }
   ]
 }

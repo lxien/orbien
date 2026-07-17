@@ -89,9 +89,9 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>META-INF/native-image/core/*.json</include>
+                    <include>META-INF/native-image/**</include>
                 </includes>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>
