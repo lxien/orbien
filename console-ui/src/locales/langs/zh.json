@@ -171,6 +171,16 @@
     "btnText": "登录",
     "noAccount": "还没有账号？",
     "register": "注册",
+    "oauth": {
+      "otherWays": "其他登录方式",
+      "loginWith": "使用 {name} 登录",
+      "errors": {
+        "userNotFound": "不支持该登录",
+        "denied": "已取消授权",
+        "invalidState": "登录已失效，请重试",
+        "failed": "登录失败，请重试"
+      }
+    },
     "success": {
       "title": "登录成功",
       "message": "欢迎回来"
@@ -256,6 +266,8 @@
       "domain": "域名管理",
       "tls": "TLS 证书",
       "token": "访问令牌",
+      "oauth": "三方登录",
+      "settings": "系统设置",
       "scheduledJob": "计划任务",
       "stats": "流量统计"
     },

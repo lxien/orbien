@@ -4,6 +4,8 @@ spring:
 server:
   servlet:
     context-path: /
+  # 生产置于反向代理后时，据此还原对外 scheme/host，供 OAuth redirect_uri 等推导
+  forward-headers-strategy: framework
 jwt:
   secret:
   expiration: 3600
@@ -14,6 +16,7 @@ security:
       - /static/**
       - /api/auth/login
       - /api/captcha
+      - /api/auth/oauth/**
 cache:
   caffeine:
     initial-capacity: 10000
@@ -25,7 +28,7 @@ orbien:
   console:
     # 开发模式
     dev: true
-    # 演示模式：可登录查看，禁止一切更新类操作
+    # 演示模式
     preview-mode: false
   acme:
     # staging=测试证书，production=正式证书

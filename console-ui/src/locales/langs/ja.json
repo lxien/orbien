@@ -171,6 +171,16 @@
     "btnText": "ログイン",
     "noAccount": "アカウントがありませんか？",
     "register": "登録",
+    "oauth": {
+      "otherWays": "その他のログイン方法",
+      "loginWith": "{name} でログイン",
+      "errors": {
+        "userNotFound": "このログイン方式はサポートされていません",
+        "denied": "認証がキャンセルされました",
+        "invalidState": "ログイン状態が無効です。再試行してください",
+        "failed": "ログインに失敗しました。再試行してください"
+      }
+    },
     "success": {
       "title": "ログイン成功",
       "message": "ようこそ"
@@ -256,6 +266,8 @@
       "domain": "ドメイン管理",
       "tls": "TLS 証明書",
       "token": "アクセストークン",
+      "oauth": "サードパーティログイン",
+      "settings": "システム設定",
       "scheduledJob": "スケジュールタスク",
       "stats": "トラフィック統計"
     },

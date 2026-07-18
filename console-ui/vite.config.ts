@@ -30,19 +30,12 @@ export default ({mode}: { mode: string }) => {
                 '/api': {
                     target: VITE_API_PROXY_URL,
                     changeOrigin: true,
-                    secure: false
+                    secure: false,
+                    // 转发客户端 Host/Proto，便于后端同域推导 OAuth redirect_uri
+                    xfwd: true
                 }
             },
-            host: true,
-            allowedHosts: [
-                "38.domain1.com",
-                "37.domain1.com",
-                "36.domain1.com",
-                "38.domain2.com",
-                "37.domain2.com",
-                "36.domain2.com",
-                "aa.xnkfz.com"
-            ]
+            host: true
         },
         // 路径别名
         resolve: {

@@ -130,5 +130,15 @@ export const penetrationRoutes: AppRouteRecord[] = [
       icon: 'ri:bar-chart-line',
       roles: ['R_SUPER']
     }
+  },
+  {
+    name: 'SystemSettings',
+    path: '/settings',
+    component: '/orbien/settings',
+    meta: {
+      title: 'menus.orbien.settings',
+      icon: 'ri:settings-3-line',
+      roles: ['R_SUPER']
+    }
   }
 ]

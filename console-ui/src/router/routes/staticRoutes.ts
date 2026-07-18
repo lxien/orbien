@@ -25,6 +25,12 @@ export const staticRoutes: AppRouteRecordRaw[] = [
     meta: { title: 'menus.login.title', isHideTab: true }
   },
   {
+    path: '/auth/oauth/callback',
+    name: 'OAuthCallback',
+    component: () => import('@views/auth/oauth-callback/index.vue'),
+    meta: { title: 'menus.login.title', isHideTab: true }
+  },
+  {
     path: '/auth/register',
     name: 'Register',
     component: () => import('@views/auth/register/index.vue'),

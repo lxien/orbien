@@ -171,6 +171,16 @@
     "btnText": "Login",
     "noAccount": "No account yet?",
     "register": "Register",
+    "oauth": {
+      "otherWays": "Other ways to sign in",
+      "loginWith": "Sign in with {name}",
+      "errors": {
+        "userNotFound": "This sign-in method is not supported",
+        "denied": "Authorization cancelled",
+        "invalidState": "Login session expired. Please try again",
+        "failed": "Login failed. Please try again"
+      }
+    },
     "success": {
       "title": "Login successful",
       "message": "Welcome back"
@@ -256,6 +266,8 @@
       "domain": "Domain",
       "tls": "TLS Certificate",
       "token": "Token",
+      "oauth": "OAuth Login",
+      "settings": "Settings",
       "scheduledJob": "Scheduled Jobs",
       "stats": "Statistics"
     },

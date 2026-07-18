@@ -20,62 +20,62 @@
  * 3. 枚举类型的值需要与 src/enums/appEnum.ts 中的定义保持一致
  */
 
-import { SystemThemeEnum, MenuThemeEnum, MenuTypeEnum, ContainerWidthEnum } from '@/enums/appEnum'
+import {SystemThemeEnum, MenuThemeEnum, MenuTypeEnum, ContainerWidthEnum} from '@/enums/appEnum'
 
 /**
  * 系统设置默认值配置
  */
 export const SETTING_DEFAULT_CONFIG = {
-  /** 菜单类型 */
-  menuType: MenuTypeEnum.LEFT,
-  /** 菜单展开宽度 */
-  menuOpenWidth: 180,
-  /** 菜单是否展开 */
-  menuOpen: true,
-  /** 双菜单是否显示文本 */
-  dualMenuShowText: false,
-  /** 系统主题类型 */
-  systemThemeType: SystemThemeEnum.LIGHT,
-  /** 系统主题模式 */
-  systemThemeMode: SystemThemeEnum.LIGHT,
-  /** 菜单风格 */
-  menuThemeType: MenuThemeEnum.DESIGN,
-  /** 系统主题颜色 */
-  systemThemeColor: '#5D87FF',
-  /** 是否显示菜单按钮 */
-  showMenuButton: true,
-  /** 是否显示快速入口 */
-  showFastEnter: false,
-  /** 是否显示刷新按钮 */
-  showRefreshButton: true,
-  /** 是否显示面包屑 */
-  showCrumbs: true,
-  /** 是否显示工作台标签 */
-  showWorkTab: true,
-  /** 是否显示语言切换 */
-  showLanguage: true,
-  /** 是否显示进度条 */
-  showNprogress: true,
-  /** 是否显示设置引导 */
-  showSettingGuide: true,
-  /** 是否自动关闭 */
-  autoClose: false,
-  /** 是否唯一展开 */
-  uniqueOpened: true,
-  /** 是否色弱模式 */
-  colorWeak: false,
-  /** 是否刷新 */
-  refresh: false,
-  /** 边框模式 */
-  boxBorderMode: false,
-  /** 页面过渡效果 */
-  pageTransition: 'fade',
-  /** 标签页样式 */
-  tabStyle: 'tab-google',
-  /** 自定义圆角 */
-  customRadius: '0.25',
-  /** 容器宽度 */
-  containerWidth: ContainerWidthEnum.FULL
+    /** 菜单类型 */
+    menuType: MenuTypeEnum.LEFT,
+    /** 菜单展开宽度 */
+    menuOpenWidth: 180,
+    /** 菜单是否展开 */
+    menuOpen: true,
+    /** 双菜单是否显示文本 */
+    dualMenuShowText: false,
+    /** 系统主题类型 */
+    systemThemeType: SystemThemeEnum.LIGHT,
+    /** 系统主题模式 */
+    systemThemeMode: SystemThemeEnum.LIGHT,
+    /** 菜单风格 */
+    menuThemeType: MenuThemeEnum.DESIGN,
+    /** 系统主题颜色 */
+    systemThemeColor: '#5D87FF',
+    /** 是否显示菜单按钮 */
+    showMenuButton: true,
+    /** 是否显示快速入口 */
+    showFastEnter: false,
+    /** 是否显示刷新按钮 */
+    showRefreshButton: true,
+    /** 是否显示面包屑 */
+    showCrumbs: true,
+    /** 是否显示工作台标签 */
+    showWorkTab: true,
+    /** 是否显示语言切换 */
+    showLanguage: true,
+    /** 是否显示进度条 */
+    showNprogress: true,
+    /** 是否显示设置引导 */
+    showSettingGuide: true,
+    /** 是否自动关闭 */
+    autoClose: false,
+    /** 是否唯一展开 */
+    uniqueOpened: true,
+    /** 是否色弱模式 */
+    colorWeak: false,
+    /** 是否刷新 */
+    refresh: false,
+    /** 边框模式 */
+    boxBorderMode: false,
+    /** 页面过渡效果 */
+    pageTransition: 'fade',
+    /** 标签页样式 */
+    tabStyle: 'tab-google',
+    /** 自定义圆角 */
+    customRadius: '0.75',
+    /** 容器宽度 */
+    containerWidth: ContainerWidthEnum.FULL
 }
 
 /**
@@ -83,7 +83,7 @@ export const SETTING_DEFAULT_CONFIG = {
  * @returns 设置默认值对象
  */
 export function getSettingDefaults() {
-  return { ...SETTING_DEFAULT_CONFIG }
+    return {...SETTING_DEFAULT_CONFIG}
 }
 
 /**
@@ -91,10 +91,10 @@ export function getSettingDefaults() {
  * @param currentSettings 当前设置对象
  */
 export function resetToDefaults(currentSettings: Record<string, any>) {
-  const defaults = getSettingDefaults()
-  Object.keys(defaults).forEach((key) => {
-    if (key in currentSettings) {
-      currentSettings[key] = defaults[key as keyof typeof defaults]
-    }
-  })
+    const defaults = getSettingDefaults()
+    Object.keys(defaults).forEach((key) => {
+        if (key in currentSettings) {
+            currentSettings[key] = defaults[key as keyof typeof defaults]
+        }
+    })
 }

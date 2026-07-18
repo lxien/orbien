@@ -1,67 +1,108 @@
-<!-- 个人中心页面 -->
+<!-- 个人中心 -->
 <template>
-  <div class="w-full h-full p-0 bg-transparent border-none shadow-none">
-    <div class="relative flex-b mt-2.5 max-md:block max-md:mt-1">
-      <div class="w-112 mr-5 max-md:w-full max-md:mr-0">
-        <div class="art-card-sm relative p-9 pb-6 overflow-hidden text-center">
-          <img class="absolute top-0 left-0 w-full h-50 object-cover" src="@imgs/user/bg.webp" />
-          <img
-            class="relative z-10 w-20 h-20 mt-30 mx-auto object-cover border-2 border-white rounded-full"
-            src="@imgs/user/avatar.webp"
-          />
-          <h2 class="mt-5 text-xl font-normal">{{ userInfo.username }}</h2>
-          <p class="mt-5 text-sm">Orbien</p>
+  <div class="user-center-page">
+    <div class="profile-card art-card-sm">
+      <img class="avatar" src="@imgs/user/avatar.webp" alt="avatar" />
+      <h2 class="username">{{ userInfo.username || '—' }}</h2>
+      <ElTag type="primary" effect="plain" size="small">管理员</ElTag>
+    </div>
 
-          <div class="w-75 mx-auto mt-7.5 text-left">
-            <div class="mt-2.5">
-              <ArtSvgIcon icon="ri:mail-line" class="text-g-700" />
-              <span class="ml-2 text-sm">未设置邮箱</span>
+    <div class="content-col">
+      <div class="section-card art-card-sm">
+        <div class="section-head">
+          <h3>修改密码</h3>
+        </div>
+        <ElForm :model="pwdForm" class="section-body" label-position="top" @submit.prevent>
+          <ElFormItem label="当前密码">
+            <ElInput
+              v-model="pwdForm.password"
+              type="password"
+              show-password
+              autocomplete="current-password"
+            />
+          </ElFormItem>
+          <ElFormItem label="新密码">
+            <ElInput
+              v-model="pwdForm.newPassword"
+              type="password"
+              show-password
+              autocomplete="new-password"
+            />
+          </ElFormItem>
+          <ElFormItem label="确认新密码">
+            <ElInput
+              v-model="pwdForm.confirmPassword"
+              type="password"
+              show-password
+              autocomplete="new-password"
+            />
+          </ElFormItem>
+          <div class="section-actions">
+            <ElButton type="primary" :loading="pwdLoading" @click="savePassword">保存密码</ElButton>
+          </div>
+        </ElForm>
+      </div>
+
+      <div class="section-card art-card-sm">
+        <div class="section-head">
+          <h3>三方登录</h3>
+          <ElButton type="primary" link @click="goSettings">平台配置</ElButton>
+        </div>
+        <div class="section-body bind-list" v-loading="bindLoading">
+          <div v-for="item in providerRows" :key="item.provider" class="bind-row">
+            <div class="bind-left">
+              <span class="bind-icon-wrap">
+                <OAuthProviderIcon :provider="item.provider" :size="22" :alt="item.displayName" />
+              </span>
+              <div class="bind-info">
+                <div class="bind-name">{{ item.displayName }}</div>
+                <div class="bind-meta" :class="{ ok: item.bound }">
+                  <template v-if="item.bound">已绑定 · {{ item.externalLogin || '—' }}</template>
+                  <template v-else-if="item.ready">已配置 · 未绑定</template>
+                  <template v-else>未配置</template>
+                </div>
+              </div>
             </div>
-            <div class="mt-2.5">
-              <ArtSvgIcon icon="ri:user-3-line" class="text-g-700" />
-              <span class="ml-2 text-sm">软件开发工程师</span>
+
+            <div class="bind-actions">
+              <template v-if="item.bound">
+                <ElButton
+                  type="danger"
+                  plain
+                  size="small"
+                  :loading="unbindingProvider === item.provider"
+                  @click="unbind(item.provider)"
+                >
+                  解绑
+                </ElButton>
+              </template>
+              <template v-else-if="item.ready">
+                <ElButton
+                  type="primary"
+                  plain
+                  size="small"
+                  :loading="bindingProvider === item.provider"
+                  @click="startBind(item.provider)"
+                >
+                  绑定
+                </ElButton>
+              </template>
+              <template v-else>
+                <ElTooltip content="请先完成 OAuth 凭证配置" placement="top">
+                  <span>
+                    <ElButton size="small" disabled>绑定</ElButton>
+                  </span>
+                </ElTooltip>
+                <ElButton type="primary" link size="small" @click="goSettings">配置</ElButton>
+              </template>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="flex-1 overflow-hidden max-md:w-full max-md:mt-3.5">
-        <div class="art-card-sm my-5">
-          <h1 class="p-4 text-xl font-normal border-b border-g-300">更改密码</h1>
 
-          <ElForm :model="pwdForm" class="box-border p-5" label-width="86px" label-position="top">
-            <ElFormItem label="当前密码" prop="password">
-              <ElInput
-                v-model="pwdForm.password"
-                type="password"
-                :disabled="!isEditPwd"
-                show-password
-              />
-            </ElFormItem>
-
-            <ElFormItem label="新密码" prop="newPassword">
-              <ElInput
-                v-model="pwdForm.newPassword"
-                type="password"
-                :disabled="!isEditPwd"
-                show-password
-              />
-            </ElFormItem>
-
-            <ElFormItem label="确认新密码" prop="confirmPassword">
-              <ElInput
-                v-model="pwdForm.confirmPassword"
-                type="password"
-                :disabled="!isEditPwd"
-                show-password
-              />
-            </ElFormItem>
-
-            <div class="flex-c justify-end [&_.el-button]:!w-27.5">
-              <ElButton type="primary" class="w-22.5" v-ripple @click="editPwd" :loading="loading">
-                {{ isEditPwd ? '保存' : '编辑' }}
-              </ElButton>
-            </div>
-          </ElForm>
+          <ElEmpty
+            v-if="!bindLoading && !providerRows.length"
+            description="暂无平台"
+            :image-size="64"
+          />
         </div>
       </div>
     </div>
@@ -69,86 +110,290 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, reactive, computed, onMounted } from 'vue'
+  import { computed, onMounted, reactive, ref } from 'vue'
+  import { useRoute, useRouter } from 'vue-router'
+  import { ElMessage, ElMessageBox } from 'element-plus'
   import { useUserStore } from '@/store/modules/user'
   import { fetchUpdatePassword } from '@/api/user'
-  import { ElMessage } from 'element-plus'
+  import {
+    fetchOAuthBindings,
+    fetchOAuthProviderConfigs,
+    fetchStartOAuthBind,
+    fetchUnbindOAuth
+  } from '@/api/oauth'
+  import OAuthProviderIcon from '@/components/oauth/OAuthProviderIcon.vue'
+
   defineOptions({ name: 'UserCenter' })
 
+  interface ProviderRow {
+    provider: string
+    displayName: string
+    /** 凭证已配置，可发起绑定 */
+    ready: boolean
+    bound: boolean
+    externalLogin?: string
+  }
+
+  const router = useRouter()
+  const route = useRoute()
   const userStore = useUserStore()
   const userInfo = computed(() => userStore.getUserInfo)
 
-  const isEditPwd = ref(false)
-  const date = ref('')
-  const loading = ref(false)
+  const pwdLoading = ref(false)
+  const bindLoading = ref(false)
+  const bindingProvider = ref('')
+  const unbindingProvider = ref('')
+  const providers = ref<Api.OAuth.ProviderConfig[]>([])
+  const bindings = ref<Api.OAuth.Binding[]>([])
 
-  /**
-   * 密码修改表单
-   */
   const pwdForm = reactive({
     password: '',
     newPassword: '',
     confirmPassword: ''
   })
 
-  onMounted(() => {
-    getDate()
+  const providerRows = computed<ProviderRow[]>(() => {
+    const bindMap = new Map(bindings.value.map((b) => [b.provider, b]))
+    return providers.value.map((p) => {
+      const bind = bindMap.get(p.provider)
+      return {
+        provider: p.provider,
+        displayName: p.displayName,
+        ready: !!(p.clientId && p.secretConfigured),
+        bound: !!bind?.bound,
+        externalLogin: bind?.externalLogin
+      }
+    })
   })
 
-  /**
-   * 根据当前时间获取问候语
-   */
-  const getDate = () => {
-    const h = new Date().getHours()
-
-    if (h >= 6 && h < 9) date.value = '早上好'
-    else if (h >= 9 && h < 11) date.value = '上午好'
-    else if (h >= 11 && h < 13) date.value = '中午好'
-    else if (h >= 13 && h < 18) date.value = '下午好'
-    else if (h >= 18 && h < 24) date.value = '晚上好'
-    else date.value = '很晚了，早点睡'
+  const goSettings = () => {
+    router.push({ path: '/settings', query: { tab: 'oauth' } })
   }
-  /**
-   * 切换密码编辑状态
-   */
-  const editPwd = async () => {
-    if (isEditPwd.value) {
-      // 保存密码
-      await savePassword()
-    } else {
-      // 进入编辑状态
-      isEditPwd.value = true
+
+  const loadOAuthData = async () => {
+    bindLoading.value = true
+    try {
+      const [providerList, bindingList] = await Promise.all([
+        fetchOAuthProviderConfigs(),
+        fetchOAuthBindings()
+      ])
+      providers.value = providerList || []
+      bindings.value = bindingList || []
+    } catch {
+      providers.value = []
+      bindings.value = []
+    } finally {
+      bindLoading.value = false
     }
   }
 
-  /**
-   * 保存密码
-   */
   const savePassword = async () => {
-    // 表单验证
     if (!pwdForm.password) {
-      ElMessage.error('请输入当前密码')
+      ElMessage.warning('请输入当前密码')
       return
     }
     if (!pwdForm.newPassword) {
-      ElMessage.error('请输入新密码')
+      ElMessage.warning('请输入新密码')
       return
     }
     if (pwdForm.newPassword !== pwdForm.confirmPassword) {
-      ElMessage.error('新密码和确认密码不一致')
+      ElMessage.warning('两次输入的新密码不一致')
       return
     }
-
+    pwdLoading.value = true
     try {
-      loading.value = true
       await fetchUpdatePassword(pwdForm)
-      isEditPwd.value = false
-      // 清空表单
+      ElMessage.success('密码已更新')
       pwdForm.password = ''
       pwdForm.newPassword = ''
       pwdForm.confirmPassword = ''
     } finally {
-      loading.value = false
+      pwdLoading.value = false
     }
   }
+
+  const startBind = async (provider: string) => {
+    bindingProvider.value = provider
+    try {
+      const { authorizeUrl } = await fetchStartOAuthBind(provider)
+      if (!authorizeUrl) {
+        ElMessage.error('未获取到授权地址')
+        return
+      }
+      window.location.href = authorizeUrl
+    } finally {
+      bindingProvider.value = ''
+    }
+  }
+
+  const unbind = async (provider: string) => {
+    await ElMessageBox.confirm('确定解绑？', '解绑确认', {
+      type: 'warning',
+      confirmButtonText: '解绑',
+      cancelButtonText: '取消'
+    })
+    unbindingProvider.value = provider
+    try {
+      await fetchUnbindOAuth(provider)
+      ElMessage.success('已解绑')
+      await loadOAuthData()
+    } finally {
+      unbindingProvider.value = ''
+    }
+  }
+
+  const handleBindResult = async () => {
+    const bind = route.query.bind as string
+    if (bind !== 'ok' && bind !== 'fail') return
+    if (bind === 'ok') {
+      ElMessage.success('账号绑定成功')
+    } else {
+      ElMessage.error('绑定失败，请确认 OAuth 凭证已配置')
+    }
+    await loadOAuthData()
+    router.replace({ path: '/system/user-center' })
+  }
+
+  onMounted(async () => {
+    await loadOAuthData()
+    await handleBindResult()
+  })
 </script>
+
+<style lang="scss" scoped>
+  .user-center-page {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 16px;
+    padding: 8px 0 20px;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 36px 24px;
+    text-align: center;
+    height: fit-content;
+  }
+
+  .avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--el-bg-color);
+    box-shadow: 0 0 0 1px var(--el-border-color-lighter);
+  }
+
+  .username {
+    margin: 16px 0 10px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .content-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .section-card {
+    overflow: hidden;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--el-border-color-extra-light);
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+
+  .section-body {
+    padding: 20px;
+  }
+
+  .section-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .bind-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 80px;
+  }
+
+  .bind-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 10px;
+    background: var(--el-fill-color-blank);
+  }
+
+  .bind-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .bind-icon-wrap {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 50%;
+    background: var(--el-bg-color);
+  }
+
+  .bind-info {
+    min-width: 0;
+  }
+
+  .bind-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .bind-meta {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+
+    &.ok {
+      color: var(--el-color-success);
+    }
+  }
+
+  .bind-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 16px;
+  }
+</style>

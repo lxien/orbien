@@ -94,6 +94,25 @@
               </ElButton>
             </div>
 
+            <div v-if="oauthProviders.length" class="oauth-login-section">
+              <div class="oauth-divider">
+                <span>{{ $t('login.oauth.otherWays') }}</span>
+              </div>
+              <div class="oauth-buttons">
+                <button
+                  v-for="item in oauthProviders"
+                  :key="item.provider"
+                  type="button"
+                  class="oauth-icon-btn"
+                  :title="$t('login.oauth.loginWith', { name: item.displayName })"
+                  :aria-label="$t('login.oauth.loginWith', { name: item.displayName })"
+                  @click="handleOAuthLogin(item.provider)"
+                >
+                  <OAuthProviderIcon :provider="item.provider" :size="22" :alt="item.displayName" />
+                </button>
+              </div>
+            </div>
+
 <!--            <div class="mt-5 text-sm text-gray-600">
               <span>{{ $t('login.noAccount') }}</span>
               <RouterLink class="text-theme" :to="{ name: 'Register' }">{{
@@ -113,7 +132,9 @@
   import { useI18n } from 'vue-i18n'
   import { HttpError } from '@/utils/http/error'
   import { fetchLogin } from '@/api/auth'
-  import { ElNotification, type FormInstance, type FormRules } from 'element-plus'
+  import { fetchPublicOAuthProviders, redirectOAuthAuthorize } from '@/api/oauth'
+  import OAuthProviderIcon from '@/components/oauth/OAuthProviderIcon.vue'
+  import { ElMessage, ElNotification, type FormInstance, type FormRules } from 'element-plus'
   import { useSettingStore } from '@/store/modules/setting'
 
   defineOptions({ name: 'Login' })
@@ -122,6 +143,7 @@
   const { isDark } = storeToRefs(settingStore)
   const { t, locale } = useI18n()
   const formKey = ref(0)
+  const oauthProviders = ref<Api.OAuth.PublicProvider[]>([])
 
   // 监听语言切换，重置表单
   watch(locale, () => {
@@ -175,7 +197,34 @@
 
   onMounted(() => {
     setupAccount('super')
+    loadOAuthProviders()
+    showOAuthErrorIfNeeded()
   })
+
+  const loadOAuthProviders = async () => {
+    try {
+      oauthProviders.value = (await fetchPublicOAuthProviders()) || []
+    } catch {
+      oauthProviders.value = []
+    }
+  }
+
+  const showOAuthErrorIfNeeded = () => {
+    const error = route.query.oauthError as string
+    if (!error) return
+    const messages: Record<string, string> = {
+      user_not_found: t('login.oauth.errors.userNotFound'),
+      denied: t('login.oauth.errors.denied'),
+      invalid_state: t('login.oauth.errors.invalidState'),
+      failed: t('login.oauth.errors.failed')
+    }
+    ElMessage.error(messages[error] || t('login.oauth.errors.failed'))
+    router.replace({ name: 'Login' })
+  }
+
+  const handleOAuthLogin = (provider: string) => {
+    redirectOAuthAuthorize(provider)
+  }
 
   // 设置账号
   const setupAccount = (key: AccountKey) => {
@@ -215,22 +264,18 @@
         throw new Error('Login failed - no token received')
       }
 
-      // 存储 token 和登录状态
       userStore.setToken(token, refreshToken)
       userStore.setLoginStatus(true)
 
-      // 登录成功处理
       showLoginSuccessNotice()
 
       // 获取 redirect 参数，如果存在则跳转到指定页面，否则跳转到首页
       const redirect = route.query.redirect as string
       router.push(redirect || '/')
     } catch (error) {
-      // 处理 HttpError
       if (error instanceof HttpError) {
         // console.log(error.code)
       } else {
-        // 处理非 HttpError
         // ElMessage.error('登录失败，请稍后重试')
         console.error('[Login] Unexpected error:', error)
       }
@@ -261,6 +306,73 @@
 
 <style scoped>
   @import './style.css';
+
+  .oauth-login-section {
+    margin-top: 28px;
+  }
+
+  .oauth-divider {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+    color: var(--art-gray-500);
+    font-size: 12px;
+  }
+
+  .oauth-divider::before,
+  .oauth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--art-gray-300);
+  }
+
+  .oauth-divider span {
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+
+  .oauth-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .oauth-icon-btn {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--art-gray-300);
+    border-radius: 50%;
+    background: var(--default-box-color);
+    cursor: pointer;
+    transition:
+      border-color 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.15s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      border-color: var(--el-color-primary-light-5);
+      background: var(--el-fill-color-light);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--el-color-primary-light-5);
+      outline-offset: 2px;
+    }
+  }
 </style>
 
 <style lang="scss" scoped>
