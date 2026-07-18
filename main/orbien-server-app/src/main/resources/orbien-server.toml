@@ -6,6 +6,6 @@ https_proxy_port = 8443
 [dashboard]
 enabled = true
 addr = "0.0.0.0"
-port = 8030
+port = 8020
 username = "admin"
 password = "123456"

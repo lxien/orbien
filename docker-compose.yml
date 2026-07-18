@@ -1,49 +1,20 @@
-version: "3.8"
-
 services:
-  orbien-mysql:
-    image: mysql:8.4
-    container_name: orbien-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: orbien
-    networks:
-      - orbien-net
-    volumes:
-      - /opt/orbien/mysql/data:/var/lib/mysql
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "mysql -uroot -p$$MYSQL_ROOT_PASSWORD -e 'SELECT 1' >/dev/null 2>&1"
-        ]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 60s
   orbien-server:
     image: lxien/orbien-server:0.20.0
     container_name: orbien-server
     restart: unless-stopped
     ports:
-      - "8080:8080" # HTTP 隧道代理服务
-      - "8020:8020" # 管理面板
-      - "9527:9527" # 控制隧道
-      - "9050-9099:9050-9099" # TCP 隧道代理服务
+      - "8080:8080"
+      - "8443:8443"
+      - "8020:8020"
+      - "9527:9527"
+      - "9050-9099:9050-9099"
+      - "9050-9099:9050-9099/udp"
     environment:
+      SPRING_PROFILES_ACTIVE: h2
+      H2_DATA_DIR: /app/data/orbien-server
       JAVA_OPTS: "-Xms256m -Xmx256m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED"
-      MYSQL_PASSWORD: 123456
-      MYSQL_HOST: orbien-mysql
-      MYSQL_DATABASE: orbien
       TZ: Asia/Shanghai
     volumes:
-      - /opt/orbien/logs:/app/logs
-    networks:
-      - orbien-net
-    depends_on:
-      orbien-mysql:
-        condition: service_healthy
-networks:
-  orbien-net:
-    driver: bridge
+      - ${ORBIEN_HOME:-./data/orbien}/data:/app/data
+      - ${ORBIEN_HOME:-./data/orbien}/logs:/app/logs

@@ -25,7 +25,7 @@ https_proxy_port = 443
 [dashboard]
 enabled = true
 addr = "localhost"
-port = 8030
+port = 8020
 username = "admin"
 password = "123456"
 #cert_file = "cert/transport/server.crt"

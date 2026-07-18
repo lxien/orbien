@@ -31,63 +31,79 @@
 
 ![dashboard.png](doc/image/dashboard.png)
 
-## 介绍
-**Orbien** 是一个高性能的**内网穿透平台**。
-- 支持 TCP、HTTP 协议代理
-- 数据压缩传输，降低带宽消耗
-- TCP 多路复用流传输，单物理连接承载多个请求
-- mTLS 双向认证实现数据安全传输
-- IP CIDR 访问控制（白名单/黑名单）
-- HTTP BasicAuth 鉴权认证、Token 身份认证
-- 精细化带宽限流与流量管控
-- 负载均衡与集群代理支持，提升系统可用性
-- 支持自定义域名、子域名路由
-- 内置现代化 Web UI 面板，方便可视化管理和运维监控
-- Spring Boot 集成，降低开发测试成本
-- 兼容 Windows、Linux、macOS，跨平台部署
-- 客户端自治 + 服务端集中化管理配置规则，便于管理
+## 一、介绍
 
-## 快速开始
+**Orbien** 是一个基于 Netty的高性能**内网穿透平台**，支持多协议代理、多传输通道、安全鉴权与可视化运维
 
-### 安装服务端
+### 1.1 功能特性
 
-环境要求：
+- **代理协议**：支持TCP / UDP / HTTP / HTTPS / SOCKS5 / 文件共享等协议，且自带文件管理UI面板
+- **数据传输**：TCP、WebSocket、QUIC；支持多路复用与独立连接，可选 Snappy / LZ4 / ZSTD 压缩
+- **安全认证**：mTLS 双向认证、Token 身份认证、IP CIDR 访问控制、HTTP BasicAuth、时间窗口访问
+- **流量管控**：带宽精细化限流、网络背压、大文件分片和流式传输
+- **高可用**：轮询 / 加权 / 随机 / 最少连接多种负载均衡策略、服务健康检查
+- **开发测试**：支持HTTP/HTTPS 流量抓包、Header头重写、HAProxy真实IP获取等
+- **域名路由**：子域名、自定义域名，支持代理多域名；支持ACME证书签发、自动续期、一件部署等
+- **运维管理**：内置现代化 Web 控制台，支持指标监控、内存监控，集中式配置管理，支持Oauth三方登陆集成等
+- **配置模式**：客户端自治 + 服务端集中化配置管理，规则双向同步，满足公网和内网配置场景
+- **开发集成**：二进制客户端、Spring Boot Starter 嵌入式接入
+- **跨平台**：兼容 Windows、Linux、macOS（含 amd64 / arm64）
 
-- Docker 20+
-- Linux x86_64
+## 二、快速开始
 
-Docker一键启动`orbien-server`服务端:
+### 2.2 服务端
+
+在具备公网IP和`Docker`环境的云服务器上，执行脚本一键安装 `orbien` 服务端，默认采用的是H2轻量数据库。
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
-管理面板访问地址：`http://服务器IP:8020` (admin: 123456)
-### 安装客户端
+| 项目   | 说明                                                                |
+|------|-------------------------------------------------------------------|
+| 面板地址 | `http://<host>:8020`（`admin` / `123456`）                          |
+| 数据目录 | Linux `/opt/orbien`，macOS `~/.orbien`                             |
+| 默认端口 | TCP隧道 `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP 池 `9050-9099` |
 
-从 [GitHub Releases](https://github.com/lxien/orbien/tags)页面下载最新版本，根据您的操作系统下载对应的二进制文件。
+### 2.3 客户端
 
-下载到本地解压后编辑配置文件`orbien.toml`，
+从 [Releases](https://github.com/lxien/orbien/releases) 下载对应平台二进制可执行文件。
 
-```toml
-server_addr = "orbien-server所在服务IP或域名"
-[auth]
-token = "身份认证令牌"
-```
-
-运行客户端:
+#### 2.3.1 快速穿透
 
 ```shell
-./orbien -c orbien.toml # Linux / MacOS
-
-orbien.exe -c orbien.toml # Windows
+orbien login --server <server-host>:9527 --token <access-token>
+orbien http 8080
+orbien tcp 3306
 ```
 
-更多使用细节请查阅[文档网站](https://lxien.github.io/orbien/)。
+#### 2.3.2 Spring Boot Starter
+
+可嵌入 Spring Boot 项目中，快速将Web应用或微服务暴露到公网
+
+```xml
+
+<dependency>
+    <groupId>io.github.lxien</groupId>
+    <artifactId>orbien-spring-boot-starter</artifactId>
+    <version>0.3.0</version>
+</dependency>
+```
+
+```yaml
+orbien:
+  client:
+    enabled: true
+    server-addr: <server-host>
+    auth:
+      token: <access-token>
+    proxy:
+      protocol: http
+```
 
 ## 问题反馈
 
-反馈问题:[issues](https://github.com/lxien/orbien/issues)
+- Issues：[github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
 
 ## 项目趋势
 

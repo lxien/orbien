@@ -1,17 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-set -e
-
-if [ "$(uname -s)" = "Darwin" ]; then
-    ORBIEN_HOME="$HOME/.orbien"
-else
+if [ -z "${ORBIEN_HOME:-}" ]; then
+  if [ "$(uname -s)" = "Darwin" ]; then
+    if [ -n "${SUDO_USER:-}" ]; then
+      ORBIEN_HOME="$(eval echo "~${SUDO_USER}")/.orbien"
+    else
+      ORBIEN_HOME="${HOME}/.orbien"
+    fi
+  else
     ORBIEN_HOME="/opt/orbien"
+  fi
 fi
 
 docker rm -f orbien-server >/dev/null 2>&1 || true
-docker rm -f orbien-mysql >/dev/null 2>&1 || true
-docker network rm orbien-net >/dev/null 2>&1 || true
-rm -rf "$ORBIEN_HOME"
-docker container prune -f
+rm -rf "${ORBIEN_HOME}"
 
-echo "orbien-server 已卸载"
+echo "orbien-server uninstalled"
