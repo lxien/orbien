@@ -46,7 +46,6 @@
       <div class="section-card art-card-sm">
         <div class="section-head">
           <h3>三方登录</h3>
-          <ElButton type="primary" link @click="goSettings">平台配置</ElButton>
         </div>
         <div class="section-body bind-list" v-loading="bindLoading">
           <div v-for="item in providerRows" :key="item.provider" class="bind-row">
@@ -58,8 +57,8 @@
                 <div class="bind-name">{{ item.displayName }}</div>
                 <div class="bind-meta" :class="{ ok: item.bound }">
                   <template v-if="item.bound">已绑定 · {{ item.externalLogin || '—' }}</template>
-                  <template v-else-if="item.ready">已配置 · 未绑定</template>
-                  <template v-else>未配置</template>
+                  <template v-else-if="item.ready">未绑定</template>
+                  <template v-else>暂不可用</template>
                 </div>
               </div>
             </div>
@@ -88,19 +87,18 @@
                 </ElButton>
               </template>
               <template v-else>
-                <ElTooltip content="请先完成 OAuth 凭证配置" placement="top">
+                <ElTooltip content="当前不可绑定" placement="top">
                   <span>
                     <ElButton size="small" disabled>绑定</ElButton>
                   </span>
                 </ElTooltip>
-                <ElButton type="primary" link size="small" @click="goSettings">配置</ElButton>
               </template>
             </div>
           </div>
 
           <ElEmpty
             v-if="!bindLoading && !providerRows.length"
-            description="暂无平台"
+            description="暂无可用平台"
             :image-size="64"
           />
         </div>
@@ -165,10 +163,6 @@
       }
     })
   })
-
-  const goSettings = () => {
-    router.push({ path: '/settings', query: { tab: 'oauth' } })
-  }
 
   const loadOAuthData = async () => {
     bindLoading.value = true
@@ -248,7 +242,7 @@
     if (bind === 'ok') {
       ElMessage.success('账号绑定成功')
     } else {
-      ElMessage.error('绑定失败，请确认 OAuth 凭证已配置')
+      ElMessage.error('绑定失败，请稍后重试')
     }
     await loadOAuthData()
     router.replace({ path: '/system/user-center' })
