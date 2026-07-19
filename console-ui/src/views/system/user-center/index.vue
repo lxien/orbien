@@ -43,7 +43,7 @@
         </ElForm>
       </div>
 
-      <div class="section-card art-card-sm">
+      <div v-if="providerRows.length" class="section-card art-card-sm">
         <div class="section-head">
           <h3>三方登录</h3>
         </div>
@@ -57,8 +57,7 @@
                 <div class="bind-name">{{ item.displayName }}</div>
                 <div class="bind-meta" :class="{ ok: item.bound }">
                   <template v-if="item.bound">已绑定 · {{ item.externalLogin || '—' }}</template>
-                  <template v-else-if="item.ready">未绑定</template>
-                  <template v-else>暂不可用</template>
+                  <template v-else>未绑定</template>
                 </div>
               </div>
             </div>
@@ -75,7 +74,7 @@
                   解绑
                 </ElButton>
               </template>
-              <template v-else-if="item.ready">
+              <template v-else>
                 <ElButton
                   type="primary"
                   plain
@@ -86,21 +85,8 @@
                   绑定
                 </ElButton>
               </template>
-              <template v-else>
-                <ElTooltip content="当前不可绑定" placement="top">
-                  <span>
-                    <ElButton size="small" disabled>绑定</ElButton>
-                  </span>
-                </ElTooltip>
-              </template>
             </div>
           </div>
-
-          <ElEmpty
-            v-if="!bindLoading && !providerRows.length"
-            description="暂无可用平台"
-            :image-size="64"
-          />
         </div>
       </div>
     </div>
@@ -126,8 +112,6 @@
   interface ProviderRow {
     provider: string
     displayName: string
-    /** 凭证已配置，可发起绑定 */
-    ready: boolean
     bound: boolean
     externalLogin?: string
   }
@@ -152,16 +136,17 @@
 
   const providerRows = computed<ProviderRow[]>(() => {
     const bindMap = new Map(bindings.value.map((b) => [b.provider, b]))
-    return providers.value.map((p) => {
-      const bind = bindMap.get(p.provider)
-      return {
-        provider: p.provider,
-        displayName: p.displayName,
-        ready: !!(p.clientId && p.secretConfigured),
-        bound: !!bind?.bound,
-        externalLogin: bind?.externalLogin
-      }
-    })
+    return providers.value
+      .filter((p) => p.enabled)
+      .map((p) => {
+        const bind = bindMap.get(p.provider)
+        return {
+          provider: p.provider,
+          displayName: p.displayName,
+          bound: !!bind?.bound,
+          externalLogin: bind?.externalLogin
+        }
+      })
   })
 
   const loadOAuthData = async () => {
