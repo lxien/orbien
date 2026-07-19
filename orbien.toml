@@ -241,7 +241,7 @@ local_port=8084
 ########################################################################################################################
 
 [log]
-level = "debug"
+level = "info"
 path = "logs"
 name = "orbien.log"
 archive_pattern = "orbien.%d{yyyy-MM-dd}.log"

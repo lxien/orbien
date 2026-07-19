@@ -38,7 +38,7 @@ public class AuthSuccessAction extends AgentBaseAction {
         List<Message.Proxy> messages = proxies.stream().map(ProxyConfigAssembler::toProto).toList();
         builder.addAllProxies(messages);
 
-        logger.info("推送本地代理配置到服务端，共 {} 条: {}",
+        logger.debug("推送本地代理配置到服务端，共 {} 条: {}",
                 messages.size(),
                 messages.stream().map(Message.Proxy::getName).toList());
 

@@ -31,64 +31,79 @@
 
 ![dashboard.png](doc/image/dashboard.png)
 
-## Introduction
-**Orbien**  is a high-performance **intranet penetration platform**.
-- Support for TCP and HTTP protocol proxying
-- Data compression transmission, reducing bandwidth consumption
-- TCP multiplexing stream transmission, multiple requests over single physical connection
-- mTLS mutual authentication for secure data transmission
-- IP CIDR access control (whitelist/blacklist)
-- HTTP BasicAuth authentication, Token-based identity verification
-- Fine-grained bandwidth rate limiting and traffic management
-- Load balancing and cluster proxy support, enhancing system availability
-- Custom domain and subdomain routing support
-- Built-in modern Web UI dashboard for visual management and operational monitoring
-- Spring Boot integration, reducing development and testing costs
-- Compatible with Windows, Linux, and macOS for cross-platform deployment
-- Client-autonomous + server-centralized management configuration rules for simplified administration
+## 1. Introduction
 
-## Quick Start
+**Orbien** is a high-performance **intranet penetration platform** built on Netty, supporting multi-protocol proxying, multiple transport channels, secure authentication, and visual operations management.
 
-### Server Installation
+### 1.1 Features
 
-Requirements:
+- **Proxy protocols**: Supports TCP / UDP / HTTP / HTTPS / SOCKS5 / file sharing and more, with a built-in file management UI panel
+- **Data transport**: TCP, WebSocket, QUIC; supports multiplexing and independent connections, with optional Snappy / LZ4 / ZSTD compression
+- **Security & authentication**: mTLS mutual authentication, Token-based identity authentication, IP CIDR access control, HTTP BasicAuth, and time-window access
+- **Traffic control**: Fine-grained bandwidth rate limiting, network backpressure, large-file chunking and streaming transfer
+- **High availability**: Round-robin / weighted / random / least-connections load balancing strategies, and service health checks
+- **Development & testing**: Supports HTTP/HTTPS traffic capture, header rewriting, HAProxy real IP retrieval, and more
+- **Domain routing**: Subdomains and custom domains, multi-domain proxying; ACME certificate issuance, auto-renewal, and one-click deployment
+- **Operations management**: Built-in modern Web console with metrics monitoring, memory monitoring, centralized configuration management, and OAuth third-party login integration
+- **Configuration modes**: Client autonomy + server-side centralized configuration management, with bidirectional rule sync for both public and private network scenarios
+- **Developer integration**: Binary client and Spring Boot Starter for embedded access
+- **Cross-platform**: Compatible with Windows, Linux, and macOS (amd64 / arm64)
 
-- Docker 20+
-- Linux x86_64
+## 2. Quick Start
 
-One-command Docker startup for `orbien-server` server:
+### 2.2 Server
+
+On a cloud server with a public IP and a `Docker` environment, run the script to install the `orbien` server in one step. H2 lightweight database is used by default.
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
-Management dashboard access: `http://server_ip:8020` (admin: 123456)
+| Item | Description |
+|------|-------------|
+| Console URL | `http://<host>:8020` (`admin` / `123456`) |
+| Data directory | Linux `/opt/orbien`, macOS `~/.orbien` |
+| Default ports | TCP tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
 
-### Client Installation
+### 2.3 Client
 
-Download the latest version from the [GitHub Releases](https://github.com/lxien/orbien/tags) page and select the binary file for your operating system.
+Download the binary for your platform from [Releases](https://github.com/lxien/orbien/releases).
 
-After extracting locally, edit the configuration file `orbien.toml`:
-
-```toml
-server_addr = "orbien-server server IP or domain"
-[auth]
-token = "authentication token"
-```
-
-Run the client:
+#### 2.3.1 Quick tunnel
 
 ```shell
-./orbien -c orbien.toml # Linux / MacOS
-
-orbien.exe -c orbien.toml # Windows
+orbien login --server <server-host>:9527 --token <access-token>
+orbien http 8080
+orbien tcp 3306
 ```
 
-For more usage details, please refer to the [documentation website](https://lxien.github.io/orbien/).
+#### 2.3.2 Spring Boot Starter
+
+Can be embedded into a Spring Boot project to quickly expose Web applications or microservices to the public network.
+
+```xml
+
+<dependency>
+    <groupId>io.github.lxien</groupId>
+    <artifactId>orbien-spring-boot-starter</artifactId>
+    <version>0.3.0</version>
+</dependency>
+```
+
+```yaml
+orbien:
+  client:
+    enabled: true
+    server-addr: <server-host>
+    auth:
+      token: <access-token>
+    proxy:
+      protocol: http
+```
 
 ## Feedback
 
-Report issues: [issues](https://github.com/lxien/orbien/issues)
+- Issues: [github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
 
 ## Project Trends
 

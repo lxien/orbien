@@ -20,7 +20,7 @@ public class AuthRespAction extends AgentBaseAction {
         Message.Status status = authResponse.getStatus();
         int code = status.getCode();
         if (code == 0) {
-            logger.info("已连接到服务端");
+            logger.info("认证成功");
             String agentId = authResponse.getAgentId();
             context.setConnectionId(authResponse.getConnectionId());
             context.setAuthenticated(true);
