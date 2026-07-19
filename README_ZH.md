@@ -25,8 +25,7 @@
 
 <div align="center">
   <a href="README.md"><strong>README</strong></a> &nbsp;|&nbsp;
-  <a href="README_ZH.md"><strong>简体中文</strong></a> &nbsp;|&nbsp;
-  <a href="https://lxien.github.io/orbien"><strong>文档网站</strong></a>
+  <a href="README_ZH.md"><strong>简体中文</strong></a> 
 </div>
 
 ![dashboard.png](doc/image/dashboard.png)
