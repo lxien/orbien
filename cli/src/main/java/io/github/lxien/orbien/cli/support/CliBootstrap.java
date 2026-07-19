@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public final class CliBootstrap {
 
     private static final Set<String> SESSION_COMMANDS = Set.of(
-            "login", "logout", "run", "http", "tcp", "udp"
+            "login", "logout", "http", "tcp", "udp"
     );
 
     private CliBootstrap() {
@@ -19,16 +19,16 @@ public final class CliBootstrap {
             return false;
         }
         boolean hasRootConfig = false;
-        boolean hasSubcommand = false;
+        boolean hasSessionSubcommand = false;
         for (String arg : args) {
-            if ("-c".equals(arg)) {
+            if ("-c".equals(arg) || "run".equals(arg)) {
                 hasRootConfig = true;
             }
             if (SESSION_COMMANDS.contains(arg)) {
-                hasSubcommand = true;
+                hasSessionSubcommand = true;
             }
         }
-        return hasRootConfig && !hasSubcommand;
+        return hasRootConfig && !hasSessionSubcommand;
     }
 
     public static void prepareQuietSession() {

@@ -1,4 +1,3 @@
-/** orbien 业务枚举 */
 
 export enum ProtocolType {
     TCP = 1,

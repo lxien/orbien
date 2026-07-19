@@ -43,11 +43,12 @@ path = "/tunnel"
 server_port = 9529
 
 ########################################################################################################################
+
+
 [[proxies]]
-name = "http-tcp"
-protocol = "http"
-custom_domains = ["33.domain1.com"]
-local_port=8084
+name = "MySQL"
+protocol = "tcp"
+local_port = 3306
 #[proxies.transport]
 #multiplex =true
 #encrypt = true

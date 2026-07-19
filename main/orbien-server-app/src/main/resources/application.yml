@@ -21,7 +21,7 @@ cache:
   caffeine:
     initial-capacity: 10000
     maximum-size: 150000
-    expire-after-access: 30m
+    expire-after-access: 60m
 
 orbien:
   console:

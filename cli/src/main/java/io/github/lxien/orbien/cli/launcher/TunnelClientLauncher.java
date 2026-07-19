@@ -95,7 +95,7 @@ public final class TunnelClientLauncher {
                 return configSource.load();
             }
         }
-        throw new IllegalArgumentException("未找到配置文件，使用 -c 指定路径。\n" +
+        throw new IllegalArgumentException("未找到配置文件，例如: orbien run orbien.toml 或 orbien -c orbien.toml\n" +
                 "搜索路径: config/orbien.toml, orbien.toml");
     }
 

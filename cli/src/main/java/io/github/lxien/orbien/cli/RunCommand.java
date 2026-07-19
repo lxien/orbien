@@ -1,8 +1,6 @@
 package io.github.lxien.orbien.cli;
 
-import io.github.lxien.orbien.cli.config.RunAppConfigFactory;
 import io.github.lxien.orbien.cli.launcher.TunnelClientLauncher;
-import io.github.lxien.orbien.client.config.AppConfig;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -24,7 +22,6 @@ public class RunCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        AppConfig config = RunAppConfigFactory.build(configFile);
-        return TunnelClientLauncher.launchSession(config);
+        return TunnelClientLauncher.launchLegacy(configFile);
     }
 }

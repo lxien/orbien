@@ -21,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * 端口池同步：TOML 首次落库、DB 加载到内存、Console CRUD 增量同步。
- */
 @Service
 public class PortPoolSyncService {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(PortPoolSyncService.class);
@@ -45,7 +42,7 @@ public class PortPoolSyncService {
     }
 
     /**
-     * TOML 区间落库，同协议+同范围已存在则跳过
+     * 本地配置区间落库，同协议+同范围已存在则跳过
      */
     private void importTomlIfAbsent() {
         PortPoolConfig config = appConfig.getPortPool();
@@ -66,7 +63,7 @@ public class PortPoolSyncService {
             entity.setEndPort(endPort);
             entity.setRemark("from toml");
             portPoolRepository.save(entity);
-            logger.debug("TOML 端口池落库: {} {}-{}", type, startPort, endPort == null ? startPort : endPort);
+            logger.debug("本地端口池落库: {} {}-{}", type, startPort, endPort == null ? startPort : endPort);
         }
     }
 

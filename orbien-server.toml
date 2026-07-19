@@ -5,22 +5,21 @@ https_proxy_port = 443
 #root_domains = ["domain1.com", "domain2.com"]
 
 ########################################################################################################################
-#[transport]
+[transport]
+[transport.tls]
+enabled = true
+cert_file = "cert/transport/server.crt"
+key_file = "cert/transport/server.key"
+#ca_file = "cert/transport/ca.crt"
 #
-#[transport.tls]
-#enabled = true
-#cert_file = "cert/transport/server.crt"
-#key_file = "cert/transport/server.key"
-##ca_file = "cert/transport/ca.crt"
-#
-#[transport.websocket]
-#enabled = true
-#server_port = 9528
-#path = "/tunnel"
-#
-#[transport.quic]
-#enabled = true
-#server_port = 9529
+[transport.websocket]
+enabled = true
+server_port = 9528
+path = "/tunnel"
+
+[transport.quic]
+enabled = true
+server_port = 9529
 
 [dashboard]
 enabled = true

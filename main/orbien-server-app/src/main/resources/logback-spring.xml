@@ -27,8 +27,8 @@
         <appender-ref ref="FILE"/>
     </root>
 
-    <logger name="io.github.lxien.orbien" level="DEBUG"/>
-    <logger name="io.netty.handler.ssl" level="DEBUG"/>
-    <logger name="io.netty.handler.ssl.util.BouncyCastleUtil" level="DEBUG"/>
-    <logger name="io.netty.channel.ChannelHandlerMask" level="DEBUG"/>
+    <logger name="io.github.lxien.orbien" level="INFO"/>
+    <logger name="io.netty.handler.ssl" level="INFO"/>
+    <logger name="io.netty.handler.ssl.util.BouncyCastleUtil" level="INFO"/>
+    <logger name="io.netty.channel.ChannelHandlerMask" level="INFO"/>
 </configuration>
