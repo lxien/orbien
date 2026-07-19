@@ -103,11 +103,3 @@ orbien:
 ## 问题反馈
 
 - Issues：[github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
-
-## 项目趋势
-
-<p align="center">
-  <a href="https://github.com/lxien/orbien/stargazers">
-    <img src="https://api.star-history.com/svg?repos=lxien/orbien&type=Date" alt="Star History">
-  </a>
-</p>

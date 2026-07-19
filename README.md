@@ -32,19 +32,28 @@
 
 ## 1. Introduction
 
-**Orbien** is a high-performance **intranet penetration platform** built on Netty, supporting multi-protocol proxying, multiple transport channels, secure authentication, and visual operations management.
+**Orbien** is a high-performance **intranet penetration platform** built on Netty, supporting multi-protocol proxying,
+multiple transport channels, secure authentication, and visual operations management.
 
 ### 1.1 Features
 
-- **Proxy protocols**: Supports TCP / UDP / HTTP / HTTPS / SOCKS5 / file sharing and more, with a built-in file management UI panel
-- **Data transport**: TCP, WebSocket, QUIC; supports multiplexing and independent connections, with optional Snappy / LZ4 / ZSTD compression
-- **Security & authentication**: mTLS mutual authentication, Token-based identity authentication, IP CIDR access control, HTTP BasicAuth, and time-window access
-- **Traffic control**: Fine-grained bandwidth rate limiting, network backpressure, large-file chunking and streaming transfer
-- **High availability**: Round-robin / weighted / random / least-connections load balancing strategies, and service health checks
+- **Proxy protocols**: Supports TCP / UDP / HTTP / HTTPS / SOCKS5 / file sharing and more, with a built-in file
+  management UI panel
+- **Data transport**: TCP, WebSocket, QUIC; supports multiplexing and independent connections, with optional Snappy /
+  LZ4 / ZSTD compression
+- **Security & authentication**: mTLS mutual authentication, Token-based identity authentication, IP CIDR access
+  control, HTTP BasicAuth, and time-window access
+- **Traffic control**: Fine-grained bandwidth rate limiting, network backpressure, large-file chunking and streaming
+  transfer
+- **High availability**: Round-robin / weighted / random / least-connections load balancing strategies, and service
+  health checks
 - **Development & testing**: Supports HTTP/HTTPS traffic capture, header rewriting, HAProxy real IP retrieval, and more
-- **Domain routing**: Subdomains and custom domains, multi-domain proxying; ACME certificate issuance, auto-renewal, and one-click deployment
-- **Operations management**: Built-in modern Web console with metrics monitoring, memory monitoring, centralized configuration management, and OAuth third-party login integration
-- **Configuration modes**: Client autonomy + server-side centralized configuration management, with bidirectional rule sync for both public and private network scenarios
+- **Domain routing**: Subdomains and custom domains, multi-domain proxying; ACME certificate issuance, auto-renewal, and
+  one-click deployment
+- **Operations management**: Built-in modern Web console with metrics monitoring, memory monitoring, centralized
+  configuration management, and OAuth third-party login integration
+- **Configuration modes**: Client autonomy + server-side centralized configuration management, with bidirectional rule
+  sync for both public and private network scenarios
 - **Developer integration**: Binary client and Spring Boot Starter for embedded access
 - **Cross-platform**: Compatible with Windows, Linux, and macOS (amd64 / arm64)
 
@@ -52,17 +61,18 @@
 
 ### 2.2 Server
 
-On a cloud server with a public IP and a `Docker` environment, run the script to install the `orbien` server in one step. H2 lightweight database is used by default.
+On a cloud server with a public IP and a `Docker` environment, run the script to install the `orbien` server in one
+step. H2 lightweight database is used by default.
 
 ```shell
 curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
 ```
 
-| Item | Description |
-|------|-------------|
-| Console URL | `http://<host>:8020` (`admin` / `123456`) |
-| Data directory | Linux `/opt/orbien`, macOS `~/.orbien` |
-| Default ports | TCP tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
+| Item           | Description                                                               |
+|----------------|---------------------------------------------------------------------------|
+| Console URL    | `http://<host>:8020` (`admin` / `123456`)                                 |
+| Data directory | Linux `/opt/orbien`, macOS `~/.orbien`                                    |
+| Default ports  | TCP tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
 
 ### 2.3 Client
 
@@ -103,11 +113,3 @@ orbien:
 ## Feedback
 
 - Issues: [github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
-
-## Project Trends
-
-<p align="center">
-  <a href="https://github.com/lxien/orbien/stargazers">
-    <img src="https://api.star-history.com/svg?repos=lxien/orbien&type=Date" alt="Star History">
-  </a>
-</p>
