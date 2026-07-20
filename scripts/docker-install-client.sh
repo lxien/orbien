@@ -32,7 +32,9 @@ if [ ! -f "${ORBIEN_HOME}/orbien.toml" ]; then
   cat > "${ORBIEN_HOME}/orbien.toml" <<'EOF'
 server_addr = "127.0.0.1"
 server_port = 9527
-auth.token = "token"
+
+[auth]
+token = "token"
 
 #[[proxies]]
 #name = "MySQL"
