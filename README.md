@@ -65,7 +65,7 @@ On a cloud server with a public IP and a `Docker` environment, run the script to
 step. H2 lightweight database is used by default.
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-server.sh -o docker-install-server.sh && chmod +x docker-install-server.sh && sudo sh docker-install-server.sh
 ```
 
 | Item           | Description                                                               |
@@ -76,9 +76,9 @@ curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.s
 
 ### 2.3 Client
 
-Download the binary for your platform from [Releases](https://github.com/lxien/orbien/releases).
+#### 2.3.1 Run from binary
 
-#### 2.3.1 Quick tunnel
+Download the binary for your platform from [Releases](https://github.com/lxien/orbien/releases).
 
 ```shell
 orbien login --server <server-host>:9527 --token <access-token>
@@ -86,7 +86,13 @@ orbien http 8080
 orbien tcp 3306
 ```
 
-#### 2.3.2 Spring Boot Starter
+#### 2.3.2 Install with Docker
+
+```shell
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-client.sh -o docker-install-client.sh && chmod +x docker-install-client.sh && sudo sh docker-install-client.sh
+```
+
+#### 2.3.3 Spring Boot Starter
 
 Can be embedded into a Spring Boot project to quickly expose Web applications or microservices to the public network.
 

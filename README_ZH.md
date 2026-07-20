@@ -55,7 +55,7 @@
 在具备公网IP和`Docker`环境的云服务器上，执行脚本一键安装 `orbien` 服务端，默认采用的是H2轻量数据库。
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.sh -o install.sh && chmod +x install.sh && sudo sh install.sh
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-server.sh -o docker-install-server.sh && chmod +x docker-install-server.sh && sudo sh docker-install-server.sh
 ```
 
 | 项目   | 说明                                                                |
@@ -66,9 +66,9 @@ curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/install.s
 
 ### 2.3 客户端
 
-从 [Releases](https://github.com/lxien/orbien/releases) 下载对应平台二进制可执行文件。
+#### 2.3.1 二进制运行
 
-#### 2.3.1 快速穿透
+从 [Releases](https://github.com/lxien/orbien/releases) 下载对应平台二进制可执行文件。
 
 ```shell
 orbien login --server <server-host>:9527 --token <access-token>
@@ -76,7 +76,13 @@ orbien http 8080
 orbien tcp 3306
 ```
 
-#### 2.3.2 Spring Boot Starter
+#### 2.3.2 使用 Docker 安装
+
+```shell
+curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-client.sh -o docker-install-client.sh && chmod +x docker-install-client.sh && sudo sh docker-install-client.sh
+```
+
+#### 2.3.3 Spring Boot Starter
 
 可嵌入 Spring Boot 项目中，快速将Web应用或微服务暴露到公网
 

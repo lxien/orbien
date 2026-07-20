@@ -14,6 +14,7 @@ if [ -z "${ORBIEN_HOME:-}" ]; then
 fi
 
 docker rm -f orbien-server >/dev/null 2>&1 || true
-rm -rf "${ORBIEN_HOME}"
+rm -f "${ORBIEN_HOME}/orbien-server.toml"
+rm -rf "${ORBIEN_HOME}/data"
 
 echo "orbien-server uninstalled"

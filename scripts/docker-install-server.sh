@@ -52,26 +52,27 @@ end = 9099
 EOF
 fi
 
-docker rm -f orbien-server >/dev/null 2>&1 || true
 docker pull "${ORBIEN_IMAGE}"
 
-docker run -d \
-  --name orbien-server \
-  --restart unless-stopped \
-  -p 8080:8080 \
-  -p 8443:8443 \
-  -p 8020:8020 \
-  -p 9527:9527 \
-  -p 9050-9099:9050-9099 \
-  -p 9050-9099:9050-9099/udp \
-  -e SPRING_PROFILES_ACTIVE=h2 \
-  -e H2_DATA_DIR=/app/data/orbien-server \
-  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED" \
-  -e TZ=Asia/Shanghai \
-  -v "${ORBIEN_HOME}/orbien-server.toml:/app/orbien-server.toml:ro" \
-  -v "${ORBIEN_HOME}/data:/app/data" \
-  -v "${ORBIEN_HOME}/logs:/app/logs" \
-  "${ORBIEN_IMAGE}" >/dev/null
+if ! docker inspect orbien-server >/dev/null 2>&1; then
+  docker run -d \
+    --name orbien-server \
+    --restart unless-stopped \
+    -p 8080:8080 \
+    -p 8443:8443 \
+    -p 8020:8020 \
+    -p 9527:9527 \
+    -p 9050-9099:9050-9099 \
+    -p 9050-9099:9050-9099/udp \
+    -e SPRING_PROFILES_ACTIVE=h2 \
+    -e H2_DATA_DIR=/app/data/orbien-server \
+    -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED" \
+    -e TZ=Asia/Shanghai \
+    -v "${ORBIEN_HOME}/orbien-server.toml:/app/orbien-server.toml:ro" \
+    -v "${ORBIEN_HOME}/data:/app/data" \
+    -v "${ORBIEN_HOME}/logs:/app/logs" \
+    "${ORBIEN_IMAGE}" >/dev/null
+fi
 
 cat <<EOF
 orbien-server ${ORBIEN_VERSION} started
