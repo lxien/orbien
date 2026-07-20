@@ -259,11 +259,30 @@ jobs:
           name: orbien-server-linux_amd64-${{ github.ref_name }}
           path: ./
 
-      - name: 创建工作目录并解压 tar.gz
+      - name: 下载客户端 Linux AMD64 构件
+        uses: actions/download-artifact@v4
+        with:
+          name: orbien-linux_amd64-${{ github.ref_name }}
+          path: ./
+
+      - name: 下载客户端 Linux ARM64 构件
+        uses: actions/download-artifact@v4
+        with:
+          name: orbien-linux_arm64-${{ github.ref_name }}
+          path: ./
+
+      - name: 准备服务端与客户端 Docker 构建上下文
         run: |
           mkdir -p main/orbien-server-app/target
           tar -xzf orbien-server_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
           cp /tmp/orbien-server_${{ github.ref_name }}_linux_amd64/orbien-server.jar main/orbien-server-app/target/orbien-server.jar
+
+          mkdir -p client-bin/amd64 client-bin/arm64
+          tar -xzf orbien_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
+          tar -xzf orbien_${{ github.ref_name }}_linux_arm64.tar.gz -C /tmp
+          cp /tmp/orbien_${{ github.ref_name }}_linux_amd64/orbien client-bin/amd64/orbien
+          cp /tmp/orbien_${{ github.ref_name }}_linux_arm64/orbien client-bin/arm64/orbien
+          chmod +x client-bin/amd64/orbien client-bin/arm64/orbien
 
       - name: 提取版本号
         id: version
@@ -291,15 +310,27 @@ jobs:
           fi
           printf '%s' "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
 
-      - name: 构建并推送多平台 Docker 镜像
+      - name: 构建并推送多平台服务端 Docker 镜像
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
             lxien/orbien-server:latest
             lxien/orbien-server:${{ steps.version.outputs.version }}
+
+      - name: 构建并推送多平台客户端 Docker 镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.client
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            lxien/orbien:latest
+            lxien/orbien:${{ steps.version.outputs.version }}
 
   # =============================================
   # 阶段4：统一发布阶段
