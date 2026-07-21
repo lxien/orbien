@@ -2,8 +2,8 @@
 orbien:
   client:
     enabled: true
-    server-addr: 127.0.0.1
+    server-addr: 129.204.59.184
     auth:
-      token: 6B1F7C9228F07F05FF6221803F192CD8
+      token: 36CCCBB7950CA41BAB22B12CBED3CCC1
     proxy:
       protocol: http

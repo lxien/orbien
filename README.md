@@ -61,47 +61,118 @@ multiple transport channels, secure authentication, and visual operations manage
 
 ### 2.2 Server
 
-On a cloud server with a public IP and a `Docker` environment, run the script to install the `orbien` server in one
-step. H2 lightweight database is used by default.
+Requires Linux, Docker, and a public IP. Uses H2 database by default.
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-server.sh -o docker-install-server.sh && chmod +x docker-install-server.sh && sudo sh docker-install-server.sh
+mkdir -p /opt/orbien/data /opt/orbien/logs
+
+cat > /opt/orbien/orbien-server.toml <<'EOF'
+server_addr = "0.0.0.0"
+server_port = 9527
+http_proxy_port = 8080
+https_proxy_port = 8443
+
+[dashboard]
+enabled = true
+addr = "0.0.0.0"
+port = 8020
+username = "admin"
+password = "123456"
+
+[[port_pool.tcp]]
+start = 9050
+end = 9099
+
+[[port_pool.udp]]
+start = 9050
+end = 9099
+EOF
+
+docker run -d \
+  --name orbien-server \
+  --restart unless-stopped \
+  -p 8080:8080 \
+  -p 8443:8443 \
+  -p 8020:8020 \
+  -p 9527:9527 \
+  -p 9050-9099:9050-9099 \
+  -p 9050-9099:9050-9099/udp \
+  -e SPRING_PROFILES_ACTIVE=h2 \
+  -e H2_DATA_DIR=/app/data/orbien-server \
+  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED" \
+  -e TZ=Asia/Shanghai \
+  -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
+  -v /opt/orbien/data:/app/data \
+  -v /opt/orbien/logs:/app/logs \
+  lxien/orbien-server:0.20.1
 ```
 
-| Item           | Description                                                               |
-|----------------|---------------------------------------------------------------------------|
-| Console URL    | `http://<host>:8020` (`admin` / `123456`)                                 |
-| Data directory | Linux `/opt/orbien`, macOS `~/.orbien`                                    |
-| Default ports  | TCP tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
+| Item      | Value                                                                 |
+|-----------|-----------------------------------------------------------------------|
+| Dashboard | `http://<host>:8020` (`admin` / `123456`)                             |
+| Data dir  | `/opt/orbien`                                                         |
+| Ports     | Tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
 
 ### 2.3 Client
 
-#### 2.3.1 Run from binary
+#### 2.3.1 Binary
 
-Download the binary for your platform from [Releases](https://github.com/lxien/orbien/releases).
+Download from [Releases](https://github.com/lxien/orbien/releases).
 
+```shell
+Usage: orbien [-hV] [-c=<configFile>] [COMMAND]
+Orbien intranet penetration client
+  -c=<configFile>    Path to the config file
+  -h, --help         Show this help message and exit.
+  -V, --version      Print version information and exit.
+Commands:
+  login   Save server credentials
+  logout  Clear local credentials
+  run     Start the client from a config file
+  http    Start an HTTP proxy
+  tcp     Start a TCP proxy
+  udp     Start a UDP proxy
+```
+
+案例：
 ```shell
 orbien login --server <server-host>:9527 --token <access-token>
 orbien http 8080
 orbien tcp 3306
 ```
 
-#### 2.3.2 Install with Docker
+#### 2.3.2 Docker
 
 ```shell
-curl -fsSL https://raw.githubusercontent.com/lxien/orbien/main/scripts/docker-install-client.sh -o docker-install-client.sh && chmod +x docker-install-client.sh && sudo sh docker-install-client.sh
+mkdir -p /path/to/orbien/logs
+
+cat > /path/to/orbien/orbien.toml <<'EOF'
+server_addr = "<server-host>"
+server_port = 9527
+
+[auth]
+token = "<access-token>"
+
+EOF
+
+docker run -d \
+  --name orbien \
+  --restart unless-stopped \
+  --network host \
+  -e TZ=Asia/Shanghai \
+  -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
+  -v /path/to/orbien/logs:/app/logs \
+  lxien/orbien:0.20.1
 ```
 
 #### 2.3.3 Spring Boot Starter
-
-Can be embedded into a Spring Boot project to quickly expose Web applications or microservices to the public network.
 
 ```xml
 
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1</version>
 </dependency>
 ```
 
