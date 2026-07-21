@@ -20,6 +20,9 @@
 <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
   <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
 </a>
+  <a href="https://discord.gg/4dgQjCS3k">
+    <img src="https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord"/>
+  </a>
 
 </div>
 
