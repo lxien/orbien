@@ -4,8 +4,22 @@ import io.github.lxien.orbien.core.enums.ProtocolType;
 
 public enum WebProxyProtocol {
     HTTP,
-    HTTPS;
+    HTTPS,
+    TCP;
+
     ProtocolType toProtocolType() {
-        return this == HTTPS ? ProtocolType.HTTPS : ProtocolType.HTTP;
+        switch (this) {
+            case HTTPS:
+                return ProtocolType.HTTPS;
+            case TCP:
+                return ProtocolType.TCP;
+            case HTTP:
+            default:
+                return ProtocolType.HTTP;
+        }
+    }
+
+    boolean isHttpOrHttps() {
+        return this == HTTP || this == HTTPS;
     }
 }

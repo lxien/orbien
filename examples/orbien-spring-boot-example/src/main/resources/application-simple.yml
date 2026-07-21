@@ -2,8 +2,9 @@
 orbien:
   client:
     enabled: true
-    server-addr: 129.204.59.184
+    server-addr: 127.0.0.1
     auth:
-      token: 36CCCBB7950CA41BAB22B12CBED3CCC1
+      token: 40F8E5002CC36CAD2273D722E36739D9
     proxy:
-      protocol: http
+      protocol: tcp
+      remote-port: 8787

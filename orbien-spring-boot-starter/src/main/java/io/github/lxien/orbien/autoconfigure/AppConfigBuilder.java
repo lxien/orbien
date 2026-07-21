@@ -192,21 +192,24 @@ final class AppConfigBuilder {
             ));
         }
 
-        RouteConfig routeConfig = new RouteConfig();
-        routeConfig.setAutoDomain(proxy.getAutoDomain());
-        routeConfig.getCustomDomains().addAll(proxy.getCustomDomains());
-        routeConfig.getSubDomains().addAll(proxy.getSubDomains());
-        proxyConfig.setRouteConfig(routeConfig);
+        // 域名与 Basic Auth 仅适用于 HTTP/HTTPS
+        if (proxy.getProtocol().isHttpOrHttps()) {
+            RouteConfig routeConfig = new RouteConfig();
+            routeConfig.setAutoDomain(proxy.getAutoDomain());
+            routeConfig.getCustomDomains().addAll(proxy.getCustomDomains());
+            routeConfig.getSubDomains().addAll(proxy.getSubDomains());
+            proxyConfig.setRouteConfig(routeConfig);
 
-        BasicAuthProperties basicAuth = proxy.getBasicAuth();
-        if (basicAuth.isEnabled() && !basicAuth.getUsers().isEmpty()) {
-            Set<HttpUser> users = basicAuth.getUsers().stream()
-                    .map(user -> new HttpUser(user.getUser(), user.getPass()))
-                    .collect(Collectors.toSet());
-            BasicAuthConfig basicAuthConfig = new BasicAuthConfig();
-            basicAuthConfig.setEnabled(true);
-            basicAuthConfig.addUsers(users);
-            proxyConfig.setBasicAuth(basicAuthConfig);
+            BasicAuthProperties basicAuth = proxy.getBasicAuth();
+            if (basicAuth.isEnabled() && !basicAuth.getUsers().isEmpty()) {
+                Set<HttpUser> users = basicAuth.getUsers().stream()
+                        .map(user -> new HttpUser(user.getUser(), user.getPass()))
+                        .collect(Collectors.toSet());
+                BasicAuthConfig basicAuthConfig = new BasicAuthConfig();
+                basicAuthConfig.setEnabled(true);
+                basicAuthConfig.addUsers(users);
+                proxyConfig.setBasicAuth(basicAuthConfig);
+            }
         }
 
         TransportCustomProperties transport = proxy.getTransport();

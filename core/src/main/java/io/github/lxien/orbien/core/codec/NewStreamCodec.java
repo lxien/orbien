@@ -43,7 +43,7 @@ public class NewStreamCodec {
                     return "127.0.0.1";
                 }
             } catch (UnknownHostException ignored) {
-                // literal IPv6 should not throw; keep original and let ipToInt fail clearly
+
             }
         }
         return host;
