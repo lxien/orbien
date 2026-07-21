@@ -658,13 +658,23 @@
     const showLogin = (message) => {
         document.body.classList.remove('is-bootstrapping');
         closeUserMenu();
-        $('loginView').classList.remove('hidden');
+        const loginView = $('loginView');
+        const switchingToLogin = loginView.classList.contains('hidden');
+        loginView.classList.remove('hidden');
         $('appView').classList.add('hidden');
         const errEl = $('loginError');
-        if (message) {
-            errEl.textContent = message;
-            errEl.style.display = 'block';
-        } else {
+        if (typeof message === 'string') {
+            if (message) {
+                errEl.textContent = message;
+                errEl.style.display = 'block';
+            } else {
+                errEl.textContent = '';
+                errEl.style.display = 'none';
+            }
+            return;
+        }
+        if (switchingToLogin) {
+            errEl.textContent = '';
             errEl.style.display = 'none';
         }
     };
@@ -686,8 +696,10 @@
         if (ct.includes('application/json')) {
             const data = await res.json();
             if (res.status === 401) {
+                // 会话失效等场景只切回登录页，不在登录框展示服务端提示；
+                // 真正的登录失败由 login() 自行展示错误。
                 if (authRequired) {
-                    showLogin(extractErrorMessage(data, '未登录'));
+                    showLogin();
                 }
                 throw new Error(extractErrorMessage(data, '未登录'));
             }
@@ -726,7 +738,8 @@
             showApp(currentUsername);
             return data;
         }
-        showLogin(data.message || '');
+        // 未登录 / 会话过期：静默展示登录页，避免把「会话已过期」等状态文案打到登录框
+        showLogin();
         return data;
     }
 
@@ -2187,6 +2200,9 @@
                 finish(() => resolve(performance.now() - startTime));
                 return;
             }
+            if (xhr.status === 401 && authRequired) {
+                showLogin();
+            }
             let msg = '上传失败';
             try {
                 const body = JSON.parse(xhr.responseText || '{}');
@@ -2277,6 +2293,9 @@
     async function downloadFile(path) {
         const res = await fetch(`/api/files/download?path=${encodeURIComponent(path)}`, {credentials: 'include'});
         if (!res.ok) {
+            if (res.status === 401 && authRequired) {
+                showLogin();
+            }
             let msg = '下载失败';
             try {
                 msg = extractErrorMessage(await res.json(), msg);
