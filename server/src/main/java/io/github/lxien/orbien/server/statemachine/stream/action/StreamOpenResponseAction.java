@@ -158,7 +158,7 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     private void enableVisitorReading(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
-        if (context.getProtocol() != null && context.getProtocol().isHttp()) {
+        if (context.getProtocol() != null && context.getProtocol().isHttpOrHttps()) {
             relayHttpFirstPackage(context, visitor, tunnelBridge);
             flushPendingUploads(context, tunnelBridge);
         }

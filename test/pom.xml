@@ -12,7 +12,7 @@
     <name>orbien-test</name>
     <description>orbien-test</description>
     <properties>
-        <orbien-server.version>0.20.0</orbien-server.version>
+        <orbien-server.version>0.20.1</orbien-server.version>
         <java.version>25</java.version>
         <maven.test.skip>false</maven.test.skip>
         <skipTests>false</skipTests>

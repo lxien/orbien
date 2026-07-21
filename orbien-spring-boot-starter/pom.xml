@@ -10,7 +10,7 @@
     <description>orbien-spring-boot-starter</description>
     <properties>
         <java.version>17</java.version>
-        <orbien.version>0.20.0</orbien.version>
+        <orbien.version>0.20.1</orbien.version>
         <orbien-spring-boot.version>0.3.0</orbien-spring-boot.version>
         <spring-boot.version>2.7.18</spring-boot.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>

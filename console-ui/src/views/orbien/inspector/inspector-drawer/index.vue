@@ -150,6 +150,8 @@ const responseTab = ref('raw')
 
 let eventSource: EventSource | null = null
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
+let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null
+let sseGeneration = 0
 
 const formatDuration = (ms?: number) => {
   if (ms == null) return '-'
@@ -270,8 +272,9 @@ const prependRecord = (summary: Api.Inspector.RecordSummary) => {
 
 const connectSse = () => {
   disconnectSse()
-  if (!props.proxyId) return
+  if (!props.proxyId || !props.visible) return
 
+  const generation = sseGeneration
   const userStore = useUserStore()
   const url = buildInspectorStreamUrl(props.proxyId, userStore.accessToken || undefined)
   eventSource = new EventSource(url)
@@ -298,10 +301,31 @@ const connectSse = () => {
     selectedId.value = ''
     detail.value = null
   })
+
+  eventSource.onerror = () => {
+    if (generation !== sseGeneration || !props.visible) {
+      return
+    }
+    disconnectSse(false)
+    void loadRecords()
+    sseReconnectTimer = setTimeout(() => {
+      if (generation === sseGeneration && props.visible) {
+        connectSse()
+      }
+    }, 2000)
+  }
 }
 
-const disconnectSse = () => {
+const disconnectSse = (bumpGeneration = true) => {
+  if (bumpGeneration) {
+    sseGeneration += 1
+  }
+  if (sseReconnectTimer) {
+    clearTimeout(sseReconnectTimer)
+    sseReconnectTimer = null
+  }
   if (eventSource) {
+    eventSource.onerror = null
     eventSource.close()
     eventSource = null
   }

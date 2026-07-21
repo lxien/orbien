@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 @Command(
         name = "orbien",
         mixinStandardHelpOptions = true,
-        version = "orbien 0.20.0",
+        version = "orbien 0.20.1",
         description = "Orbien 内网穿透客户端",
         subcommands = {
                 LoginCommand.class,

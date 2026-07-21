@@ -2,17 +2,25 @@ package io.github.lxien.orbien.server.inspector;
 
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.handler.ssl.SslHandler;
 import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
  * 单条 HTTP 流的抓包状态，同一 TCP 连接上可连续捕获多条 HTTP 交换
+ *
+ * 跨 TCP/TLS 分片重组请求/响应头；按 Content-Length / chunked 精确切分 body
+ * 忽略中间 1xx 响应；在 keep-alive 下于响应完成时立即落库，而不是等连接关闭
  */
 public class HttpStreamCapture {
     private static final int MAX_HEADER_SIZE = 65536;
@@ -34,8 +42,12 @@ public class HttpStreamCapture {
     private boolean streamFinalized;
     private boolean requestStarted;
     private boolean responseStarted;
+    private boolean responseChunked;
+    private long responseBodyRemaining = -1;
     private final byte[] chunkedTailBuf = new byte[5];
     private int chunkedTailLen;
+    private final HeaderAccumulator requestHeaderBuf = new HeaderAccumulator();
+    private final HeaderAccumulator responseHeaderBuf = new HeaderAccumulator();
     @Setter
     private Consumer<HttpCaptureRecord> completionHandler;
 
@@ -63,48 +75,101 @@ public class HttpStreamCapture {
         if (streamFinalized || payload == null || !payload.isReadable()) {
             return;
         }
-        if (requestStarted) {
-            HttpMessageParser.ParsedRequest nextRequest = HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
-            if (nextRequest != null) {
-                emitCurrentExchange();
-                beginRequest(payload, nextRequest);
-                return;
-            }
+        ByteBuf remaining = payload;
+        while (remaining != null && remaining.isReadable() && !streamFinalized) {
+            remaining = consumeRequest(remaining);
         }
-        if (!requestStarted) {
-            if (parsedRequest != null) {
-                requestStarted = true;
-                appendBodyAfterHeaders(payload);
-                return;
-            }
-            HttpMessageParser.ParsedRequest request = HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
-            if (request != null) {
-                beginRequest(payload, request);
-                return;
-            }
-        }
-        appendRequestChunk(payload, payload.readerIndex(), payload.readableBytes());
     }
 
-    private void beginRequest(ByteBuf payload, HttpMessageParser.ParsedRequest request) {
+    private ByteBuf consumeRequest(ByteBuf payload) {
+        if (!requestStarted) {
+            if (parsedRequest != null && requestHeaderBuf.isEmpty()) {
+                requestStarted = true;
+                return appendRequestBodyAfterHeaders(payload);
+            }
+            return beginOrAccumulateRequest(payload);
+        }
+
+        HttpMessageParser.ParsedRequest nextRequest = tryParseRequestAtStart(payload);
+        if (nextRequest != null) {
+            emitCurrentExchange();
+            return beginRequest(payload, nextRequest);
+        }
+        appendRequestChunk(payload, payload.readerIndex(), payload.readableBytes());
+        return null;
+    }
+
+    private ByteBuf beginOrAccumulateRequest(ByteBuf payload) {
+        if (requestHeaderBuf.isEmpty()) {
+            HttpMessageParser.ParsedRequest request = HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
+            if (request != null) {
+                return beginRequest(payload, request);
+            }
+        }
+        requestHeaderBuf.append(payload);
+        if (requestHeaderBuf.size() > MAX_HEADER_SIZE) {
+            requestHeaderBuf.clear();
+            return null;
+        }
+        int headerEnd = requestHeaderBuf.findHeaderEnd();
+        if (headerEnd <= 0) {
+            return null;
+        }
+        ByteBuf assembled = requestHeaderBuf.toByteBuf();
+        try {
+            HttpMessageParser.ParsedRequest request = HttpMessageParser.parseRequest(assembled, MAX_HEADER_SIZE);
+            if (request == null) {
+                requestHeaderBuf.clear();
+                return null;
+            }
+            beginRequestFromAssembled(request, assembled, headerEnd);
+            return null;
+        } finally {
+            requestHeaderBuf.clear();
+        }
+    }
+
+    private ByteBuf beginRequest(ByteBuf payload, HttpMessageParser.ParsedRequest request) {
         parsedRequest = request;
         rawRequestHeaders = request.rawHeaders();
         requestStarted = true;
-        appendBodyAfterHeaders(payload);
+        return appendRequestBodyAfterHeaders(payload);
     }
 
-    private void appendBodyAfterHeaders(ByteBuf payload) {
-        int headerEnd = HttpMessageParser.findHeaderEnd(payload);
-        if (headerEnd > 0) {
-            int bodyStart = payload.readerIndex() + headerEnd;
-            int bodyLen = payload.readableBytes() - headerEnd;
-            if (bodyLen > 0) {
-                appendRequestChunk(payload, bodyStart, bodyLen);
-            }
+    private void beginRequestFromAssembled(HttpMessageParser.ParsedRequest request, ByteBuf assembled, int headerEnd) {
+        parsedRequest = request;
+        rawRequestHeaders = request.rawHeaders();
+        requestStarted = true;
+        int bodyLen = assembled.readableBytes() - headerEnd;
+        if (bodyLen > 0) {
+            appendRequestChunk(assembled, assembled.readerIndex() + headerEnd, bodyLen);
         }
     }
 
+    private ByteBuf appendRequestBodyAfterHeaders(ByteBuf payload) {
+        int headerEnd = HttpMessageParser.findHeaderEnd(payload);
+        if (headerEnd <= 0) {
+            return null;
+        }
+        int bodyStart = payload.readerIndex() + headerEnd;
+        int bodyLen = payload.readableBytes() - headerEnd;
+        if (bodyLen > 0) {
+            appendRequestChunk(payload, bodyStart, bodyLen);
+        }
+        return null;
+    }
+
+    private HttpMessageParser.ParsedRequest tryParseRequestAtStart(ByteBuf payload) {
+        if (!payload.isReadable()) {
+            return null;
+        }
+        return HttpMessageParser.parseRequest(payload, MAX_HEADER_SIZE);
+    }
+
     private void appendRequestChunk(ByteBuf buf, int index, int length) {
+        if (length <= 0) {
+            return;
+        }
         requestBodySize += length;
         if (requestBodyTruncated) {
             return;
@@ -127,33 +192,142 @@ public class HttpStreamCapture {
         if (streamFinalized || payload == null || !payload.isReadable()) {
             return;
         }
-        if (!responseStarted) {
-            HttpMessageParser.ParsedResponse response = HttpMessageParser.parseResponse(payload, MAX_HEADER_SIZE);
-            if (response != null) {
-                parsedResponse = response;
-                rawResponseHeaders = response.rawHeaders();
-                responseStarted = true;
-                int headerEnd = HttpMessageParser.findHeaderEnd(payload);
-                if (headerEnd > 0) {
-                    int bodyStart = payload.readerIndex() + headerEnd;
-                    int bodyLen = payload.readableBytes() - headerEnd;
-                    if (bodyLen > 0) {
-                        appendResponseChunk(payload, bodyStart, bodyLen);
-                    }
-                }
-                tryCompleteResponse();
-                return;
-            }
+        ByteBuf remaining = payload;
+        while (remaining != null && remaining.isReadable() && !streamFinalized) {
+            remaining = consumeResponse(remaining);
         }
-        appendResponseChunk(payload, payload.readerIndex(), payload.readableBytes());
-        tryCompleteResponse();
     }
 
-    private void tryCompleteResponse() {
-        if (streamFinalized || !responseStarted || parsedResponse == null || !isHttpResponseComplete()) {
+    private ByteBuf consumeResponse(ByteBuf payload) {
+        if (!responseStarted) {
+            return beginOrAccumulateResponse(payload);
+        }
+        return appendResponseBodyBytes(payload);
+    }
+
+    private ByteBuf beginOrAccumulateResponse(ByteBuf payload) {
+        if (responseHeaderBuf.isEmpty()) {
+            HttpMessageParser.ParsedResponse response = HttpMessageParser.parseResponse(payload, MAX_HEADER_SIZE);
+            if (response != null) {
+                int headerEnd = HttpMessageParser.findHeaderEnd(payload);
+                return onResponseHeaders(response, payload, headerEnd);
+            }
+        }
+        responseHeaderBuf.append(payload);
+        if (responseHeaderBuf.size() > MAX_HEADER_SIZE) {
+            responseHeaderBuf.clear();
+            return null;
+        }
+        int headerEnd = responseHeaderBuf.findHeaderEnd();
+        if (headerEnd <= 0) {
+            return null;
+        }
+        ByteBuf assembled = responseHeaderBuf.toByteBuf();
+        try {
+            HttpMessageParser.ParsedResponse response = HttpMessageParser.parseResponse(assembled, MAX_HEADER_SIZE);
+            if (response == null) {
+                responseHeaderBuf.clear();
+                return null;
+            }
+            return onResponseHeaders(response, assembled, headerEnd);
+        } finally {
+            responseHeaderBuf.clear();
+        }
+    }
+
+    private ByteBuf onResponseHeaders(HttpMessageParser.ParsedResponse response, ByteBuf source, int headerEnd) {
+        int status = response.status();
+        if (status >= 100 && status < 200 && status != 101) {
+            int bodyStart = source.readerIndex() + Math.max(headerEnd, 0);
+            int leftover = source.readableBytes() - Math.max(headerEnd, 0);
+            if (leftover <= 0) {
+                return null;
+            }
+            return source.slice(bodyStart, leftover);
+        }
+
+        parsedResponse = response;
+        rawResponseHeaders = response.rawHeaders();
+        responseStarted = true;
+        armResponseBodyTracking(response);
+
+        int bodyOffset = Math.max(headerEnd, 0);
+        int available = source.readableBytes() - bodyOffset;
+        if (available <= 0) {
+            if (isHttpResponseComplete()) {
+                emitCurrentExchange();
+            }
+            return null;
+        }
+        ByteBuf body = source.slice(source.readerIndex() + bodyOffset, available);
+        return appendResponseBodyBytes(body);
+    }
+
+    private void armResponseBodyTracking(HttpMessageParser.ParsedResponse response) {
+        responseChunked = false;
+        responseBodyRemaining = -1;
+        chunkedTailLen = 0;
+        Arrays.fill(chunkedTailBuf, (byte) 0);
+
+        int status = response.status();
+        if (status == 101 || status == 204 || status == 304) {
+            responseBodyRemaining = 0;
             return;
         }
-        emitCurrentExchange();
+        if (parsedRequest != null && "HEAD".equalsIgnoreCase(parsedRequest.method())) {
+            responseBodyRemaining = 0;
+            return;
+        }
+
+        Map<String, String> headers = response.headers();
+        String transferEncoding = headerValue(headers, "Transfer-Encoding");
+        if (transferEncoding != null && transferEncoding.toLowerCase(Locale.ROOT).contains("chunked")) {
+            responseChunked = true;
+            responseBodyRemaining = -1;
+            return;
+        }
+        String contentLength = headerValue(headers, "Content-Length");
+        if (contentLength != null) {
+            try {
+                responseBodyRemaining = Math.max(0, Long.parseLong(contentLength.trim()));
+            } catch (NumberFormatException ignored) {
+                responseBodyRemaining = -1;
+            }
+        }
+    }
+
+    private ByteBuf appendResponseBodyBytes(ByteBuf payload) {
+        int reader = payload.readerIndex();
+        int available = payload.readableBytes();
+        if (available <= 0) {
+            return null;
+        }
+
+        int take;
+        if (responseChunked) {
+            take = available;
+        } else if (responseBodyRemaining >= 0) {
+            take = (int) Math.min(available, responseBodyRemaining);
+        } else {
+            take = available;
+        }
+
+        if (take > 0) {
+            appendResponseChunk(payload, reader, take);
+            if (responseBodyRemaining > 0) {
+                responseBodyRemaining -= take;
+            }
+        }
+
+        if (isHttpResponseComplete()) {
+            emitCurrentExchange();
+            int leftover = available - take;
+            if (leftover > 0) {
+                return payload.slice(reader + take, leftover);
+            }
+            return null;
+        }
+        return null;
     }
 
     private void emitCurrentExchange() {
@@ -181,11 +355,19 @@ public class HttpStreamCapture {
         responseBodyTruncated = false;
         requestStarted = false;
         responseStarted = false;
+        responseChunked = false;
+        responseBodyRemaining = -1;
         chunkedTailLen = 0;
+        Arrays.fill(chunkedTailBuf, (byte) 0);
+        requestHeaderBuf.clear();
+        responseHeaderBuf.clear();
         exchangeStartedAt = Instant.now();
     }
 
     private boolean isHttpResponseComplete() {
+        if (!responseStarted || parsedResponse == null) {
+            return false;
+        }
         int status = parsedResponse.status();
         if (status == 101 || status == 204 || status == 304) {
             return true;
@@ -193,21 +375,11 @@ public class HttpStreamCapture {
         if (parsedRequest != null && "HEAD".equalsIgnoreCase(parsedRequest.method())) {
             return true;
         }
-
-        Map<String, String> headers = parsedResponse.headers();
-        String transferEncoding = headerValue(headers, "Transfer-Encoding");
-        if (transferEncoding != null && transferEncoding.toLowerCase().contains("chunked")) {
+        if (responseChunked) {
             return isChunkedBodyComplete();
         }
-
-        String contentLength = headerValue(headers, "Content-Length");
-        if (contentLength != null) {
-            try {
-                long expected = Long.parseLong(contentLength.trim());
-                return responseBodySize >= expected;
-            } catch (NumberFormatException ignored) {
-                return false;
-            }
+        if (responseBodyRemaining >= 0) {
+            return responseBodyRemaining == 0;
         }
         return false;
     }
@@ -238,6 +410,9 @@ public class HttpStreamCapture {
     }
 
     private void appendResponseChunk(ByteBuf buf, int index, int length) {
+        if (length <= 0) {
+            return;
+        }
         responseBodySize += length;
         updateChunkedTail(buf, index, length);
         if (responseBodyTruncated) {
@@ -258,6 +433,9 @@ public class HttpStreamCapture {
     }
 
     private void updateChunkedTail(ByteBuf buf, int index, int length) {
+        if (!responseChunked) {
+            return;
+        }
         for (int i = index; i < index + length; i++) {
             byte b = buf.getByte(i);
             if (chunkedTailLen < chunkedTailBuf.length) {
@@ -349,6 +527,10 @@ public class HttpStreamCapture {
     }
 
     private String resolveScheme() {
+        Channel visitor = context.getVisitor();
+        if (visitor != null && visitor.pipeline().get(SslHandler.class) != null) {
+            return "https";
+        }
         if (context.getProtocol() != null && context.getProtocol().isHttps()) {
             return "https";
         }
@@ -361,5 +543,62 @@ public class HttpStreamCapture {
 
     private static String nullToEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    /**
+     * 跨分片累积 HTTP 头块，避免 TLS/TCP 半包导致永远解析不出响应头
+     */
+    private static final class HeaderAccumulator {
+        private byte[] buf = new byte[256];
+        private int len;
+
+        void append(ByteBuf src) {
+            int n = src.readableBytes();
+            if (n <= 0) {
+                return;
+            }
+            ensureCapacity(len + n);
+            src.getBytes(src.readerIndex(), buf, len, n);
+            len += n;
+        }
+
+        int findHeaderEnd() {
+            for (int i = 0; i < len - 3; i++) {
+                if (buf[i] == '\r'
+                        && buf[i + 1] == '\n'
+                        && buf[i + 2] == '\r'
+                        && buf[i + 3] == '\n') {
+                    return i + 4;
+                }
+            }
+            return -1;
+        }
+
+        ByteBuf toByteBuf() {
+            return Unpooled.wrappedBuffer(buf, 0, len);
+        }
+
+        int size() {
+            return len;
+        }
+
+        boolean isEmpty() {
+            return len == 0;
+        }
+
+        void clear() {
+            len = 0;
+        }
+
+        private void ensureCapacity(int needed) {
+            if (needed <= buf.length) {
+                return;
+            }
+            int cap = buf.length;
+            while (cap < needed) {
+                cap <<= 1;
+            }
+            buf = Arrays.copyOf(buf, cap);
+        }
     }
 }

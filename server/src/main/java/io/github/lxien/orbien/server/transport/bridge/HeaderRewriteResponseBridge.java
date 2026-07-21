@@ -189,7 +189,7 @@ public class HeaderRewriteResponseBridge extends AbstractTunnelBridgeDecorator {
         if (bridge == null || context == null || proxyConfigService == null) {
             return bridge;
         }
-        if (context.getProtocol() == null || !context.getProtocol().isHttp()) {
+        if (context.getProtocol() == null || !context.getProtocol().isHttpOrHttps()) {
             return bridge;
         }
         if (!StringUtils.hasText(context.getProxyId())) {

@@ -1,7 +1,8 @@
 package io.github.lxien.orbien.server.transport.bridge;
 
 import io.github.lxien.orbien.core.transport.TunnelBridge;
-import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
+import io.github.lxien.orbien.server.inspector.InspectorBuffer;
+import io.github.lxien.orbien.server.inspector.InspectorProperties;
 import io.github.lxien.orbien.server.metrics.MetricsCollector;
 import io.github.lxien.orbien.server.service.ProxyConfigService;
 import io.github.lxien.orbien.server.statemachine.stream.StreamContext;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 public class TunnelBridgeFactory {
     private static MetricsCollector metricsCollector;
     private static ProxyConfigService proxyConfigService;
+    private static InspectorProperties inspectorProperties;
+    private static InspectorBuffer inspectorBuffer;
 
     @Autowired
     public void setMetricsCollector(MetricsCollector collector) {
@@ -21,6 +24,16 @@ public class TunnelBridgeFactory {
     @Autowired
     public void setProxyConfigService(ProxyConfigService service) {
         TunnelBridgeFactory.proxyConfigService = service;
+    }
+
+    @Autowired
+    public void setInspectorProperties(InspectorProperties properties) {
+        TunnelBridgeFactory.inspectorProperties = properties;
+    }
+
+    @Autowired
+    public void setInspectorBuffer(InspectorBuffer buffer) {
+        TunnelBridgeFactory.inspectorBuffer = buffer;
     }
 
     public static TunnelBridge buildDirect(StreamContext streamContext) {
@@ -47,11 +60,16 @@ public class TunnelBridgeFactory {
     }
 
     private static TunnelBridge wrapInspection(TunnelBridge bridge, StreamContext ctx) {
-        HttpStreamCapture capture = ctx.getHttpStreamCapture();
-        if (capture != null) {
-            return new InspectionTunnelBridge(bridge, capture);
+        if (bridge == null || ctx == null) {
+            return bridge;
         }
-        return bridge;
+        if (ctx.getProtocol() == null || !ctx.getProtocol().isHttpOrHttps()) {
+            return bridge;
+        }
+        if (inspectorProperties == null || inspectorBuffer == null) {
+            return bridge;
+        }
+        return new InspectionTunnelBridge(bridge, ctx, inspectorProperties, inspectorBuffer, proxyConfigService);
     }
 
     private static TunnelBridge addMetricsIfNeeded(TunnelBridge bridge, StreamContext ctx) {

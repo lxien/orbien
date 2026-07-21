@@ -3,7 +3,7 @@
     <groupId>io.github.lxien</groupId>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>orbien-main</artifactId>
-    <version>0.20.0</version>
+    <version>0.20.1</version>
     <packaging>pom</packaging>
     <name>orbien-main</name>
     <properties>
