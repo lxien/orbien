@@ -1,0 +1,15 @@
+
+FROM ubuntu:24.04
+
+ARG TARGETARCH
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates tzdata \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY --chmod=755 client-bin/${TARGETARCH}/orbien /app/orbien
+COPY main/orbien-client-app/src/main/resources/orbien.toml /app/orbien.toml
+
+ENTRYPOINT ["/app/orbien", "-c", "/app/orbien.toml"]

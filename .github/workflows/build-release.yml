@@ -273,6 +273,10 @@ jobs:
 
       - name: 准备服务端与客户端 Docker 构建上下文
         run: |
+          set -euo pipefail
+          test -f Dockerfile
+          test -f Dockerfile.client
+
           mkdir -p main/orbien-server-app/target
           tar -xzf orbien-server_${{ github.ref_name }}_linux_amd64.tar.gz -C /tmp
           cp /tmp/orbien-server_${{ github.ref_name }}_linux_amd64/orbien-server.jar main/orbien-server-app/target/orbien-server.jar
@@ -283,6 +287,13 @@ jobs:
           cp /tmp/orbien_${{ github.ref_name }}_linux_amd64/orbien client-bin/amd64/orbien
           cp /tmp/orbien_${{ github.ref_name }}_linux_arm64/orbien client-bin/arm64/orbien
           chmod +x client-bin/amd64/orbien client-bin/arm64/orbien
+
+          # 校验多架构二进制已就位，避免空镜像被推送
+          test -x client-bin/amd64/orbien
+          test -x client-bin/arm64/orbien
+          file client-bin/amd64/orbien
+          file client-bin/arm64/orbien
+          ls -lh client-bin/amd64/orbien client-bin/arm64/orbien
 
       - name: 提取版本号
         id: version
