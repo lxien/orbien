@@ -73,7 +73,7 @@ export const SETTING_DEFAULT_CONFIG = {
     /** 标签页样式 */
     tabStyle: 'tab-google',
     /** 自定义圆角 */
-    customRadius: '0.75',
+    customRadius: '0',
     /** 容器宽度 */
     containerWidth: ContainerWidthEnum.FULL
 }

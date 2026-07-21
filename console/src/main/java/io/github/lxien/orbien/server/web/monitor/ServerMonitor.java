@@ -21,7 +21,7 @@ import java.lang.management.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * 获取物理内存利用率、JVM内存利用率以及CPU利用率等信息
+ * 获取物理内存利用率、堆内存利用率以及CPU利用率等信息
  */
 public class ServerMonitor {
     /**
@@ -29,7 +29,7 @@ public class ServerMonitor {
      */
     private static final OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
     /**
-     * 获取JVM内存信息
+     * 获取堆内存信息
      */
     private static final MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
     /**
@@ -47,7 +47,7 @@ public class ServerMonitor {
     private static final AtomicLong prevUptimeMs = new AtomicLong(0);
 
     /**
-     * 获取JVM内存信息
+     * 获取堆内存信息
      */
     public static JvmMemoryDTO getJvmMemory() {
         JvmMemoryDTO jvmMemory = new JvmMemoryDTO();

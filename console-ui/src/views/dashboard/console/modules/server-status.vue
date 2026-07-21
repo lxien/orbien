@@ -74,7 +74,7 @@
           ]
         },
         {
-          label: 'JVM内存',
+          label: '堆内存',
           value: '--',
           percentage: 0,
           desc: '--',
@@ -133,7 +133,7 @@
         ]
       },
       {
-        label: 'JVM内存',
+        label: '堆内存',
         value: '',
         usedValue: serverInfo.value.jvmMem?.used || '0MB',
         totalValue: serverInfo.value.jvmMem?.total || '0MB',
