@@ -81,11 +81,11 @@ password = "123456"
 
 [[port_pool.tcp]]
 start = 9050
-end = 9099
+end = 9060
 
 [[port_pool.udp]]
 start = 9050
-end = 9099
+end = 9060
 EOF
 
 docker run -d \
@@ -95,8 +95,8 @@ docker run -d \
   -p 8443:8443 \
   -p 8020:8020 \
   -p 9527:9527 \
-  -p 9050-9099:9050-9099 \
-  -p 9050-9099:9050-9099/udp \
+  -p 9050-9060:9050-9060 \
+  -p 9050-9060:9050-9060/udp \
   -e SPRING_PROFILES_ACTIVE=h2 \
   -e H2_DATA_DIR=/app/data/orbien-server \
   -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC --enable-native-access=ALL-UNNAMED" \
@@ -111,7 +111,7 @@ docker run -d \
 |-----------|-----------------------------------------------------------------------|
 | Dashboard | `http://<host>:8020` (`admin` / `123456`)                             |
 | Data dir  | `/opt/orbien`                                                         |
-| Ports     | Tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9099` |
+| Ports     | Tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9060` |
 
 ### 2.3 Client
 
