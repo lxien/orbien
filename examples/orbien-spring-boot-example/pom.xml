@@ -15,7 +15,7 @@
     <name>orbien-spring-boot-example</name>
     <properties>
         <java.version>25</java.version>
-        <orbien-spring-boot-starter.version>0.3.1</orbien-spring-boot-starter.version>
+        <orbien-spring-boot-starter.version>0.4.0</orbien-spring-boot-starter.version>
     </properties>
     <dependencies>
         <dependency>
