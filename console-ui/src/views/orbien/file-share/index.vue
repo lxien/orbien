@@ -130,18 +130,17 @@ const {
       {type: 'selection'},
       {
         prop: 'name',
-        label: '共享名称',
-        minWidth: 60
+        label: '代理名称'
       },
 
       {
         prop: 'rootPath',
         label: '根目录',
-        minWidth: 120
       },
       {
         prop: 'accessUrls',
         label: '访问地址',
+        minWidth: 100,
         formatter: (row: FileShareItem) => {
           const urls = row.accessUrls?.length ? row.accessUrls : (row.domains || [])
           if (!urls.length) {
@@ -177,21 +176,21 @@ const {
         formatter: (row: FileShareItem) => renderTransportProtocolTag(row.transportProtocol)
       },
       {
-        prop: 'traffic',
-        label: '流量',
-        width: 130,
-        formatter: (row: FileShareItem) =>
-          renderTrafficRate(row.traffic, () => handleMetrics(row))
-      },
-      {
         prop: 'authEnabled',
-        label: '认证状态',
+        label: '身份认证',
         formatter: (row: FileShareItem) =>
             h(ElTag, {
               type: row.authEnabled ? 'primary' : 'info',
               size: 'small'
             }, () => row.authEnabled ? '已启用' : '未启用')
       },
+      {
+        prop: 'traffic',
+        label: '流量',
+        formatter: (row: FileShareItem) =>
+          renderTrafficRate(row.traffic, () => handleMetrics(row))
+      },
+
       {
         prop: 'status',
         label: '状态',

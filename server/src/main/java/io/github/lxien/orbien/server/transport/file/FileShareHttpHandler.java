@@ -104,8 +104,9 @@ public class FileShareHttpHandler {
 
             if ("GET".equals(req.method()) && path.startsWith("/api/files/list")) {
                 String dir = queryParam(requestPath, "path");
-                String sort = queryParam(requestPath, "sort");
-                Message.FileListResponse resp = fileTransferCoordinator.list(agentId, proxyId, dir, sort);
+                String sort = queryParam(requestPath, "sort", "");
+                String query = queryParam(requestPath, "q", "");
+                Message.FileListResponse resp = fileTransferCoordinator.list(agentId, proxyId, dir, sort, query);
                 if (resp.getStatus().getCode() != 0) {
                     logger.debug("文件列表失败 agentId={} proxyId={} path={} msg={}",
                             agentId, proxyId, dir, resp.getStatus().getMessage());
@@ -890,9 +891,13 @@ public class FileShareHttpHandler {
     }
 
     private String queryParam(String path, String key) {
+        return queryParam(path, key, "/");
+    }
+
+    private String queryParam(String path, String key, String defaultValue) {
         int idx = path.indexOf('?');
         if (idx < 0) {
-            return "/";
+            return defaultValue;
         }
         String query = path.substring(idx + 1);
         for (String part : query.split("&")) {
@@ -901,7 +906,7 @@ public class FileShareHttpHandler {
                 return URLDecoder.decode(kv[1], StandardCharsets.UTF_8);
             }
         }
-        return "/";
+        return defaultValue;
     }
 
     private record MultipartFilePart(byte[] data, int offset, int length, String filename) {

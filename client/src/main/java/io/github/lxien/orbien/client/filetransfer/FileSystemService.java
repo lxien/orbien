@@ -12,11 +12,13 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 public class FileSystemService {
 
-    public Message.FileListResponse list(Path rootPath, String requestPath, String sort) throws IOException {
+    public Message.FileListResponse list(Path rootPath, String requestPath, String sort, String query)
+            throws IOException {
         Path dir = FilePermissionChecker.resolveSafe(rootPath, requestPath);
         if (!Files.exists(dir)) {
             throw new FilePermissionChecker.FileAccessException("目录不存在");
@@ -26,10 +28,15 @@ public class FileSystemService {
         }
         String current = toRelative(rootPath, dir);
         String parent = "/".equals(current) ? "" : parentPath(current);
+        String needle = normalizeQuery(query);
 
         List<Message.FileEntry> entries = new ArrayList<>();
         try (Stream<Path> stream = Files.list(dir)) {
-            stream.map(this::toEntry).forEach(entries::add);
+            Stream<Message.FileEntry> mapped = stream.map(this::toEntry);
+            if (!needle.isEmpty()) {
+                mapped = mapped.filter(entry -> nameMatches(entry.getName(), needle));
+            }
+            mapped.forEach(entries::add);
         } catch (NoSuchFileException | NotDirectoryException e) {
             throw new FilePermissionChecker.FileAccessException("目录不存在");
         } catch (AccessDeniedException e) {
@@ -45,6 +52,17 @@ public class FileSystemService {
                 .addAllEntries(entries)
                 .setStatus(success())
                 .build();
+    }
+
+    private static String normalizeQuery(String query) {
+        if (query == null || query.isBlank()) {
+            return "";
+        }
+        return query.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private static boolean nameMatches(String name, String needle) {
+        return name != null && name.toLowerCase(Locale.ROOT).contains(needle);
     }
 
     public Message.FileOpResponse mkdir(Path rootPath, String parentPath, String name,

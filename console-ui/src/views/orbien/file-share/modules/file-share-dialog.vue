@@ -28,8 +28,8 @@
         </ElSelect>
       </ElFormItem>
 
-      <ElFormItem label="共享名称" prop="name">
-        <ElInput v-model="formData.name" placeholder="请输入共享名称" clearable/>
+      <ElFormItem label="代理名称" prop="name">
+        <ElInput v-model="formData.name" placeholder="请输入代理名称" clearable/>
       </ElFormItem>
 
       <ElFormItem label="根目录" prop="rootPath">
@@ -273,7 +273,7 @@ const emptyAuthUser = (): AuthUserForm => ({username: '', password: '', permissi
 
 const rules = computed<FormRules>(() => ({
   agentId: [{required: true, message: '请选择客户端', trigger: 'change'}],
-  name: [{required: true, message: '请输入共享名称', trigger: 'blur'}],
+  name: [{required: true, message: '请输入代理名称', trigger: 'blur'}],
   rootPath: [{required: true, message: '请输入根目录', trigger: 'blur'}],
   domainType: [{required: true, message: '请选择域名类型', trigger: 'change'}],
   customDomains: [

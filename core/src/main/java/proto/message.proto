@@ -170,6 +170,8 @@ message FileListRequest {
   string path = 3;
   // 排序字段，空表示不排序；可选 name/kind/last_opened/date_added/modified/created/size
   string sort = 4;
+  // 目录文件名过滤，空表示不过滤
+  string query = 5;
 }
 
 message FileEntry {

@@ -94,6 +94,7 @@
     let listLoading = false;
     let viewMode = 'list';
     let currentSort = '';
+    let currentQuery = '';
     let dragPaths = [];
     const selectedPathSet = new Set();
     let selectionAnchorPath = null;
@@ -499,9 +500,26 @@
         await showAlert(err.message || String(err), {title: '操作失败', type: 'danger'});
     };
 
-    const entriesCacheKey = (path, sort) => `${path}\0${sort || ''}`;
+    const entriesCacheKey = (path, sort, query = '') => `${path}\0${sort || ''}\0${query || ''}`;
 
     const invalidateEntriesCache = () => entriesCache.clear();
+
+    const emptyFolderHint = () => {
+        if (currentQuery) {
+            return `未找到与“${currentQuery}”匹配的项目`;
+        }
+        return canUpload || canMkdir
+            ? '此文件夹为空，右键可上传或新建文件夹'
+            : '此文件夹为空';
+    };
+
+    const clearSearchState = () => {
+        currentQuery = '';
+        const input = $('fileSearchInput');
+        if (input) {
+            input.value = '';
+        }
+    };
 
     const pathChain = (path) => {
         if (path === '/') {
@@ -649,9 +667,7 @@
         setActionVisible('fileInput', canUpload);
         const hint = document.querySelector('#emptyState .empty-hint');
         if (hint) {
-            hint.textContent = canUpload || canMkdir
-                ? '此文件夹为空，右键可上传或新建文件夹'
-                : '此文件夹为空';
+            hint.textContent = emptyFolderHint();
         }
     };
 
@@ -988,6 +1004,48 @@
         });
     };
 
+    const submitSearch = () => {
+        const input = $('fileSearchInput');
+        const next = (input?.value || '').trim();
+        if (next === currentQuery) {
+            return;
+        }
+        currentQuery = next;
+        updateActionControls();
+        loadList().catch(showError);
+    };
+
+    const initSearchBox = () => {
+        const input = $('fileSearchInput');
+        if (!input) {
+            return;
+        }
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                submitSearch();
+                return;
+            }
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (input.value || currentQuery) {
+                    clearSearchState();
+                    updateActionControls();
+                    loadList().catch(showError);
+                }
+                input.blur();
+            }
+        });
+        // type=search 的清除按钮会触发 search 事件
+        input.addEventListener('search', () => {
+            if (!input.value.trim() && currentQuery) {
+                currentQuery = '';
+                updateActionControls();
+                loadList().catch(showError);
+            }
+        });
+    };
+
     const setViewMode = (mode) => {
         if (mode === viewMode) {
             return;
@@ -1009,6 +1067,8 @@
         }
         clearSelection();
         closeInspectorDialog();
+        clearSearchState();
+        updateActionControls();
         currentPath = path;
         loadList().catch(showError);
     };
@@ -1017,14 +1077,17 @@
 
     const goHome = () => navigateTo('/');
 
-    async function fetchEntries(path, useCache = true) {
-        const key = entriesCacheKey(path, currentSort);
+    async function fetchEntries(path, useCache = true, query = '') {
+        const key = entriesCacheKey(path, currentSort, query);
         if (useCache && entriesCache.has(key)) {
             return entriesCache.get(key);
         }
         let url = `/api/files/list?path=${encodeURIComponent(path)}`;
         if (currentSort) {
             url += `&sort=${encodeURIComponent(currentSort)}`;
+        }
+        if (query) {
+            url += `&q=${encodeURIComponent(query)}`;
         }
         const data = await api(url);
         const list = data.entries || data.entriesList || [];
@@ -1039,12 +1102,13 @@
         setListLoading(true);
         try {
             invalidateEntriesCache();
-            entries = await fetchEntries(currentPath, false);
+            entries = await fetchEntries(currentPath, false, currentQuery);
             pruneSelection();
             await renderFiles();
         } catch (e) {
             if (e.message?.includes('目录不存在') || e.message?.includes('不是目录')) {
                 if (currentPath !== '/') {
+                    clearSearchState();
                     currentPath = parentPath(currentPath);
                     await loadList(true);
                     return;
@@ -1058,7 +1122,7 @@
 
     async function refreshListQuiet() {
         invalidateEntriesCache();
-        entries = await fetchEntries(currentPath, false);
+        entries = await fetchEntries(currentPath, false, currentQuery);
         pruneSelection();
         await renderFiles();
     }
@@ -1066,11 +1130,21 @@
     const updateSummary = () => {
         const dirs = entries.filter((e) => e.directory).length;
         const files = entries.length - dirs;
-        $('summary').textContent = entries.length
-            ? `${dirs} 个文件夹，${files} 个文件`
-            : '此文件夹为空';
+        if (currentQuery) {
+            $('summary').textContent = entries.length
+                ? `找到 ${entries.length} 项`
+                : '未找到匹配项';
+        } else {
+            $('summary').textContent = entries.length
+                ? `${dirs} 个文件夹，${files} 个文件`
+                : '此文件夹为空';
+        }
         const showGlobalEmpty = entries.length === 0 && viewMode !== 'column';
         $('emptyState').classList.toggle('hidden', !showGlobalEmpty);
+        const hint = document.querySelector('#emptyState .empty-hint');
+        if (hint) {
+            hint.textContent = emptyFolderHint();
+        }
     };
 
     const createColumnEmptyContent = () => {
@@ -1079,9 +1153,7 @@
 
         const text = document.createElement('p');
         text.className = 'column-panel-empty-text';
-        text.textContent = canUpload || canMkdir
-            ? '此文件夹为空，右键可上传或新建文件夹'
-            : '此文件夹为空';
+        text.textContent = emptyFolderHint();
         wrap.appendChild(text);
         return wrap;
     };
@@ -2013,6 +2085,8 @@
             if (!shift && !multi && entry.directory) {
                 const targetPath = joinPath(colPath, name);
                 if (targetPath !== currentPath) {
+                    clearSearchState();
+                    updateActionControls();
                     currentPath = targetPath;
                     loadList().catch(showError);
                     return;
@@ -2434,6 +2508,7 @@
         initContextMenu();
         initViewMode();
         initSortMenu();
+        initSearchBox();
         try {
             const status = await refreshAuthStatus();
             scheduleAuthRefresh();

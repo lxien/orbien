@@ -62,7 +62,8 @@ public class FileTransferControlHandler {
         Message.FileListRequest req = parseFrame(control, frame, Message.FileListRequest.parser());
         logger.debug("收到文件列表请求 proxyId={} path={}", req.getProxyId(), req.getPath());
         PathContext ctx = resolve(req.getProxyId());
-        Message.FileListResponse resp = fileSystemService.list(ctx.root(), req.getPath(), req.getSort());
+        Message.FileListResponse resp = fileSystemService.list(
+                ctx.root(), req.getPath(), req.getSort(), req.getQuery());
         send(control, TMSP.MSG_FILE_LIST_RESP, resp.toBuilder().setRequestId(req.getRequestId()).build(), req.getProxyId());
     }
 
