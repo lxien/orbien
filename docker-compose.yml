@@ -1,6 +1,6 @@
 services:
   orbien-server:
-    image: lxien/orbien-server:0.20.1
+    image: lxien/orbien-server:0.21.0
     container_name: orbien-server
     restart: unless-stopped
     ports:

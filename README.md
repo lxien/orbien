@@ -14,8 +14,8 @@
   <a href="https://github.com/lxien/orbien/blob/main/LICENSE">
     <img src="https://img.shields.io/github/license/lxien/orbien?style=for-the-badge" alt="License"/>
   </a>
- <a href="https://github.com/lxien/orbien/releases/v0.20.1">
-    <img src="https://img.shields.io/badge/orbien-0.20.1-blue?style=for-the-badge" alt="orbien:0.20.1"/>
+ <a href="https://github.com/lxien/orbien/releases/v0.21.0">
+    <img src="https://img.shields.io/badge/orbien-0.21.0-blue?style=for-the-badge" alt="orbien:0.21.0"/>
   </a>
 <a href="https://somsubhra.github.io/github-release-stats/?username=lxien&repository=orbien">
   <img src="https://img.shields.io/github/downloads/lxien/orbien/total?style=for-the-badge" alt="Downloads"/>
@@ -107,7 +107,7 @@ docker run -d \
   -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/logs:/app/logs \
-  lxien/orbien-server:0.20.1
+  lxien/orbien-server:0.21.0
 ```
 
 | Item      | Value                                                                 |
@@ -165,7 +165,7 @@ docker run -d \
   -e TZ=Asia/Shanghai \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
-  lxien/orbien:0.20.1
+  lxien/orbien:0.21.0
 ```
 
 #### 2.3.3 Spring Boot Starter

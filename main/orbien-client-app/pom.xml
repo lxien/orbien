@@ -4,7 +4,7 @@
     <parent>
         <groupId>io.github.lxien</groupId>
         <artifactId>orbien-main</artifactId>
-        <version>0.20.1</version>
+        <version>0.21.0</version>
     </parent>
     <artifactId>orbien-client-app</artifactId>
     <packaging>jar</packaging>
@@ -15,7 +15,7 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <orbien.version>0.20.1</orbien.version>
+        <orbien.version>0.21.0</orbien.version>
         <native-maven-plugin.version>0.11.4</native-maven-plugin.version>
         <maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
         <shade.skip>false</shade.skip>
