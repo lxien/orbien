@@ -98,7 +98,7 @@ docker run -d \
   -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
-  -v /opt/orbien/logs:/app/logs \
+  -v /opt/orbien/config:/app/config \
   lxien/orbien-server:0.21.0
 ```
 

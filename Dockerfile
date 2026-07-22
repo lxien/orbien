@@ -1,4 +1,4 @@
-FROM eclipse-temurin:25-jdk-alpine
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 COPY main/orbien-server-app/target/orbien-server.jar /app/orbien-server.jar
 COPY main/orbien-server-app/src/main/resources/orbien-server.toml /app/
