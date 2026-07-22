@@ -173,7 +173,7 @@ docker run -d \
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 

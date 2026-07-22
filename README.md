@@ -112,7 +112,7 @@ docker run -d \
   -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
   -v /opt/orbien/data:/app/data \
   -v /opt/orbien/cert:/app/cert \
-    -v /opt/orbien/config:/app/config \
+  -v /opt/orbien/config:/app/config \
   -v /opt/orbien/logs:/app/logs \
   lxien/orbien-server:0.21.0
 ```
@@ -182,7 +182,7 @@ docker run -d \
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
-    <version>0.3.1</version>
+    <version>0.4.0</version>
 </dependency>
 ```
 
