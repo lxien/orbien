@@ -36,11 +36,169 @@
 
     const formatTime = (ms) => (ms ? new Date(Number(ms)).toLocaleString('zh-CN') : '—');
 
+    const formatPixels = (w, h) => (w > 0 && h > 0 ? `${w} × ${h}` : '—');
+
+    const formatDpi = (x, y) => (x > 0 && y > 0
+        ? `${Math.round(x)} × ${Math.round(y)}`
+        : '—');
+
     const kindLabel = (meta) => {
         if (meta.directory) return '文件夹';
         const ext = (meta.name || '').split('.').pop();
         if (ext && ext !== meta.name) return `${ext.toUpperCase()} 文件`;
         return '文件';
+    };
+
+    const readUint32BE = (view, offset) => view.getUint32(offset, false);
+
+    // JPEG JFIF / EXIF、PNG pHYs；解析失败返回 null
+    const parseImageDpi = (buffer) => {
+        const bytes = new Uint8Array(buffer);
+        if (bytes.length < 24) {
+            return null;
+        }
+        if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4E && bytes[3] === 0x47) {
+            return parsePngDpi(bytes);
+        }
+        if (bytes[0] === 0xFF && bytes[1] === 0xD8) {
+            return parseJpegDpi(bytes);
+        }
+        return null;
+    };
+
+    const parsePngDpi = (bytes) => {
+        let offset = 8;
+        while (offset + 12 <= bytes.length) {
+            const length = ((bytes[offset] << 24) | (bytes[offset + 1] << 16)
+                | (bytes[offset + 2] << 8) | bytes[offset + 3]) >>> 0;
+            const type = String.fromCharCode(
+                bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+            const dataStart = offset + 8;
+            if (dataStart + length + 4 > bytes.length) {
+                break;
+            }
+            if (type === 'pHYs' && length >= 9) {
+                const view = new DataView(bytes.buffer, bytes.byteOffset + dataStart, length);
+                const ppux = readUint32BE(view, 0);
+                const ppuy = readUint32BE(view, 4);
+                const unit = bytes[dataStart + 8];
+                if (unit === 1 && ppux > 0 && ppuy > 0) {
+                    return {dpiX: ppux * 0.0254, dpiY: ppuy * 0.0254};
+                }
+                return null;
+            }
+            if (type === 'IDAT' || type === 'IEND') {
+                break;
+            }
+            offset = dataStart + length + 4;
+        }
+        return null;
+    };
+
+    const parseJpegDpi = (bytes) => {
+        let offset = 2;
+        while (offset + 4 <= bytes.length) {
+            if (bytes[offset] !== 0xFF) {
+                break;
+            }
+            const marker = bytes[offset + 1];
+            if (marker === 0xD9 || marker === 0xDA) {
+                break;
+            }
+            const size = (bytes[offset + 2] << 8) | bytes[offset + 3];
+            if (size < 2 || offset + 2 + size > bytes.length) {
+                break;
+            }
+            const dataStart = offset + 4;
+            const segLen = size - 2;
+            if (marker === 0xE0 && segLen >= 12
+                && bytes[dataStart] === 0x4A && bytes[dataStart + 1] === 0x46
+                && bytes[dataStart + 2] === 0x49 && bytes[dataStart + 3] === 0x46
+                && bytes[dataStart + 4] === 0x00) {
+                const unit = bytes[dataStart + 7];
+                const dx = (bytes[dataStart + 8] << 8) | bytes[dataStart + 9];
+                const dy = (bytes[dataStart + 10] << 8) | bytes[dataStart + 11];
+                if (dx > 0 && dy > 0) {
+                    if (unit === 1) {
+                        return {dpiX: dx, dpiY: dy};
+                    }
+                    if (unit === 2) {
+                        return {dpiX: dx * 2.54, dpiY: dy * 2.54};
+                    }
+                }
+            }
+            if (marker === 0xE1 && segLen > 8
+                && bytes[dataStart] === 0x45 && bytes[dataStart + 1] === 0x78
+                && bytes[dataStart + 2] === 0x69 && bytes[dataStart + 3] === 0x66
+                && bytes[dataStart + 4] === 0x00 && bytes[dataStart + 5] === 0x00) {
+                const dpi = parseExifDpi(bytes, dataStart + 6, segLen - 6);
+                if (dpi) {
+                    return dpi;
+                }
+            }
+            offset += 2 + size;
+        }
+        return null;
+    };
+
+    const parseExifDpi = (bytes, tiffStart, maxLen) => {
+        if (maxLen < 8) {
+            return null;
+        }
+        const view = new DataView(bytes.buffer, bytes.byteOffset + tiffStart, maxLen);
+        const endian = String.fromCharCode(bytes[tiffStart], bytes[tiffStart + 1]);
+        const le = endian === 'II';
+        if (!le && endian !== 'MM') {
+            return null;
+        }
+        const u16 = (off) => le ? view.getUint16(off, true) : view.getUint16(off, false);
+        const u32 = (off) => le ? view.getUint32(off, true) : view.getUint32(off, false);
+        if (u16(2) !== 42) {
+            return null;
+        }
+        let ifd = u32(4);
+        if (ifd + 2 > maxLen) {
+            return null;
+        }
+        const count = u16(ifd);
+        let xResOff = 0;
+        let yResOff = 0;
+        let unit = 2;
+        for (let i = 0; i < count; i++) {
+            const entry = ifd + 2 + i * 12;
+            if (entry + 12 > maxLen) {
+                break;
+            }
+            const tag = u16(entry);
+            const type = u16(entry + 2);
+            const valueOrOffset = u32(entry + 8);
+            if (tag === 0x011A && type === 5 && valueOrOffset + 8 <= maxLen) {
+                xResOff = valueOrOffset;
+            } else if (tag === 0x011B && type === 5 && valueOrOffset + 8 <= maxLen) {
+                yResOff = valueOrOffset;
+            } else if (tag === 0x0128 && type === 3) {
+                unit = u16(entry + 8);
+            }
+        }
+        if (!xResOff || !yResOff) {
+            return null;
+        }
+        const readRational = (off) => {
+            const num = u32(off);
+            const den = u32(off + 4);
+            return den ? num / den : 0;
+        };
+        let dx = readRational(xResOff);
+        let dy = readRational(yResOff);
+        if (!(dx > 0) || !(dy > 0)) {
+            return null;
+        }
+        // 3 = centimeters
+        if (unit === 3) {
+            dx *= 2.54;
+            dy *= 2.54;
+        }
+        return {dpiX: dx, dpiY: dy};
     };
 
     const fetchPreviewMeta = async (path, signal) => {
@@ -99,13 +257,38 @@
 
     const renderImage = async (previewEl, path, meta, signal) => {
         const {blob} = await fetchPreviewBlob(path, signal);
+        if (signal.aborted) {
+            return null;
+        }
+        let dpi = null;
+        try {
+            dpi = parseImageDpi(await blob.arrayBuffer());
+        } catch {
+            dpi = null;
+        }
         const url = trackBlobUrl(URL.createObjectURL(blob));
         previewEl.replaceChildren();
         const img = document.createElement('img');
         img.className = 'inspector-preview-image';
-        img.src = url;
         img.alt = meta.name || '';
         previewEl.appendChild(img);
+
+        const metrics = await new Promise((resolve) => {
+            img.onload = () => resolve({
+                width: img.naturalWidth || 0,
+                height: img.naturalHeight || 0,
+                dpiX: dpi?.dpiX || 0,
+                dpiY: dpi?.dpiY || 0
+            });
+            img.onerror = () => resolve({
+                width: 0,
+                height: 0,
+                dpiX: dpi?.dpiX || 0,
+                dpiY: dpi?.dpiY || 0
+            });
+            img.src = url;
+        });
+        return signal.aborted ? null : metrics;
     };
 
     const renderText = async (previewEl, path, meta, signal) => {
@@ -142,7 +325,7 @@
         previewEl.appendChild(wrap);
     };
 
-    const renderDetails = (detailsEl, meta) => {
+    const renderDetails = (detailsEl, meta, imageMetrics = null) => {
         detailsEl.replaceChildren();
 
         const title = document.createElement('h3');
@@ -173,6 +356,14 @@
         if (!meta.directory) {
             rows.push(['大小', formatSize(meta.size)]);
         }
+        if ((meta.previewKind || '').toLowerCase() === 'image' && imageMetrics) {
+            if (imageMetrics.width > 0 && imageMetrics.height > 0) {
+                rows.push(['尺寸', formatPixels(imageMetrics.width, imageMetrics.height)]);
+            }
+            if (imageMetrics.dpiX > 0 && imageMetrics.dpiY > 0) {
+                rows.push(['分辨率', formatDpi(imageMetrics.dpiX, imageMetrics.dpiY)]);
+            }
+        }
 
         for (const [label, value] of rows) {
             const row = document.createElement('div');
@@ -192,18 +383,18 @@
     const renderPreview = async (previewEl, path, meta, signal) => {
         if (meta.directory) {
             renderFolderIcon(previewEl, '/icon/folder.svg');
-            return;
+            return null;
         }
         const kind = (meta.previewKind || '').toLowerCase();
         if (kind === 'image' && meta.previewable) {
-            await renderImage(previewEl, path, meta, signal);
-            return;
+            return renderImage(previewEl, path, meta, signal);
         }
         if (kind === 'text' && meta.previewable) {
             await renderText(previewEl, path, meta, signal);
-            return;
+            return null;
         }
         renderUnknown(previewEl, meta);
+        return null;
     };
 
     const buildInspectorPanel = (mode = 'column') => {
@@ -250,7 +441,13 @@
                 return;
             }
             renderDetails(details, meta);
-            await renderPreview(preview, path, meta, signal);
+            const imageMetrics = await renderPreview(preview, path, meta, signal);
+            if (signal.aborted) {
+                return;
+            }
+            if (imageMetrics) {
+                renderDetails(details, meta, imageMetrics);
+            }
         } catch (e) {
             if (signal.aborted || e.name === 'AbortError') {
                 return;
