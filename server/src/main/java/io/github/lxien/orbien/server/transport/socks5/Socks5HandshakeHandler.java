@@ -243,9 +243,6 @@ public class Socks5HandshakeHandler extends SimpleChannelInboundHandler<ByteBuf>
         return sa.getPort();
     }
 
-    /**
-     * localhost / IPv6 loopback 归一为 127.0.0.1
-     */
     static String normalizeSocks5Host(String host) {
         return NewStreamCodec.normalizeLocalIp(host);
     }
