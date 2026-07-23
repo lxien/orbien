@@ -188,6 +188,7 @@ jobs:
           cp main/orbien-server-app/target/orbien-server.jar "$SERVER_RELEASE_NAME/orbien-server.jar"
           cp "main/orbien-server-app/src/main/resources/orbien-server.toml" "$SERVER_RELEASE_NAME/orbien-server.toml"
           cp "main/orbien-server-app/src/main/resources/application.yml" "$SERVER_RELEASE_NAME/config/application.yml"
+          cp "main/orbien-server-app/src/main/resources/application-h2.yml" "$SERVER_RELEASE_NAME/config/application-h2.yml"
           cp "main/orbien-server-app/src/main/resources/application-mysql.yml" "$SERVER_RELEASE_NAME/config/application-mysql.yml"
           cp "main/orbien-server-app/src/main/resources/logback-spring.xml" "$SERVER_RELEASE_NAME/config/logback-spring.xml"
 
@@ -215,6 +216,7 @@ jobs:
           Copy-Item "main\orbien-server-app\target\orbien-server.jar" "$SERVER_RELEASE_NAME\orbien-server.jar"
           Copy-Item "main\orbien-server-app\src\main\resources\orbien-server.toml" "$SERVER_RELEASE_NAME\orbien-server.toml"
           Copy-Item "main\orbien-server-app\src\main\resources\application.yml" "$SERVER_RELEASE_NAME\config\application.yml"
+          Copy-Item "main\orbien-server-app\src\main\resources\application-h2.yml" "$SERVER_RELEASE_NAME\config\application-h2.yml"
           Copy-Item "main\orbien-server-app\src\main\resources\application-mysql.yml" "$SERVER_RELEASE_NAME\config\application-mysql.yml"
           Copy-Item "main\orbien-server-app\src\main\resources\logback-spring.xml" "$SERVER_RELEASE_NAME\config\logback-spring.xml"
 
