@@ -117,12 +117,6 @@ docker run -d \
   lxien/orbien-server:0.21.0
 ```
 
-| Item      | Value                                                                 |
-|-----------|-----------------------------------------------------------------------|
-| Dashboard | `http://<host>:8020` (`admin` / `123456`)                             |
-| Data dir  | `/opt/orbien`                                                         |
-| Ports     | Tunnel `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP pool `9050-9060` |
-
 ### 2.3 Client
 
 #### 2.3.1 Binary
