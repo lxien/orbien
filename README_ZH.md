@@ -107,6 +107,12 @@ docker run -d \
   lxien/orbien-server:0.21.0
 ```
 
+| 项目   | 说明                                                             |
+|------|----------------------------------------------------------------|
+| 面板   | `http://<host>:8020`（`admin` / `123456`）                       |
+| 数据目录 | `/opt/orbien`                                                  |
+| 端口   | 隧道 `9527` · HTTP `8080` · HTTPS `8443` · TCP/UDP 池 `9050-9060` |
+
 ### 2.3 客户端
 
 #### 2.3.1 二进制
@@ -160,12 +166,6 @@ docker run -d \
   -v /path/to/orbien/.orbien:/root/.orbien \
   lxien/orbien:0.21.0
 ```
-
-| 项目   | 说明 |
-|------|------|
-| 配置   | `/path/to/orbien/orbien.toml` → `/app/orbien.toml` |
-| 日志   | `/path/to/orbien/logs` → `/app/logs` |
-| 身份   | `/path/to/orbien/.orbien` → `/root/.orbien`（持久化 `agent.id`，重建容器后保持同一 Agent） |
 
 #### 2.3.3 Spring Boot Starter
 
