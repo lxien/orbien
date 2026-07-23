@@ -145,7 +145,7 @@ orbien tcp 3306
 #### 2.3.2 Docker
 
 ```shell
-mkdir -p /path/to/orbien/logs
+mkdir -p /path/to/orbien/logs /path/to/orbien/.orbien
 
 cat > /path/to/orbien/orbien.toml <<'EOF'
 server_addr = "<server-host>"
@@ -163,8 +163,15 @@ docker run -d \
   -e TZ=Asia/Shanghai \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
+  -v /path/to/orbien/.orbien:/root/.orbien \
   lxien/orbien:0.21.0
 ```
+
+| 项目   | 说明 |
+|------|------|
+| 配置   | `/path/to/orbien/orbien.toml` → `/app/orbien.toml` |
+| 日志   | `/path/to/orbien/logs` → `/app/logs` |
+| 身份   | `/path/to/orbien/.orbien` → `/root/.orbien`（持久化 `agent.id`，重建容器后保持同一 Agent） |
 
 #### 2.3.3 Spring Boot Starter
 

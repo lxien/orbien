@@ -154,7 +154,7 @@ orbien tcp 3306
 #### 2.3.2 Docker
 
 ```shell
-mkdir -p /path/to/orbien/logs
+mkdir -p /path/to/orbien/logs /path/to/orbien/.orbien
 
 cat > /path/to/orbien/orbien.toml <<'EOF'
 server_addr = "<server-host>"
@@ -172,8 +172,15 @@ docker run -d \
   -e TZ=Asia/Shanghai \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
+  -v /path/to/orbien/.orbien:/root/.orbien \
   lxien/orbien:0.21.0
 ```
+
+| Item | Description |
+|------|-------------|
+| Config | `/path/to/orbien/orbien.toml` → `/app/orbien.toml` |
+| Logs | `/path/to/orbien/logs` → `/app/logs` |
+| Identity | `/path/to/orbien/.orbien` → `/root/.orbien` (persists `agent.id` so the same Agent survives container recreation) |
 
 #### 2.3.3 Spring Boot Starter
 
