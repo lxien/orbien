@@ -159,7 +159,6 @@ EOF
 docker run -d \
   --name orbien \
   --restart unless-stopped \
-  --network host \
   -e TZ=Asia/Shanghai \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
@@ -192,3 +191,5 @@ orbien:
 ## 问题反馈
 
 - Issues：[github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
+- 在线讨论：[Discord](https://discord.com/invite/4dgQjCS3k)
+

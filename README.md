@@ -145,6 +145,7 @@ Commands:
 ```
 
 案例：
+
 ```shell
 orbien login --server <server-host>:9527 --token <access-token>
 orbien http 8080
@@ -168,14 +169,12 @@ EOF
 docker run -d \
   --name orbien \
   --restart unless-stopped \
-  --network host \
   -e TZ=Asia/Shanghai \
   -v /path/to/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /path/to/orbien/logs:/app/logs \
   -v /path/to/orbien/.orbien:/root/.orbien \
   lxien/orbien:0.21.0
 ```
-
 #### 2.3.3 Spring Boot Starter
 
 ```xml
@@ -201,3 +200,4 @@ orbien:
 ## Feedback
 
 - Issues: [github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
+- Online discussion： [Discord](https://discord.com/invite/4dgQjCS3k)
