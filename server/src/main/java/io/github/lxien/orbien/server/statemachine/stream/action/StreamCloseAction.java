@@ -150,6 +150,20 @@ public class StreamCloseAction extends StreamBaseAction {
         }
         context.setHttpStreamCapture(null);
         HttpCaptureRecord record = capture.finalizeCapture();
+        if (context.isReplay()) {
+            if (record != null && context.isReplayCaptureToBuffer()) {
+                inspectorBuffer.append(record);
+            }
+            var future = context.getReplayCompletion();
+            if (future != null && !future.isDone()) {
+                if (record != null) {
+                    future.complete(record);
+                } else {
+                    future.completeExceptionally(new IllegalStateException("replay stream closed before response"));
+                }
+            }
+            return;
+        }
         if (record != null) {
             inspectorBuffer.append(record);
         }

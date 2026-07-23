@@ -11,6 +11,8 @@ declare namespace Api.Inspector {
         scheme: string
         status: number
         statusText: string
+        replay?: boolean
+        sourceRecordId?: string
     }
 
     interface RecordDetail extends RecordSummary {
@@ -35,5 +37,26 @@ declare namespace Api.Inspector {
     interface ConfigUpdateParam {
         proxyId: string
         inspectorEnabled: boolean
+    }
+
+    interface ReplayOverrides {
+        method?: string
+        path?: string
+        headers?: Record<string, string>
+        body?: string
+    }
+
+    interface ReplayParam {
+        captureToBuffer?: boolean
+        timeoutSeconds?: number
+        overrides?: ReplayOverrides
+    }
+
+    interface ReplayResult {
+        sourceRecordId: string
+        replayRecordId: string
+        modified: boolean
+        status: string
+        record: RecordDetail
     }
 }

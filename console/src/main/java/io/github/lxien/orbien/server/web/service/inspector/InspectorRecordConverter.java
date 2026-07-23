@@ -25,6 +25,8 @@ public class InspectorRecordConverter {
         dto.setScheme(summary.getScheme());
         dto.setStatus(summary.getStatus());
         dto.setStatusText(summary.getStatusText());
+        dto.setReplay(summary.isReplay());
+        dto.setSourceRecordId(summary.getSourceRecordId());
         return dto;
     }
 
@@ -55,6 +57,8 @@ public class InspectorRecordConverter {
         dto.setResponseBodyTruncated(record.isResponseBodyTruncated());
         dto.setRawRequest(record.getRawRequest());
         dto.setRawResponse(record.getRawResponse());
+        dto.setReplay(record.isReplay());
+        dto.setSourceRecordId(record.getSourceRecordId());
         return dto;
     }
 }

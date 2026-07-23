@@ -8,6 +8,7 @@ import io.github.lxien.orbien.core.transport.AbstractStreamContext;
 import io.github.lxien.orbien.core.transport.AttributeKeys;
 import io.github.lxien.orbien.core.utils.ChannelUtils;
 import io.github.lxien.orbien.server.statemachine.agent.AgentContext;
+import io.github.lxien.orbien.server.inspector.HttpCaptureRecord;
 import io.github.lxien.orbien.server.inspector.HttpStreamCapture;
 import io.github.lxien.orbien.server.transport.traffic.BandwidthLimiter;
 import io.github.lxien.orbien.server.transport.traffic.RemoteProducerGate;
@@ -23,6 +24,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Getter
@@ -61,6 +63,15 @@ public class StreamContext extends AbstractStreamContext {
 
     private HttpStreamCapture httpStreamCapture;
     private int gatewayErrorStatus = 502;
+
+    /**
+     * Inspector 重放流
+     */
+    private boolean replay;
+    private String replaySourceRecordId;
+    private String replayProxyId;
+    private boolean replayCaptureToBuffer = true;
+    private CompletableFuture<HttpCaptureRecord> replayCompletion;
 
     public StreamContext(int streamId, StateMachine<StreamState, StreamEvent, StreamContext> streamStateMachine) {
         this.streamId = streamId;
@@ -110,8 +121,10 @@ public class StreamContext extends AbstractStreamContext {
         if (visitor == null) {
             return null;
         }
-        InetSocketAddress sa = (InetSocketAddress) visitor.localAddress();
-        return sa.getPort();
+        if (visitor.localAddress() instanceof InetSocketAddress sa) {
+            return sa.getPort();
+        }
+        return null;
     }
 
     public String getAgentId() {

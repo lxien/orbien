@@ -172,16 +172,18 @@ public class StreamOpenResponseAction extends StreamBaseAction {
 
     private void initHttpCaptureIfNeeded(StreamContext context, Channel visitor) {
         if (!InspectorBuffer.shouldCapture(context, inspectorProperties)) {
-            logger.debug("[Inspector] 跳过抓包 streamId={} proxyId={} globalEnabled={} inspectorEnabled={}",
+            logger.debug("[Inspector] 跳过抓包 streamId={} proxyId={} globalEnabled={} inspectorEnabled={} replay={}",
                     context.getStreamId(), context.getProxyId(),
                     inspectorProperties != null && inspectorProperties.isEnabled(),
-                    context.getProxyConfig() != null && context.getProxyConfig().isInspectorEnabled());
+                    context.getProxyConfig() != null && context.getProxyConfig().isInspectorEnabled(),
+                    context.isReplay());
             return;
         }
         HttpStreamCapture capture = new HttpStreamCapture(context, inspectorProperties);
         capture.setCompletionHandler(record -> onHttpCaptureComplete(context, record));
         context.setHttpStreamCapture(capture);
-        logger.debug("[Inspector] 开始抓包 streamId={} proxyId={}", context.getStreamId(), context.getProxyId());
+        logger.debug("[Inspector] 开始抓包 streamId={} proxyId={} replay={}",
+                context.getStreamId(), context.getProxyId(), context.isReplay());
         if (visitor != null) {
             ByteBuf firstPacket = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).get();
             if (firstPacket != null && firstPacket.isReadable()) {
@@ -191,18 +193,33 @@ public class StreamOpenResponseAction extends StreamBaseAction {
     }
 
     /**
-     * HTTP 单条交换抓包完成，写入 Inspector 缓冲；不关闭流/TCP，同一连接可继续抓取下一条请求。
+     * HTTP 单条交换抓包完成，写入 Inspector 缓冲
+     * 重放流只完成 Future，由 {@code InspectorReplayService} 负责关流，避免在转发回调中同步关闭
      */
     private void onHttpCaptureComplete(StreamContext context, HttpCaptureRecord record) {
+        if (context.isReplay()) {
+            if (record != null && context.isReplayCaptureToBuffer()) {
+                inspectorBuffer.append(record);
+            }
+            completeReplayFuture(context, record);
+            return;
+        }
         if (record != null) {
             inspectorBuffer.append(record);
+        }
+    }
+
+    private static void completeReplayFuture(StreamContext context, HttpCaptureRecord record) {
+        var future = context.getReplayCompletion();
+        if (future != null && !future.isDone()) {
+            future.complete(record);
         }
     }
 
     /**
      * 发送 HTTP 协议首次缓存的第一个数据包
      * <p>
-     * 使用 {@code getAndSet} 原子取走 attr，避免与 {@link StreamContext#abortLocalForwarding()} 竞态双重释放。
+     * 使用 {@code getAndSet} 原子取走 attr，避免与 {@link StreamContext#abortLocalForwarding()} 竞态双重释放
      */
     public void relayHttpFirstPackage(StreamContext context, Channel visitor, TunnelBridge tunnelBridge) {
         ByteBuf cached = visitor.attr(AttributeKeys.HTTP_FIRST_PACKET).getAndSet(null);

@@ -2,6 +2,7 @@ package io.github.lxien.orbien.server.web.controller;
 
 import io.github.lxien.orbien.server.web.common.message.Ajax;
 import io.github.lxien.orbien.server.web.param.inspector.InspectorConfigUpdateParam;
+import io.github.lxien.orbien.server.web.param.inspector.ReplayRequestParam;
 import io.github.lxien.orbien.server.web.service.inspector.InspectorService;
 import io.github.lxien.orbien.server.web.service.inspector.InspectorSseHub;
 import jakarta.validation.Valid;
@@ -26,6 +27,12 @@ public class InspectorController {
     @GetMapping("/requests/{id}")
     public Ajax getRequest(@PathVariable String id) {
         return Ajax.success(inspectorService.getRequest(id));
+    }
+
+    @PostMapping("/requests/{id}/replay")
+    public Ajax replay(@PathVariable String id,
+                       @RequestBody(required = false) ReplayRequestParam param) {
+        return Ajax.success(inspectorService.replay(id, param));
     }
 
     @DeleteMapping("/requests")

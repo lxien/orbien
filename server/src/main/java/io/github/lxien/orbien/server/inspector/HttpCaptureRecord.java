@@ -31,6 +31,15 @@ public class HttpCaptureRecord {
     private final boolean responseBodyTruncated;
     private final String rawRequest;
     private final String rawResponse;
+    /**
+     * 是否由重放产生
+     */
+    @Builder.Default
+    private final boolean replay = false;
+    /**
+     * 重放源记录 ID
+     */
+    private final String sourceRecordId;
 
     public HttpCaptureRecordSummary toSummary() {
         return HttpCaptureRecordSummary.builder()
@@ -45,6 +54,8 @@ public class HttpCaptureRecord {
                 .scheme(scheme)
                 .status(status)
                 .statusText(statusText)
+                .replay(replay)
+                .sourceRecordId(sourceRecordId)
                 .build();
     }
 }

@@ -36,6 +36,7 @@
               @click="selectRecord(item.id)"
           >
             <div class="inspector-list-item__line">
+              <span v-if="item.replay" class="inspector-list-item__replay" title="重放产生">↻</span>
               <span class="inspector-list-item__method">{{ item.method || 'HTTP' }}</span>
               <span class="inspector-list-item__path">{{ item.path || '/' }}</span>
             </div>
@@ -46,18 +47,55 @@
           </button>
         </div>
 
-        <div v-loading="detailLoading" class="inspector-detail">
+        <div v-loading="detailLoading || replayLoading" class="inspector-detail">
           <template v-if="detail">
             <div class="inspector-detail__header">
-              <div class="inspector-detail__title">
-                {{ detail.method }} {{ detail.path }}
+              <div class="inspector-detail__header-main">
+                <div class="inspector-detail__title">
+                  {{ detail.method }} {{ detail.path }}
+                </div>
+                <div class="inspector-detail__meta">
+                  <span>{{ detail.scheme }}://{{ detail.host || '-' }}</span>
+                  <span :class="statusClass(detail.status)">{{ formatStatus(detail) }}</span>
+                  <span>{{ formatDuration(detail.durationMs) }}</span>
+                  <span v-if="detail.clientIp">来自 {{ detail.clientIp }}</span>
+                  <span v-if="detail.replay && detail.sourceRecordId" class="inspector-detail__source">
+                    重放自 {{ detail.sourceRecordId }}
+                  </span>
+                </div>
               </div>
-              <div class="inspector-detail__meta">
-                <span>{{ detail.scheme }}://{{ detail.host || '-' }}</span>
-                <span>{{ formatStatus(detail) }}</span>
-                <span>{{ formatDuration(detail.durationMs) }}</span>
-                <span v-if="detail.clientIp">来自 {{ detail.clientIp }}</span>
-              </div>
+              <ElTooltip
+                  :disabled="replayEnabled"
+                  :content="replayDisabledReason"
+                  placement="top"
+              >
+                <span class="inspector-replay-trigger">
+                  <ElDropdown
+                      trigger="click"
+                      placement="bottom-end"
+                      :disabled="!replayEnabled || replayLoading"
+                      popper-class="inspector-replay-dropdown"
+                      @command="handleReplayCommand"
+                  >
+                    <ElButton
+                        type="primary"
+                        plain
+                        size="small"
+                        :loading="replayLoading"
+                        :disabled="!replayEnabled"
+                    >
+                      重放
+                      <span class="inspector-replay-caret">▾</span>
+                    </ElButton>
+                    <template #dropdown>
+                      <ElDropdownMenu>
+                        <ElDropdownItem command="replay">重放</ElDropdownItem>
+                        <ElDropdownItem command="edit">编辑重放</ElDropdownItem>
+                      </ElDropdownMenu>
+                    </template>
+                  </ElDropdown>
+                </span>
+              </ElTooltip>
             </div>
 
             <section class="inspector-section">
@@ -99,12 +137,19 @@
         </div>
       </div>
     </div>
+
+    <ReplayEditor
+        v-model:visible="editorVisible"
+        :detail="detail"
+        :submitting="replayLoading"
+        @submit="handleEditReplaySubmit"
+    />
   </ElDrawer>
 </template>
 
 <script setup lang="ts">
 import {computed, ref, watch, onBeforeUnmount} from 'vue'
-import {ElMessage, ElMessageBox} from 'element-plus'
+import {ElMessageBox} from 'element-plus'
 import {useUserStore} from '@/store/modules/user'
 import {
   buildInspectorStreamUrl,
@@ -112,11 +157,15 @@ import {
   fetchInspectorConfig,
   fetchInspectorRequestDetail,
   fetchInspectorRequests,
+  fetchReplayInspectorRequest,
   fetchUpdateInspectorConfig,
   INSPECTOR_DISPLAY_LIMIT
 } from '@/api/inspector'
+import ReplayEditor from './components/ReplayEditor.vue'
 
 defineOptions({name: 'InspectorDrawer'})
+
+const ALLOWED_METHODS = new Set(['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'])
 
 const props = defineProps<{
   visible: boolean
@@ -140,6 +189,8 @@ const drawerTitle = computed(() =>
 const configLoading = ref(false)
 const switchLoading = ref(false)
 const detailLoading = ref(false)
+const replayLoading = ref(false)
+const editorVisible = ref(false)
 const inspectorEnabled = ref(false)
 const records = ref<Api.Inspector.RecordSummary[]>([])
 const selectedId = ref('')
@@ -152,6 +203,26 @@ let eventSource: EventSource | null = null
 let highlightTimer: ReturnType<typeof setTimeout> | null = null
 let sseReconnectTimer: ReturnType<typeof setTimeout> | null = null
 let sseGeneration = 0
+
+const replayDisabledReason = computed(() => {
+  if (!inspectorEnabled.value) return '先开启抓包'
+  if (!detail.value) return ''
+  if (detail.value.requestBodyTruncated) return '请求体已截断'
+  const method = (detail.value.method || '').toUpperCase()
+  if (!method || !ALLOWED_METHODS.has(method)) return '方法无效'
+  if (detail.value.status === 101) return '不支持协议升级'
+  if (hasUpgradeHeader(detail.value.requestHeaders) || hasUpgradeHeader(detail.value.responseHeaders)) {
+    return '不支持协议升级'
+  }
+  return ''
+})
+
+const replayEnabled = computed(() => !replayDisabledReason.value)
+
+const hasUpgradeHeader = (headers?: Record<string, string>) => {
+  if (!headers) return false
+  return Object.keys(headers).some((key) => key.toLowerCase() === 'upgrade')
+}
 
 const formatDuration = (ms?: number) => {
   if (ms == null) return '-'
@@ -236,7 +307,6 @@ const handleToggleInspector = async (enabled: boolean) => {
       inspectorEnabled: enabled
     })
     inspectorEnabled.value = config.inspectorEnabled
-    ElMessage.success(config.inspectorEnabled ? '已开启抓包' : '已关闭抓包')
   } catch {
     inspectorEnabled.value = !enabled
   } finally {
@@ -245,15 +315,14 @@ const handleToggleInspector = async (enabled: boolean) => {
 }
 
 const handleClear = async () => {
-  await ElMessageBox.confirm('确定清空该代理的捕获记录？', '清空确认', {type: 'warning'})
+  await ElMessageBox.confirm('确定清空？', '清空', {type: 'warning'})
   await fetchClearInspectorRequests(props.proxyId)
   records.value = []
   selectedId.value = ''
   detail.value = null
-  ElMessage.success('已清空')
 }
 
-const prependRecord = (summary: Api.Inspector.RecordSummary) => {
+const prependRecord = (summary: Api.Inspector.RecordSummary, select = true) => {
   if (summary.proxyId && summary.proxyId !== props.proxyId) {
     return
   }
@@ -266,8 +335,70 @@ const prependRecord = (summary: Api.Inspector.RecordSummary) => {
   highlightTimer = setTimeout(() => {
     highlightId.value = ''
   }, 2000)
-  selectedId.value = summary.id
-  void loadDetail(summary.id)
+  if (select) {
+    selectedId.value = summary.id
+    void loadDetail(summary.id)
+  }
+}
+
+const applyReplayResult = (result: Api.Inspector.ReplayResult) => {
+  const record = result.record
+  if (!record) return
+  prependRecord({
+    id: record.id,
+    proxyId: record.proxyId,
+    streamId: record.streamId,
+    startedAt: record.startedAt,
+    durationMs: record.durationMs,
+    method: record.method,
+    path: record.path,
+    host: record.host,
+    scheme: record.scheme,
+    status: record.status,
+    statusText: record.statusText,
+    replay: record.replay ?? true,
+    sourceRecordId: record.sourceRecordId || result.sourceRecordId
+  })
+  detail.value = record
+}
+
+const doReplay = async (overrides?: Api.Inspector.ReplayOverrides) => {
+  if (!detail.value) return
+  replayLoading.value = true
+  try {
+    const result = await fetchReplayInspectorRequest(detail.value.id, {
+      captureToBuffer: true,
+      timeoutSeconds: 30,
+      overrides
+    })
+    editorVisible.value = false
+    applyReplayResult(result)
+  } finally {
+    replayLoading.value = false
+  }
+}
+
+const handleReplayCommand = async (command: string | number | object) => {
+  if (!detail.value || !replayEnabled.value) return
+  if (command === 'edit') {
+    editorVisible.value = true
+    return
+  }
+  if (command === 'replay') {
+    try {
+      await doReplay()
+    } catch {
+    }
+  }
+}
+
+const handleEditReplaySubmit = async (overrides: Api.Inspector.ReplayOverrides) => {
+  if (!detail.value) return
+  try {
+    await doReplay(overrides)
+  } catch {
+    // cancelled / failed
+  }
 }
 
 const connectSse = () => {
@@ -282,7 +413,9 @@ const connectSse = () => {
   eventSource.addEventListener('request.captured', (event) => {
     try {
       const summary = JSON.parse(event.data) as Api.Inspector.RecordSummary
-      prependRecord(summary)
+      // 重放成功时已本地选中，SSE 再来只合并列表、避免抢焦点
+      const alreadySelected = summary.id === selectedId.value
+      prependRecord(summary, !alreadySelected && !replayLoading.value)
     } catch {
       // ignore malformed payload
     }
@@ -336,6 +469,7 @@ watch(
     async ([visible, proxyId]) => {
       if (!visible) {
         disconnectSse()
+        editorVisible.value = false
         return
       }
       if (!proxyId) return
@@ -431,6 +565,14 @@ onBeforeUnmount(() => {
   gap: 8px;
   margin-bottom: 6px;
   min-width: 0;
+  align-items: center;
+}
+
+.inspector-list-item__replay {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--theme-color);
+  font-weight: 600;
 }
 
 .inspector-list-item__method {
@@ -465,7 +607,16 @@ onBeforeUnmount(() => {
 }
 
 .inspector-detail__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 16px;
+}
+
+.inspector-detail__header-main {
+  min-width: 0;
+  flex: 1;
 }
 
 .inspector-detail__title {
@@ -481,6 +632,22 @@ onBeforeUnmount(() => {
   gap: 12px;
   font-size: 13px;
   color: var(--el-text-color-secondary);
+}
+
+.inspector-detail__source {
+  color: var(--theme-color);
+}
+
+.inspector-replay-trigger {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
+
+.inspector-replay-caret {
+  margin-left: 4px;
+  font-size: 11px;
+  opacity: 0.85;
 }
 
 .inspector-section + .inspector-section {
@@ -556,6 +723,17 @@ onBeforeUnmount(() => {
   }
   100% {
     background: transparent;
+  }
+}
+</style>
+
+<style lang="scss">
+.inspector-replay-dropdown {
+  min-width: 140px;
+
+  .el-dropdown-menu__item {
+    padding: 8px 16px;
+    white-space: nowrap;
   }
 }
 </style>

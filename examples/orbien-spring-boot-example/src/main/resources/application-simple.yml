@@ -1,7 +1,7 @@
 # application.yml
 orbien:
   client:
-    enabled: true
+    enabled: false
     server-addr: 127.0.0.1
     auth:
       token: 40F8E5002CC36CAD2273D722E36739D9

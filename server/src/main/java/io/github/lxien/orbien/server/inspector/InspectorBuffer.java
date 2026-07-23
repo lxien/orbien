@@ -86,10 +86,17 @@ public class InspectorBuffer {
     }
 
     public static boolean shouldCapture(StreamContext context, InspectorProperties properties) {
-        if (context == null || properties == null || !properties.isEnabled()) {
+        if (context == null) {
             return false;
         }
         if (context.getProtocol() == null || !context.getProtocol().isHttpOrHttps()) {
+            return false;
+        }
+        // 重放流必须抓包以收集响应，不受代理 inspectorEnabled 限制
+        if (context.isReplay()) {
+            return true;
+        }
+        if (properties == null || !properties.isEnabled()) {
             return false;
         }
         ProxyConfig config = context.getProxyConfig();

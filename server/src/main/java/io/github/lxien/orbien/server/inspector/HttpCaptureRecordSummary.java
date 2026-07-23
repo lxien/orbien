@@ -19,4 +19,7 @@ public class HttpCaptureRecordSummary {
     private final String scheme;
     private final int status;
     private final String statusText;
+    @Builder.Default
+    private final boolean replay = false;
+    private final String sourceRecordId;
 }

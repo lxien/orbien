@@ -21,6 +21,14 @@ public class InspectorProperties {
      */
     private int defaultListLimit = 50;
     private int maxBodyBytes = 65536;
+    /**
+     * 单次 replay 等待响应超时（毫秒）
+     */
+    private long replayTimeoutMs = 30_000;
+    /**
+     * 同时进行的 replay 上限
+     */
+    private int replayMaxConcurrency = 16;
 
     public int clampListLimit(int limit) {
         if (limit <= 0) {

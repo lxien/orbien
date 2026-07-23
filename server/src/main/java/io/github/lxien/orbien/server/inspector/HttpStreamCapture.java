@@ -18,9 +18,9 @@ import java.util.function.Consumer;
 
 /**
  * 单条 HTTP 流的抓包状态，同一 TCP 连接上可连续捕获多条 HTTP 交换
- *
+ * <p>
  * 跨 TCP/TLS 分片重组请求/响应头；按 Content-Length / chunked 精确切分 body
- * 忽略中间 1xx 响应；在 keep-alive 下于响应完成时立即落库，而不是等连接关闭
+ * 忽略中间 1xx 响应；在 keep-alive 下于响应完成时立即落库，不等连接关闭
  */
 public class HttpStreamCapture {
     private static final int MAX_HEADER_SIZE = 65536;
@@ -44,8 +44,7 @@ public class HttpStreamCapture {
     private boolean responseStarted;
     private boolean responseChunked;
     private long responseBodyRemaining = -1;
-    private final byte[] chunkedTailBuf = new byte[5];
-    private int chunkedTailLen;
+    private final ChunkedBodyDecoder chunkedDecoder = new ChunkedBodyDecoder();
     private final HeaderAccumulator requestHeaderBuf = new HeaderAccumulator();
     private final HeaderAccumulator responseHeaderBuf = new HeaderAccumulator();
     @Setter
@@ -266,8 +265,7 @@ public class HttpStreamCapture {
     private void armResponseBodyTracking(HttpMessageParser.ParsedResponse response) {
         responseChunked = false;
         responseBodyRemaining = -1;
-        chunkedTailLen = 0;
-        Arrays.fill(chunkedTailBuf, (byte) 0);
+        chunkedDecoder.reset();
 
         int status = response.status();
         if (status == 101 || status == 204 || status == 304) {
@@ -303,17 +301,27 @@ public class HttpStreamCapture {
             return null;
         }
 
-        int take;
         if (responseChunked) {
-            take = available;
-        } else if (responseBodyRemaining >= 0) {
+            int consumed = chunkedDecoder.feed(payload, reader, available, this::appendDecodedResponseBody);
+            if (chunkedDecoder.isDone()) {
+                emitCurrentExchange();
+                int leftover = available - consumed;
+                if (leftover > 0) {
+                    return payload.slice(reader + consumed, leftover);
+                }
+            }
+            return null;
+        }
+
+        int take;
+        if (responseBodyRemaining >= 0) {
             take = (int) Math.min(available, responseBodyRemaining);
         } else {
             take = available;
         }
 
         if (take > 0) {
-            appendResponseChunk(payload, reader, take);
+            appendDecodedResponseBody(payload, reader, take);
             if (responseBodyRemaining > 0) {
                 responseBodyRemaining -= take;
             }
@@ -357,8 +365,7 @@ public class HttpStreamCapture {
         responseStarted = false;
         responseChunked = false;
         responseBodyRemaining = -1;
-        chunkedTailLen = 0;
-        Arrays.fill(chunkedTailBuf, (byte) 0);
+        chunkedDecoder.reset();
         requestHeaderBuf.clear();
         responseHeaderBuf.clear();
         exchangeStartedAt = Instant.now();
@@ -376,21 +383,12 @@ public class HttpStreamCapture {
             return true;
         }
         if (responseChunked) {
-            return isChunkedBodyComplete();
+            return chunkedDecoder.isDone();
         }
         if (responseBodyRemaining >= 0) {
             return responseBodyRemaining == 0;
         }
         return false;
-    }
-
-    private boolean isChunkedBodyComplete() {
-        return chunkedTailLen >= 5
-                && chunkedTailBuf[0] == '0'
-                && chunkedTailBuf[1] == '\r'
-                && chunkedTailBuf[2] == '\n'
-                && chunkedTailBuf[3] == '\r'
-                && chunkedTailBuf[4] == '\n';
     }
 
     private static String headerValue(Map<String, String> headers, String name) {
@@ -409,12 +407,14 @@ public class HttpStreamCapture {
         return null;
     }
 
-    private void appendResponseChunk(ByteBuf buf, int index, int length) {
+    /**
+     * 仅写入解码后的 body 字节（chunked 已去掉长度行）
+     */
+    private void appendDecodedResponseBody(ByteBuf buf, int index, int length) {
         if (length <= 0) {
             return;
         }
         responseBodySize += length;
-        updateChunkedTail(buf, index, length);
         if (responseBodyTruncated) {
             return;
         }
@@ -429,21 +429,6 @@ public class HttpStreamCapture {
         responseBody.append(new String(bytes, StandardCharsets.UTF_8));
         if (toCopy < length) {
             responseBodyTruncated = true;
-        }
-    }
-
-    private void updateChunkedTail(ByteBuf buf, int index, int length) {
-        if (!responseChunked) {
-            return;
-        }
-        for (int i = index; i < index + length; i++) {
-            byte b = buf.getByte(i);
-            if (chunkedTailLen < chunkedTailBuf.length) {
-                chunkedTailBuf[chunkedTailLen++] = b;
-            } else {
-                System.arraycopy(chunkedTailBuf, 1, chunkedTailBuf, 0, chunkedTailBuf.length - 1);
-                chunkedTailBuf[chunkedTailBuf.length - 1] = b;
-            }
         }
     }
 
@@ -501,6 +486,8 @@ public class HttpStreamCapture {
                 .responseBodyTruncated(responseBodyTruncated)
                 .rawRequest(rawRequest)
                 .rawResponse(rawResponse)
+                .replay(context.isReplay())
+                .sourceRecordId(context.isReplay() ? context.getReplaySourceRecordId() : null)
                 .build();
     }
 
@@ -543,6 +530,142 @@ public class HttpStreamCapture {
 
     private static String nullToEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    @FunctionalInterface
+    private interface DecodedBodySink {
+        void accept(ByteBuf buf, int index, int length);
+    }
+
+    private static final class ChunkedBodyDecoder {
+        private enum State {
+            SIZE, DATA, CRLF, TRAILER, DONE
+        }
+
+        private State state = State.SIZE;
+        private final StringBuilder sizeHex = new StringBuilder(16);
+        private long dataRemaining;
+        private int crlfNeed;
+        private int trailerEndMatch;
+
+        void reset() {
+            state = State.SIZE;
+            sizeHex.setLength(0);
+            dataRemaining = 0;
+            crlfNeed = 0;
+            trailerEndMatch = 0;
+        }
+
+        boolean isDone() {
+            return state == State.DONE;
+        }
+
+        /**
+         * @return 已消费的字节数
+         */
+        int feed(ByteBuf buf, int index, int length, DecodedBodySink sink) {
+            int i = index;
+            int end = index + length;
+            while (i < end && state != State.DONE) {
+                switch (state) {
+                    case SIZE -> i = feedSize(buf, i, end);
+                    case DATA -> i = feedData(buf, i, end, sink);
+                    case CRLF -> i = feedCrlf(buf, i, end);
+                    case TRAILER -> i = feedTrailer(buf, i, end);
+                    default -> {
+                        return i - index;
+                    }
+                }
+            }
+            return i - index;
+        }
+
+        private int feedSize(ByteBuf buf, int i, int end) {
+            while (i < end) {
+                byte b = buf.getByte(i++);
+                if (b == '\n') {
+                    String line = sizeHex.toString().trim();
+                    sizeHex.setLength(0);
+                    int semi = line.indexOf(';');
+                    if (semi >= 0) {
+                        line = line.substring(0, semi).trim();
+                    }
+                    long size;
+                    try {
+                        size = line.isEmpty() ? 0L : Long.parseLong(line, 16);
+                    } catch (NumberFormatException ex) {
+                        state = State.DONE;
+                        return i;
+                    }
+                    if (size <= 0) {
+                        state = State.TRAILER;
+                        trailerEndMatch = 0;
+                    } else {
+                        dataRemaining = size;
+                        state = State.DATA;
+                    }
+                    return i;
+                }
+                if (b != '\r' && sizeHex.length() < 64) {
+                    sizeHex.append((char) (b & 0xFF));
+                }
+            }
+            return i;
+        }
+
+        private int feedData(ByteBuf buf, int i, int end, DecodedBodySink sink) {
+            int available = end - i;
+            int take = (int) Math.min(available, dataRemaining);
+            if (take > 0) {
+                sink.accept(buf, i, take);
+                i += take;
+                dataRemaining -= take;
+            }
+            if (dataRemaining == 0) {
+                state = State.CRLF;
+                crlfNeed = 2;
+            }
+            return i;
+        }
+
+        private int feedCrlf(ByteBuf buf, int i, int end) {
+            while (i < end && crlfNeed > 0) {
+                byte b = buf.getByte(i++);
+                if (crlfNeed == 2) {
+                    if (b == '\r') {
+                        crlfNeed = 1;
+                    } else if (b == '\n') {
+                        crlfNeed = 0;
+                    }
+                } else if (b == '\n') {
+                    crlfNeed = 0;
+                }
+            }
+            if (crlfNeed == 0) {
+                state = State.SIZE;
+            }
+            return i;
+        }
+
+        private int feedTrailer(ByteBuf buf, int i, int end) {
+            while (i < end) {
+                byte b = buf.getByte(i++);
+                if (b == '\r' && trailerEndMatch % 2 == 0) {
+                    trailerEndMatch++;
+                } else if (b == '\n' && trailerEndMatch % 2 == 1) {
+                    trailerEndMatch++;
+                    if (trailerEndMatch >= 4) {
+                        state = State.DONE;
+                        return i;
+                    }
+                } else if (b == '\r') {
+                    trailerEndMatch = 1;
+                } else {
+                    trailerEndMatch = 0;
+                }
+            }
+            return i;
+        }
     }
 
     /**

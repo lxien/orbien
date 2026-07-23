@@ -17,4 +17,6 @@ public class HttpCaptureRecordSummaryDTO {
     private String scheme;
     private int status;
     private String statusText;
+    private boolean replay;
+    private String sourceRecordId;
 }

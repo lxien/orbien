@@ -14,7 +14,7 @@ import io.netty.buffer.ByteBuf;
 
 /**
  * Inspector 旁路抓包，读取 {@link ByteBuf} 副本用于展示，不改变转发语义
- *
+ * <p>
  * 同一 keep-alive 连接上的后续请求也会被捕获
  */
 public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
@@ -101,6 +101,9 @@ public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
     }
 
     private boolean computeLiveShouldCapture() {
+        if (context.isReplay()) {
+            return context.getProtocol() != null && context.getProtocol().isHttpOrHttps();
+        }
         if (properties == null || !properties.isEnabled()) {
             return false;
         }
@@ -121,7 +124,22 @@ public class InspectionTunnelBridge extends AbstractTunnelBridgeDecorator {
     }
 
     private void onCaptureComplete(HttpCaptureRecord record) {
-        if (record != null && inspectorBuffer != null) {
+        if (record == null) {
+            return;
+        }
+        if (context.isReplay()) {
+            // 重放流的 completion 由 StreamOpenResponseAction 注册的 handler 处理；
+            // 此处仅兜底：若 lazy 创建的 capture 走到这里，仍需写入缓冲
+            if (context.isReplayCaptureToBuffer() && inspectorBuffer != null) {
+                inspectorBuffer.append(record);
+            }
+            var future = context.getReplayCompletion();
+            if (future != null && !future.isDone()) {
+                future.complete(record);
+            }
+            return;
+        }
+        if (inspectorBuffer != null) {
             inspectorBuffer.append(record);
         }
     }

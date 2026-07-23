@@ -44,3 +44,12 @@ export function buildInspectorStreamUrl(proxyId: string, token?: string) {
     }
     return `${base}/api/inspector/stream?${params.toString()}`
 }
+
+export function fetchReplayInspectorRequest(id: string, data?: Api.Inspector.ReplayParam) {
+    return request.post<Api.Inspector.ReplayResult>({
+        url: `/api/inspector/requests/${id}/replay`,
+        data: data || {},
+        timeout: 65000,
+        showErrorMessage: true
+    })
+}

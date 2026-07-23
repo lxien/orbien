@@ -29,4 +29,6 @@ public class HttpCaptureRecordDTO {
     private boolean responseBodyTruncated;
     private String rawRequest;
     private String rawResponse;
+    private boolean replay;
+    private String sourceRecordId;
 }

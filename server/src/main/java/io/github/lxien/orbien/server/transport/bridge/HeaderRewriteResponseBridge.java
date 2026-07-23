@@ -172,6 +172,9 @@ public class HeaderRewriteResponseBridge extends AbstractTunnelBridgeDecorator {
         if (visitor != null && visitor.pipeline().get(SslHandler.class) != null) {
             return "https";
         }
+        if (context.getProtocol() != null && context.getProtocol().isHttps()) {
+            return "https";
+        }
         Integer port = context.getListenerPort();
         if (port != null && port == 443) {
             return "https";

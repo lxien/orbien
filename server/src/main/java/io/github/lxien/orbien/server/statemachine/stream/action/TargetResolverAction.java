@@ -108,9 +108,9 @@ public class TargetResolverAction extends StreamBaseAction {
             context.setMultiplex(TransportEndpointResolver.normalizeMultiplex(
                     transportProtocol, config.isMuxTunnelFor(transportProtocol)));
 
-            logger.debug("[传输] 流 {} 代理={} 数据隧道传输协议={} encrypt={} multiplex={}",
+            logger.debug("[传输] 流 {} 代理={} 数据隧道传输协议={} encrypt={} multiplex={} replay={}",
                     context.getStreamId(), config.getName(), transportProtocol.getName(),
-                    context.isEncrypt(), context.isMultiplex());
+                    context.isEncrypt(), context.isMultiplex(), context.isReplay());
 
             if (config.isUdp()) {
                 context.setDatagram(true);
@@ -161,6 +161,10 @@ public class TargetResolverAction extends StreamBaseAction {
     }
 
     private ProxyConfigExt resolveProxyConfig(StreamContext context) {
+        // 重放优先按 proxyId 解析，避免 Host 与域名注册表不一致导致失败
+        if (context.isReplay() && StringUtils.hasText(context.getReplayProxyId())) {
+            return proxyConfigService.findById(context.getReplayProxyId());
+        }
         if (context.getProtocol().isHttpOrHttps()) {
             String domain = context.getVisitorDomain();
             String proxyId = domainRegistry.getProxyIdByDomain(domain);
