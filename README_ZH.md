@@ -169,7 +169,6 @@ docker run -d \
 #### 2.3.3 Spring Boot Starter
 
 ```xml
-
 <dependency>
     <groupId>io.github.lxien</groupId>
     <artifactId>orbien-spring-boot-starter</artifactId>
@@ -192,4 +191,6 @@ orbien:
 
 - Issues：[github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
 - 在线讨论：[Discord](https://discord.com/invite/4dgQjCS3k)
+- QQ群：1061026558
 
+<img src="doc/image/qq-group.png" width="200"/>

@@ -201,3 +201,6 @@ orbien:
 
 - Issues: [github.com/lxien/orbien/issues](https://github.com/lxien/orbien/issues)
 - Online discussion： [Discord](https://discord.com/invite/4dgQjCS3k)
+- QQ Group：1061026558
+
+<img src="doc/image/qq-group.png" width="200"/>
