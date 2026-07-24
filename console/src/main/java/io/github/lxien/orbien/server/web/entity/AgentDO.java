@@ -66,6 +66,11 @@ public class AgentDO {
      */
     @Column(name = "version", nullable = false)
     private String version;
+    /**
+     * 来源 IP
+     */
+    @Column(name = "source_ip")
+    private String sourceIp;
 
     @Column(name = "last_active_time",nullable = false)
     private LocalDateTime lastActiveTime;

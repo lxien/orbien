@@ -32,6 +32,7 @@ public class AgentInfo implements Serializable {
     private String version;
     private String os;
     private String arch;
+    private String sourceIp;
     private LocalDateTime createdAt;
     private LocalDateTime lastActiveTime;
 

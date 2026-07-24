@@ -47,13 +47,10 @@ public class AgentAuthListener implements EventListener<AgentAuthEvent> {
     @Override
     public void onEvent(AgentAuthEvent event) {
         logger.debug("Received AgentAuthEvent: {}", event);
-        boolean reconnect = event.isReconnect();
         AgentInfo agentInfo = event.getAgentInfo();
-        if (!reconnect) {
-            AgentDO agentDO = agentModelConvert.toDO(agentInfo);
-            agentRepository.save(agentDO);
-            logger.debug("客户端信息保存成功: agentId={}, name={}",
-                    agentInfo.getAgentId(), agentInfo.getName());
-        }
+        AgentDO agentDO = agentModelConvert.toDO(agentInfo);
+        agentRepository.save(agentDO);
+        logger.debug("客户端信息保存成功: agentId={}, name={}, sourceIp={}",
+                agentInfo.getAgentId(), agentInfo.getName(), agentInfo.getSourceIp());
     }
 }

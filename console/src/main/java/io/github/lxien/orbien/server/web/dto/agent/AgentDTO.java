@@ -32,6 +32,7 @@ public class AgentDTO implements Serializable {
     private String os;
     private String arch;
     private String version;
+    private String sourceIp;
     private Integer agentType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Shanghai")
     private LocalDateTime lastActiveTime;

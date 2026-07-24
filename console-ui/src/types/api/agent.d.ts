@@ -23,6 +23,7 @@ declare namespace Api.Agent {
     os: string
     arch: string
     version: string
+    sourceIp?: string
     agentType: number
     lastActiveTime: string
     createdAt: string

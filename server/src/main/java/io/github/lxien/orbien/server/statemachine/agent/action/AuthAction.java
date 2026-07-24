@@ -12,6 +12,7 @@ import io.github.lxien.orbien.core.utils.ProtobufUtil;
 import io.github.lxien.orbien.server.event.AgentAuthEvent;
 import io.github.lxien.orbien.server.service.AgentConfigService;
 import io.github.lxien.orbien.server.service.TokenConfigService;
+import io.github.lxien.orbien.server.utils.NetUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFutureListener;
@@ -118,6 +119,7 @@ public class AuthAction extends AgentBaseAction {
             }
         }
         AgentInfo agentInfo = createOrUpdateAgentInfo(agentId, oldAgentInfo, authInfo);
+        agentInfo.setSourceIp(NetUtils.getIp(control));
         context.setControl(control);
         context.setAgentInfo(agentInfo);
 

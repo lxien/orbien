@@ -139,6 +139,9 @@ public class AgentServiceImpl implements AgentService {
         agentManager.getAgentContext(agentId).ifPresent(agentContext -> {
             AgentInfo agentInfo = agentContext.getAgentInfo();
             dto.setLastActiveTime(agentInfo.getLastActiveTime());
+            if (StringUtils.hasText(agentInfo.getSourceIp())) {
+                dto.setSourceIp(agentInfo.getSourceIp());
+            }
         });
         return dto;
     }
