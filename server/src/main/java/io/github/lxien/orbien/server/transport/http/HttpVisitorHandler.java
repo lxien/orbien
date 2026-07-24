@@ -41,6 +41,11 @@ public class HttpVisitorHandler extends SimpleChannelInboundHandler<ByteBuf> {
             }
             if (streamContext.getState() == StreamState.OPENED) {
                 TunnelEntry tunnelEntry = streamContext.getTunnelEntry();
+                if (tunnelEntry == null || streamContext.getTunnelBridge() == null) {
+                    logger.error("隧道连接不存在，关闭流：streamId={}", streamContext.getStreamId());
+                    streamContext.fireEvent(StreamEvent.STREAM_LOCAL_CLOSE);
+                    return;
+                }
                 Channel tunnel = tunnelEntry.getChannel();
                 if (!tunnel.isWritable()) {
                     logger.warn("数据无法转发到内网，流量过高，隧道不可写，暂停访问者读取");

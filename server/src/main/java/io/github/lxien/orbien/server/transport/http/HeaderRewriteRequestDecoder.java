@@ -60,7 +60,7 @@ public class HeaderRewriteRequestDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (!in.isReadable()) {
+        if (!ctx.channel().isActive() || !in.isReadable()) {
             return;
         }
         if (processor.mode() == HttpHeaderBlockProcessor.Mode.PASSTHROUGH) {
@@ -140,6 +140,10 @@ public class HeaderRewriteRequestDecoder extends ByteToMessageDecoder {
             return Collections.emptyList();
         }
         return new ArrayList<>(rewrite.getRequestRulesView());
+    }
+
+    @Override
+    protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
     }
 
     @Override

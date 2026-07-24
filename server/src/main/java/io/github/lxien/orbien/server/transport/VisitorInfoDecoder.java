@@ -37,7 +37,7 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (!in.isReadable()) {
+        if (!ctx.channel().isActive() || !in.isReadable()) {
             return;
         }
         if (finished) {
@@ -86,9 +86,6 @@ public class VisitorInfoDecoder extends ByteToMessageDecoder {
 
     @Override
     protected void decodeLast(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        if (in.isReadable()) {
-            out.add(in.readRetainedSlice(in.readableBytes()));
-        }
     }
 
     private String parseAuthHeader(String content) {
