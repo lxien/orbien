@@ -28,7 +28,7 @@ docker run -d \
   -v /opt/orbien/orbien.toml:/app/orbien.toml:ro \
   -v /opt/orbien/logs:/app/logs \
   -v /opt/orbien/.orbien:/root/.orbien \
-  lxien/orbien:0.28.2
+  lxien/orbien:0.29.0
 ```
 
 ### Docker Compose
@@ -37,7 +37,7 @@ docker run -d \
 # docker-compose.yml
 services:
   orbien:
-    image: lxien/orbien:0.28.2
+    image: lxien/orbien:0.29.0
     container_name: orbien
     restart: unless-stopped
     volumes:
