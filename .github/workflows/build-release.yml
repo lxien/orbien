@@ -2,9 +2,9 @@ name: Build release version
 
 on:
   workflow_dispatch:
-#    push:
-#      tags:
-#        - 'v*'
+    push:
+      tags:
+        - 'v*'
 
 env:
   JAVA_VERSION: '25'
