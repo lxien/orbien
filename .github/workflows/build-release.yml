@@ -158,18 +158,56 @@ jobs:
           key: ${{ matrix.platform }}-${{ matrix.arch }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ matrix.platform }}-${{ matrix.arch }}-maven-
+          # 失败 job 也写入缓存，避免下次冷启动再次打满 Central
+          save-always: true
 
       - name: 安装根目录模块到本地仓库
         shell: bash
-        run: mvn install -pl '!main' -am -DskipTests -D"gpg.skip=true" --no-transfer-progress
+        env:
+          MAVEN_OPTS: -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Daether.connector.http.retryHandler.count=5
+        run: |
+          set -euo pipefail
+          mvn_install() {
+            mvn -s .github/ci-settings.xml --no-transfer-progress \
+              -DskipTests -Dgpg.skip=true \
+              -pl core,common,server,console,client,cli -am \
+              install
+          }
+          for attempt in 1 2 3; do
+            echo "::group::Maven install attempt ${attempt}/3"
+            if mvn_install; then
+              echo "::endgroup::"
+              exit 0
+            else
+              status=$?
+              echo "::endgroup::"
+              echo "Maven install failed (attempt ${attempt}/3, exit ${status})"
+              if [[ "${attempt}" -eq 3 ]]; then
+                exit "${status}"
+              fi
+              sleep $((attempt * 15))
+            fi
+          done
 
       - name: 构建服务端 JAR 包
         shell: bash
-        run: cd main && mvn clean package -pl orbien-server-app -DskipTests --no-transfer-progress
+        env:
+          MAVEN_OPTS: -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Daether.connector.http.retryHandler.count=5
+        run: |
+          mvn -s .github/ci-settings.xml --no-transfer-progress \
+            -DskipTests -Dgpg.skip=true \
+            -f main/pom.xml \
+            clean package -pl orbien-server-app
 
       - name: 构建客户端原生镜像
         shell: bash
-        run: mvn clean package -pl main/orbien-client-app,client -am -Pnative,${{ matrix.client_native_profile }} -DskipTests -D"gpg.skip=true" --no-transfer-progress
+        env:
+          MAVEN_OPTS: -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.http.retryHandler.requestSentEnabled=true -Daether.connector.http.retryHandler.count=5
+        run: |
+          mvn -s .github/ci-settings.xml --no-transfer-progress \
+            -DskipTests -Dgpg.skip=true \
+            clean package -pl main/orbien-client-app,client -am \
+            -Pnative,${{ matrix.client_native_profile }}
 
       # Linux/macOS 打包
       - name: 打包 Unix 发布文件
