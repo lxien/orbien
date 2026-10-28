@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
- * 模拟远程访客，向 orbien 服务端 UDP 代理端口发送测试报文并等待回包。
+ * 模拟远程访客，向 orbien 服务端 UDP 代理端口发送测试报文并等待回包
  */
 public final class RemoteUdpTester {
     private static final String SERVER_HOST = "127.0.0.1";
