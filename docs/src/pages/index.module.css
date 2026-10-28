@@ -42,45 +42,19 @@
 }
 
 .heroBrand {
-    background-image: linear-gradient(
-            100deg,
-            #1e6ad4 0%,
-            #2b78e0 55%,
-            #4a7eb8 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #1677ff;
 }
 
 .heroSuffix {
-    background-image: linear-gradient(
-            100deg,
-            #6e8294 0%,
-            #5f6974 45%,
-            #525a64 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: #64748b;
 }
 
 [data-theme='dark'] .heroBrand {
-    background-image: linear-gradient(
-            100deg,
-            #4d9af0 0%,
-            #5aa3f5 55%,
-            #7a9fc4 100%
-    );
+    color: #91caff;
 }
 
 [data-theme='dark'] .heroSuffix {
-    background-image: linear-gradient(
-            100deg,
-            #9aabba 0%,
-            #8e97a2 45%,
-            #7f8791 100%
-    );
+    color: #94a3b8;
 }
 
 .heroTagline {

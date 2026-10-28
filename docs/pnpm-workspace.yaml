@@ -1,0 +1,7 @@
+# webpack 5.106+ 校验 ProgressPlugin schema，webpackbar 6 会传入 name/color 导致启动失败
+overrides:
+  webpackbar: "^7.0.0"
+
+allowBuilds:
+  core-js: true
+  core-js-pure: true

@@ -19,7 +19,7 @@ const features: Array<{ title: string; details: string; to: string }> = [
     },
     {
         title: '高性能',
-        details: '传输层支持 TCP、WebSocket、QUIC协议\n全链路零拷贝；多路复用；压缩、限流',
+        details: '传输层支持 TCP、WebSocket、QUIC协议\n零拷贝、多路复用、压缩、限流',
         to: '/docs/transport/protocols',
     },
     {
