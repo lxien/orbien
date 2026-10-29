@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
         name = "orbien",
         mixinStandardHelpOptions = true,
         version = "orbien 0.29.0",
-        description = "Orbien 内网穿透客户端",
+        description = "Orbien 隧道客户端",
         subcommands = {
                 LoginCommand.class,
                 LogoutCommand.class,

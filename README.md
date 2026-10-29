@@ -2,7 +2,7 @@
   <img src="doc/image/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-  A high-performance intranet penetration platform
+  A high-performance tunneling and reverse proxy platform
 </p>
 <div align="center">
   <a href="https://github.com/lxien/orbien/stargazers">
@@ -36,7 +36,7 @@
 
 ## 1. Introduction
 
-**Orbien** is a high-performance **intranet penetration platform** built on Netty, supporting multi-protocol proxying,
+**Orbien** is a high-performance **tunneling and reverse proxy platform** built on Netty, supporting multi-protocol proxying,
 multiple transport channels, secure authentication, and visual operations management.
 
 ### 1.1 Features
@@ -131,7 +131,7 @@ Download from [Releases](https://github.com/lxien/orbien/releases)
 
 ```shell
 Usage: orbien [-hV] [-c=<configFile>] [COMMAND]
-Orbien intranet penetration client
+Orbien tunnel client
   -c=<configFile>    Path to the config file
   -h, --help         Show this help message and exit.
   -V, --version      Print version information and exit.
@@ -166,7 +166,7 @@ local_port = 3306
 orbien run orbien.toml
 ```
 
-Quick expose via CLI
+Quickly expose services via CLI
 ```shell
 orbien login --server YOUR_SERVER_ADDR:9527 --token YOUR_TOKEN
 orbien http 8080

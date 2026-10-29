@@ -808,7 +808,7 @@
         },
         "protocol": {
           "tcpDesc": "默认选项，兼容性最好",
-          "websocketDesc": "穿透防火墙友好，强制 TLS",
+          "websocketDesc": "易穿越防火墙，强制 TLS",
           "quicDesc": "低延迟，强制 TLS，多路复用"
         },
         "algorithm": {

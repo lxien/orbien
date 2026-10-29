@@ -1,6 +1,6 @@
 import { AppRouteRecord } from '@/types/router'
 
-export const penetrationRoutes: AppRouteRecord[] = [
+export const proxyRoutes: AppRouteRecord[] = [
   {
     name: 'HTTP',
     path: '/http',

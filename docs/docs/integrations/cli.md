@@ -27,7 +27,7 @@ chmod +x orbien
 
 ```js
 Usage: orbien [-hV] [-c=<configFile>] [COMMAND]
-Orbien 内网穿透客户端
+Orbien 隧道客户端
   -c=<configFile>    配置文件路径
   -h, --help         Show this help message and exit.
   -V, --version      Print version information and exit.

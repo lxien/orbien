@@ -2,7 +2,7 @@
   <img src="doc/image/logo.png" alt="Logo" width="180" height="180" style="border-radius:24px;margin-bottom:20px;"/>
 </div>
 <p align="center" style="font-size:18px;color:#555;margin-top:-10px;margin-bottom:24px;">
-  An out-of-the-box intranet penetration platform
+  An out-of-the-box tunneling and reverse proxy platform
 </p>
 <div align="center">
   <a href="https://github.com/lxien/orbien/stargazers">
@@ -36,7 +36,7 @@
 
 ## 一、介绍
 
-**Orbien** 是一个基于 Netty的高性能 **内网穿透平台**，支持多协议代理、多传输通道、安全鉴权与可视化运维
+**Orbien** 是一个基于 Netty的高性能 **隧道与反向代理平台**，支持多协议代理、多传输通道、安全鉴权与可视化运维
 
 ### 1.1 功能特性
 
@@ -121,7 +121,7 @@ docker run -d \
 
 ```shell
 Usage: orbien [-hV] [-c=<configFile>] [COMMAND]
-Orbien 内网穿透客户端
+Orbien 隧道客户端
   -c=<configFile>    配置文件路径
   -h, --help         Show this help message and exit.
   -V, --version      Print version information and exit.

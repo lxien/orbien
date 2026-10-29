@@ -86,7 +86,7 @@ export default function Home() {
     return (
         <Layout
             title={siteConfig.title}
-            description="一个开箱即用的内网穿透与反向代理平台"
+            description="一个开箱即用的隧道与反向代理平台"
         >
             <div className={styles.page}>
                 <section className={styles.hero}>
@@ -97,7 +97,7 @@ export default function Home() {
                                 <span className={styles.heroSuffix}>ien</span>
                             </h1>
                             <p className={styles.heroTagline}>
-                                一个开箱即用的内网穿透与反向代理平台
+                                一个开箱即用的隧道与反向代理平台
                             </p>
                             <div className={styles.heroActions}>
                                 <Link className={clsx(styles.btn, styles.btnBrand)} to="/docs/getting-started">

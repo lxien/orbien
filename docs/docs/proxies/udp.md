@@ -1,7 +1,7 @@
 ---
 sidebar_position: 4
 title: UDP
-description: UDP 流量穿透
+description: UDP 隧道代理
 ---
 
 # UDP 代理
