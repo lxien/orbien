@@ -98,7 +98,7 @@ docker run -d \
   -p 9050-9060:9050-9060/udp \
   -e SPRING_PROFILES_ACTIVE=h2 \
   -e H2_DATA_DIR=/app/data/orbien-server \
-  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 --enable-native-access=ALL-UNNAMED" \
+  -e JAVA_OPTS="-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./heapdump.hprof --enable-native-access=ALL-UNNAMED" \
   -e TZ=Asia/Shanghai \
   -v /opt/orbien/orbien-server.toml:/app/orbien-server.toml:ro \
   -v /opt/orbien/data:/app/data \
